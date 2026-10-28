@@ -5,30 +5,27 @@
   "author": "Shane",
   "license": "MIT",
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      }
-    }
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE-koenig"
+  ],
+  "sideEffects": [
+    "*.css"
   ],
   "config": {
-    "packMaxUnpackedBytes": 250000,
+    "packMaxUnpackedBytes": 600000,
     "packMaxGrowthPercent": 25
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13"
   },
   "repository": {
     "type": "git",
@@ -38,16 +35,24 @@
   "bugs": {
     "url": "https://github.com/Bugs5382/node-koenig-editor/issues"
   },
+  "keywords": [
+    "koenig",
+    "lexical",
+    "react",
+    "editor",
+    "rich-text",
+    "yjs",
+    "collaboration"
+  ],
   "scripts": {
-    "build": "tsdown",
+    "build": "vite build",
+    "build:css": "node scripts/build-css.mjs",
     "check:pack": "node scripts/checkPack.mjs",
     "check:pack:growth": "node scripts/checkPackGrowth.mjs",
     "check:install": "node scripts/checkInstall.mjs",
-    "dev": "tsdown --watch",
     "clean": "rm -rf dist docs coverage",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -55,18 +60,73 @@
     "format:check": "prettier --check .",
     "docs": "typedoc"
   },
+  "peerDependencies": {
+    "@lexical/clipboard": "^0.52.0",
+    "@lexical/code": "^0.52.0",
+    "@lexical/html": "^0.52.0",
+    "@lexical/link": "^0.52.0",
+    "@lexical/list": "^0.52.0",
+    "@lexical/markdown": "^0.52.0",
+    "@lexical/react": "^0.52.0",
+    "@lexical/rich-text": "^0.52.0",
+    "@lexical/selection": "^0.52.0",
+    "@lexical/table": "^0.52.0",
+    "@lexical/text": "^0.52.0",
+    "@lexical/utils": "^0.52.0",
+    "@lexical/yjs": "^0.52.0",
+    "lexical": "^0.52.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "yjs": "^13.6.31"
+  },
+  "dependencies": {
+    "@tryghost/kg-clean-basic-html": "^4.3.5",
+    "clsx": "^2.1.1",
+    "dompurify": "^3.4.16",
+    "eventemitter3": "^5.0.4",
+    "lodash": "^4.18.1",
+    "react-error-boundary": "^6.1.6"
+  },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@lexical/clipboard": "^0.52.0",
+    "@lexical/code": "^0.52.0",
+    "@lexical/html": "^0.52.0",
+    "@lexical/link": "^0.52.0",
+    "@lexical/list": "^0.52.0",
+    "@lexical/markdown": "^0.52.0",
+    "@lexical/react": "^0.52.0",
+    "@lexical/rich-text": "^0.52.0",
+    "@lexical/selection": "^0.52.0",
+    "@lexical/table": "^0.52.0",
+    "@lexical/text": "^0.52.0",
+    "@lexical/utils": "^0.52.0",
+    "@lexical/yjs": "^0.52.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/lodash": "^4.17.25",
     "@types/node": "^22.10.0",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
+    "jsdom": "^30.1.2",
+    "lexical": "^0.52.0",
+    "postcss": "^8.5.29",
+    "postcss-import": "^16.2.0",
     "prettier": "^3.4.2",
-    "tsdown": "^0.22.0",
-    "typedoc": "^0.27.4",
+    "react": "^19.3.0",
+    "react-colorful": "^5.8.1",
+    "react-dom": "^19.3.0",
+    "tailwindcss": "^3.4.19",
+    "typedoc": "^0.28.20",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.0",
-    "vitest": "^2.1.8"
+    "vite": "^8.3.2",
+    "vite-plugin-svgr": "^5.2.0",
+    "vitest": "^5.0.3",
+    "yjs": "^13.6.31"
   }
 }
