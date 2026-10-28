@@ -7,34 +7,50 @@ hook-enforced rules). Keep this file current when the build, layout, or public A
 
 Ghost's Koenig editor on Lexical 0.52 and React 19, packaged for reuse, with optional Yjs collaboration.
 
-<!-- Fill in: what the project does, what it ships (library, service, action, CLI), and the one or
-two things an agent must understand before changing it. -->
+An npm library (ESM only) that host apps wrap in their own editor component. It is a
+configurable base: it ships the cards, menus, toolbar and styles, and each host turns options on
+or off, adds its own nodes, wording and theme. Two things to know before changing it:
+
+- The code under `src/koenig-lexical`, `src/kg-default-nodes` and `src/kg-default-transforms` is
+  upstream Koenig (pinned commit in the README). Keep upstream's layout and style there; put new
+  code in `src/additions/` and change upstream files only where a feature needs a hook.
+- Consumers type-check against the hand-written `index.d.ts`, not the sources. Every public
+  value must be declared there, and the surface test fails when a declared value is missing at
+  runtime.
 
 ## Using node-koenig-editor
 
-<!-- If this project is consumed by others (a library/plugin/action), describe the contract a
-consumer must respect: the single entry point, the public surface, required options, and anything
-that must not be bypassed. Delete this section for a leaf application. -->
+- Entry points: `node-koenig-editor` (components, node sets, options) and
+  `node-koenig-editor/styles.css`. Nothing else is public.
+- Host options live on `KoenigComposer`: `cards`, `customNodes`, `menuItems`, `strings`,
+  `toolbar`, `collaboration`. The README documents each, with a complete host component.
+- No product code or wording goes into this package. Product nodes, translations and theme stay
+  in the host app.
+- Lexical, `@lexical/*`, React and Yjs are peers and must never be bundled.
 
 ## Layout
 
-<!-- The directories that matter and what lives in each. Keep it short; point at the entry points. -->
-
-- `src/` - <what>
-- `<tests dir>/` - <what>
+- `index.d.ts` - the public declarations, copied into `dist/` by the build
+- `src/index.ts` - the runtime entry: re-exports only
+- `src/additions/options/` - the host options (cards, strings, toolbar, menu entries)
+- `src/additions/table/` - Lexical's table nodes as a card
+- `src/koenig-lexical/`, `src/kg-default-nodes/`, `src/kg-default-transforms/` - upstream Koenig
+- `src/generated/koenig.css` - the stylesheet, built by `npm run build:css` and committed
+- `tailwind.config.cjs` - upstream's Tailwind 3 theme, with the palette and fonts on CSS tokens
+- `__tests__/` - vitest + jsdom tests, helpers in `__tests__/__utils__/`
+- `scripts/` - `build-css.mjs` and the pack checks
 
 ## Build, test, lint
 
-<!-- The exact commands. Pull these from package.json scripts (npm), the Taskfile (Go/Task), or
-pyproject (Python) so they stay accurate. -->
-
-- Build: `<command>`
-- Test: `<command>` (note any service/fixture the integration tests require)
-- Lint: `<command>`
+- Build: `npm run build` (Vite library build to `dist/index.js`, plus `index.d.ts` and `styles.css`)
+- Stylesheet: `npm run build:css` after changing a class name or `tailwind.config.cjs`
+- Test: `npm test` (jsdom; no services needed)
+- Lint: `npm run lint`; types: `npm run typecheck` (both skip the upstream folders)
 - Package checks (npm packages), after a build: `npm run check:pack` (contents and ceiling),
   `npm run check:pack:growth` (growth against the last release), `npm run check:install`
-  (install the tarball, import ESM and CJS); see CLAUDE.md "npm package contents"
-- License headers / docs: `<command>`
+  (install the tarball, import ESM); see CLAUDE.md "npm package contents"
+- License headers: `task license` (upstream and generated files are in `.licignore`); docs:
+  `npm run docs`
 
 ## Logging
 
@@ -56,4 +72,8 @@ Follow the logging rules in `CLAUDE.md`. In short:
   `.claude/hooks` (run `bash .claude/hooks/install.sh` once per clone).
 - Open every PR as a draft. CI skips drafts, so run the full checks locally, push once they pass,
   and mark the PR ready when the work is finished; see CLAUDE.md "CI and Actions minutes".
-- <project-specific conventions, non-obvious constraints, and traps an agent should know>
+- Install with `npm install --ignore-scripts`; the build needs no install scripts.
+- The menus list a card only when its node is registered; a new shipped card needs its node in
+  `DEFAULT_NODES`, a `KoenigCardName`, an entry in `CARD_NODE_TYPES` and its wording in
+  `DEFAULT_STRINGS`, and its plugin guarded in `AllDefaultPlugins`.
+- New user-facing text goes through `useKoenigStrings()` with an English default, never a literal.

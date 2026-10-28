@@ -1,10 +1,32 @@
-/**
- * node-koenig-editor
- *
- * Ghost's Koenig editor on Lexical 0.52 and React 19, packaged for reuse, with optional Yjs collaboration.
- */
+/*
+MIT License
 
-/** Greet a name. Replace with the package's real entry point. */
-export function hello(name: string): string {
-  return `Hello, ${name}!`;
-}
+Copyright (c) 2026 Shane
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+export * from "./koenig-lexical/index";
+export { TABLE_MENU_ITEM } from "./additions/table/tableMenu";
+export { TablePlugin } from "./additions/table/TablePlugin";
+export {
+  DEFAULT_STRINGS,
+  KOENIG_CARD_NAMES,
+  KOENIG_TOOLBAR_ITEMS,
+  KoenigStringsContext,
+  useKoenigStrings,
+} from "./additions/options";
