@@ -76,7 +76,9 @@ const lastPublished = (name) => {
       ["view", name, "version", "dist.unpackedSize", "dist.fileCount", "--json"],
       { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
     );
-    const view = JSON.parse(out);
+    // npm 12 wraps the fields in a one-item array; earlier versions print the object.
+    const viewed = JSON.parse(out);
+    const view = Array.isArray(viewed) ? viewed[0] : viewed;
     console.log(`check:pack:growth: npm view answered in ${Date.now() - started} ms`);
     return {
       version: view.version,
@@ -97,12 +99,14 @@ const lastPublished = (name) => {
 };
 
 console.log("check:pack:growth: running npm pack --dry-run --json --ignore-scripts");
-const [pack] = JSON.parse(
+// npm 12 prints an object keyed by package name; earlier versions print an array.
+const parsed = JSON.parse(
   execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "inherit"],
   }),
 );
+const [pack] = Array.isArray(parsed) ? parsed : Object.values(parsed);
 console.log(
   `check:pack:growth: this build ${pack.name}@${pack.version}: ` +
     `${pack.entryCount} files, ${pack.unpackedSize} bytes unpacked`,
