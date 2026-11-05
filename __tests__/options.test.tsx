@@ -42,7 +42,7 @@ import {
 import type { JSX } from "react";
 import { describe, expect, it } from "vitest";
 
-import { documentOf, mount, openSlashMenu } from "./__utils__/mount";
+import { documentOf, mount, openSlashMenu, typeAtEnd } from "./__utils__/mount";
 
 const INSERT_BADGE_COMMAND = createCommand<unknown>("INSERT_BADGE_COMMAND");
 
@@ -226,5 +226,42 @@ describe("collaboration", () => {
     };
     await mount({ composer: { collaboration } });
     await waitFor(() => expect(asked).toContain("main"));
+  });
+});
+
+describe("file uploads", () => {
+  const withImage = JSON.stringify({
+    root: {
+      children: [
+        { alt: "A diagram", src: "https://example.test/diagram.png", type: "image", version: 1 },
+      ],
+      direction: null,
+      format: "",
+      indent: 0,
+      type: "root",
+      version: 1,
+    },
+  });
+
+  it("edits without a fileUploader, which is optional", async () => {
+    const { api } = await mount({ composer: { fileUploader: undefined } });
+    await typeAtEnd(api, "No uploads here");
+    expect(api.serialize()).toContain("No uploads here");
+  });
+
+  it("shows an image card without a fileUploader", async () => {
+    await mount({ composer: { fileUploader: undefined, initialEditorState: withImage } });
+    expect(await screen.findByAltText("A diagram")).toBeDefined();
+  });
+
+  it("shows an image card when the fileUploader names no fileTypes", async () => {
+    const useFileUpload = () => ({
+      errors: [],
+      isLoading: false,
+      progress: 0,
+      upload: async () => null,
+    });
+    await mount({ composer: { fileUploader: { useFileUpload }, initialEditorState: withImage } });
+    expect(await screen.findByAltText("A diagram")).toBeDefined();
   });
 });
