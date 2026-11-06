@@ -26,8 +26,11 @@ import type { KoenigToolbarItem } from "node-koenig-editor";
 export const KOENIG_TOOLBAR_ITEMS: readonly KoenigToolbarItem[] = [
   "bold",
   "italic",
+  "heading1",
   "heading2",
   "heading3",
+  "heading4",
+  "heading5",
   "quote",
   "link",
   "snippet",

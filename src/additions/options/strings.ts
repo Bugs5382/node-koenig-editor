@@ -29,7 +29,7 @@ import { createContext, useContext } from "react";
 export const DEFAULT_STRINGS: KoenigStrings = {
   placeholder: "Begin writing...",
   nestedPlaceholder: "Type here",
-  errorFallback: "An error was thrown.",
+  errorFallback: "The {card} card could not be shown. Remove it and try again.",
   close: "Close",
   searching: "Searching...",
   cards: {
@@ -46,12 +46,26 @@ export const DEFAULT_STRINGS: KoenigStrings = {
   },
   toolbar: {
     bold: "Bold",
+    heading1: "Heading 1",
     heading2: "Heading 2",
     heading3: "Heading 3",
+    heading4: "Heading 4",
+    heading5: "Heading 5",
     italic: "Emphasize",
     link: "Link",
     quote: "Quote",
     snippet: "Save as snippet",
+  },
+  table: {
+    addColumnLeft: "Column left",
+    addColumnRight: "Column right",
+    addRowAbove: "Row above",
+    addRowBelow: "Row below",
+    deleteColumn: "Delete column",
+    deleteRow: "Delete row",
+    deleteTable: "Delete table",
+    headerRow: "Header row",
+    toolbar: "Table",
   },
   card: {
     edit: "Edit",
@@ -118,6 +132,10 @@ export const resolveStrings = (strings?: KoenigStringsInput | null): KoenigStrin
         strings as Record<string, unknown>,
       ) as unknown as KoenigStrings)
     : DEFAULT_STRINGS;
+
+/** The message for a card that failed: the host's `errorFallback` with `{card}` filled in. */
+export const describeFailedCard = (strings: KoenigStrings, card?: string | null): string =>
+  strings.errorFallback.replace("{card}", card || "unknown");
 
 /** Carries the composer's resolved wording to every editor and card under it. */
 export const KoenigStringsContext = createContext<KoenigStrings>(DEFAULT_STRINGS);

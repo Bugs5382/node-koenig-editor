@@ -31,6 +31,9 @@
 
     --green: var(--kg-color-green, #30CF43);
 
+    /* Selection and focus: the host's colour, black by default and white on a dark editor. */
+    --kg-selection: var(--kg-selection-color, #000);
+
     --kg-breakout-adjustment-with-fallback: var(--kg-breakout-adjustment, 0px);
 
     /*
@@ -50,4 +53,9 @@
     .-translate-y-full {
         translate: none;
     }
+}
+
+.koenig-lexical.dark,
+.dark .koenig-lexical {
+    --kg-selection: var(--kg-selection-color, #fff);
 }

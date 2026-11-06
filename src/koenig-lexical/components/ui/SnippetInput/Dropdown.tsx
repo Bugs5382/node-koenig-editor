@@ -20,12 +20,12 @@ export const Dropdown = ({
 
             <li className="mb-0 block">
                 <button
-                    className={`flex w-full cursor-pointer items-center justify-between px-3 py-2 text-left text-sm font-medium text-green-600 hover:bg-grey-100 dark:hover:bg-black ${isCreateButtonActive ? 'bg-grey-100 dark:bg-black' : ''}`}
+                    className={`flex w-full cursor-pointer items-center justify-between px-3 py-2 text-left text-sm font-medium text-selection hover:bg-grey-100 dark:hover:bg-black ${isCreateButtonActive ? 'bg-grey-100 dark:bg-black' : ''}`}
                     type="button"
                     onClick={onCreateSnippet}
                 >
                     <span>Create &quot;{value}&ldquo;</span>
-                    <PlusIcon className="size-3 stroke-green-600 stroke-[3px]" />
+                    <PlusIcon className="size-3 stroke-selection stroke-[3px]" />
                 </button>
             </li>
 

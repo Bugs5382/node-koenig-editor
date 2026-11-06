@@ -9,6 +9,7 @@ import MarkdownShortcutPlugin from '../plugins/MarkdownShortcutPlugin';
 import React from 'react';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {EditorPlaceholder} from './ui/EditorPlaceholder';
+import {HeadingLimitPlugin} from '../../additions/headings/HeadingLimitPlugin';
 import {ExternalControlPlugin} from '../plugins/ExternalControlPlugin';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {KoenigBlurPlugin} from '../plugins/KoenigBlurPlugin';
@@ -114,6 +115,7 @@ const KoenigComposableEditor = ({
             {onBlur && <KoenigBlurPlugin onBlur={onBlur} />}
             {onFocus && <KoenigFocusPlugin onFocus={onFocus} />}
             <MarkdownPastePlugin />
+            <HeadingLimitPlugin />
             {children}
         </div>
     );

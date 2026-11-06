@@ -16,6 +16,8 @@ module.exports = {
     theme: {
         colors: {
             accent: mix('var(--kg-accent-color, #ff0095)'),
+            // the selection and focus colour: set --kg-selection-color on any ancestor (default black, white in dark mode)
+            selection: mix('var(--kg-selection)'),
             transparent: 'transparent',
             current: 'currentColor',
             white: token('white', '#FFF'),
@@ -102,7 +104,7 @@ module.exports = {
             lg: '0px 50px 100px -25px rgba(50, 50, 93, 0.2), 0px 30px 60px -20px rgba(0, 0, 0, 0.25)',
             xl: '0 2.8px 2.2px rgba(0, 0, 0, 0.02), 0 6.7px 5.3px rgba(0, 0, 0, 0.028), 0 12.5px 10px rgba(0, 0, 0, 0.035), 0 22.3px 17.9px rgba(0, 0, 0, 0.042), 0 41.8px 33.4px rgba(0, 0, 0, 0.05), 0 100px 80px rgba(0, 0, 0, 0.07)',
             inner: 'inset 0 0 4px 0 rgb(0 0 0 / 0.08)',
-            insetgreen: '0px 0px 0px 1px inset var(--green)',
+            insetselection: '0px 0px 0px 1px inset var(--kg-selection)',
             none: '0 0 #0000'
         },
         extend: {

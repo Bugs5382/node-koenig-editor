@@ -13,7 +13,7 @@ export const ImageUploadSwatch = ({
         <button
             className={clsx(
                 `group relative flex size-6 shrink-0 items-center justify-center rounded-full border border-grey-300 bg-grey-100 text-black`,
-                showBackgroundImage && 'outline outline-2 outline-green'
+                showBackgroundImage && 'outline outline-2 outline-selection'
             )}
             data-testid={dataTestId}
             title={strings.image.uploadLabel}

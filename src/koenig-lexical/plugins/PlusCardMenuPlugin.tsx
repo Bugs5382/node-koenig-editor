@@ -1,6 +1,7 @@
 import KoenigComposerContext from '../context/KoenigComposerContext.jsx';
 import React from 'react';
 import {$getSelection, $isParagraphNode, $isRangeSelection, $setSelection} from 'lexical';
+import {AnchoredMenu} from '../../additions/placement/AnchoredMenu';
 import {CardMenu} from '../components/ui/CardMenu';
 import {PlusButton, PlusMenu} from '../components/ui/PlusMenu';
 import {buildCardMenu} from '../utils/buildCardMenu';
@@ -16,6 +17,8 @@ function usePlusCardMenu(editor) {
     const [cachedRange, setCachedRange] = React.useState(null);
     const [cardMenu, setCardMenu] = React.useState({});
     const containerRef = React.useRef(null);
+    const menuRef = React.useRef(null);
+    const buttonRef = React.useRef(null);
     const {cardConfig, menuItems} = React.useContext(KoenigComposerContext);
     const strings = useKoenigStrings();
 
@@ -129,7 +132,7 @@ function usePlusCardMenu(editor) {
 
             // clicking inside the menu changes native selection, we don't want
             // to close the menu when that occurs
-            if (isShowingMenu && containerRef.current?.contains(nativeSelection.anchorNode)) {
+            if (isShowingMenu && (containerRef.current?.contains(nativeSelection.anchorNode) || menuRef.current?.contains(nativeSelection.anchorNode))) {
                 return;
             }
 
@@ -198,7 +201,7 @@ function usePlusCardMenu(editor) {
     // close it when we detect a click outside
     const closeMenuOnClickOutside = React.useCallback((event) => {
         if (isShowingMenu) {
-            if (!containerRef.current?.contains(event.target)) {
+            if (!containerRef.current?.contains(event.target) && !menuRef.current?.contains(event.target)) {
                 return closeMenu();
             }
         }
@@ -250,11 +253,13 @@ function usePlusCardMenu(editor) {
     if (isShowingButton) {
         return (
             <div ref={containerRef} className="absolute z-50" style={style} data-kg-plus-container>
-                {isShowingButton && <PlusButton onClick={openMenu} />}
+                {isShowingButton && <div ref={buttonRef}><PlusButton onClick={openMenu} /></div>}
                 {isShowingMenu && (
-                    <PlusMenu>
-                        <CardMenu closeMenu={closeMenu} insert={insert} menu={cardMenu.menu} />
-                    </PlusMenu>
+                    <AnchoredMenu anchor={buttonRef.current} containerRef={menuRef}>
+                        <PlusMenu>
+                            <CardMenu closeMenu={closeMenu} insert={insert} menu={cardMenu.menu} />
+                        </PlusMenu>
+                    </AnchoredMenu>
                 )}
             </div>
         );

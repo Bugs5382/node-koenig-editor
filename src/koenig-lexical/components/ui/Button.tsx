@@ -36,7 +36,7 @@ export function Button({
                 color === 'grey' && 'bg-grey-200 text-black',
                 color === 'black' && 'bg-black text-white',
                 color === 'accent' && 'bg-accent text-white',
-                !['white', 'grey', 'black', 'accent'].includes(color) && 'bg-green text-white')}
+                !['white', 'grey', 'black', 'accent'].includes(color) && 'bg-selection text-white dark:text-black')}
             data-testid={`${dataTestId}`}
             disabled={disabled}
             {...props}

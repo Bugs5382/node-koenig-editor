@@ -600,20 +600,16 @@
     bottom: 0px;
 }
 
-.koenig-lexical .-left-2 {
-    left: -0.8rem;
-}
-
 .koenig-lexical .-right-3 {
-    right: -1.2rem;
+    right: calc(-1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .-top-0\.5 {
-    top: -0.2rem;
+    top: calc(-0.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .-top-8 {
-    top: -3.2rem;
+    top: calc(-3.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .bottom-0 {
@@ -632,16 +628,12 @@
     left: 50%;
 }
 
-.koenig-lexical .left-\[-16px\] {
-    left: -16px;
-}
-
-.koenig-lexical .left-\[-32px\] {
-    left: -32px;
+.koenig-lexical .left-\[-28px\] {
+    left: -28px;
 }
 
 .koenig-lexical .left-\[-6rem\] {
-    left: -6rem;
+    left: calc(-6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .left-\[3px\] {
@@ -653,7 +645,7 @@
 }
 
 .koenig-lexical .right-3 {
-    right: 1.2rem;
+    right: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .top-0 {
@@ -661,19 +653,19 @@
 }
 
 .koenig-lexical .top-\[-\.6rem\] {
-    top: -.6rem;
-}
-
-.koenig-lexical .top-\[-2px\] {
-    top: -2px;
+    top: calc(-.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .top-\[-46px\] {
     top: -46px;
 }
 
+.koenig-lexical .top-\[0\] {
+    top: 0;
+}
+
 .koenig-lexical .top-\[1\.5rem\] {
-    top: 1.5rem;
+    top: calc(1.5 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .top-\[3px\] {
@@ -712,12 +704,16 @@
     z-index: 9999999;
 }
 
+.koenig-lexical .z-\[9999\] {
+    z-index: 9999;
+}
+
 .koenig-lexical .\!m-0 {
     margin: 0px !important;
 }
 
 .koenig-lexical .-m-1 {
-    margin: -0.4rem;
+    margin: calc(-0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .m-0 {
@@ -725,12 +721,12 @@
 }
 
 .koenig-lexical .m-2 {
-    margin: 0.8rem;
+    margin: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .\!-mx-3 {
-    margin-left: -1.2rem !important;
-    margin-right: -1.2rem !important;
+    margin-left: calc(-1.2 * var(--kg-rem, 0.625rem)) !important;
+    margin-right: calc(-1.2 * var(--kg-rem, 0.625rem)) !important;
 }
 
 .koenig-lexical .\!my-0 {
@@ -739,33 +735,33 @@
 }
 
 .koenig-lexical .-mx-1 {
-    margin-left: -0.4rem;
-    margin-right: -0.4rem;
+    margin-left: calc(-0.4 * var(--kg-rem, 0.625rem));
+    margin-right: calc(-0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .-mx-6 {
-    margin-left: -2.4rem;
-    margin-right: -2.4rem;
+    margin-left: calc(-2.4 * var(--kg-rem, 0.625rem));
+    margin-right: calc(-2.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mx-1 {
-    margin-left: 0.4rem;
-    margin-right: 0.4rem;
+    margin-left: calc(0.4 * var(--kg-rem, 0.625rem));
+    margin-right: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mx-6 {
-    margin-left: 2.4rem;
-    margin-right: 2.4rem;
+    margin-left: calc(2.4 * var(--kg-rem, 0.625rem));
+    margin-right: calc(2.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mx-\[-\.2rem\] {
-    margin-left: -.2rem;
-    margin-right: -.2rem;
+    margin-left: calc(-.2 * var(--kg-rem, 0.625rem));
+    margin-right: calc(-.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mx-\[calc\(50\%-\(50vw-var\(--kg-breakout-adjustment-with-fallback\)\)-\.8rem\)\] {
-    margin-left: calc(50% - (50vw - var(--kg-breakout-adjustment-with-fallback)) - .8rem);
-    margin-right: calc(50% - (50vw - var(--kg-breakout-adjustment-with-fallback)) - .8rem);
+    margin-left: calc(50% - (50vw - var(--kg-breakout-adjustment-with-fallback)) - calc(.8 * var(--kg-rem, 0.625rem)));
+    margin-right: calc(50% - (50vw - var(--kg-breakout-adjustment-with-fallback)) - calc(.8 * var(--kg-rem, 0.625rem)));
 }
 
 .koenig-lexical .mx-\[calc\(50\%-50vw\)\] {
@@ -779,13 +775,13 @@
 }
 
 .koenig-lexical .my-1 {
-    margin-top: 0.4rem;
-    margin-bottom: 0.4rem;
+    margin-top: calc(0.4 * var(--kg-rem, 0.625rem));
+    margin-bottom: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .my-\[\.2rem\] {
-    margin-top: .2rem;
-    margin-bottom: .2rem;
+    margin-top: calc(.2 * var(--kg-rem, 0.625rem));
+    margin-bottom: calc(.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .my-auto {
@@ -798,11 +794,11 @@
 }
 
 .koenig-lexical .\!mt-2 {
-    margin-top: 0.8rem !important;
+    margin-top: calc(0.8 * var(--kg-rem, 0.625rem)) !important;
 }
 
 .koenig-lexical .\!mt-4 {
-    margin-top: 1.6rem !important;
+    margin-top: calc(1.6 * var(--kg-rem, 0.625rem)) !important;
 }
 
 .koenig-lexical .\!mt-\[-1px\] {
@@ -814,7 +810,7 @@
 }
 
 .koenig-lexical .-ml-1 {
-    margin-left: -0.4rem;
+    margin-left: calc(-0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mb-0 {
@@ -822,19 +818,19 @@
 }
 
 .koenig-lexical .mb-1 {
-    margin-bottom: 0.4rem;
+    margin-bottom: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mb-1\.5 {
-    margin-bottom: 0.6rem;
+    margin-bottom: calc(0.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mb-2 {
-    margin-bottom: 0.8rem;
+    margin-bottom: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mb-3 {
-    margin-bottom: 1.2rem;
+    margin-bottom: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mb-\[1px\] {
@@ -842,15 +838,15 @@
 }
 
 .koenig-lexical .ml-1 {
-    margin-left: 0.4rem;
+    margin-left: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .ml-3 {
-    margin-left: 1.2rem;
+    margin-left: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .ml-4 {
-    margin-left: 1.6rem;
+    margin-left: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .ml-auto {
@@ -862,27 +858,27 @@
 }
 
 .koenig-lexical .mr-2 {
-    margin-right: 0.8rem;
+    margin-right: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mr-3 {
-    margin-right: 1.2rem;
+    margin-right: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mt-0\.5 {
-    margin-top: 0.2rem;
+    margin-top: calc(0.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mt-1 {
-    margin-top: 0.4rem;
+    margin-top: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mt-2 {
-    margin-top: 0.8rem;
+    margin-top: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mt-3 {
-    margin-top: 1.2rem;
+    margin-top: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mt-\[-1px\] {
@@ -890,7 +886,7 @@
 }
 
 .koenig-lexical .mt-\[\.6rem\] {
-    margin-top: .6rem;
+    margin-top: calc(.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .line-clamp-1 {
@@ -916,6 +912,10 @@
     display: flex;
 }
 
+.koenig-lexical .\!table {
+    display: table !important;
+}
+
 .koenig-lexical .table {
     display: table;
 }
@@ -933,73 +933,83 @@
 }
 
 .koenig-lexical .size-14 {
-    width: 5.6rem;
-    height: 5.6rem;
+    width: calc(5.6 * var(--kg-rem, 0.625rem));
+    height: calc(5.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-16 {
-    width: 6.4rem;
-    height: 6.4rem;
+    width: calc(6.4 * var(--kg-rem, 0.625rem));
+    height: calc(6.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-2 {
-    width: 0.8rem;
-    height: 0.8rem;
+    width: calc(0.8 * var(--kg-rem, 0.625rem));
+    height: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-20 {
-    width: 8rem;
-    height: 8rem;
+    width: calc(8 * var(--kg-rem, 0.625rem));
+    height: calc(8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-3 {
-    width: 1.2rem;
-    height: 1.2rem;
+    width: calc(1.2 * var(--kg-rem, 0.625rem));
+    height: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-4 {
-    width: 1.6rem;
-    height: 1.6rem;
+    width: calc(1.6 * var(--kg-rem, 0.625rem));
+    height: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-5 {
-    width: 2rem;
-    height: 2rem;
+    width: calc(2 * var(--kg-rem, 0.625rem));
+    height: calc(2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-6 {
-    width: 2.4rem;
-    height: 2.4rem;
+    width: calc(2.4 * var(--kg-rem, 0.625rem));
+    height: calc(2.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-7 {
-    width: 2.8rem;
-    height: 2.8rem;
+    width: calc(2.8 * var(--kg-rem, 0.625rem));
+    height: calc(2.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-8 {
-    width: 3.2rem;
-    height: 3.2rem;
+    width: calc(3.2 * var(--kg-rem, 0.625rem));
+    height: calc(3.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-\[1\.4rem\] {
-    width: 1.4rem;
-    height: 1.4rem;
+    width: calc(1.4 * var(--kg-rem, 0.625rem));
+    height: calc(1.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-\[1\.5rem\] {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: calc(1.5 * var(--kg-rem, 0.625rem));
+    height: calc(1.5 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .size-\[1\.6rem\] {
+    width: calc(1.6 * var(--kg-rem, 0.625rem));
+    height: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-\[1\.8rem\] {
-    width: 1.8rem;
-    height: 1.8rem;
+    width: calc(1.8 * var(--kg-rem, 0.625rem));
+    height: calc(1.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .size-\[3rem\] {
-    width: 3rem;
-    height: 3rem;
+    width: calc(3 * var(--kg-rem, 0.625rem));
+    height: calc(3 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .size-\[var\(--kg-plus-size\2c 2\.2rem\)\] {
+    width: var(--kg-plus-size,calc(2.2 * var(--kg-rem, 0.625rem)));
+    height: var(--kg-plus-size,calc(2.2 * var(--kg-rem, 0.625rem)));
 }
 
 .koenig-lexical .size-full {
@@ -1012,27 +1022,27 @@
 }
 
 .koenig-lexical .h-3 {
-    height: 1.2rem;
+    height: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .h-4 {
-    height: 1.6rem;
+    height: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .h-5 {
-    height: 2rem;
+    height: calc(2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .h-7 {
-    height: 2.8rem;
+    height: calc(2.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .h-8 {
-    height: 3.2rem;
+    height: calc(3.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .h-9 {
-    height: 3.6rem;
+    height: calc(3.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .h-\[1px\] {
@@ -1051,8 +1061,8 @@
     max-height: 30vh;
 }
 
-.koenig-lexical .max-h-\[420px\] {
-    max-height: 420px;
+.koenig-lexical .max-h-\[min\(var\(--kg-menu-max-height\2c 32rem\)\2c var\(--kg-menu-fit\2c 100vh\)\)\] {
+    max-height: min(var(--kg-menu-max-height,calc(32 * var(--kg-rem, 0.625rem))), var(--kg-menu-fit,100vh));
 }
 
 .koenig-lexical .min-h-\[40px\] {
@@ -1064,7 +1074,7 @@
 }
 
 .koenig-lexical .w-3 {
-    width: 1.2rem;
+    width: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .w-3\/5 {
@@ -1072,27 +1082,23 @@
 }
 
 .koenig-lexical .w-5 {
-    width: 2rem;
+    width: calc(2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .w-7 {
-    width: 2.8rem;
+    width: calc(2.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .w-8 {
-    width: 3.2rem;
+    width: calc(3.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .w-9 {
-    width: 3.6rem;
+    width: calc(3.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .w-\[136\%\] {
     width: 136%;
-}
-
-.koenig-lexical .w-\[312px\] {
-    width: 312px;
 }
 
 .koenig-lexical .w-\[320px\] {
@@ -1105,6 +1111,10 @@
 
 .koenig-lexical .w-\[calc\(75vw-var\(--kg-breakout-adjustment-with-fallback\)\+2px\)\] {
     width: calc(75vw - var(--kg-breakout-adjustment-with-fallback) + 2px);
+}
+
+.koenig-lexical .w-\[var\(--kg-menu-width\2c 28rem\)\] {
+    width: var(--kg-menu-width,calc(28 * var(--kg-rem, 0.625rem)));
 }
 
 .koenig-lexical .w-full {
@@ -1132,7 +1142,7 @@
 }
 
 .koenig-lexical .min-w-\[calc\(100\%\+3\.6rem\)\] {
-    min-width: calc(100% + 3.6rem);
+    min-width: calc(100% + calc(3.6 * var(--kg-rem, 0.625rem)));
 }
 
 .koenig-lexical .min-w-full {
@@ -1140,7 +1150,7 @@
 }
 
 .koenig-lexical .max-w-2xl {
-    max-width: 67.2rem;
+    max-width: calc(67.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .max-w-\[240px\] {
@@ -1182,7 +1192,7 @@
 }
 
 .koenig-lexical .translate-x-\[calc\(50vw-50\%\+\.8rem-var\(--kg-breakout-adjustment-with-fallback\)\)\] {
-    --tw-translate-x: calc(50vw - 50% + .8rem - var(--kg-breakout-adjustment-with-fallback));
+    --tw-translate-x: calc(50vw - 50% + calc(.8 * var(--kg-rem, 0.625rem)) - var(--kg-breakout-adjustment-with-fallback));
     transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
@@ -1241,7 +1251,7 @@
 }
 
 .koenig-lexical .scroll-p-2 {
-    scroll-padding: 0.8rem;
+    scroll-padding: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .\!list-none {
@@ -1289,27 +1299,27 @@
 }
 
 .koenig-lexical .gap-1 {
-    gap: 0.4rem;
+    gap: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .gap-1\.5 {
-    gap: 0.6rem;
+    gap: calc(0.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .gap-2 {
-    gap: 0.8rem;
+    gap: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .gap-3 {
-    gap: 1.2rem;
+    gap: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .gap-4 {
-    gap: 1.6rem;
+    gap: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .gap-\[\.6rem\] {
-    gap: .6rem;
+    gap: calc(.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .self-stretch {
@@ -1347,7 +1357,7 @@
 }
 
 .koenig-lexical .rounded {
-    border-radius: 0.4rem;
+    border-radius: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .rounded-full {
@@ -1355,16 +1365,16 @@
 }
 
 .koenig-lexical .rounded-lg {
-    border-radius: 0.8rem;
+    border-radius: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .rounded-md {
-    border-radius: 0.6rem;
+    border-radius: calc(0.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .rounded-b {
-    border-bottom-right-radius: 0.4rem;
-    border-bottom-left-radius: 0.4rem;
+    border-bottom-right-radius: calc(0.4 * var(--kg-rem, 0.625rem));
+    border-bottom-left-radius: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .rounded-b-none {
@@ -1373,8 +1383,8 @@
 }
 
 .koenig-lexical .rounded-t {
-    border-top-left-radius: 0.4rem;
-    border-top-right-radius: 0.4rem;
+    border-top-left-radius: calc(0.4 * var(--kg-rem, 0.625rem));
+    border-top-right-radius: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .border {
@@ -1420,15 +1430,6 @@
 
 .koenig-lexical .border-black\/\[0\.08\] {
     border-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.08 * 100%), transparent);
-}
-
-.koenig-lexical .border-green {
-    --tw-border-opacity: 1;
-    border-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(var(--tw-border-opacity, 1) * 100%), transparent);
-}
-
-.koenig-lexical .border-green\/20 {
-    border-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(0.2 * 100%), transparent);
 }
 
 .koenig-lexical .border-grey {
@@ -1478,6 +1479,15 @@
     border-color: color-mix(in srgb, var(--kg-color-red, #F50B23) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .border-selection {
+    --tw-border-opacity: 1;
+    border-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-border-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .border-selection\/20 {
+    border-color: color-mix(in srgb, var(--kg-selection) calc(0.2 * 100%), transparent);
+}
+
 .koenig-lexical .border-transparent {
     border-color: transparent;
 }
@@ -1512,11 +1522,6 @@
 
 .koenig-lexical .bg-blue\/20 {
     background-color: color-mix(in srgb, var(--kg-color-blue, #14B8FF) calc(0.2 * 100%), transparent);
-}
-
-.koenig-lexical .bg-green {
-    --tw-bg-opacity: 1;
-    background-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .bg-green\/10 {
@@ -1606,6 +1611,11 @@
     background-color: color-mix(in srgb, var(--kg-color-red, #F50B23) calc(0.2 * 100%), transparent);
 }
 
+.koenig-lexical .bg-selection {
+    --tw-bg-opacity: 1;
+    background-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
+}
+
 .koenig-lexical .bg-transparent {
     background-color: transparent;
 }
@@ -1670,10 +1680,6 @@
     fill: color-mix(in srgb, var(--kg-color-grey-900, #394047) calc(1 * 100%), transparent);
 }
 
-.koenig-lexical .stroke-green-600 {
-    stroke: color-mix(in srgb, var(--kg-color-green-600, #2AB23A) calc(1 * 100%), transparent);
-}
-
 .koenig-lexical .stroke-grey-700 {
     stroke: color-mix(in srgb, var(--kg-color-grey-700, #7C8B9A) calc(1 * 100%), transparent);
 }
@@ -1684,6 +1690,10 @@
 
 .koenig-lexical .stroke-red {
     stroke: color-mix(in srgb, var(--kg-color-red, #F50B23) calc(1 * 100%), transparent);
+}
+
+.koenig-lexical .stroke-selection {
+    stroke: color-mix(in srgb, var(--kg-selection) calc(1 * 100%), transparent);
 }
 
 .koenig-lexical .stroke-2 {
@@ -1711,27 +1721,27 @@
 }
 
 .koenig-lexical .p-1 {
-    padding: 0.4rem;
+    padding: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .p-2 {
-    padding: 0.8rem;
+    padding: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .p-20 {
-    padding: 8rem;
+    padding: calc(8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .p-3 {
-    padding: 1.2rem;
+    padding: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .p-4 {
-    padding: 1.6rem;
+    padding: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .p-6 {
-    padding: 2.4rem;
+    padding: calc(2.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .p-\[1px\] {
@@ -1751,93 +1761,93 @@
 }
 
 .koenig-lexical .\!px-3 {
-    padding-left: 1.2rem !important;
-    padding-right: 1.2rem !important;
+    padding-left: calc(1.2 * var(--kg-rem, 0.625rem)) !important;
+    padding-right: calc(1.2 * var(--kg-rem, 0.625rem)) !important;
 }
 
 .koenig-lexical .px-1 {
-    padding-left: 0.4rem;
-    padding-right: 0.4rem;
+    padding-left: calc(0.4 * var(--kg-rem, 0.625rem));
+    padding-right: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .px-2 {
-    padding-left: 0.8rem;
-    padding-right: 0.8rem;
+    padding-left: calc(0.8 * var(--kg-rem, 0.625rem));
+    padding-right: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .px-3 {
-    padding-left: 1.2rem;
-    padding-right: 1.2rem;
+    padding-left: calc(1.2 * var(--kg-rem, 0.625rem));
+    padding-right: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .px-4 {
-    padding-left: 1.6rem;
-    padding-right: 1.6rem;
+    padding-left: calc(1.6 * var(--kg-rem, 0.625rem));
+    padding-right: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .px-5 {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding-left: calc(2 * var(--kg-rem, 0.625rem));
+    padding-right: calc(2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .px-6 {
-    padding-left: 2.4rem;
-    padding-right: 2.4rem;
+    padding-left: calc(2.4 * var(--kg-rem, 0.625rem));
+    padding-right: calc(2.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .px-7 {
-    padding-left: 2.8rem;
-    padding-right: 2.8rem;
+    padding-left: calc(2.8 * var(--kg-rem, 0.625rem));
+    padding-right: calc(2.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .px-9 {
-    padding-left: 3.6rem;
-    padding-right: 3.6rem;
+    padding-left: calc(3.6 * var(--kg-rem, 0.625rem));
+    padding-right: calc(3.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .px-\[1rem\] {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: calc(1 * var(--kg-rem, 0.625rem));
+    padding-right: calc(1 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-1 {
-    padding-top: 0.4rem;
-    padding-bottom: 0.4rem;
+    padding-top: calc(0.4 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-1\.5 {
-    padding-top: 0.6rem;
-    padding-bottom: 0.6rem;
+    padding-top: calc(0.6 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(0.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-2 {
-    padding-top: 0.8rem;
-    padding-bottom: 0.8rem;
+    padding-top: calc(0.8 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-3 {
-    padding-top: 1.2rem;
-    padding-bottom: 1.2rem;
+    padding-top: calc(1.2 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-4 {
-    padding-top: 1.6rem;
-    padding-bottom: 1.6rem;
+    padding-top: calc(1.6 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-5 {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-top: calc(2 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(2 * var(--kg-rem, 0.625rem));
 }
 
-.koenig-lexical .py-\[\.6rem\] {
-    padding-top: .6rem;
-    padding-bottom: .6rem;
+.koenig-lexical .py-\[\.3rem\] {
+    padding-top: calc(.3 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(.3 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-\[1rem\] {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+    padding-top: calc(1 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(1 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-\[7px\] {
@@ -1846,51 +1856,51 @@
 }
 
 .koenig-lexical .pb-2 {
-    padding-bottom: 0.8rem;
+    padding-bottom: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pb-3 {
-    padding-bottom: 1.2rem;
+    padding-bottom: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pb-\[\.2rem\] {
-    padding-bottom: .2rem;
+    padding-bottom: calc(.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pl-2 {
-    padding-left: 0.8rem;
+    padding-left: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pl-3 {
-    padding-left: 1.2rem;
+    padding-left: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pl-\[1rem\] {
-    padding-left: 1rem;
+    padding-left: calc(1 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pr-1 {
-    padding-right: 0.4rem;
+    padding-right: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pr-5 {
-    padding-right: 2rem;
+    padding-right: calc(2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pr-9 {
-    padding-right: 3.6rem;
+    padding-right: calc(3.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pt-3 {
-    padding-top: 1.2rem;
+    padding-top: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pt-4 {
-    padding-top: 1.6rem;
+    padding-top: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pt-\[\.6rem\] {
-    padding-top: .6rem;
+    padding-top: calc(.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-left {
@@ -1914,55 +1924,59 @@
 }
 
 .koenig-lexical .\!text-2xl {
-    font-size: 2.4rem !important;
+    font-size: calc(2.4 * var(--kg-rem, 0.625rem)) !important;
 }
 
 .koenig-lexical .\!text-\[1\.3rem\] {
-    font-size: 1.3rem !important;
+    font-size: calc(1.3 * var(--kg-rem, 0.625rem)) !important;
 }
 
 .koenig-lexical .\!text-sm {
-    font-size: 1.4rem !important;
+    font-size: calc(1.4 * var(--kg-rem, 0.625rem)) !important;
 }
 
 .koenig-lexical .text-2xs {
-    font-size: 1.2rem;
+    font-size: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-\[1\.1rem\] {
-    font-size: 1.1rem;
+    font-size: calc(1.1 * var(--kg-rem, 0.625rem));
 }
 
-.koenig-lexical .text-\[1\.35rem\] {
-    font-size: 1.35rem;
+.koenig-lexical .text-\[1\.25rem\] {
+    font-size: calc(1.25 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .text-\[1\.2rem\] {
+    font-size: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-\[1\.3rem\] {
-    font-size: 1.3rem;
+    font-size: calc(1.3 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-\[1\.6rem\] {
-    font-size: 1.6rem;
+    font-size: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-lg {
-    font-size: 1.8rem;
+    font-size: calc(1.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-md {
-    font-size: 1.5rem;
+    font-size: calc(1.5 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-sm {
-    font-size: 1.4rem;
+    font-size: calc(1.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-xl {
-    font-size: 2rem;
+    font-size: calc(2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-xs {
-    font-size: 1.25rem;
+    font-size: calc(1.25 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .\!font-bold {
@@ -2014,7 +2028,7 @@
 }
 
 .koenig-lexical .leading-7 {
-    line-height: 1.75rem;
+    line-height: calc(1.75 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .leading-\[1\.35\] {
@@ -2058,7 +2072,7 @@
 }
 
 .koenig-lexical .tracking-\[\.02rem\] {
-    letter-spacing: .02rem;
+    letter-spacing: calc(.02 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .tracking-normal {
@@ -2076,11 +2090,6 @@
 .koenig-lexical .text-black {
     --tw-text-opacity: 1;
     color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(var(--tw-text-opacity, 1) * 100%), transparent);
-}
-
-.koenig-lexical .text-green-600 {
-    --tw-text-opacity: 1;
-    color: color-mix(in srgb, var(--kg-color-green-600, #2AB23A) calc(var(--tw-text-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .text-grey {
@@ -2121,6 +2130,11 @@
 .koenig-lexical .text-red {
     --tw-text-opacity: 1;
     color: color-mix(in srgb, var(--kg-color-red, #F50B23) calc(var(--tw-text-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .text-selection {
+    --tw-text-opacity: 1;
+    color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-text-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .text-white {
@@ -2212,8 +2226,8 @@
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-.koenig-lexical .shadow-green {
-    --tw-shadow-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(1 * 100%), transparent);
+.koenig-lexical .shadow-selection {
+    --tw-shadow-color: color-mix(in srgb, var(--kg-selection) calc(1 * 100%), transparent);
     --tw-shadow: var(--tw-shadow-colored);
 }
 
@@ -2230,8 +2244,8 @@
     outline-width: 2px;
 }
 
-.koenig-lexical .outline-green {
-    outline-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(1 * 100%), transparent);
+.koenig-lexical .outline-selection {
+    outline-color: color-mix(in srgb, var(--kg-selection) calc(1 * 100%), transparent);
 }
 
 .koenig-lexical .blur {
@@ -2299,7 +2313,7 @@
 
 /* everything is nested here to keep it scoped to our container */
 .koenig-lexical > * {
-        font-size: 1.7rem;
+        font-size: calc(1.7 * var(--kg-rem, 0.625rem));
         font-weight: 400;
         letter-spacing: 0.1px;
         color: var(--grey-900);
@@ -2335,8 +2349,8 @@
         background: var(--grey-900);
     }
 .koenig-lexical > .dark em-emoji-picker, .koenig-lexical.dark em-emoji-picker, .dark .koenig-lexical em-emoji-picker {
-        /* --green */
-        --rgb-accent: 48, 207, 67;
+        /* --black */
+        --rgb-accent: 21, 23, 26;
         /* --grey-950 */
         --rgb-background: 35, 41, 47;
         /* --grey-300 */
@@ -2350,7 +2364,7 @@
 }
 
 .koenig-lexical.koenig-lexical-caption > * {
-        font-size: 1.4rem;
+        font-size: calc(1.4 * var(--kg-rem, 0.625rem));
     }
 
 /* Caption in dark mode */
@@ -2391,7 +2405,7 @@ em-emoji-picker {
   /* HTML card */
 
   .koenig-lexical .js-embed-placeholder {
-    margin: .4rem 0!important;
+    margin: calc(.4 * var(--kg-rem, 0.625rem)) 0!important;
     color: var(--grey-700) !important;
   }
 
@@ -2442,10 +2456,10 @@ em-emoji-picker {
 
 /* Table */
 .koenig-lexical table {
-    font-size: 1.75rem;
+    font-size: calc(1.75 * var(--kg-rem, 0.625rem));
     margin: 0;
     font-family: georgia,Times,serif;
-    letter-spacing: .02rem;
+    letter-spacing: calc(.02 * var(--kg-rem, 0.625rem));
     line-height: 1.6em;
 }
 
@@ -2483,7 +2497,7 @@ em-emoji-picker {
             blockquote,
             aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 1.6rem 0 0;
+            margin: calc(1.6 * var(--kg-rem, 0.625rem)) 0 0;
             min-width: 100%;
             max-width: 100%;
         }
@@ -2518,19 +2532,19 @@ em-emoji-picker {
 /* H1 should be almost the same size as the post title to suggest avoid using it */
 
 .koenig-lexical .kg-prose :where(h1):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 4.4rem;
+            font-size: var(--kg-font-size-h1, calc(4.4 * var(--kg-rem, 0.625rem)));
             line-height: 1.15em;
             letter-spacing: -0.015em;
         }
 
 .koenig-lexical .kg-prose :where(h2):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 3.2rem;
+            font-size: var(--kg-font-size-h2, calc(3.2 * var(--kg-rem, 0.625rem)));
             line-height: 1.2em;
             letter-spacing: -0.014em;
         }
 
 .koenig-lexical .kg-prose :where(h3):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 2.5rem;
+            font-size: var(--kg-font-size-h3, calc(2.5 * var(--kg-rem, 0.625rem)));
             line-height: 1.3em;
             letter-spacing: -0.013em;
         }
@@ -2538,20 +2552,20 @@ em-emoji-picker {
 /* H4 is almost the same size as H3 to discourage using it */
 
 .koenig-lexical .kg-prose :where(h4):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 2.2rem;
+            font-size: var(--kg-font-size-h4, calc(2.2 * var(--kg-rem, 0.625rem)));
             line-height: 1.35em;
             letter-spacing: -0.011em;
         }
 
 .koenig-lexical .kg-prose :where(h5):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 2.0rem;
+            font-size: var(--kg-font-size-h5, calc(2.0 * var(--kg-rem, 0.625rem)));
             line-height: 1.35em;
             font-weight: 700;
             letter-spacing: -0.011em;
         }
 
 .koenig-lexical .kg-prose :where(h6):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 1.85rem;
+            font-size: calc(1.85 * var(--kg-rem, 0.625rem));
             line-height: 1.4em;
             font-weight: 700;
             letter-spacing: -0.008em;
@@ -2593,7 +2607,7 @@ em-emoji-picker {
             ol + h5,
             ol + h6
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 4.8rem 0 0;
+            margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 /* Heading 1 vertical rhythm */
@@ -2601,33 +2615,33 @@ em-emoji-picker {
 .koenig-lexical .kg-prose :where(
             h1 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 1.4rem 0 0;
+            margin: calc(1.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             h2 + h1,
             h3 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 1.0rem 0 0;
+            margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             h4 + h1,
             h5 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0.8rem 0 0;
+            margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             h6 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0.6rem 0 0;
+            margin: calc(0.6 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             div + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 4.8rem 0 0;
+            margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 /* Heading 2 */
@@ -2635,7 +2649,7 @@ em-emoji-picker {
 .koenig-lexical .kg-prose :where(
             h1 + h2
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 1.6rem 0 0;
+            margin: calc(1.6 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2644,19 +2658,19 @@ em-emoji-picker {
             h4 + h2,
             .koenig-react__editor h5 + h2
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0.8rem 0 0;
+            margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             h6 + h2
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0.4rem 0 0;
+            margin: calc(0.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             div + h2
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 4.8rem 0 0;
+            margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 /* Heading 3 - 6 (share common styles) */
@@ -2674,13 +2688,13 @@ em-emoji-picker {
             h1 + h6,
             h2 + h6
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 1.2rem 0 0;
+            margin: calc(1.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             h3 + h4
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0.8rem 0 0;
+            margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2698,13 +2712,13 @@ em-emoji-picker {
             h3 + h6,
             h4 + h6
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0.8rem 0 0;
+            margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             h5 + h6
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0.4rem 0 0;
+            margin: calc(0.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2713,7 +2727,7 @@ em-emoji-picker {
             h6 + h5,
             h6 + h6
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0.4rem 0 0;
+            margin: calc(0.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2722,7 +2736,7 @@ em-emoji-picker {
             div + h5,
             div + h6
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 4.8rem 0 0;
+            margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 /* Headings right after post title */
@@ -2735,32 +2749,32 @@ em-emoji-picker {
             .koenig-react__editor h5:first-child,
             h6:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin-top: 0rem;
+            margin-top: 0;
         }
 
 @media (max-width: 500px) {
             .koenig-lexical .kg-prose :where(h1):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                font-size: 3.2rem;
+                font-size: calc(3.2 * var(--kg-rem, 0.625rem));
             }
 
             .koenig-lexical .kg-prose :where(h2):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                font-size: 2.8rem;
+                font-size: calc(2.8 * var(--kg-rem, 0.625rem));
             }
 
             .koenig-lexical .kg-prose :where(h3):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                font-size: 2.4rem;
+                font-size: calc(2.4 * var(--kg-rem, 0.625rem));
             }
 
             .koenig-lexical .kg-prose :where(h4):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                font-size: 2.3rem;
+                font-size: calc(2.3 * var(--kg-rem, 0.625rem));
             }
 
             .koenig-lexical .kg-prose :where(h5):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                font-size: 2.0rem;
+                font-size: calc(2.0 * var(--kg-rem, 0.625rem));
             }
 
             .koenig-lexical .kg-prose :where(h6):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                font-size: 1.9rem;
+                font-size: calc(1.9 * var(--kg-rem, 0.625rem));
             }
         }
 
@@ -2774,10 +2788,10 @@ em-emoji-picker {
             ul,
             ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-family: georgia,Times,serif;
+            font-family: var(--kg-font-body, georgia,Times,serif);
             font-weight: 400;
-            line-height: 1.6em;
-            font-size: 2.0rem;
+            line-height: var(--kg-line-height, 1.6em);
+            font-size: var(--kg-font-size, calc(2.0 * var(--kg-rem, 0.625rem)));
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2793,13 +2807,13 @@ em-emoji-picker {
 .koenig-lexical .kg-prose :where(
             h1 + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 1.0rem 0 0;
+            margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             h2 + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0.8rem 0 0;
+            margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2808,7 +2822,7 @@ em-emoji-picker {
             h5 + p,
             h6 + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0.8rem 0 0;
+            margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2818,7 +2832,7 @@ em-emoji-picker {
             ul + p,
             ol + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 3.2rem 0 0;
+            margin: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 /*  Cards can be addressed by their wrapper div element */
@@ -2826,7 +2840,7 @@ em-emoji-picker {
 .koenig-lexical .kg-prose :where(
             div + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 2.8rem 0 0;
+            margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 /*  Cards can be addressed by their wrapper div element */
@@ -2834,7 +2848,7 @@ em-emoji-picker {
 .koenig-lexical .kg-prose :where(
             div + figure
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 2.8rem 0 0;
+            margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 /* Paragraph right after title */
@@ -2842,7 +2856,7 @@ em-emoji-picker {
 .koenig-lexical .kg-prose :where(
             p:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin-top: 0rem;
+            margin-top: 0;
         }
 
 @media (max-width: 500px) {
@@ -2853,7 +2867,7 @@ em-emoji-picker {
                 ul,
                 ol
             ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                font-size: 1.8rem;
+                font-size: calc(1.8 * var(--kg-rem, 0.625rem));
             }
         }
 
@@ -2864,7 +2878,7 @@ em-emoji-picker {
             ul,
             ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 1.6rem 0 0;
+            margin: calc(1.6 * var(--kg-rem, 0.625rem)) 0 0;
             padding: 0;
             min-width: 100%;
             max-width: 100%;
@@ -2875,15 +2889,15 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             display: list-item;
             list-style-type: disc;
-            margin: 1.0rem 0 0 2.4rem;
-            padding: 0 0 0 0.6rem;
-            line-height: 3.2rem;
+            margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 0 calc(2.4 * var(--kg-rem, 0.625rem));
+            padding: 0 0 0 calc(0.6 * var(--kg-rem, 0.625rem));
+            line-height: calc(3.2 * var(--kg-rem, 0.625rem));
         }
 
 .koenig-lexical .kg-prose :where(
             ul li:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0 0 0 2.4rem;
+            margin: 0 0 0 calc(2.4 * var(--kg-rem, 0.625rem));
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2903,15 +2917,15 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             display: list-item;
             list-style-type: decimal;
-            margin: 1.0rem 0 0 2.2rem;
-            padding: 0 0 0 0.8rem;
-            line-height: 3.2rem;
+            margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 0 calc(2.2 * var(--kg-rem, 0.625rem));
+            padding: 0 0 0 calc(0.8 * var(--kg-rem, 0.625rem));
+            line-height: calc(3.2 * var(--kg-rem, 0.625rem));
         }
 
 .koenig-lexical .kg-prose :where(
             ol li:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 0 0 0 2.2rem;
+            margin: 0 0 0 calc(2.2 * var(--kg-rem, 0.625rem));
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2930,7 +2944,7 @@ em-emoji-picker {
             p + ul,
             p + ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 3.0rem 0 0;
+            margin: calc(3.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2943,7 +2957,7 @@ em-emoji-picker {
             aside + ul,
             aside + ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 3.0rem 0 0;
+            margin: calc(3.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2952,7 +2966,7 @@ em-emoji-picker {
             h2 + ul,
             h2 + ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: .8rem 0 0;
+            margin: calc(.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2965,14 +2979,14 @@ em-emoji-picker {
             h6 + ul,
             h6 + ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 1.2rem 0 0;
+            margin: calc(1.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             div + ul,
             div + ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 2.8rem 0 0;
+            margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -2981,7 +2995,7 @@ em-emoji-picker {
             ol ul,
             ol ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 1.0rem 0 2rem;
+            margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 calc(2 * var(--kg-rem, 0.625rem));
         }
 
 /* Lists right after title */
@@ -2990,7 +3004,7 @@ em-emoji-picker {
             ul:first-child,
             ol:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin-top: 0rem;
+            margin-top: 0;
         }
 
 /* Links
@@ -3024,8 +3038,8 @@ em-emoji-picker {
 .koenig-lexical .kg-prose :where(
             blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            border-left: 0.25rem solid var(--kg-accent-color, #ff0095);
-            padding-left: 2.0rem;
+            border-left: calc(0.25 * var(--kg-rem, 0.625rem)) solid var(--kg-accent-color, #ff0095);
+            padding-left: calc(2.0 * var(--kg-rem, 0.625rem));
             font-style: italic;
         }
 
@@ -3033,7 +3047,7 @@ em-emoji-picker {
             h1 + blockquote,
             h2 + blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: .8rem 0 0;
+            margin: calc(.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -3042,14 +3056,14 @@ em-emoji-picker {
             .koenig-react__editor h5 + blockquote,
             h6 + blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: .4rem 0 0;
+            margin: calc(.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             p + blockquote,
             blockquote + blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 3.2rem 0 0;
+            margin: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 /* Cards can be selected by their wrapper div element */
@@ -3057,7 +3071,7 @@ em-emoji-picker {
 .koenig-lexical .kg-prose :where(
             div + blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 2.8rem 0 0;
+            margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 /* Aside, Blockquote Alternative
@@ -3072,11 +3086,11 @@ em-emoji-picker {
 .koenig-lexical .kg-prose :where(
             aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 3.2rem 0 0;
-            padding: 1rem 6rem 1.25rem;
+            margin: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
+            padding: calc(1 * var(--kg-rem, 0.625rem)) calc(6 * var(--kg-rem, 0.625rem)) calc(1.25 * var(--kg-rem, 0.625rem));
             font-style: italic;
             text-align: center;
-            font-size: 2.4rem;
+            font-size: calc(2.4 * var(--kg-rem, 0.625rem));
             color: var(--grey-500);
         }
 
@@ -3084,7 +3098,7 @@ em-emoji-picker {
             h1 + aside,
             h2 + aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: .8rem 0 0;
+            margin: calc(.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -3093,22 +3107,22 @@ em-emoji-picker {
             h5 + aside,
             h6 + aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: .4rem 0 0;
+            margin: calc(.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             p + aside,
             blockquote + aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 3.2rem 0 0;
+            margin: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 @media (max-width: 800px) {
             .koenig-lexical .kg-prose :where(
                 aside
             ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                padding-left: 6rem;
-                padding-right: 6rem;
+                padding-left: calc(6 * var(--kg-rem, 0.625rem));
+                padding-right: calc(6 * var(--kg-rem, 0.625rem));
             }
         }
 
@@ -3116,7 +3130,7 @@ em-emoji-picker {
             .koenig-lexical .kg-prose :where(
                 aside
             ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                font-size: 2.2rem;
+                font-size: calc(2.2 * var(--kg-rem, 0.625rem));
             }
         }
 
@@ -3125,7 +3139,7 @@ em-emoji-picker {
 .koenig-lexical .kg-prose :where(
             div + aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            margin: 2.8rem 0 0;
+            margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 /* Cards in general
@@ -3141,7 +3155,7 @@ em-emoji-picker {
 .koenig-lexical .kg-prose > :where(
             div + div
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            padding: 3.2rem 0 0;
+            padding: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose > :where(
@@ -3157,13 +3171,13 @@ em-emoji-picker {
             ul + div,
             ol + div
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            padding: 3.2rem 0 0;
+            padding: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             h1 + div
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            padding: 2.8rem 0 0;
+            padding: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
@@ -3173,14 +3187,14 @@ em-emoji-picker {
             h5 + div,
             h6 + div
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            padding: 1.6rem 0 0;
+            padding: calc(1.6 * var(--kg-rem, 0.625rem)) 0 0;
         }
 
 .koenig-lexical .kg-prose :where(
             hr
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             display: block;
-            margin: 1.6rem 0;
+            margin: calc(1.6 * var(--kg-rem, 0.625rem)) 0;
             border: 0;
             border-top: 1px solid var(--grey-300);
         }
@@ -3198,7 +3212,7 @@ em-emoji-picker {
             color: var(--grey-900);
             font-size: .8em;
             line-height: 1em;
-            padding: .4rem .4rem .2rem;
+            padding: calc(.4 * var(--kg-rem, 0.625rem)) calc(.4 * var(--kg-rem, 0.625rem)) calc(.2 * var(--kg-rem, 0.625rem));
             vertical-align: middle;
             white-space: pre-wrap;
         }
@@ -3215,7 +3229,7 @@ em-emoji-picker {
             border-radius: 2px;
             color: var(--grey-900);
             line-height: 1.4em;
-            padding: .8rem .8rem .4rem;
+            padding: calc(.8 * var(--kg-rem, 0.625rem)) calc(.8 * var(--kg-rem, 0.625rem)) calc(.4 * var(--kg-rem, 0.625rem));
             vertical-align: middle;
             white-space: pre-wrap;
         }
@@ -3262,7 +3276,7 @@ em-emoji-picker {
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
     font-family: var(--kg-font-sans, Inter, -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif);
-    font-size: 1.4rem;
+    font-size: calc(1.4 * var(--kg-rem, 0.625rem));
     line-height: 24px;
     letter-spacing: 0.025em;
 }
@@ -3275,7 +3289,7 @@ em-emoji-picker {
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
     font-family: var(--kg-font-sans, Inter, -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif);
-    font-size: 1.5rem;
+    font-size: calc(1.5 * var(--kg-rem, 0.625rem));
     font-weight: 700;
     text-transform: uppercase;
     line-height: 1.5;
@@ -3315,7 +3329,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-    font-size: 2.4rem;
+    font-size: calc(2.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical-heading.heading-small .kg-prose :where(
@@ -3325,7 +3339,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-    font-size: 3rem;
+    font-size: calc(3 * var(--kg-rem, 0.625rem));
 }
 
 @media (min-width: 640px) {
@@ -3337,7 +3351,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 3.6rem;
+        font-size: calc(3.6 * var(--kg-rem, 0.625rem));
     }
 }
 
@@ -3348,7 +3362,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-    font-size: 3rem;
+    font-size: calc(3 * var(--kg-rem, 0.625rem));
 }
 
 @media (min-width: 640px) {
@@ -3360,7 +3374,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 3.6rem;
+        font-size: calc(3.6 * var(--kg-rem, 0.625rem));
     }
 }
 
@@ -3373,7 +3387,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 4.8rem;
+        font-size: calc(4.8 * var(--kg-rem, 0.625rem));
         line-height: 1.15;
     }
 }
@@ -3385,7 +3399,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-    font-size: 3rem;
+    font-size: calc(3 * var(--kg-rem, 0.625rem));
 }
 
 @media (min-width: 640px) {
@@ -3397,7 +3411,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 3.6rem;
+        font-size: calc(3.6 * var(--kg-rem, 0.625rem));
     }
 }
 
@@ -3410,7 +3424,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 4.8rem;
+        font-size: calc(4.8 * var(--kg-rem, 0.625rem));
         line-height: 1.15;
     }
 }
@@ -3424,7 +3438,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 6rem;
+        font-size: calc(6 * var(--kg-rem, 0.625rem));
         line-height: 1;
     }
 }
@@ -3462,7 +3476,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-    font-size: 1.6rem;
+    font-size: calc(1.6 * var(--kg-rem, 0.625rem));
     font-weight: 400;
 }
 
@@ -3473,7 +3487,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-    font-size: 1.8rem;
+    font-size: calc(1.8 * var(--kg-rem, 0.625rem));
 }
 
 @media (min-width: 640px) {
@@ -3485,7 +3499,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 2rem;
+        font-size: calc(2 * var(--kg-rem, 0.625rem));
     }
 }
 
@@ -3496,7 +3510,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-    font-size: 1.8rem;
+    font-size: calc(1.8 * var(--kg-rem, 0.625rem));
 }
 
 @media (min-width: 640px) {
@@ -3508,7 +3522,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 2rem;
+        font-size: calc(2 * var(--kg-rem, 0.625rem));
     }
 }
 
@@ -3521,7 +3535,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 2.2rem;
+        font-size: calc(2.2 * var(--kg-rem, 0.625rem));
     }
 }
 
@@ -3532,7 +3546,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-    font-size: 1.8rem;
+    font-size: calc(1.8 * var(--kg-rem, 0.625rem));
 }
 
 @media (min-width: 640px) {
@@ -3544,7 +3558,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 2rem;
+        font-size: calc(2 * var(--kg-rem, 0.625rem));
     }
 }
 
@@ -3557,7 +3571,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 2.2rem;
+        font-size: calc(2.2 * var(--kg-rem, 0.625rem));
     }
 }
 
@@ -3570,7 +3584,7 @@ em-emoji-picker {
                     ul,
                     ol
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-        font-size: 2.4rem;
+        font-size: calc(2.4 * var(--kg-rem, 0.625rem));
     }
 }
 
@@ -3637,6 +3651,9 @@ em-emoji-picker {
 
     --green: var(--kg-color-green, #30CF43);
 
+    /* Selection and focus: the host's colour, black by default and white on a dark editor. */
+    --kg-selection: var(--kg-selection-color, #000);
+
     --kg-breakout-adjustment-with-fallback: var(--kg-breakout-adjustment, 0px);
 }
 
@@ -3658,6 +3675,11 @@ em-emoji-picker {
         translate: none;
     }
 
+.koenig-lexical.dark,
+.dark .koenig-lexical {
+    --kg-selection: var(--kg-selection-color, #fff);
+}
+
 .koenig-lexical :is(.selection\:bg-grey\/40 *)::selection {
     background-color: color-mix(in srgb, var(--kg-color-grey, #ABB4BE) calc(0.4 * 100%), transparent);
 }
@@ -3667,7 +3689,7 @@ em-emoji-picker {
 }
 
 .koenig-lexical .placeholder\:text-sm::placeholder {
-    font-size: 1.4rem;
+    font-size: calc(1.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .placeholder\:font-medium::placeholder {
@@ -3700,8 +3722,8 @@ em-emoji-picker {
 
 .koenig-lexical .before\:size-3::before {
     content: var(--tw-content);
-    width: 1.2rem;
-    height: 1.2rem;
+    width: calc(1.2 * var(--kg-rem, 0.625rem));
+    height: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .before\:rounded-full::before {
@@ -3749,8 +3771,8 @@ em-emoji-picker {
 
 .koenig-lexical .after\:size-1::after {
     content: var(--tw-content);
-    width: 0.4rem;
-    height: 0.4rem;
+    width: calc(0.4 * var(--kg-rem, 0.625rem));
+    height: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .after\:rounded-full::after {
@@ -3758,14 +3780,14 @@ em-emoji-picker {
     border-radius: 9999px;
 }
 
-.koenig-lexical .after\:bg-green\/70::after {
+.koenig-lexical .after\:bg-selection\/70::after {
     content: var(--tw-content);
-    background-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(0.7 * 100%), transparent);
+    background-color: color-mix(in srgb, var(--kg-selection) calc(0.7 * 100%), transparent);
 }
 
 .koenig-lexical .after\:pb-1::after {
     content: var(--tw-content);
-    padding-bottom: 0.4rem;
+    padding-bottom: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .after\:text-grey-500::after {
@@ -3796,9 +3818,9 @@ em-emoji-picker {
     border-top-width: 0px;
 }
 
-.koenig-lexical .focus-within\:border-green:focus-within {
+.koenig-lexical .focus-within\:border-selection:focus-within {
     --tw-border-opacity: 1;
-    border-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(var(--tw-border-opacity, 1) * 100%), transparent);
+    border-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .focus-within\:bg-white:focus-within {
@@ -3818,8 +3840,8 @@ em-emoji-picker {
 }
 
 .koenig-lexical .hover\:-mx-3:hover {
-    margin-left: -1.2rem;
-    margin-right: -1.2rem;
+    margin-left: calc(-1.2 * var(--kg-rem, 0.625rem));
+    margin-right: calc(-1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .hover\:scale-105:hover {
@@ -3867,8 +3889,8 @@ em-emoji-picker {
 }
 
 .koenig-lexical .hover\:px-3:hover {
-    padding-left: 1.2rem;
-    padding-right: 1.2rem;
+    padding-left: calc(1.2 * var(--kg-rem, 0.625rem));
+    padding-right: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .hover\:text-black:hover {
@@ -3876,9 +3898,9 @@ em-emoji-picker {
     color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(var(--tw-text-opacity, 1) * 100%), transparent);
 }
 
-.koenig-lexical .hover\:text-green-600:hover {
+.koenig-lexical .hover\:text-selection:hover {
     --tw-text-opacity: 1;
-    color: color-mix(in srgb, var(--kg-color-green-600, #2AB23A) calc(var(--tw-text-opacity, 1) * 100%), transparent);
+    color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-text-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .hover\:shadow-\[0_0_0_1px\]:hover {
@@ -3887,14 +3909,14 @@ em-emoji-picker {
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-.koenig-lexical .hover\:shadow-green:hover {
-    --tw-shadow-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(1 * 100%), transparent);
+.koenig-lexical .hover\:shadow-selection:hover {
+    --tw-shadow-color: color-mix(in srgb, var(--kg-selection) calc(1 * 100%), transparent);
     --tw-shadow: var(--tw-shadow-colored);
 }
 
-.koenig-lexical .focus\:border-green:focus {
+.koenig-lexical .focus\:border-selection:focus {
     --tw-border-opacity: 1;
-    border-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(var(--tw-border-opacity, 1) * 100%), transparent);
+    border-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .focus\:bg-white:focus {
@@ -4035,9 +4057,9 @@ em-emoji-picker {
     stroke: color-mix(in srgb, var(--kg-color-grey-500, #AEB7C1) calc(1 * 100%), transparent);
 }
 
-.koenig-lexical .dark\:text-green-600:is(.dark *) {
+.koenig-lexical .dark\:text-black:is(.dark *) {
     --tw-text-opacity: 1;
-    color: color-mix(in srgb, var(--kg-color-green-600, #2AB23A) calc(var(--tw-text-opacity, 1) * 100%), transparent);
+    color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(var(--tw-text-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .dark\:text-grey-100:is(.dark *) {
@@ -4077,6 +4099,11 @@ em-emoji-picker {
 
 .koenig-lexical .dark\:text-grey\/30:is(.dark *) {
     color: color-mix(in srgb, var(--kg-color-grey, #ABB4BE) calc(0.3 * 100%), transparent);
+}
+
+.koenig-lexical .dark\:text-selection:is(.dark *) {
+    --tw-text-opacity: 1;
+    color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-text-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .dark\:text-white:is(.dark *) {
@@ -4146,9 +4173,9 @@ em-emoji-picker {
     color: color-mix(in srgb, var(--kg-color-grey-600, #95A1AD) calc(var(--tw-text-opacity, 1) * 100%), transparent);
 }
 
-.koenig-lexical .dark\:focus-within\:border-green:focus-within:is(.dark *) {
+.koenig-lexical .dark\:focus-within\:border-selection:focus-within:is(.dark *) {
     --tw-border-opacity: 1;
-    border-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(var(--tw-border-opacity, 1) * 100%), transparent);
+    border-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .dark\:hover\:border-grey-400:hover:is(.dark *) {
@@ -4181,9 +4208,9 @@ em-emoji-picker {
     background-color: color-mix(in srgb, var(--kg-color-grey-950, #23292F) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
-.koenig-lexical .dark\:focus\:border-green:focus:is(.dark *) {
+.koenig-lexical .dark\:focus\:border-selection:focus:is(.dark *) {
     --tw-border-opacity: 1;
-    border-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(var(--tw-border-opacity, 1) * 100%), transparent);
+    border-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .dark\:focus\:bg-grey-900:focus:is(.dark *) {
@@ -4200,15 +4227,15 @@ em-emoji-picker {
     stroke: color-mix(in srgb, var(--kg-color-grey-100, #F4F5F6) calc(1 * 100%), transparent);
 }
 
-.koenig-lexical :is(.peer:checked ~ .dark\:peer-checked\:bg-green:is(.dark *)) {
+.koenig-lexical :is(.peer:checked ~ .dark\:peer-checked\:bg-selection:is(.dark *)) {
     --tw-bg-opacity: 1;
-    background-color: color-mix(in srgb, var(--kg-color-green, #30CF43) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
+    background-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
 @media (min-width: 500px) {
 
-    .koenig-lexical .xs\:left-\[-66px\] {
-        left: -66px;
+    .koenig-lexical .xs\:left-\[-44px\] {
+        left: -44px;
     }
 
     .koenig-lexical .xs\:overflow-visible {
@@ -4226,46 +4253,41 @@ em-emoji-picker {
         display: grid;
     }
 
-    .koenig-lexical .md\:size-9 {
-        width: 3.6rem;
-        height: 3.6rem;
-    }
-
     .koenig-lexical .md\:h-\[38px\] {
         height: 38px;
     }
 
-    .koenig-lexical .md\:w-\[348px\] {
-        width: 348px;
+    .koenig-lexical .md\:w-\[var\(--kg-menu-width\2c 28rem\)\] {
+        width: var(--kg-menu-width,calc(28 * var(--kg-rem, 0.625rem)));
     }
 
     .koenig-lexical .md\:min-w-\[calc\(100\%\+10rem\)\] {
-        min-width: calc(100% + 10rem);
+        min-width: calc(100% + calc(10 * var(--kg-rem, 0.625rem)));
     }
 
     .koenig-lexical .md\:gap-y-\[\.2rem\] {
-        row-gap: .2rem;
+        row-gap: calc(.2 * var(--kg-rem, 0.625rem));
     }
 
     .koenig-lexical .md\:rounded-md {
-        border-radius: 0.6rem;
+        border-radius: calc(0.6 * var(--kg-rem, 0.625rem));
     }
 
     .koenig-lexical .md\:px-2 {
-        padding-left: 0.8rem;
-        padding-right: 0.8rem;
+        padding-left: calc(0.8 * var(--kg-rem, 0.625rem));
+        padding-right: calc(0.8 * var(--kg-rem, 0.625rem));
     }
 
     .koenig-lexical .md\:py-2 {
-        padding-top: 0.8rem;
-        padding-bottom: 0.8rem;
+        padding-top: calc(0.8 * var(--kg-rem, 0.625rem));
+        padding-bottom: calc(0.8 * var(--kg-rem, 0.625rem));
     }
 }
 
 @media (min-width: 1024px) {
 
     .koenig-lexical .lg\:top-8 {
-        top: 3.2rem;
+        top: calc(3.2 * var(--kg-rem, 0.625rem));
     }
 
     .koenig-lexical .lg\:mx-\[calc\(50\%-50vw\+\(var\(--kg-breakout-adjustment-with-fallback\)\/2\)\)\] {
@@ -4278,6 +4300,6 @@ em-emoji-picker {
     }
 
     .koenig-lexical .lg\:min-w-\[calc\(100\%\+18rem\)\] {
-        min-width: calc(100% + 18rem);
+        min-width: calc(100% + calc(18 * var(--kg-rem, 0.625rem)));
     }
 }
