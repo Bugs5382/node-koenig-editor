@@ -31,8 +31,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { catalog, useWordCount } from "./catalog";
 import { ConfirmDialog, Toast } from "./dialogs";
 import { EditorErrorBoundary } from "./EditorErrorBoundary";
-import { HelpSheet } from "./HelpSheet";
-import { kitchenSink } from "./kitchenSink";
+import { GuidePage } from "./GuidePage";
+import { kitchenSink, tryDocument, tryNeeds } from "./kitchenSink";
+import { parseRoute, type Route } from "./route";
 import {
   buildSnippet,
   defaultSettings,
@@ -83,7 +84,7 @@ function WordCount() {
 export function App() {
   const [settings, setSettings] = useState(() => parseSettings(window.location.search, catalog));
   const settingsRef = useRef(settings);
-  const [helpOpen, setHelpOpen] = useState(false);
+  const [route, setRoute] = useState<Route>(() => parseRoute(window.location.hash));
   const [confirm, setConfirm] = useState<"clear" | "reset" | null>(null);
   const [toast, setToast] = useState<{ message: string; undo: () => void } | null>(null);
   const [state, setState] = useState<unknown>(null);
@@ -104,6 +105,12 @@ export function App() {
   useEffect(() => {
     setSampleUploads(settings.sampleUploads);
   }, [settings.sampleUploads]);
+
+  useEffect(() => {
+    const onHash = () => setRoute(parseRoute(window.location.hash));
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
 
   // The address always shows the current setup, so the page URL is the share link.
   useEffect(() => {
@@ -145,6 +152,21 @@ export function App() {
     threadsRef.current = [];
     rebuild(kitchenSink(catalog.cards, enabledCards(settingsRef.current)));
   }, [rebuild]);
+
+  // A "Try it" link: switch on what the card needs, put the card in a short document, and leave a
+  // plain address behind so a reload does not do it again.
+  const tryId = route.page === "editor" ? route.tryId : undefined;
+  useEffect(() => {
+    if (!tryId) return;
+    const doc = tryDocument(tryId, catalog.cards);
+    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#/`);
+    setRoute({ page: "editor" });
+    if (!doc) return;
+    const needs = tryNeeds(tryId, settingsRef.current, catalog);
+    if (Object.keys(needs).length) update(needs);
+    threadsRef.current = [];
+    rebuild(doc);
+  }, [tryId, update, rebuild]);
 
   // Clear and Reset throw work away, so they ask first when there is something to lose, and they
   // leave an Undo that puts back the document, the settings and the comment threads together.
@@ -235,9 +257,9 @@ export function App() {
         catalog={catalog}
         galleryOn={cardOn("gallery")}
         settings={settings}
+        page={route.page}
         onChange={update}
         onCopyLink={() => void navigator.clipboard?.writeText(window.location.href)}
-        onHelp={() => setHelpOpen(true)}
         onLoadKitchenSink={loadKitchenSink}
         onLoadSamples={() => addCard(galleryNode(SAMPLES))}
         onClear={requestClear}
@@ -269,7 +291,7 @@ export function App() {
           onDismiss={() => setToast(null)}
         />
       )}
-      <HelpSheet open={helpOpen} onClose={() => setHelpOpen(false)} />
+      {route.page === "guide" && <GuidePage anchor={route.anchor} />}
       <EditorErrorBoundary key={rebuilds}>
         <KoenigComposer
           cards={catalog.cards.length ? (settings.cards as KoenigCardName[]) : undefined}
@@ -281,7 +303,7 @@ export function App() {
           toolbarActions={settings.toolbarActions ? toolbarActions : undefined}
           {...optionalProps}
         >
-          <div className="page">
+          <div className="page" hidden={route.page === "guide"}>
             <main>
               <div className="editor-box" style={editorStyle}>
                 <KoenigEditor readOnly={settings.readOnly} onChange={onChange} />

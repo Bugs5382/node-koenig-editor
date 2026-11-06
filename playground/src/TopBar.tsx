@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 // The sticky bar: the title and the controls that change how the page looks and works, in groups.
 import { useEffect, useRef } from "react";
+import { editorHref, guideHref } from "./route";
 import { Button, Listbox, Segmented, SwatchPicker, Switch } from "./controls";
 import {
   applyPreset,
@@ -40,10 +41,10 @@ interface Props {
   onChange: (patch: Partial<Settings>) => void;
   onClear: () => void;
   onCopyLink: () => void;
-  onHelp: () => void;
   onLoadKitchenSink: () => void;
   onLoadSamples: () => void;
   onReset: () => void;
+  page: "editor" | "guide";
   settings: Settings;
 }
 
@@ -53,10 +54,10 @@ export function TopBar({
   onChange,
   onClear,
   onCopyLink,
-  onHelp,
   onLoadKitchenSink,
   onLoadSamples,
   onReset,
+  page,
   settings,
 }: Props) {
   // The split layout is as tall as the window minus the bar, and the bar wraps, so it reports its height.
@@ -75,6 +76,14 @@ export function TopBar({
   return (
     <header className="bar" ref={bar}>
       <h1 className="bar-title">Koenig playground</h1>
+      <nav className="bar-tabs" aria-label="Pages">
+        <a href={editorHref} aria-current={page === "editor" ? "page" : undefined}>
+          Editor
+        </a>
+        <a href={guideHref()} aria-current={page === "guide" ? "page" : undefined}>
+          Guide
+        </a>
+      </nav>
       <div className="bar-group" role="group" aria-label="Appearance">
         <Switch label="Dark" checked={settings.dark} onChange={(dark) => onChange({ dark })} />
         <Segmented
@@ -91,50 +100,53 @@ export function TopBar({
           onChange={(selection) => onChange({ selection })}
         />
       </div>
-      <div className="bar-group" role="group" aria-label="Editor">
-        <Switch
-          label="Read only"
-          checked={settings.readOnly}
-          onChange={(readOnly) => onChange({ readOnly })}
-        />
-        {catalog.cards.length > 0 && (
-          <Listbox<PresetId | "custom">
-            label="Cards"
-            value={preset}
-            options={[
-              ...PRESETS.map((p) => ({ label: p.label, value: p.id as PresetId | "custom" })),
-              { label: "Custom", value: "custom", disabled: true },
-            ]}
-            onChange={(id) => {
-              if (id !== "custom") onChange({ cards: applyPreset(id, catalog) });
-            }}
-          />
-        )}
-      </div>
-      <div className="bar-group bar-actions" role="group" aria-label="Actions">
-        <Button
-          variant="primary"
-          disabled={!galleryOn}
-          title={galleryOn ? undefined : "The gallery card is switched off"}
-          onClick={onLoadSamples}
-        >
-          Load sample images
-        </Button>
-        <Button
-          title="Replace the document with one that shows every card"
-          onClick={onLoadKitchenSink}
-        >
-          Load the kitchen sink
-        </Button>
-        <Button onClick={onCopyLink}>Copy link</Button>
-        <Button title="Empty the document, keep the settings" onClick={onClear}>
-          Clear
-        </Button>
-        <Button title="Empty document and default settings" onClick={onReset}>
-          Reset
-        </Button>
-        <Button onClick={onHelp}>Help</Button>
-      </div>
+      {page === "editor" && (
+        <>
+          <div className="bar-group" role="group" aria-label="Editor">
+            <Switch
+              label="Read only"
+              checked={settings.readOnly}
+              onChange={(readOnly) => onChange({ readOnly })}
+            />
+            {catalog.cards.length > 0 && (
+              <Listbox<PresetId | "custom">
+                label="Cards"
+                value={preset}
+                options={[
+                  ...PRESETS.map((p) => ({ label: p.label, value: p.id as PresetId | "custom" })),
+                  { label: "Custom", value: "custom", disabled: true },
+                ]}
+                onChange={(id) => {
+                  if (id !== "custom") onChange({ cards: applyPreset(id, catalog) });
+                }}
+              />
+            )}
+          </div>
+          <div className="bar-group bar-actions" role="group" aria-label="Actions">
+            <Button
+              variant="primary"
+              disabled={!galleryOn}
+              title={galleryOn ? undefined : "The gallery card is switched off"}
+              onClick={onLoadSamples}
+            >
+              Load sample images
+            </Button>
+            <Button
+              title="Replace the document with one that shows every card"
+              onClick={onLoadKitchenSink}
+            >
+              Load the kitchen sink
+            </Button>
+            <Button onClick={onCopyLink}>Copy link</Button>
+            <Button title="Empty the document, keep the settings" onClick={onClear}>
+              Clear
+            </Button>
+            <Button title="Empty document and default settings" onClick={onReset}>
+              Reset
+            </Button>
+          </div>
+        </>
+      )}
     </header>
   );
 }

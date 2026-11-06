@@ -26,7 +26,7 @@ editor works alone.
 
 - [The default cards on one page](https://github.com/Bugs5382/node-koenig-editor/blob/main/guides/cards.md):
   what each card and tool is for, how to add it, its limits, keyboard use, accessibility notes and
-  how a host switches it off or replaces it. The playground's Help button shows the same page.
+  how a host switches it off or replaces it. The playground shows the same page under its Guide tab, with a Try it link under each card.
 
 ## 📦 Install
 
@@ -818,9 +818,12 @@ A demo app in `playground/` runs the editor in your browser, with a checkbox for
 tool, the toolbar actions, comments, word count and read-only mode, and the matching code next to
 them. The page splits 50/50 under a sticky top bar (the editor on the left, the options, code,
 sample images, comments and saved state stacked on the right, each side scrolling on its own; under
-1000px the right side drops below the editor). The bar holds the switches (dark, read only), a
-text-size control, a selection colour picker, a card preset list, and the Load sample images, Copy
-link and Reset buttons. The setup lives in the page address, so copying the link shares it.
+1000px the right side drops below the editor). The bar holds the Editor and Guide tabs, the switches (dark, read only), a
+text-size control, a selection colour picker, a card preset list, and the Load sample images, Load
+the kitchen sink, Copy link, Clear and Reset buttons. Clear empties the document and keeps the
+settings; Reset empties it and restores the default settings; both ask first and leave an Undo.
+The Guide tab is the cards guide as a page: contents, an anchor per card, Print, and a Try it link
+that opens the editor with that card inserted. The setup lives in the page address, so copying the link shares it.
 
 The demo starts with a header and a gallery made of ten sample pictures (small PNGs it draws itself, no
 network: `npm --prefix playground run samples` rebuilds them). A "Load sample images" button adds a

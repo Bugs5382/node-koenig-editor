@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 // saved-state JSON, like seed.ts, so it needs no editor instance. Cards the package lacks, or that
 // are switched off, are left out: a document holding a node the composer was built without would
 // not load.
+import type { Settings, Catalog } from "./config";
+import { type TryId } from "./route";
 import { galleryNode, headerNode, imageNode, SAMPLES, type CardNode } from "./seed";
 
 /** The cards of a build that does not list its own. */
@@ -219,4 +221,121 @@ export function kitchenSink(
   return JSON.stringify({
     root: { children, direction: null, format: "", indent: 0, type: "root", version: 1 },
   });
+}
+
+// What each "Try it" link sets up: a line saying what to do, then the card.
+const TRY: Record<TryId, { label: string; hint: string; needs: string | null }> = {
+  image: {
+    label: "Image",
+    hint: "Pick the picture to edit its alt text and caption, or add a link.",
+    needs: "image",
+  },
+  gallery: {
+    label: "Gallery",
+    hint: "Select a picture for its icons; the full screen button opens the viewer.",
+    needs: "gallery",
+  },
+  header: {
+    label: "Header",
+    hint: "Select the header to change its colour, picture, alignment and button.",
+    needs: "header",
+  },
+  callout: {
+    label: "Callout",
+    hint: "Select the callout to change its colour, or press the emoji button.",
+    needs: "callout",
+  },
+  toggle: {
+    label: "Toggle",
+    hint: "Press the arrow to open and close it, and type in both parts.",
+    needs: "toggle",
+  },
+  divider: {
+    label: "Divider",
+    hint: "Select the line and press Backspace to remove it.",
+    needs: "divider",
+  },
+  table: {
+    label: "Table",
+    hint: "Click in a cell: a toolbar above it adds and removes rows and columns.",
+    needs: "table",
+  },
+  file: {
+    label: "File",
+    hint: "The card links to a small text file kept with the demo.",
+    needs: "file",
+  },
+  video: {
+    label: "Video",
+    hint: "Drop a video file on the card, or press its upload button.",
+    needs: "video",
+  },
+  audio: {
+    label: "Audio",
+    hint: "Press play. The transcript is below the player's title.",
+    needs: "audio",
+  },
+  button: {
+    label: "Button",
+    hint: "Select the button to change its label, link and placement.",
+    needs: "button",
+  },
+  markdown: {
+    label: "Markdown",
+    hint: "Select the card and edit the Markdown; the card shows the result.",
+    needs: "markdown",
+  },
+  "image-editor": {
+    label: "Image editor",
+    hint: "Pick a picture on the card below: a crop and rotate dialog opens first.",
+    needs: "image",
+  },
+  "emoji-picker": {
+    label: "Emoji picker",
+    hint: "Select the callout and press its emoji button to open the picker.",
+    needs: "callout",
+  },
+  "word-count": {
+    label: "Word count",
+    hint: "Type here and watch the count under the editor.",
+    needs: null,
+  },
+};
+
+const WORDS =
+  "The word count reads the text of the document and shows how many words it holds and how long they take to read. " +
+  "Cards are not counted, only paragraphs, headings, lists, quotes, code and table cells. " +
+  "Edit this paragraph, add a few sentences, and the number under the editor follows as you type.";
+
+/** A short document for a "Try it" link, or null when the package does not have what it needs. */
+export function tryDocument(id: TryId, available: readonly string[]): string | null {
+  const has = available.length ? available : KITCHEN_SINK_FALLBACK;
+  const info = TRY[id];
+  if (info.needs && !has.includes(info.needs)) return null;
+
+  const children: CardNode[] = [paragraph(`Trying the ${info.label.toLowerCase()}. ${info.hint}`)];
+  if (id === "word-count") children.push(paragraph(WORDS));
+  else if (id === "image-editor") children.push({ type: "image", version: 1, src: "" });
+  else if (id === "emoji-picker") children.push(...CARD_NODES.callout!());
+  else children.push(...CARD_NODES[id]!());
+  children.push(paragraph(""));
+
+  return JSON.stringify({
+    root: { children, direction: null, format: "", indent: 0, type: "root", version: 1 },
+  });
+}
+
+/** The settings a try link needs on so its card, tool or count is there; empty when all are on. */
+export function tryNeeds(id: TryId, settings: Settings, catalog: Catalog): Partial<Settings> {
+  const needs: Partial<Settings> = {};
+  const card = TRY[id].needs;
+  if (card && catalog.cards.includes(card) && !settings.cards.includes(card)) {
+    needs.cards = catalog.cards.filter((c) => c === card || settings.cards.includes(c));
+  }
+  const tool = id === "image-editor" ? "imageEditor" : id === "emoji-picker" ? "emojiPicker" : null;
+  if (tool && catalog.tools.includes(tool) && !settings.tools.includes(tool)) {
+    needs.tools = catalog.tools.filter((t) => t === tool || settings.tools.includes(t));
+  }
+  if (id === "word-count" && catalog.wordCount && !settings.wordCount) needs.wordCount = true;
+  return needs;
 }

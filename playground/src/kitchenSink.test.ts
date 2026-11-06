@@ -21,7 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { describe, expect, it } from "vitest";
-import { kitchenSink, KITCHEN_SINK_FALLBACK } from "./kitchenSink";
+import { kitchenSink, KITCHEN_SINK_FALLBACK, tryDocument, tryNeeds } from "./kitchenSink";
+import { defaultSettings, type Catalog } from "./config";
+import { TRY_IDS } from "./route";
 
 type Node = { type: string; [key: string]: unknown };
 const childrenOf = (json: string): Node[] => JSON.parse(json).root.children;
@@ -105,5 +107,54 @@ describe("kitchen sink document", () => {
     expect(rows.length).toBeGreaterThanOrEqual(3);
     const firstCells = rows[0]!.children as Node[];
     expect(firstCells.every((cell) => cell.headerState === 1)).toBe(true);
+  });
+});
+
+describe("try documents", () => {
+  it("make a short document for each card, with that card in it", () => {
+    for (const id of ["image", "gallery", "header", "callout", "toggle", "divider", "table"]) {
+      const types = childrenOf(tryDocument(id as never, ALL)!).map((n) => n.type);
+      const want = id === "divider" ? "horizontalrule" : id;
+      expect(types, id).toContain(want);
+      expect(types[0]).toBe("paragraph");
+    }
+    for (const id of ["file", "video", "audio", "button", "markdown"]) {
+      expect(typesOf(tryDocument(id as never, ALL)!), id).toContain(id);
+    }
+  });
+
+  it("opens the tools on a card that uses them", () => {
+    expect(typesOf(tryDocument("image-editor", ALL)!)).toContain("image");
+    expect(typesOf(tryDocument("emoji-picker", ALL)!)).toContain("callout");
+    const words = tryDocument("word-count", ALL)!;
+    expect(typesOf(words)).toEqual(["paragraph"]);
+    expect(words.length).toBeGreaterThan(200);
+  });
+
+  it("is nothing for a card the package does not have", () => {
+    expect(tryDocument("file", MAIN)).toBeNull();
+    expect(tryDocument("image-editor", ["callout"])).toBeNull();
+    expect(tryDocument("word-count", [])).not.toBeNull();
+  });
+
+  it("has a document for every try id when the package has everything", () => {
+    for (const id of TRY_IDS) expect(tryDocument(id, ALL), id).not.toBeNull();
+  });
+
+  const catalog: Catalog = { cards: ALL, tools: ["emojiPicker", "imageEditor"], wordCount: true };
+
+  it("says which settings the card needs, and nothing when they are already on", () => {
+    const all = defaultSettings(catalog);
+    expect(tryNeeds("gallery", all, catalog)).toEqual({});
+    const few = { ...all, cards: ["image", "divider"], tools: [], wordCount: false };
+    expect(tryNeeds("gallery", few, catalog)).toEqual({
+      cards: ["image", "divider", "gallery"].sort((a, b) => ALL.indexOf(a) - ALL.indexOf(b)),
+    });
+    expect(tryNeeds("image-editor", few, catalog)).toEqual({ tools: ["imageEditor"] });
+    expect(tryNeeds("emoji-picker", few, catalog)).toEqual({
+      cards: ["image", "divider", "callout"].sort((a, b) => ALL.indexOf(a) - ALL.indexOf(b)),
+      tools: ["emojiPicker"],
+    });
+    expect(tryNeeds("word-count", few, catalog)).toEqual({ wordCount: true });
   });
 });

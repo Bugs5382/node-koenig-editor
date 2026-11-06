@@ -38,7 +38,6 @@
     "@eslint/js": "^9.17.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
-    "@types/markdown-it": "^14.2.0",
     "@types/node": "^22.10.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

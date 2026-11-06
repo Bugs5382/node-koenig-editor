@@ -299,38 +299,6 @@ ul.threads li.resolved {
   margin: 4px 0;
 }
 
-/* Help sheet: slides in from the right under the bar, above the page. */
-.sheet-backdrop {
-  position: fixed;
-  inset: var(--bar-h, 53px) 0 0 0;
-  z-index: 1000;
-  background: rgb(0 0 0 / 0.35);
-}
-.sheet {
-  position: fixed;
-  top: var(--bar-h, 53px);
-  right: 0;
-  bottom: 0;
-  z-index: 1001;
-  display: flex;
-  flex-direction: column;
-  width: min(560px, 100vw);
-  border-left: 1px solid var(--line);
-  background: var(--panel);
-  box-shadow: -8px 0 24px rgb(0 0 0 / 0.18);
-}
-.sheet-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--line);
-}
-.sheet-actions {
-  display: flex;
-  gap: 8px;
-}
 .md {
   flex: 1;
   overflow: auto;
@@ -374,12 +342,147 @@ ul.threads li.resolved {
   background: var(--bg);
 }
 
+/* The guide page: contents on the left, the whole guide in the middle. */
+.page[hidden] {
+  display: none;
+}
+.bar-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--bg);
+}
+.bar-tabs a {
+  padding: 4px 12px;
+  border-radius: 7px;
+  color: var(--fg);
+  font-size: 13px;
+  text-decoration: none;
+}
+.bar-tabs a:hover {
+  background: var(--hover);
+}
+.bar-tabs a[aria-current="page"] {
+  background: var(--panel);
+  box-shadow:
+    0 0 0 1px var(--line),
+    0 1px 2px rgb(0 0 0 / 0.12);
+  font-weight: 600;
+}
+.bar-tabs a:focus-visible,
+.guide a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.guide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+.guide-toc,
+.guide-main {
+  min-width: 0;
+}
+.guide-toc h2 {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.guide-toc ol {
+  margin: 0;
+  padding-left: 20px;
+}
+.guide-toc li {
+  margin: 2px 0;
+}
+.guide-toc a {
+  color: inherit;
+}
+.guide-toc a[aria-current="location"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+.guide-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.guide-back {
+  color: var(--accent);
+  font-weight: 600;
+}
+.guide-main .md {
+  padding: 0;
+  overflow: visible;
+}
+.md h2 {
+  scroll-margin-top: calc(var(--bar-h, 53px) + 8px);
+}
+.md .anchor {
+  margin-left: 6px;
+  color: var(--muted);
+  font-weight: 400;
+  opacity: 0;
+  text-decoration: none;
+}
+.md h2:hover .anchor,
+.md .anchor:focus-visible {
+  opacity: 1;
+}
+.md .try {
+  margin: 4px 0 8px;
+}
+.md .try-link {
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.md .try-link:hover {
+  background: var(--accent);
+  color: #fff;
+}
+@media (min-width: 1000px) {
+  .guide {
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 0;
+    padding: 0;
+    height: calc(100dvh - var(--bar-h, 53px));
+    overflow: auto;
+  }
+  .guide-toc {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    max-height: calc(100dvh - var(--bar-h, 53px));
+    overflow: auto;
+    padding: 16px;
+    border-right: 1px solid var(--line);
+  }
+  .guide-main {
+    max-width: 900px;
+    padding: 16px 32px 64px;
+  }
+}
+
 /* Print: only the guide, as a plain page. */
 @media print {
   header.bar,
   .page,
-  .sheet-backdrop,
-  .sheet-head {
+  .guide-toc,
+  .guide-head,
+  .md .try,
+  .md .anchor {
     display: none !important;
   }
   html,
@@ -387,15 +490,14 @@ ul.threads li.resolved {
     height: auto !important;
     overflow: visible !important;
   }
-  .sheet {
-    position: static;
-    width: auto;
-    border: 0;
-    box-shadow: none;
+  .guide {
     display: block;
-  }
-  .md {
+    height: auto;
     overflow: visible;
+    padding: 0;
+  }
+  .guide-main {
+    max-width: none;
     padding: 0;
   }
   .md h2 {
