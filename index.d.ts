@@ -158,17 +158,52 @@ export interface KoenigStrings {
   };
   menu: { addCard: string; removeSnippet: string; sections: Record<string, string> };
   toolbar: Record<KoenigToolbarItem, string>;
-  /** The table card's controls; `toolbar` names the group for screen readers. */
+  /** The table card's controls; `toolbar` names the group for screen readers. The two announcements
+   *  take `{row}`, `{rows}`, `{column}`, `{columns}`, `{rowSpan}` and `{colSpan}`. */
   table: {
     addColumnLeft: string;
     addColumnRight: string;
     addRowAbove: string;
     addRowBelow: string;
+    alignBottom: string;
+    alignCenter: string;
+    alignLeft: string;
+    alignMenu: string;
+    alignMiddle: string;
+    alignRight: string;
+    alignTop: string;
+    caption: string;
+    captionDone: string;
+    captionLabel: string;
+    captionPlaceholder: string;
+    captionRemove: string;
+    cellMenu: string;
+    colourMenu: string;
+    columnMenu: string;
+    contextMenu: string;
     deleteColumn: string;
     deleteRow: string;
     deleteTable: string;
+    headerColumn: string;
     headerRow: string;
+    mergeCells: string;
+    moveColumnLeft: string;
+    moveColumnRight: string;
+    moveRowDown: string;
+    moveRowUp: string;
+    noColour: string;
+    positionAnnouncement: string;
+    rowMenu: string;
+    spanAnnouncement: string;
+    splitCell: string;
     toolbar: string;
+    widthAuto: string;
+    widthMedium: string;
+    widthMenu: string;
+    widthNarrow: string;
+    widthWide: string;
+    /** Names of the cell colours, by their key. */
+    colours: Record<"blue" | "green" | "grey" | "orange" | "pink" | "purple" | "red" | "yellow", string>;
   };
   card: {
     edit: string;

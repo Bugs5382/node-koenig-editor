@@ -1061,6 +1061,11 @@
     height: calc(3.6 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .size-\[0\.8rem\] {
+    width: calc(0.8 * var(--kg-rem, 0.625rem));
+    height: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .size-\[1\.4rem\] {
     width: calc(1.4 * var(--kg-rem, 0.625rem));
     height: calc(1.4 * var(--kg-rem, 0.625rem));
@@ -1164,6 +1169,10 @@
     max-height: min(calc(22.4 * var(--kg-rem, 0.625rem)), 40vh);
 }
 
+.koenig-lexical .max-h-\[min\(40rem\2c 70vh\)\] {
+    max-height: min(calc(40 * var(--kg-rem, 0.625rem)), 70vh);
+}
+
 .koenig-lexical .max-h-\[min\(var\(--kg-menu-max-height\2c 32rem\)\2c var\(--kg-menu-fit\2c 100vh\)\)\] {
     max-height: min(var(--kg-menu-max-height,calc(32 * var(--kg-rem, 0.625rem))), var(--kg-menu-fit,100vh));
 }
@@ -1240,6 +1249,10 @@
     width: 136%;
 }
 
+.koenig-lexical .w-\[28rem\] {
+    width: calc(28 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .w-\[320px\] {
     width: 320px;
 }
@@ -1282,6 +1295,10 @@
 
 .koenig-lexical .min-w-11 {
     min-width: calc(4.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .min-w-\[18rem\] {
+    min-width: calc(18 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .min-w-\[296px\] {
@@ -1689,6 +1706,11 @@
     border-color: color-mix(in srgb, var(--kg-color-grey-300, #DDE1E5) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .border-grey-500 {
+    --tw-border-opacity: 1;
+    border-color: color-mix(in srgb, var(--kg-color-grey-500, #AEB7C1) calc(var(--tw-border-opacity, 1) * 100%), transparent);
+}
+
 .koenig-lexical .border-grey\/20 {
     border-color: color-mix(in srgb, var(--kg-color-grey, #ABB4BE) calc(0.2 * 100%), transparent);
 }
@@ -1773,6 +1795,10 @@
 
 .koenig-lexical .bg-blue\/20 {
     background-color: color-mix(in srgb, var(--kg-color-blue, #14B8FF) calc(0.2 * 100%), transparent);
+}
+
+.koenig-lexical .bg-current {
+    background-color: currentColor;
 }
 
 .koenig-lexical .bg-green\/10 {
@@ -2125,6 +2151,11 @@
 .koenig-lexical .py-\[\.3rem\] {
     padding-top: calc(.3 * var(--kg-rem, 0.625rem));
     padding-bottom: calc(.3 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .py-\[0\.7rem\] {
+    padding-top: calc(0.7 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(0.7 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-\[1rem\] {
@@ -4526,6 +4557,14 @@ em-emoji-picker {
 .koenig-lexical .has-\[\:focus-visible\]\:ring-grey-500:has(:focus-visible) {
     --tw-ring-opacity: 1;
     --tw-ring-color: color-mix(in srgb, var(--kg-color-grey-500, #AEB7C1) calc(var(--tw-ring-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .aria-disabled\:cursor-default[aria-disabled="true"] {
+    cursor: default;
+}
+
+.koenig-lexical .aria-disabled\:opacity-40[aria-disabled="true"] {
+    opacity: 0.4;
 }
 
 .koenig-lexical .aria-pressed\:bg-grey-100[aria-pressed="true"] {

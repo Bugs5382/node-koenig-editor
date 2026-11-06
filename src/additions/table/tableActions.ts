@@ -43,6 +43,7 @@ import {
 } from "@lexical/table";
 import { $findMatchingParent } from "@lexical/utils";
 import {
+  $createParagraphNode,
   $getSelection,
   $isRangeSelection,
   $getState,
@@ -219,8 +220,10 @@ export const $readTableState = (): TableState | null => {
 };
 
 /** Whether an action makes sense for the cell or range the cursor is in right now. */
-export const $isTableActionEnabled = (id: TableActionId): boolean => {
-  const state = $readTableState();
+export const $isTableActionEnabled = (
+  id: TableActionId,
+  state: TableState | null = $readTableState(),
+): boolean => {
   if (!state) return false;
   switch (id) {
     case "merge":
@@ -272,7 +275,7 @@ export const $setCellColor = (color: string | null): void => {
 /** Runs an action on the cell or range the cursor is in. Does nothing when it is not possible. */
 export const $runTableAction = (id: TableActionId): void => {
   const state = $readTableState();
-  if (!state || !$isTableActionEnabled(id)) return;
+  if (!state || !$isTableActionEnabled(id, state)) return;
   switch (id) {
     case "rowAbove":
       $insertTableRowAtSelection(false);
@@ -292,9 +295,13 @@ export const $runTableAction = (id: TableActionId): void => {
     case "deleteColumn":
       $deleteTableColumnAtSelection();
       return;
-    case "deleteTable":
-      state.table.remove();
+    case "deleteTable": {
+      // the document is never left without a place to type
+      const paragraph = $createParagraphNode();
+      state.table.replace(paragraph);
+      paragraph.select();
       return;
+    }
     case "moveRowUp":
       $moveTableRow(state.table, state.row, state.row - 1);
       return;
