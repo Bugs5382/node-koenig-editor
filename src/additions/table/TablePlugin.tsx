@@ -35,11 +35,7 @@ export const TablePlugin = () => {
   }
   return (
     <>
-      <LexicalTablePlugin
-        hasCellBackgroundColor={false}
-        hasCellMerge={false}
-        hasTabHandler={true}
-      />
+      <LexicalTablePlugin hasCellBackgroundColor={true} hasCellMerge={true} hasTabHandler={true} />
       <TableActionsPlugin />
     </>
   );
