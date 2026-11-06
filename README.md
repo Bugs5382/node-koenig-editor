@@ -68,6 +68,7 @@ the sources.
 | -------------------- | --------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `file`, `video`, `audio`, `button`, `markdown`, `divider`, `callout`, `toggle`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
 | `cardRenderers`      | `KoenigCardRenderers`             | none            | Your own layout for the `gallery` and `header` cards; see [Gallery and header cards](#-gallery-and-header-cards). |
+| `gallery`            | `{ maxImages?: number }`          | `{ maxImages: 50 }` | Options for the gallery card. `maxImages` is the most photos a gallery takes, and the ceiling for each gallery's own setting. It limits adding photos, never cuts off photos a document already has. |
 | `customNodes`        | `EditorNodes`                     | none            | Your own node classes, registered after the shipped ones. A node with a static `kgMenu` (a `CardMenuItem` or a list) is listed in the menus.                                     |
 | `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
@@ -305,12 +306,29 @@ simple: no merged cells and no cell colours.
 Both are in the default card set, so they are in the "+" and slash menus (`/gallery`, `/header`).
 `cards` leaves either out, like any other card.
 
-**Gallery.** Up to nine images. Reorder by dragging. Without a mouse, select the card, focus a
+**Gallery.** Up to 50 images by default (`gallery.maxImages` on the composer changes the ceiling; each gallery can set a lower limit of its own, see below). Reorder by dragging. Without a mouse, select the card, focus a
 photo (Tab) and press Alt with the left or right arrow key; a short announcement follows ("Image
 2 of 5, moved before image 1"). The host's `fileUploader` is called once per image, so a progress
 bar or a failure belongs to one picture. Files outside `fileUploader.fileTypes.image.mimeTypes`,
 and images past the ninth, are refused with a message (`strings.gallery`) before the uploader is
 called. A gallery has its own caption too.
+
+*Full screen.* A button on the gallery, and one on each photo, opens a viewer that fills the
+screen, for editors and for people reading the document. It is a modal dialog: focus stays in it,
+Escape closes it and returns focus to the button, Left and Right (and swipe on a touch screen)
+move between photos, Home and End jump to the first and last, a thumbnail strip jumps to any
+photo, and the photo's title and caption show over the bottom with the same collapse control. It
+fades only when the person has not asked for reduced motion. The photo's alt text is on the
+image, not printed over it.
+
+*How many photos.* `gallery.maxImages` (default 50) is the host's ceiling. Select a gallery and its
+settings panel has a "Maximum number of images" box for that gallery: at most the host's ceiling,
+at least the number of photos already in it, and saved in the card, so the reader's view and the
+HTML output (`data-kg-max-images`, never more photos than that) keep to it. The card shows "n of
+max". Adding past the limit is refused with a message. A document that already has more photos
+than the host's limit keeps them all: the limit is for adding. Many photos load lazily, and the
+host's `fileUploader.upload` is called once per photo, up to three at a time, so a host's upload
+hook must cope with overlapping calls.
 
 *Title, caption and alt text.* Selecting a photo shows its icons: remove, and an icon that opens a
 dialog for that photo's title, caption and alt text (its help text says how to move the photo; focus stays in the dialog, Escape closes it without saving,
@@ -337,36 +355,80 @@ not see it. The background image goes through the host's `fileUploader`.
 
 Pass `cardRenderers` to draw either card yourself, with no fork. A renderer is a React component;
 the editor keeps the node, the uploads, the limits and the saving, and hands the component what
-it needs. Without an entry the default layout draws.
+it needs. Without an entry the default layout draws. A custom renderer changes how the card looks
+in the editor; the saved document and the HTML output are the same.
+
+**The gallery contract** (`KoenigGalleryRenderProps`) has four groups of props:
+
+| Group | Props |
+| --- | --- |
+| What to show | `images` (each with `alt`, `title` and `caption`, all plain text, plus `src`, `previewSrc`, `width`, `height`), `caption` (the gallery's own caption editor, ready to place), `errorMessage`, `isUploading`, `progress` |
+| State | `isSelected`, and `readOnly`: true when the editor is not editable, so draw a reader's view with no editing controls |
+| Settings | `maxImages` (this gallery's limit), `hostMaxImages` (the ceiling it cannot exceed), `mimeTypes` |
+| Callbacks | `addFiles(files)`, `removeImage(index)`, `moveImage(from, to)`, `replaceImages(list)` (the whole list, for your own drag and drop), `updateImage(index, { alt, title, caption })`, `setMaxImages(n)`, `clearError()` |
+
+**The header contract** (`KoenigHeaderRenderProps`) carries the card's values (`title`,
+`subtitle`, `backgroundColor`, `backgroundImageSrc`, `buttonText`, `buttonUrl`, `alignment`, the
+colours, `layout`), `titleField` and `subtitleField` (their editors, ready to place), `isEditing`,
+`isSelected`, `readOnly`, `update(changes)`, `uploadBackgroundImage(file)` and `uploadError`.
+
+**Wrap the default.** `KoenigGalleryCard` and `KoenigHeaderCard` are the default renderers, taking
+exactly those props, so you can add to the default instead of replacing it. This adds a download
+link to the reader's view of every gallery and leaves editing, the dialog and the full-screen
+viewer as they are:
+
+```tsx
+import { KoenigGalleryCard, type KoenigGalleryRenderProps } from "node-koenig-editor";
+
+const WithDownloadLink = (props: KoenigGalleryRenderProps) => (
+  <div>
+    <KoenigGalleryCard {...props} />
+    {props.readOnly ? <a href="#all">Download all {props.images.length} photos</a> : null}
+  </div>
+);
+
+<KoenigComposer cardRenderers={{ gallery: WithDownloadLink }} fileUploader={uploader}>
+```
+
+The header works the same way:
+
+```tsx
+import { KoenigHeaderCard, type KoenigHeaderRenderProps } from "node-koenig-editor";
+
+const WithBanner = (props: KoenigHeaderRenderProps) => (
+  <div className="my-banner">
+    <KoenigHeaderCard {...props} />
+  </div>
+);
+
+<KoenigComposer cardRenderers={{ header: WithBanner }} fileUploader={uploader}>
+```
+
+**Draw it all yourself.** This is a bare strip with no full-screen viewer; it shows the contract
+at its smallest:
 
 ```tsx
 import type { KoenigGalleryRenderProps } from "node-koenig-editor";
 
-const Strip = ({ images, addFiles, removeImage, updateImage, moveImage, caption, maxImages }: KoenigGalleryRenderProps) => (
+const Strip = ({ images, addFiles, removeImage, updateImage, moveImage, caption, maxImages, readOnly }: KoenigGalleryRenderProps) => (
   <div className="my-gallery">
     {images.map((image, index) => (
       <figure key={image.fileName}>
         <img alt={image.alt} src={image.previewSrc ?? image.src} />
-        <input value={image.alt} onChange={(e) => updateImage(index, { alt: e.target.value })} />
-        <button onClick={() => moveImage(index, index - 1)}>Earlier</button>
-        <button onClick={() => removeImage(index)}>Remove</button>
+        {readOnly ? null : (
+          <>
+            <input value={image.alt} onChange={(e) => updateImage(index, { alt: e.target.value })} />
+            <button onClick={() => moveImage(index, index - 1)}>Earlier</button>
+            <button onClick={() => removeImage(index)}>Remove</button>
+          </>
+        )}
       </figure>
     ))}
-    {images.length < maxImages ? <input multiple type="file" onChange={(e) => addFiles(e.target.files!)} /> : null}
+    {!readOnly && images.length < maxImages ? <input multiple type="file" onChange={(e) => addFiles(e.target.files!)} /> : null}
     {caption}
   </div>
 );
-
-<KoenigComposer cardRenderers={{ gallery: Strip }} fileUploader={uploader}>
 ```
-
-`KoenigGalleryRenderProps` carries `images`, `maxImages`, `mimeTypes`, `addFiles`, `removeImage`,
-`moveImage`, `updateImage` (alt and caption), `caption` (the gallery's own caption editor),
-`isSelected`, `isUploading`, `progress` and `errorMessage` with `clearError`.
-`KoenigHeaderRenderProps` carries the card's values (`title`, `subtitle`, `backgroundColor`,
-`backgroundImageSrc`, `buttonText`, `buttonUrl`, `alignment` and the colours), `isEditing`,
-`isSelected`, `update(changes)` and `uploadBackgroundImage(file)`. A custom renderer changes how
-the card looks in the editor; the saved document and the HTML output are the same.
 
 Not included: the parts of upstream's header and gallery that need a Ghost site or service
 (Unsplash, the Pintura image editor, the version 1 header editor).
