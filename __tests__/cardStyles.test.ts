@@ -38,7 +38,8 @@ const sources: Record<string, string[]> = {
 };
 
 // Classes that are markers or hooks, not utilities, so the stylesheet has no rule for them.
-const MARKERS = /^(group|peer|kg-|not-kg|bg-black-60$|markdown-editor$|sans-serif$|fw7$|f7$|center$|buttonUrl$)/;
+const MARKERS =
+  /^(group|peer|kg-|not-kg|bg-black-60$|markdown-editor$|sans-serif$|fw7$|f7$|center$|buttonUrl$)/;
 
 const escape = (name: string) => name.replace(/([^a-zA-Z0-9_-])/g, "\\$1");
 
@@ -52,7 +53,8 @@ const classesIn = (file: string) => {
   }
   // Classes picked in a ternary: 'opacity-100' : 'opacity-50'
   for (const match of source.matchAll(/'([a-z][a-z0-9:/[\].%#!_-]*)'/g)) {
-    if (/^(opacity|justify|bg|text|border|w|h|m|p|flex|items)-/.test(match[1]!)) found.add(match[1]!);
+    if (/^(opacity|justify|bg|text|border|w|h|m|p|flex|items)-/.test(match[1]!))
+      found.add(match[1]!);
   }
   return [...found];
 };

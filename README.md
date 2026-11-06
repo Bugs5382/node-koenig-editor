@@ -477,6 +477,18 @@ esbuild).
   when the selection is not in text). From a toolbar action, use `replaceSelection(native)`
   instead, as in [Toolbar actions](#-toolbar-actions).
 
+## ⌨️ Room around cards
+
+Every card keeps an empty paragraph before and after it: at the start and the end of the document
+and between two cards. The editor adds them itself, also to a stored document that is only a
+card, so there is always a place to click, type, or arrive at with the arrow keys and Enter. They
+are ordinary paragraphs; delete one and the editor puts it back while a card is still there. A
+read-only editor and the editors inside cards are left alone, and changes that arrive from a
+collaborator are not patched by this editor, so two editors do not both add one.
+
+The "+" button for an empty line sits inside the editor's box: just before the line when the
+padding leaves room, at the box's left edge otherwise, and never outside it.
+
 ## 🔠 Headings
 
 Headings run from H1 to H5 and no deeper. The toolbar has a button for each level (hide any with

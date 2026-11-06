@@ -36,9 +36,7 @@ const rect = (left: number, width: number): DOMRect =>
 
 // jsdom has no layout: give the editor's box, the empty line and the button the sizes a browser would.
 const withLayout = (box: DOMRect, line: DOMRect) => {
-  vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (
-    this: Element,
-  ) {
+  vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
     if (this.matches(".koenig-lexical")) return box;
     if (this.tagName === "P") return line;
     if (this.closest("[data-kg-plus-button]") && this.tagName === "BUTTON") return rect(0, 22);

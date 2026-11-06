@@ -641,10 +641,6 @@
     left: 50%;
 }
 
-.koenig-lexical .left-\[-28px\] {
-    left: -28px;
-}
-
 .koenig-lexical .left-\[-6rem\] {
     left: calc(-6 * var(--kg-rem, 0.625rem));
 }
@@ -671,10 +667,6 @@
 
 .koenig-lexical .top-\[-46px\] {
     top: -46px;
-}
-
-.koenig-lexical .top-\[0\] {
-    top: 0;
 }
 
 .koenig-lexical .top-\[1\.5rem\] {
@@ -4435,10 +4427,6 @@ em-emoji-picker {
 }
 
 @media (min-width: 500px) {
-
-    .koenig-lexical .xs\:left-\[-44px\] {
-        left: -44px;
-    }
 
     .koenig-lexical .xs\:overflow-visible {
         overflow: visible;
