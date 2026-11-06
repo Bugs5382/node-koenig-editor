@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 // @vitest-environment node
 import { readFileSync, readdirSync } from "node:fs";
 import { URL } from "node:url";
+import { inflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { SAMPLE_SPECS, sampleFileName } from "./sampleSpecs.mjs";
 import { renderSample, encodePng } from "../scripts/samples.mjs";
@@ -54,10 +55,29 @@ describe("sample pictures", () => {
     expect(SAMPLE_SPECS.some((s) => ratio(s) > 3)).toBe(true);
   });
 
-  it("are exactly what the script draws, so the files can be rebuilt", () => {
+  it("hold the pixels the script draws, so the files can be rebuilt", () => {
+    // Compare decoded pixels: the compressed bytes differ between zlib versions.
     for (const spec of SAMPLE_SPECS) {
-      const committed = readFileSync(new URL(sampleFileName(spec), dir));
-      expect(encodePng(spec.width, spec.height, renderSample(spec)).equals(committed)).toBe(true);
+      const file = readFileSync(new URL(sampleFileName(spec), dir));
+      const data: Buffer[] = [];
+      for (let at = 8; at < file.length;) {
+        const length = file.readUInt32BE(at);
+        if (file.toString("ascii", at + 4, at + 8) === "IDAT") {
+          data.push(file.subarray(at + 8, at + 8 + length));
+        }
+        at += length + 12;
+      }
+      const rows = inflateSync(Buffer.concat(data));
+      const stride = spec.width * 3 + 1;
+      const pixels = Buffer.alloc(spec.width * spec.height * 3);
+      for (let y = 0; y < spec.height; y++) {
+        expect(rows[y * stride]).toBe(0); // filter "none"
+        rows.copy(pixels, y * spec.width * 3, y * stride + 1, (y + 1) * stride);
+      }
+      expect(pixels.equals(renderSample(spec))).toBe(true);
+      expect(encodePng(spec.width, spec.height, pixels).subarray(0, 8).equals(SIGNATURE)).toBe(
+        true,
+      );
     }
   });
 
