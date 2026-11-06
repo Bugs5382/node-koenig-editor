@@ -1,6 +1,5 @@
 import DeleteIcon from '../../../assets/icons/kg-trash.svg?react';
 import React from 'react';
-import {CardCaptionEditor} from '../CardCaptionEditor';
 import {IconButton} from '../IconButton';
 import {MediaPlaceholder} from '../MediaPlaceholder';
 import {GalleryViewer} from '../../../../additions/gallery/GalleryViewer';
@@ -375,8 +374,7 @@ function FileDragOverlay({maxImages, strings}) {
 }
 
 export function GalleryCard({
-    captionEditor,
-    captionEditorInitialState,
+    caption,
     clearErrorMessage,
     deleteImage,
     filesDropper,
@@ -448,13 +446,7 @@ export function GalleryCard({
                 </div>
             ) : null}
 
-            <CardCaptionEditor
-                captionEditor={captionEditor}
-                captionEditorInitialState={captionEditorInitialState}
-                captionPlaceholder={strings.captionPlaceholder}
-                dataTestId="gallery-card-caption"
-                isSelected={isSelected}
-            />
+            {caption}
 
             {!readOnly && isSelected && images.length ? (
                 <GallerySettings count={images.length} hostMaxImages={hostMaxImages} maxImages={maxImages} setMaxImages={setMaxImages} strings={strings} />

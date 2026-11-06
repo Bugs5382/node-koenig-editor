@@ -408,8 +408,9 @@ export interface KoenigCommentsController {
 
 /** One image in a gallery. `previewSrc` is set only while the image is still uploading. */
 export interface KoenigGalleryImage {
+  /** Describes the photo for people who cannot see it. */
   alt: string;
-  /** Plain text escaped as HTML, because the gallery's HTML output writes it as is. */
+  /** Plain text. The card keeps it escaped, because the HTML output writes it as it is. */
   caption: string;
   fileName: string;
   height: null | number;
@@ -417,32 +418,60 @@ export interface KoenigGalleryImage {
   row?: number;
   /** The address the host's uploader returned; empty until the upload finishes. */
   src?: string;
+  /** Plain text, shown over the bottom of the photo and under it in the HTML output. */
+  title: string;
   width: null | number;
 }
 
-/** What the composer's `cardRenderers.gallery` component receives. It draws the gallery; the
- *  editor keeps the node, the uploads and the limits. */
+/**
+ * What the composer's `cardRenderers.gallery` component receives. It draws the gallery; the
+ * editor keeps the node, the uploads, the limits and the saving. The props are the contract, in
+ * four groups:
+ *
+ * - **What to show:** `images` (each with `alt`, `title` and `caption`, as plain text), `caption`
+ *   (the gallery's own caption editor, ready to place), `errorMessage`, `isUploading`, `progress`.
+ * - **State:** `isSelected`, and `readOnly`, true when the editor is not editable (a reader's view:
+ *   draw no editing controls).
+ * - **Settings:** `maxImages` (this gallery's limit), `hostMaxImages` (the host's ceiling for it)
+ *   and `mimeTypes` (the image types the host's uploader accepts).
+ * - **Callbacks:** `addFiles`, `removeImage`, `moveImage`, `replaceImages`, `updateImage`,
+ *   `setMaxImages`, `clearError`.
+ *
+ * Draw it yourself, or wrap the default with `KoenigGalleryCard`.
+ */
 export interface KoenigGalleryRenderProps {
   /** Adds files: each one is checked against `mimeTypes` and the limit, then sent to the
-   *  host's uploader on its own. */
+   *  host's uploader on its own, a few at a time. */
   addFiles: (files: File[] | FileList) => Promise<void>;
   /** The gallery's own caption editor, ready to place. */
   caption: ReactNode;
   clearError: () => void;
   errorMessage: null | string;
+  /** The host's ceiling for `maxImages`: the most this gallery's own limit can be set to. */
+  hostMaxImages: number;
   images: readonly KoenigGalleryImage[];
   isSelected: boolean;
   isUploading: boolean;
+  /** This gallery's limit on photos: its own setting, never above `hostMaxImages`. Adding past it
+   *  is refused with a message. */
   maxImages: number;
   /** The image types the host's uploader accepts; empty means any. */
   mimeTypes: readonly string[];
   /** Moves the image at `from` to position `to`. */
   moveImage: (from: number, to: number) => void;
   progress: number;
+  /** True when the editor is not editable: draw a reader's view, with no editing controls. */
+  readOnly: boolean;
   removeImage: (index: number) => void;
+  /** Replaces the whole list, in the order given: for your own drag and drop. */
+  replaceImages: (images: readonly KoenigGalleryImage[]) => void;
+  /** Sets this gallery's limit, kept between `max(photos in the gallery, 1)` and `hostMaxImages`.
+   *  Text that is not a number changes nothing. */
+  setMaxImages: (value: number | string) => void;
+  /** Saves changes to one image; `title` and `caption` are plain text. */
   updateImage: (
     index: number,
-    changes: Partial<Pick<KoenigGalleryImage, "alt" | "caption">>,
+    changes: Partial<Pick<KoenigGalleryImage, "alt" | "caption" | "title">>,
   ) => void;
 }
 
@@ -459,11 +488,17 @@ export interface KoenigHeaderRenderProps {
   isEditing: boolean;
   isSelected: boolean;
   layout: string;
+  /** True when the editor is not editable: draw a reader's view, with no settings. */
+  readOnly: boolean;
   /** The subtitle as plain text. */
   subtitle: string;
+  /** The subtitle's editor, ready to place. */
+  subtitleField: ReactNode;
   textColor: string;
   /** The title as plain text. */
   title: string;
+  /** The title's editor, ready to place. */
+  titleField: ReactNode;
   /** Saves changes to the card; `title` and `subtitle` are plain text. */
   update: (
     changes: Partial<
@@ -578,6 +613,12 @@ export declare const MINIMAL_NODES: EditorNodes;
 
 /** The shipped card names, in menu order. */
 export declare const KOENIG_CARD_NAMES: readonly KoenigCardName[];
+
+/** The default gallery, drawn from the props of `cardRenderers.gallery`, for a host to wrap. */
+export declare const KoenigGalleryCard: FC<KoenigGalleryRenderProps>;
+
+/** The default header, drawn from the props of `cardRenderers.header`, for a host to wrap. */
+export declare const KoenigHeaderCard: FC<KoenigHeaderRenderProps>;
 /** The tool names, `imageEditor` and `emojiPicker`. */
 export declare const KOENIG_TOOLS: readonly KoenigTool[];
 /** Whether a tool is on for the composer this component sits in. */

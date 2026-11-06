@@ -1,12 +1,10 @@
 import CardContext from '../context/CardContext';
 import KoenigComposerContext from '../context/KoenigComposerContext';
 import React from 'react';
-import useFileDragAndDrop from '../hooks/useFileDragAndDrop';
-import useGalleryReorder from '../hooks/useGalleryReorder';
 import {$getNodeByKey} from 'lexical';
 import {ActionToolbar} from '../components/ui/ActionToolbar';
 import {CardCaptionEditor} from '../components/ui/CardCaptionEditor';
-import {GalleryCard} from '../components/ui/cards/GalleryCard';
+import {KoenigGalleryCard} from '../components/KoenigGalleryCard';
 import {GALLERY_UPLOAD_CONCURRENCY, resolveMaxImages} from '../../additions/gallery/limits';
 import {recalculateImageRows} from './GalleryNode';
 import {SnippetActionToolbar} from '../components/ui/SnippetActionToolbar';
@@ -168,14 +166,6 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
         setIsUploading(false);
     };
 
-    const galleryReorder = useGalleryReorder({
-        images,
-        updateImages: commit,
-        isSelected,
-        maxImages
-    });
-    const imageFilesDropper = useFileDragAndDrop({handleDrop: files => addFiles(files)});
-
     const onFileChange = async (e) => {
         const files = e.target.files;
 
@@ -191,80 +181,67 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
         fileInputRef.current.click();
     }
 
-    const hideToolbar =
-        !isSelected ||
-        imageFilesDropper.isDraggedOver ||
-        galleryReorder.isDraggedOver ||
-        images.length <= 0;
+    const hideToolbar = !isSelected || readOnly || images.length <= 0;
+
+    // What a host's component gets. Title and caption go out as plain text and come back as plain
+    // text; the card keeps them escaped, because the HTML output writes them as they are.
+    const plain = list => list.map(image => ({
+        ...image,
+        title: unescapeHtml(image.title || ''),
+        caption: unescapeHtml(image.caption || '')
+    }));
+    const stored = (changes) => ({
+        ...(changes.alt !== undefined ? {alt: changes.alt} : {}),
+        ...(changes.title !== undefined ? {title: escapeHtml(changes.title)} : {}),
+        ...(changes.caption !== undefined ? {caption: escapeHtml(changes.caption)} : {})
+    });
+    const replaceImages = list => commit(list.map(image => ({
+        ...image,
+        ...(image.title !== undefined ? {title: escapeHtml(image.title)} : {}),
+        ...(image.caption !== undefined ? {caption: escapeHtml(image.caption)} : {})
+    })));
 
     const Custom = cardRenderers?.gallery;
+    const Renderer = Custom || KoenigGalleryCard;
+    const rendered = (
+        <Renderer
+            addFiles={addFiles}
+            caption={(
+                <CardCaptionEditor
+                    captionEditor={captionEditor}
+                    captionEditorInitialState={captionEditorInitialState}
+                    captionPlaceholder={strings.gallery.captionPlaceholder}
+                    dataTestId="gallery-card-caption"
+                    isSelected={isSelected}
+                />
+            )}
+            clearError={() => setErrorMessage(null)}
+            errorMessage={errorMessage}
+            hostMaxImages={hostMaxImages}
+            images={plain(images)}
+            isSelected={Boolean(isSelected)}
+            isUploading={isUploading}
+            maxImages={maxImages}
+            mimeTypes={mimeTypes ?? []}
+            moveImage={moveImage}
+            progress={imageUploader.progress ?? 0}
+            readOnly={readOnly}
+            removeImage={removeImage}
+            replaceImages={replaceImages}
+            setMaxImages={setMaxImages}
+            updateImage={(index, changes) => updateImage(index, stored(changes))}
+        />
+    );
 
     return (
         <>
-            {Custom ? (
-                <figure data-kg-gallery-custom>
-                    <Custom
-                        addFiles={addFiles}
-                        caption={(
-                            <CardCaptionEditor
-                                captionEditor={captionEditor}
-                                captionEditorInitialState={captionEditorInitialState}
-                                captionPlaceholder={strings.gallery.captionPlaceholder}
-                                dataTestId="gallery-card-caption"
-                                isSelected={isSelected}
-                            />
-                        )}
-                        clearError={() => setErrorMessage(null)}
-                        errorMessage={errorMessage}
-                        images={images}
-                        isSelected={Boolean(isSelected)}
-                        isUploading={isUploading}
-                        hostMaxImages={hostMaxImages}
-                        maxImages={maxImages}
-                        mimeTypes={mimeTypes ?? []}
-                        moveImage={moveImage}
-                        progress={imageUploader.progress ?? 0}
-                        readOnly={readOnly}
-                        removeImage={removeImage}
-                        setMaxImages={setMaxImages}
-                        updateImage={updateImage}
-                    />
-                </figure>
-            ) : (
-                <GalleryCard
-                    captionEditor={captionEditor}
-                    captionEditorInitialState={captionEditorInitialState}
-                    clearErrorMessage={() => setErrorMessage(null)}
-                    deleteImage={image => removeImage(imagesRef.current.indexOf(image))}
-                    errorMessage={errorMessage}
-                    fileInputRef={fileInputRef}
-                    filesDropper={imageFilesDropper}
-                    hostMaxImages={hostMaxImages}
-                    imageMimeTypes={mimeTypes}
-                    images={images}
-                    maxImages={maxImages}
-                    readOnly={readOnly}
-                    setMaxImages={setMaxImages}
-                    isSelected={isSelected}
-                    moveImage={moveImage}
-                    reorderHandler={galleryReorder}
-                    strings={strings.gallery}
-                    unescapeHtml={unescapeHtml}
-                    updateImageText={(index, changes) => updateImage(index, {
-                        ...(changes.alt !== undefined ? {alt: changes.alt} : {}),
-                        ...(changes.title !== undefined ? {title: escapeHtml(changes.title)} : {}),
-                        ...(changes.caption !== undefined ? {caption: escapeHtml(changes.caption)} : {})
-                    })}
-                    uploader={imageUploader}
-                    onFileChange={onFileChange}
-                />
-            )}
+            {Custom ? <figure data-kg-gallery-custom>{rendered}</figure> : rendered}
 
-            {Custom ? (
+            {readOnly ? null : (
                 <form hidden>
                     <input ref={fileInputRef} name="image-input" type="file" hidden multiple onChange={onFileChange} />
                 </form>
-            ) : null}
+            )}
 
             <ActionToolbar
                 data-kg-card-toolbar="gallery"

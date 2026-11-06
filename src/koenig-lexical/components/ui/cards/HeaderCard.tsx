@@ -1,4 +1,3 @@
-import KoenigCaptionEditor from '../../KoenigCaptionEditor';
 import React from 'react';
 
 // Every length is a multiple of --kg-rem and the type reads the host's font tokens, so the
@@ -123,13 +122,12 @@ export function HeaderCard({
     buttonText,
     buttonTextColor,
     buttonUrl,
-    headerTextEditor,
-    headerTextEditorInitialState,
     isEditing,
+    readOnly = false,
     strings,
-    subheaderTextEditor,
-    subheaderTextEditorInitialState,
+    subtitleField,
     textColor,
+    titleField,
     update,
     uploadBackgroundImage,
     uploadError
@@ -153,21 +151,13 @@ export function HeaderCard({
                     data-header-title
                     style={{fontSize: 'var(--kg-font-size-h1, 4.4rem)', fontWeight: 700, lineHeight: 1.15}}
                 >
-                    <KoenigCaptionEditor
-                        captionEditor={headerTextEditor}
-                        captionEditorInitialState={headerTextEditorInitialState}
-                        placeholderText={strings.titlePlaceholder}
-                    />
+                    {titleField}
                 </div>
                 <div
                     data-header-subtitle
                     style={{fontSize: 'var(--kg-font-size, 2rem)', marginTop: rem(1.2), opacity: 0.85}}
                 >
-                    <KoenigCaptionEditor
-                        captionEditor={subheaderTextEditor}
-                        captionEditorInitialState={subheaderTextEditorInitialState}
-                        placeholderText={strings.subtitlePlaceholder}
-                    />
+                    {subtitleField}
                 </div>
                 {buttonEnabled && (buttonText || isEditing) ? (
                     <div style={{marginTop: rem(2.4)}}>
@@ -188,7 +178,7 @@ export function HeaderCard({
                     </div>
                 ) : null}
             </div>
-            {isEditing ? (
+            {isEditing && !readOnly ? (
                 <Settings
                     alignment={alignment}
                     backgroundColor={backgroundColor}
