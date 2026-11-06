@@ -87,3 +87,14 @@ describe("the stylesheet prints a gallery photo's text under the photo", () => {
     expect(print).toContain("[data-gallery-image-text-toggle]");
   });
 });
+
+describe("the header card's title and subtitle take the card's own text colour", () => {
+  it("has a rule that makes the nested editors inherit it, whatever the prose styles say", () => {
+    for (const hook of ["[data-header-title]", "[data-header-subtitle]"]) {
+      const rule =
+        css.match(new RegExp(`[^{}]*${hook.replace(/[[\]]/g, "\\$&")}[^{}]*\\{[^}]*\\}`, "g")) ??
+        [];
+      expect(rule.join(" "), `${hook} has no colour rule`).toContain("color: inherit");
+    }
+  });
+});

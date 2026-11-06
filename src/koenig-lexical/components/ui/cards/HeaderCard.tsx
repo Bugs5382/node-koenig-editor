@@ -155,7 +155,7 @@ export function HeaderCard({
                 </div>
                 <div
                     data-header-subtitle
-                    style={{fontSize: 'var(--kg-font-size, 2rem)', marginTop: rem(1.2), opacity: 0.85}}
+                    style={{fontSize: 'var(--kg-font-size, 2rem)', marginTop: rem(1.2)}}
                 >
                     {subtitleField}
                 </div>

@@ -133,3 +133,12 @@ describe("the header card's settings", () => {
     }
   });
 });
+
+describe("the header card keeps its text readable", () => {
+  it("does not dim the subtitle with opacity, which lowers its contrast below 4.5:1", async () => {
+    await insertHeader();
+    await waitFor(() => expect(document.querySelector("[data-header-subtitle]")).not.toBeNull());
+    const subtitle = document.querySelector("[data-header-subtitle]") as HTMLElement;
+    expect(subtitle.style.opacity).toBe("");
+  });
+});

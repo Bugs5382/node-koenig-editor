@@ -213,3 +213,14 @@ em-emoji-picker {
         display: none !important;
     }
 }
+
+/* The header card's title and subtitle are nested editors, and the wrappers and prose styles around
+   them set a grey of their own. Under the card's text colour that was 2.7:1 on a dark background;
+   they take the card's colour instead, so contrast is whatever the colours the person chose give.
+   Links keep their own colour. */
+.koenig-lexical [data-header-title],
+.koenig-lexical [data-header-title] *:not(a),
+.koenig-lexical [data-header-subtitle],
+.koenig-lexical [data-header-subtitle] *:not(a) {
+    color: inherit;
+}
