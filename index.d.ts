@@ -51,6 +51,21 @@ export type KoenigCardName =
   | "toggle"
   | "video";
 
+/** Features that are not cards. Pass a list as the composer's `tools` to keep only those. */
+export type KoenigTool = "emojiPicker" | "imageEditor";
+
+/** The emoji picker's groups, in tab order. */
+export type KoenigEmojiCategory =
+  | "activities"
+  | "animals"
+  | "flags"
+  | "food"
+  | "objects"
+  | "people"
+  | "smileys"
+  | "symbols"
+  | "travel";
+
 /** The format toolbar's buttons. Pass a list as the composer's `toolbar` to show only those. */
 export type KoenigToolbarItem =
   | "bold"
@@ -218,6 +233,31 @@ export interface KoenigStrings {
   callout: { background: string; emoji: string; placeholder: string };
   toggle: { contentPlaceholder: string; headingPlaceholder: string };
   snippet: { namePlaceholder: string; replaceExisting: string };
+  imageEditor: {
+    apply: string;
+    aspectFree: string;
+    aspectLabel: string;
+    aspectOriginal: string;
+    cancel: string;
+    cropHelp: string;
+    cropLabel: string;
+    exportError: string;
+    loadError: string;
+    loading: string;
+    rotateLeft: string;
+    rotateRight: string;
+    title: string;
+  };
+  emojiPicker: {
+    categories: Record<KoenigEmojiCategory, string>;
+    categoriesLabel: string;
+    label: string;
+    loadError: string;
+    loading: string;
+    noResults: string;
+    searchLabel: string;
+    searchPlaceholder: string;
+  };
 }
 
 /** Every field optional, all the way down. */
@@ -449,6 +489,9 @@ export interface KoenigComposerProps {
   toolbar?: readonly KoenigToolbarItem[];
   /** The host's own buttons and cards on the selection toolbar. */
   toolbarActions?: readonly KoenigToolbarAction[];
+  /** The features that are not cards: `imageEditor` (crop and rotate before upload) and
+   *  `emojiPicker`. Default: both. Pass a list to keep only those. */
+  tools?: readonly KoenigTool[];
 }
 
 export interface KoenigEditorAPI {
@@ -490,6 +533,23 @@ export declare const MINIMAL_NODES: EditorNodes;
 
 /** The shipped card names, in menu order. */
 export declare const KOENIG_CARD_NAMES: readonly KoenigCardName[];
+/** The tool names, `imageEditor` and `emojiPicker`. */
+export declare const KOENIG_TOOLS: readonly KoenigTool[];
+/** Whether a tool is on for the composer this component sits in. */
+export declare const useKoenigTool: (tool: KoenigTool) => boolean;
+/** The offline emoji picker. Calls `onSelect` with the chosen emoji and `onClose` on Escape. */
+export declare const EmojiPicker: FC<{
+  onClose?: () => void;
+  onSelect: (emoji: { native: string }) => void;
+}>;
+/** Inserts an emoji at the editor's selection (replacing a range selection). */
+export declare const insertEmoji: (editor: LexicalEditor, emoji: string) => boolean;
+/** The crop and rotate dialog. `onApply` gets the edited copy of `file`. */
+export declare const ImageEditorDialog: FC<{
+  file: File;
+  onApply: (file: File) => void;
+  onCancel: () => void;
+}>;
 /** The format toolbar's button names, in toolbar order. */
 export declare const KOENIG_TOOLBAR_ITEMS: readonly KoenigToolbarItem[];
 /** The English wording. */

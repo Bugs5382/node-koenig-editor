@@ -14,6 +14,7 @@ editor works alone.
 - 🧱 **Pick your cards** — image, gallery, header, file, video, audio, button, markdown, divider, callout, toggle and table, on by default, off one by one.
 - 🧩 **Bring your own nodes** — register custom nodes and cards, and add your own "+" and slash menu entries.
 - 🗣️ **Your wording** — every label, placeholder and menu text comes from a `strings` option with English defaults.
+- 🖼️ **Crop, rotate and emoji, offline** — an image editor before upload and an emoji picker, both switchable with `tools`.
 - 🎛️ **Your toolbar** — show only the format buttons you want.
 - 🎨 **Theme with tokens** — CSS custom properties with documented defaults; no class overrides needed.
 - 💬 **Inline comments** — threads anchored on any selected text, kept in the document, with events for your own storage.
@@ -73,6 +74,7 @@ the sources.
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
 | `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `heading1` to `heading5` (headings stop at H5), `quote`, `link`, `snippet`.                                                        |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
+| `tools`              | `KoenigTool[]`                    | both            | The features that are not cards: `imageEditor` and `emojiPicker`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker). |
 | `collaboration`      | `KoenigCollaboration \| null`     | `null`          | The Yjs provider factory. Without it the editor works alone and asks for no provider.                                                                                            |
 | `nodes`              | `EditorNodes`                     | `DEFAULT_NODES` | The base node set the `cards` choice filters. `BASIC_NODES` and `MINIMAL_NODES` are smaller sets.                                                                                |
 | `initialEditorState` | `string \| SerializedEditorState` | empty           | The document to open. In a collaborative session it seeds the room only while the room is empty.                                                                                 |
@@ -99,7 +101,7 @@ the sources.
 
 `DEFAULT_STRINGS` holds every piece of text the editor shows, grouped as `placeholder`,
 `nestedPlaceholder`, `errorFallback` (the message a failed card shows; `{card}` is replaced with the card's name), `cards` (each card's menu `label` and `desc`), `menu`, `toolbar`, `table` (the table card's controls), `card`
-(card toolbar buttons), `link`, `image`, `button`, `markdown`, `wordCount`, `callout`, `toggle` and `snippet`. Plug your i18n in by
+(card toolbar buttons), `link`, `image`, `button`, `markdown`, `wordCount`, `file`, `video`, `audio`, `callout`, `toggle`, `snippet`, `imageEditor` and `emojiPicker`. Plug your i18n in by
 building the `strings` object from your translations. Your own cards read the wording in effect
 with `useKoenigStrings()`.
 
@@ -439,6 +441,42 @@ const uploader = {
 };
 ```
 
+## 🖼️ Image editor and emoji picker
+
+Neither is a card, so the composer's `cards` option does not list them. Both are on by default;
+`tools` turns them off one by one: `tools={["emojiPicker"]}` keeps only the emoji picker, and
+`tools={[]}` turns both off.
+
+**Image editor.** When someone picks, drops or pastes a single image into an image card, a dialog
+opens first to crop and rotate it, and the edited copy (`photo-edited.jpg`) goes to your
+`fileUploader` instead of the original. Cancel uploads nothing. The work happens on a canvas in
+the browser: no dependency, no network call. GIF and SVG files skip the editor, since a canvas
+would flatten them. JPEG stays JPEG; everything else is saved as PNG.
+
+- Keyboard: Tab stays inside the dialog and Escape cancels. On the crop area the arrow keys move
+  it and Shift with the arrow keys makes it larger or smaller. The crop shape (free, original,
+  1:1, 4:3, 16:9) is a select, and the rotate buttons turn by 90 degrees. The mouse drags the
+  crop and its corner.
+- Wording: `strings.imageEditor`. Use the dialog in your own UI with
+  `<ImageEditorDialog file onApply onCancel />`.
+
+**Emoji picker.** The callout card's emoji button opens it. It is searchable by name, has the nine
+standard groups, and works fully offline: the emoji come from
+[`unicode-emoji-json`](https://www.npmjs.com/package/unicode-emoji-json) (MIT), a dependency of
+this package that is not part of `dist/index.js`. It is loaded with a dynamic `import()` the
+first time a picker opens, so your bundler puts it in its own chunk and a page that never opens
+the picker never loads it. The import needs a bundler that handles JSON (Vite, webpack,
+esbuild).
+
+- Keyboard: Down from the search box enters the grid; arrows, Home and End move through it; Up
+  from the top row returns to the search; Enter picks; typing goes to the search; Escape closes.
+  The emoji are buttons in a listbox, each named in words.
+- Wording: `strings.emojiPicker`.
+- In your own UI: `<EmojiPicker onSelect={({ native }) => ...} onClose={...} />`, and
+  `insertEmoji(editor, native)` to put the pick into the text at the cursor (it returns `false`
+  when the selection is not in text). From a toolbar action, use `replaceSelection(native)`
+  instead, as in [Toolbar actions](#-toolbar-actions).
+
 ## 🔠 Headings
 
 Headings run from H1 to H5 and no deeper. The toolbar has a button for each level (hide any with
@@ -669,7 +707,8 @@ one, apply the change by hand, and update the commit here. Upstream history is n
 - Removed: cards that need a Ghost site or service (membership, signup, product, paywall, email
   and email CTA, call to action, bookmark, embed,
   HTML, Transistor, Ghost's code block card), the GIF and Unsplash pickers, the Pintura
-  image editor, the emoji picker, the TK and at-link nodes, replacement strings, the
+  image editor (replaced by a small canvas editor), the upstream emoji picker (replaced by an
+  offline one), the TK and at-link nodes, replacement strings, the
   demo, stories and upstream's tests.
 - Images: an image an older document kept inside a paragraph loads as an image card placed after
   that paragraph, because cards sit at the top level. Its `src`, `alt`, `width` and `height` are

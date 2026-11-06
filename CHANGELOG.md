@@ -1,5 +1,17 @@
 # node-koenig-editor
 
+## v1.2.0 - 2026-11-06
+
+### What Changed 👀
+
+#### 🚀 Features
+
+- feat(editor): image gallery and header cards in the default set, with host-replaceable layout @Bugs5382 (#33)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.1.0...v1.2.0
+
 ## v1.1.0 - 2026-11-06
 
 ### What Changed 👀

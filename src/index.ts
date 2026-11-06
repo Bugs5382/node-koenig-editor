@@ -27,8 +27,10 @@ export {
   DEFAULT_STRINGS,
   KOENIG_CARD_NAMES,
   KOENIG_TOOLBAR_ITEMS,
+  KOENIG_TOOLS,
   KoenigStringsContext,
   useKoenigStrings,
+  useKoenigTool,
 } from "./additions/options";
 export { useKoenigComments } from "./additions/comments";
 export { isSafeUrl, renderMarkdown, toSafeUrl } from "#kg-default-nodes";
@@ -39,3 +41,6 @@ export {
   getWordCount,
   useKoenigWordCount,
 } from "./additions/wordCount";
+export { ImageEditorDialog } from "./additions/imageEditor/ImageEditorDialog";
+export { EmojiPicker } from "./additions/emojiPicker/EmojiPicker";
+export { insertEmoji } from "./additions/emojiPicker/insertEmoji";

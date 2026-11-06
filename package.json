@@ -1,6 +1,6 @@
 {
   "name": "node-koenig-editor",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Ghost's Koenig editor on Lexical 0.52 and React 19, packaged for reuse, with optional Yjs collaboration.",
   "author": "Shane",
   "license": "MIT",
@@ -87,7 +87,8 @@
     "eventemitter3": "^5.0.4",
     "lodash": "^4.18.1",
     "markdown-it": "^15.0.3",
-    "react-error-boundary": "^6.1.6"
+    "react-error-boundary": "^6.1.6",
+    "unicode-emoji-json": "^0.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
