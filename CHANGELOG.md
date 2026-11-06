@@ -1,5 +1,17 @@
 # node-koenig-editor
 
+## v1.1.0 - 2026-11-06
+
+### What Changed 👀
+
+#### 🚀 Features
+
+- feat(editor): inline comment threads anchored to selected text @Bugs5382 (#13)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.0.0...v1.1.0
+
 ## v1.0.0 - 2026-11-05
 
 ### What Changed 👀
