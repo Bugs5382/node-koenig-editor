@@ -22,6 +22,12 @@ editor works alone.
 - 📄 **Plain Lexical documents** — stock node names (`text`, `heading`, `table`), readable by any Lexical consumer.
 - 🪶 **Peers stay yours** — Lexical, `@lexical/*`, React and Yjs are peer dependencies, never bundled.
 
+## 📚 Guides
+
+- [The default cards on one page](https://github.com/Bugs5382/node-koenig-editor/blob/main/guides/cards.md):
+  what each card and tool is for, how to add it, its limits, keyboard use, accessibility notes and
+  how a host switches it off or replaces it. The playground's Help button shows the same page.
+
 ## 📦 Install
 
 ```bash

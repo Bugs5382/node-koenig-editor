@@ -298,3 +298,111 @@ ul.threads li.resolved {
 .error-card p {
   margin: 4px 0;
 }
+
+/* Help sheet: slides in from the right under the bar, above the page. */
+.sheet-backdrop {
+  position: fixed;
+  inset: var(--bar-h, 53px) 0 0 0;
+  z-index: 1000;
+  background: rgb(0 0 0 / 0.35);
+}
+.sheet {
+  position: fixed;
+  top: var(--bar-h, 53px);
+  right: 0;
+  bottom: 0;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  width: min(560px, 100vw);
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: -8px 0 24px rgb(0 0 0 / 0.18);
+}
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.sheet-actions {
+  display: flex;
+  gap: 8px;
+}
+.md {
+  flex: 1;
+  overflow: auto;
+  padding: 8px 20px 32px;
+  line-height: 1.55;
+}
+.md h1 {
+  font-size: 22px;
+  margin: 16px 0 8px;
+}
+.md h2 {
+  font-size: 17px;
+  margin: 24px 0 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.md p,
+.md ul {
+  margin: 6px 0;
+}
+.md code {
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg);
+}
+.md table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 13px;
+}
+.md th,
+.md td {
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.md th {
+  background: var(--bg);
+}
+
+/* Print: only the guide, as a plain page. */
+@media print {
+  header.bar,
+  .page,
+  .sheet-backdrop,
+  .sheet-head {
+    display: none !important;
+  }
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .sheet {
+    position: static;
+    width: auto;
+    border: 0;
+    box-shadow: none;
+    display: block;
+  }
+  .md {
+    overflow: visible;
+    padding: 0;
+  }
+  .md h2 {
+    break-after: avoid;
+  }
+  .md table,
+  .md pre {
+    break-inside: avoid;
+  }
+}

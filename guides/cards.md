@@ -1,0 +1,236 @@
+# Koenig editor: the default cards
+
+A card is a block you add to your writing: a picture, a gallery, a table, a button. This page lists
+every card the editor comes with, what each one is for, how to add it, and how a developer switches
+it off or replaces it. It describes the full default set, so it matches the version that has all 12
+cards.
+
+## Quick reference
+
+| Card | Use it for | Add it with | Good to know |
+| --- | --- | --- | --- |
+| Image | One picture | `/image` | Alt text and caption; regular, wide or full width |
+| Gallery | Several pictures in rows | `/gallery` | Up to 50 pictures by default; full-screen viewer |
+| Header | A big title at the top of a section | `/header` | Colour or picture background, optional button |
+| Callout | A box that stands out | `/callout` | Nine colours, optional emoji |
+| Toggle | Text that opens and closes | `/toggle` | A header and hidden content |
+| Divider | A line between sections | `/hr` or type `---` | No settings |
+| Table | Rows and columns | `/table` | Header row, no merged cells |
+| File | A download | `/file` | Title, description, name and size |
+| Video | A video you upload | `/video` | Needs captions or a transcript |
+| Audio | A sound file you upload | `/audio` | Needs captions or a transcript |
+| Button | A call-to-action link | `/button` | Only `http`, `https` and `mailto` links |
+| Markdown | Text written in Markdown | `/md` | Raw HTML is shown as text, never run |
+
+Not cards, but part of the editor: the **image editor** (crop and rotate before upload), the
+**emoji picker** (in the callout card) and the **word count** (a number and a reading time).
+
+## Adding a card, for any card
+
+- **The plus button.** On an empty line a "+" button appears. Press it and pick a card from the list.
+- **The slash menu.** On an empty line type `/`, then a few letters of the card's name
+  (`/gallery`, `/callout`). Up and Down choose, Enter adds, Escape closes the menu.
+- **Dragging a file in.** Drop a file on the editor and it makes the matching card for the file's
+  type (image, video, audio or file) and uploads it through the developer's uploader.
+- **A card with an upload** (image, gallery, file, video, audio) opens the file picker when you
+  add it from a menu.
+
+Moving around cards, for any card:
+
+- Select a card by clicking it, or by moving onto it with the arrow keys.
+- Press **Enter** on a selected card to add a paragraph after it and start typing there.
+- Press **Ctrl+Enter** (**Cmd+Enter** on a Mac) to open or close a selected card's settings.
+- The editor keeps an empty line above the first card and below the last one, so there is always
+  somewhere to put the cursor.
+
+## Image
+
+**For:** one picture in your writing.
+**Add it:** the plus button, `/image`, dragging a picture in, or `/image` followed by a web address
+to embed a picture that is already online.
+**What it can do:**
+- Alt text (the description for people who cannot see the picture) and a caption.
+- A link on the picture.
+- Width: regular, wide or full. (Animated GIFs stay as they are and have no width choice.)
+- Before upload, the **image editor** opens to crop and rotate a single picture you add.
+
+**Keyboard:** select the card; its alt text and caption fields are on the card, and Ctrl+Enter (Cmd+Enter on a Mac) opens or closes its settings.
+**Accessibility:** write alt text for every picture that carries meaning. Leave it empty only for
+pictures that are pure decoration.
+**Developer:** `cards` leaves it out; the file types and sizes allowed come from the uploader's
+`fileTypes.image`.
+
+## Gallery
+
+**For:** several pictures shown together in tidy rows.
+**Add it:** the plus button, `/gallery`, or dragging pictures in.
+**What it can do:**
+- Up to **50 pictures** by default. The developer sets the ceiling (`gallery.maxImages`). Each
+  gallery can have a lower limit of its own in its settings ("Maximum number of images"), never
+  below the number of pictures it already holds. The card shows "9 of 50".
+- Each picture has a title, a caption and alt text (open them from the picture's icon).
+- A caption for the whole gallery.
+- Drag pictures to reorder them.
+- A **full-screen viewer** (button on the gallery and on each picture): Left and Right (or swipe)
+  move between pictures, Home and End jump to the first and last, Escape closes.
+
+**Keyboard:** Tab onto a picture, then **Alt+Left** or **Alt+Right** moves it one place. A
+spoken message says where it went. A picture text can be collapsed; screen readers still read it.
+**Accessibility:** alt text for every picture; the viewer is a dialog that keeps focus inside and
+gives focus back when it closes.
+**Developer:** `cards` leaves it out; `gallery.maxImages` sets the limit; `cardRenderers.gallery`
+replaces how it looks while the editor keeps the pictures, uploads and limits.
+
+## Header
+
+**For:** a big title and subtitle that open a section.
+**Add it:** the plus button or `/header`.
+**What it can do:**
+- A title and a subtitle.
+- A background colour or a background picture.
+- Left or centred writing.
+- An optional button with a label and a link.
+
+**Accessibility:** the title is a styled block, not a heading, so it does not appear in a page
+outline. Use a heading for the real structure of the page.
+**Developer:** `cards` leaves it out; `cardRenderers.header` replaces how it looks.
+
+## Callout
+
+**For:** a note, a tip or a warning that should not be missed.
+**Add it:** the plus button or `/callout`.
+**What it can do:**
+- Text inside a coloured box: white, grey, blue, green, yellow, red, pink, purple or the site's
+  accent colour.
+- An optional emoji at the start, picked from the **emoji picker** (searchable, works offline).
+
+**Keyboard (emoji picker):** Down from the search box enters the grid; arrows, Home and End move;
+Enter picks; Escape closes.
+**Accessibility:** do not rely on the colour alone to say what the note means; say it in words.
+**Developer:** `cards` leaves it out; `tools` without `emojiPicker` removes the emoji button.
+
+## Toggle
+
+**For:** content most people can skip, such as an answer under a question.
+**Add it:** the plus button or `/toggle`.
+**What it can do:** a short header that is always visible and a body that opens and closes when
+you press the header's arrow.
+**Accessibility:** keep the header a clear question or label, because it is what people see before they open it.
+**Developer:** `cards` leaves it out.
+
+## Divider
+
+**For:** a line that separates two parts of the writing.
+**Add it:** the plus button, `/hr`, or type `---` on an empty line.
+**What it can do:** nothing to set. Select it and press Backspace or Delete to remove it.
+**Developer:** `cards` leaves it out.
+
+## Table
+
+**For:** rows and columns of text.
+**Add it:** the plus button or `/table`. It starts as 3 by 3 with a header row.
+**What it can do:** while the cursor is in a table, a toolbar above it adds or removes rows and
+columns, turns the header row on and off, and deletes the table. No merged cells and no cell
+colours.
+**Keyboard:** Tab and Shift+Tab move between cells; the arrow keys move within and between cells;
+**Alt+F10** moves focus to the table toolbar and Escape returns to the cell.
+**Accessibility:** the header row is marked up as column headers; the toolbar buttons have names.
+**Developer:** `cards` leaves it out; the wording is `strings.table`.
+
+## File
+
+**For:** a document people can download, such as a PDF.
+**Add it:** the plus button, `/file`, or dragging a file in.
+**What it can do:** a title, a description, and the file's name and size. It is saved as a
+download link.
+**Limits:** if the developer sets `fileTypes.file`, the card checks the type and size (`maxSize`)
+before uploading and names the file in its message.
+**Developer:** `cards` leaves it out.
+
+## Video
+
+**For:** a video file you upload. Nothing is embedded from another site.
+**Add it:** the plus button, `/video`, or dragging a video in.
+**What it can do:** plays in the browser's own player, so play, seek, volume and mute work from
+the keyboard.
+**Captions are required.** Add a **transcript** (plain text) or upload a **WebVTT (`.vtt`)
+captions file**. Until you do, the card shows a reminder.
+**Limits:** the developer can limit types and size with `fileTypes.video`. The captions file goes
+through the file uploader, which must allow `.vtt`.
+**Developer:** `cards` leaves it out.
+
+## Audio
+
+**For:** a sound file you upload, such as a podcast episode.
+**Add it:** the plus button, `/audio`, or dragging an audio file in.
+**What it can do:** plays in the browser's own player. Same captions rule as video: add a
+transcript or a `.vtt` file.
+**Limits:** `fileTypes.audio` sets the allowed types and size.
+**Developer:** `cards` leaves it out.
+
+## Button
+
+**For:** one clear link that you want people to follow.
+**Add it:** the plus button or `/button` (typing `cta` or `link` finds it too).
+**What it can do:** a label, a link, and left or centred placement.
+**Limits:** only absolute `http`, `https` and `mailto` links are kept. Others (`javascript:`,
+`data:`, relative links) are refused and the field says so. A button with no valid link is left
+out of the saved HTML.
+**Accessibility:** make the label say where the link goes ("Read the report"), not "Click here".
+**Developer:** `cards` leaves it out.
+
+## Markdown
+
+**For:** people who prefer to write in Markdown, or are pasting Markdown from elsewhere.
+**Add it:** the plus button or `/md`.
+**What it can do:** you type Markdown into a text box and the card shows the result. Headings go
+no deeper than H5.
+**Limits:** raw HTML you type is shown as text, never run. Links and picture sources follow the
+same safe-link rule as the button.
+**Developer:** `cards` leaves it out.
+
+## Image editor
+
+**For:** cropping and turning a picture before it is uploaded.
+**It opens:** when you pick, drop or paste a single image into an image card. Cancel uploads
+nothing. GIF and SVG files skip it.
+**What it can do:** crop (free, original, 1:1, 4:3, 16:9) and rotate in 90-degree steps. It works
+on your device; nothing is sent anywhere until you confirm.
+**Keyboard:** Tab stays inside the dialog; Escape cancels. On the crop area, arrow keys move it and
+Shift with the arrows resizes it.
+**Developer:** `tools` leaves it out (`tools={["emojiPicker"]}` keeps only the emoji picker).
+
+## Emoji picker
+
+**For:** adding an emoji to a callout.
+**It opens:** from the emoji button in the callout card.
+**What it can do:** search by name and browse the nine standard groups, fully offline.
+**Developer:** `tools` leaves it out (`tools={["imageEditor"]}` keeps only the image editor,
+`tools={[]}` turns both off).
+
+## Word count
+
+**For:** showing "120 words, 1 min read" next to the writing.
+**How:** the developer places `useKoenigWordCount()` anywhere inside the composer. It updates as
+you type.
+**What it counts:** the document's own text (paragraphs, headings, lists, quotes, code and table
+cells). Text inside cards is not counted. Reading time assumes 238 words a minute unless the
+developer changes it.
+**Developer:** do not use the hook and there is no word count.
+
+## For developers: switching things off or replacing them
+
+| You want to | Use | Example |
+| --- | --- | --- |
+| Keep only some cards | `cards` on `KoenigComposer` | `cards={["image", "divider"]}` |
+| Remove the image editor or the emoji picker | `tools` | `tools={[]}` |
+| Change how the gallery or header looks | `cardRenderers` | `cardRenderers={{ gallery: MyGallery }}` |
+| Change the gallery's picture limit | `gallery` | `gallery={{ maxImages: 12 }}` |
+| Add your own card | `customNodes` and `menuItems` | a node with a `kgMenu` entry |
+| Change any wording | `strings` | `strings={{ gallery: { ... } }}` |
+
+A card left out of `cards` is missing from the menus and its commands do nothing. Keep the
+**divider** in any list you pass: a composer built without it does not start (a known problem,
+tracked in the repository's issues).
+
+The full option list is in the README.

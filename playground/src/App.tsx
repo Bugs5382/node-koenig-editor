@@ -30,6 +30,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { catalog, useWordCount } from "./catalog";
 import { EditorErrorBoundary } from "./EditorErrorBoundary";
+import { HelpSheet } from "./HelpSheet";
 import {
   buildSnippet,
   defaultSettings,
@@ -78,6 +79,7 @@ function WordCount() {
 export function App() {
   const [settings, setSettings] = useState(() => parseSettings(window.location.search, catalog));
   const settingsRef = useRef(settings);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [state, setState] = useState<unknown>(null);
   const [events, setEvents] = useState<string[]>([]);
   const [rebuilds, setRebuilds] = useState(0);
@@ -172,9 +174,11 @@ export function App() {
         settings={settings}
         onChange={update}
         onCopyLink={() => void navigator.clipboard?.writeText(window.location.href)}
+        onHelp={() => setHelpOpen(true)}
         onLoadSamples={() => addCard(galleryNode(SAMPLES))}
         onReset={() => update(defaultSettings(catalog))}
       />
+      <HelpSheet open={helpOpen} onClose={() => setHelpOpen(false)} />
       <EditorErrorBoundary key={rebuilds}>
         <KoenigComposer
           cards={catalog.cards.length ? (settings.cards as KoenigCardName[]) : undefined}

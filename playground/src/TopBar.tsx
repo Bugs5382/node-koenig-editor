@@ -39,6 +39,7 @@ interface Props {
   galleryOn: boolean;
   onChange: (patch: Partial<Settings>) => void;
   onCopyLink: () => void;
+  onHelp: () => void;
   onLoadSamples: () => void;
   onReset: () => void;
   settings: Settings;
@@ -49,6 +50,7 @@ export function TopBar({
   galleryOn,
   onChange,
   onCopyLink,
+  onHelp,
   onLoadSamples,
   onReset,
   settings,
@@ -116,6 +118,7 @@ export function TopBar({
         </Button>
         <Button onClick={onCopyLink}>Copy link</Button>
         <Button onClick={onReset}>Reset</Button>
+        <Button onClick={onHelp}>Help</Button>
       </div>
     </header>
   );
