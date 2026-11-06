@@ -457,3 +457,51 @@ describe("Alt and the left or right arrow move the focused photo", () => {
     expect(names(api)).toEqual(["one.gif", "two.gif", "three.gif"]);
   });
 });
+
+describe("the remembered collapse choice follows the photo, not the order", () => {
+  it("is kept when a photo is moved with Alt and the arrow keys", async () => {
+    await open();
+    await selectGallery();
+    const toggles = () =>
+      [...document.querySelectorAll<HTMLElement>("[data-gallery-image-text-toggle]")].map(
+        (toggle) => toggle.getAttribute("aria-expanded"),
+      );
+    await act(async () => {
+      fireEvent.click(document.querySelector("[data-gallery-image-text-toggle]") as Element);
+    });
+    expect(toggles()).toEqual(["false", "true"]);
+    // "one" moves right twice, past "two" and "three", so it is now the last photo with text
+    for (const position of [0, 1]) {
+      await act(async () => {
+        fireEvent.keyDown(document.querySelectorAll("[data-gallery-image]")[position] as Element, {
+          altKey: true,
+          key: "ArrowRight",
+        });
+      });
+    }
+    // the collapsed photo is now second of the two; the choice went with it
+    expect(toggles()).toEqual(["true", "false"]);
+    cleanup();
+    await open();
+    expect(
+      [...document.querySelectorAll<HTMLElement>("[data-gallery-image-text-toggle]")].map(
+        (toggle) => toggle.getAttribute("aria-expanded"),
+      ),
+    ).toEqual(["false", "true"]);
+  });
+
+  it("is kept when a photo is added to the gallery", async () => {
+    await open();
+    await act(async () => {
+      fireEvent.click(document.querySelector("[data-gallery-text-toggle-all]") as Element);
+    });
+    cleanup();
+    await open([...SAMPLE, image("four", { row: 1, title: "Delta" })]);
+    const toggles = [...document.querySelectorAll<HTMLElement>("[data-gallery-image-text-toggle]")];
+    expect(toggles.map((toggle) => toggle.getAttribute("aria-expanded"))).toEqual([
+      "false",
+      "false",
+      "true",
+    ]);
+  });
+});

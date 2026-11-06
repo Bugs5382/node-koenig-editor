@@ -20,20 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 // Whether each photo's title and caption is shown or collapsed, remembered in the viewer's own
 // browser. Collapsing is visual only: the text stays in the page for screen readers.
-const STORAGE_KEY = "koenig-gallery-text";
-
-export interface GalleryTextState {
-  /** The gallery-wide choice: every photo collapsed or expanded; null when none was made. */
-  all: "collapsed" | "expanded" | null;
-  /** A photo's own choice, which wins over the gallery-wide one. true is collapsed. */
-  images: Record<string, boolean>;
-}
-
-const EMPTY: GalleryTextState = { all: null, images: {} };
+//
+// One flag per photo, keyed by the photo itself, not by the gallery or its order: moving a photo
+// or adding one must not lose what the viewer chose.
+const STORAGE_KEY = "koenig-gallery-photo-text";
 
 /** A short stable key for a string; photo sources can be very long (data: URLs). */
 export const shortHash = (value: string): string => {
@@ -51,70 +45,52 @@ interface PhotoLike {
 
 export const photoKey = (photo: PhotoLike): string =>
   shortHash(`${photo.fileName ?? ""}|${photo.src ?? ""}`);
-export const galleryKey = (photos: PhotoLike[]): string =>
-  shortHash(photos.map(photoKey).join(","));
 
-const readAll = (): Record<string, GalleryTextState> => {
+/** true is collapsed. */
+type Flags = Record<string, boolean>;
+
+const read = (): Flags => {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
-    return parsed && typeof parsed === "object" ? parsed : {};
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
   } catch {
     return {};
   }
 };
 
-const writeOne = (key: string, state: GalleryTextState) => {
+const write = (flags: Flags) => {
   try {
-    const all = readAll();
-    all[key] = state;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(flags));
   } catch {
     // Private windows and blocked storage: the choice just lasts until the page closes.
   }
 };
 
-const load = (key: string): GalleryTextState => {
-  const stored = readAll()[key];
-  if (!stored) return EMPTY;
-  return {
-    all: stored.all === "collapsed" || stored.all === "expanded" ? stored.all : null,
-    images: stored.images && typeof stored.images === "object" ? stored.images : {},
-  };
-};
-
 /**
- * Shown or collapsed, per photo and for the whole gallery. Precedence: a photo's own choice wins;
- * otherwise the gallery-wide choice applies. The gallery-wide control sets every photo and clears
- * the individual choices, so it always means what it says.
+ * Shown or collapsed, per photo and for the whole gallery. The gallery-wide control writes every
+ * photo's own flag, so a photo added later starts shown and a photo's flag stays with the photo.
  */
-export const useGalleryText = (photos: PhotoLike[], withText: PhotoLike[]) => {
-  const key = useMemo(() => galleryKey(photos), [photos]);
-  const [state, setState] = useState<GalleryTextState>(() => load(key));
-  const [loadedFor, setLoadedFor] = useState(key);
-  if (loadedFor !== key) {
-    setLoadedFor(key);
-    setState(load(key));
-  }
+export const useGalleryText = (_photos: PhotoLike[], withText: PhotoLike[]) => {
+  const [flags, setFlags] = useState<Flags>(read);
 
-  const isCollapsed = useCallback(
-    (photo: PhotoLike) => {
-      const own = state.images[photoKey(photo)];
-      return own !== undefined ? own : state.all === "collapsed";
-    },
-    [state],
-  );
+  const isCollapsed = useCallback((photo: PhotoLike) => flags[photoKey(photo)] === true, [flags]);
 
-  const commit = (next: GalleryTextState) => {
-    setState(next);
-    writeOne(key, next);
+  const commit = (next: Flags) => {
+    setFlags(next);
+    // merge into what is stored, so another gallery's flags are kept
+    write({ ...read(), ...next });
   };
 
   const toggleImage = (photo: PhotoLike) =>
-    commit({ ...state, images: { ...state.images, [photoKey(photo)]: !isCollapsed(photo) } });
+    commit({ ...flags, [photoKey(photo)]: !isCollapsed(photo) });
 
   const allCollapsed = withText.length > 0 && withText.every(isCollapsed);
-  const toggleAll = () => commit({ all: allCollapsed ? "expanded" : "collapsed", images: {} });
+  const toggleAll = () => {
+    const next = { ...flags };
+    for (const photo of withText) next[photoKey(photo)] = !allCollapsed;
+    commit(next);
+  };
 
   return { allCollapsed, isCollapsed, toggleAll, toggleImage };
 };
