@@ -108,9 +108,11 @@ describe("the gallery card", () => {
     ]);
   });
 
-  it("stops at nine images and says so", async () => {
+  it("stops at the host's limit and says so", async () => {
     const calls: string[][] = [];
-    const { api } = await insertGallery({ composer: { fileUploader: recordingUploader(calls) } });
+    const { api } = await insertGallery({
+      composer: { fileUploader: recordingUploader(calls), gallery: { maxImages: 9 } },
+    });
     await addFiles(Array.from({ length: 11 }, (_, index) => png(`${index}.png`)));
     await waitFor(() => expect(galleryOf(api.serialize())?.images).toHaveLength(9));
     expect(calls).toHaveLength(9);
@@ -205,7 +207,7 @@ describe("the gallery card", () => {
     });
     expect(document.querySelector("[data-custom-gallery]")).not.toBeNull();
     expect(document.querySelector("[data-gallery]")).toBeNull();
-    expect(seen?.maxImages).toBe(9);
+    expect(seen?.maxImages).toBe(50);
     await act(async () => {
       await seen?.addFiles([png("a.png"), png("b.png")]);
     });

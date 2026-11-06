@@ -7,7 +7,8 @@ import {$getNodeByKey} from 'lexical';
 import {ActionToolbar} from '../components/ui/ActionToolbar';
 import {CardCaptionEditor} from '../components/ui/CardCaptionEditor';
 import {GalleryCard} from '../components/ui/cards/GalleryCard';
-import {MAX_IMAGES, recalculateImageRows} from './GalleryNode';
+import {GALLERY_UPLOAD_CONCURRENCY, resolveMaxImages} from '../../additions/gallery/limits';
+import {recalculateImageRows} from './GalleryNode';
 import {SnippetActionToolbar} from '../components/ui/SnippetActionToolbar';
 import {ToolbarMenu, ToolbarMenuItem, ToolbarMenuSeparator} from '../components/ui/ToolbarMenu';
 import {getImageDimensions} from '../utils/getImageDimensions';
@@ -29,7 +30,8 @@ const dimensionsOf = async (url) => {
 
 export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorInitialState}) {
     const [editor] = useLexicalComposerContext();
-    const {fileUploader, cardConfig, cardRenderers} = React.useContext(KoenigComposerContext);
+    const {fileUploader, cardConfig, cardRenderers, gallery} = React.useContext(KoenigComposerContext);
+    const maxImages = resolveMaxImages(gallery?.maxImages);
     const {isSelected} = React.useContext(CardContext);
     const strings = useKoenigStrings();
     const fileInputRef = React.useRef();
@@ -92,13 +94,13 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
         const incoming = Array.prototype.slice.call(files);
         const allowedType = file => !mimeTypes?.length || mimeTypes.includes(file.type);
         const accepted = incoming.filter(allowedType);
-        const room = MAX_IMAGES - imagesRef.current.length;
+        const room = maxImages - imagesRef.current.length;
         const chosen = accepted.slice(0, Math.max(room, 0));
 
         if (accepted.length < incoming.length) {
             setErrorMessage(strings.gallery.fileTypeError);
         } else if (chosen.length < accepted.length) {
-            setErrorMessage(strings.gallery.limitError.replace('{max}', String(MAX_IMAGES)));
+            setErrorMessage(strings.gallery.limitError.replace('{max}', String(maxImages)));
         }
 
         if (chosen.length === 0) {
@@ -106,17 +108,17 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
         }
 
         // previews first, so the person sees the images straight away
-        const pending = [];
-        for (const file of chosen) {
+        const pending = await Promise.all(chosen.map(async (file) => {
             const previewSrc = URL.createObjectURL(file);
             const {width, height} = await dimensionsOf(previewSrc);
-            pending.push({file, image: {fileName: file.name, previewSrc, width, height, alt: '', caption: ''}});
-        }
+            return {file, image: {fileName: file.name, previewSrc, width, height, alt: '', caption: ''}};
+        }));
         setImages([...imagesRef.current, ...pending.map(p => p.image)]);
 
-        // the host's uploader is called once for each image
+        // The host's uploader is called once for each image, a few at a time: many photos go up
+        // faster, but a host's upload hook can be asked to run more than one upload at once.
         setIsUploading(true);
-        for (const {file, image} of pending) {
+        const uploadOne = async ({file, image}) => {
             let result = null;
             try {
                 result = await imageUploader.upload([file]);
@@ -127,11 +129,19 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
             if (!url) {
                 setErrorMessage(strings.gallery.uploadError);
                 setImages(imagesRef.current.filter(i => i !== image));
-                continue;
+            } else {
+                commit(imagesRef.current.map(i => (i === image ? {...i, src: url} : i)));
             }
-            const list = imagesRef.current.map(i => (i === image ? {...i, src: url} : i));
-            commit(list);
-        }
+            // the preview is no longer needed once the real address (or a failure) is known
+            URL.revokeObjectURL?.(image.previewSrc);
+        };
+        const queue = [...pending];
+        const workers = Array.from({length: Math.min(GALLERY_UPLOAD_CONCURRENCY, queue.length)}, async () => {
+            while (queue.length) {
+                await uploadOne(queue.shift());
+            }
+        });
+        await Promise.all(workers);
         setIsUploading(false);
     };
 
@@ -139,7 +149,7 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
         images,
         updateImages: commit,
         isSelected,
-        maxImages: MAX_IMAGES
+        maxImages
     });
     const imageFilesDropper = useFileDragAndDrop({handleDrop: files => addFiles(files)});
 
@@ -186,7 +196,7 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
                         images={images}
                         isSelected={Boolean(isSelected)}
                         isUploading={isUploading}
-                        maxImages={MAX_IMAGES}
+                        maxImages={maxImages}
                         mimeTypes={mimeTypes ?? []}
                         moveImage={moveImage}
                         progress={imageUploader.progress ?? 0}
@@ -205,6 +215,7 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
                     filesDropper={imageFilesDropper}
                     imageMimeTypes={mimeTypes}
                     images={images}
+                    maxImages={maxImages}
                     isSelected={isSelected}
                     moveImage={moveImage}
                     reorderHandler={galleryReorder}

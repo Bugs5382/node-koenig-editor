@@ -181,11 +181,13 @@ export interface KoenigStrings {
     addImages: string;
     captionPlaceholder: string;
     dismiss: string;
+    /** `{max}` is replaced with the gallery's image limit. */
     dropToAdd: string;
     fileTypeError: string;
     imageCaptionPlaceholder: string;
     /** `{max}` is replaced with the image limit. */
     limitError: string;
+    /** `{max}` is replaced with the gallery's image limit. */
     select: string;
     uploadError: string;
     /** Names the icon that opens the title and caption dialog for one photo. */
@@ -473,6 +475,14 @@ export interface KoenigHeaderRenderProps {
 }
 
 /** The host's own layout for the cards that have one. Without an entry the default draws. */
+/** The host's options for the gallery card. */
+export interface KoenigGalleryOptions {
+  /** The most photos a gallery takes: the ceiling for each gallery's own setting. A positive whole
+   *  number; anything else means the default, 50. It limits adding photos, never cuts off the
+   *  photos a stored document already has. */
+  maxImages?: number;
+}
+
 export interface KoenigCardRenderers {
   gallery?: FC<KoenigGalleryRenderProps>;
   header?: FC<KoenigHeaderRenderProps>;
@@ -481,6 +491,8 @@ export interface KoenigCardRenderers {
 export interface KoenigComposerProps {
   /** Replaces how a shipped card is drawn; see `KoenigCardRenderers`. */
   cardRenderers?: KoenigCardRenderers;
+  /** Options for the gallery card. */
+  gallery?: KoenigGalleryOptions;
   cardConfig?: Record<string, unknown>;
   /** The shipped cards to register, and so list in the menus. Default: all of them. */
   cards?: readonly KoenigCardName[];

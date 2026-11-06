@@ -44,6 +44,7 @@ const KoenigComposer = ({
     customNodes,
     menuItems,
     cardRenderers,
+    gallery,
     strings: hostStrings,
     toolbar,
     toolbarActions,
@@ -119,6 +120,7 @@ const KoenigComposer = ({
                     collaboration,
                     menuItems,
                     cardRenderers,
+                    gallery,
                     toolbar,
                     toolbarActions
                 }}>

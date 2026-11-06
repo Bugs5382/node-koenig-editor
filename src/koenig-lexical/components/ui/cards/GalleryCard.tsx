@@ -134,7 +134,9 @@ function GalleryImage({image, deleteImage, position, isDragging, isSelected, lis
             <img
                 alt={image.alt}
                 className="pointer-events-none block size-full"
+                decoding="async"
                 height={image.height}
+                loading="lazy"
                 src={image.previewSrc || image.src}
                 width={image.width}
             />
@@ -251,10 +253,10 @@ function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, 
     );
 }
 
-function EmptyGalleryCard({openFilePicker, isDraggedOver, reorderHandler, strings}) {
+function EmptyGalleryCard({openFilePicker, isDraggedOver, maxImages, reorderHandler, strings}) {
     return (
         <MediaPlaceholder
-            desc={strings.select}
+            desc={fill(strings.select, {max: maxImages})}
             filePicker={openFilePicker}
             icon='gallery'
             isDraggedOver={isDraggedOver}
@@ -277,11 +279,11 @@ function UploadOverlay({progress}) {
     );
 }
 
-function FileDragOverlay({strings}) {
+function FileDragOverlay({maxImages, strings}) {
     return (
         <div className="bg-black-60 pointer-events-none absolute inset-0 flex items-center bg-black/60" data-kg-card-drag-text>
             <span className="sans-serif fw7 f7 block w-full text-center font-bold text-white">
-                {strings.dropToAdd}
+                {fill(strings.dropToAdd, {max: maxImages})}
             </span>
         </div>
     );
@@ -296,6 +298,7 @@ export function GalleryCard({
     errorMessage,
     fileInputRef,
     imageMimeTypes = [],
+    maxImages,
     images = [],
     isSelected,
     moveImage,
@@ -320,11 +323,11 @@ export function GalleryCard({
             <div ref={filesDropper.setRef} className="not-kg-prose relative" data-testid="gallery-container">
                 {images.length
                     ? <PopulatedGalleryCard deleteImage={deleteImage} images={images} isDragging={isDragging} isSelected={isSelected} moveImage={moveImage} reorderHandler={reorderHandler} strings={strings} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />
-                    : <EmptyGalleryCard isDraggedOver={isDragging} openFilePicker={openFilePicker} reorderHandler={reorderHandler} strings={strings} />
+                    : <EmptyGalleryCard isDraggedOver={isDragging} maxImages={maxImages} openFilePicker={openFilePicker} reorderHandler={reorderHandler} strings={strings} />
                 }
 
                 {isLoading ? <UploadOverlay progress={progress} /> : null}
-                {images.length && filesDraggedOver ? <FileDragOverlay strings={strings} /> : null}
+                {images.length && filesDraggedOver ? <FileDragOverlay maxImages={maxImages} strings={strings} /> : null}
 
                 {errorMessage && !isDragging ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/60" data-testid="gallery-error">
