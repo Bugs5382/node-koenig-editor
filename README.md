@@ -307,6 +307,28 @@ simple: no merged cells and no cell colours.
 - Document: a table is stock `@lexical/table` nodes, so it saves and loads with the rest of the
   document, header row included.
 
+**How it looks.** A new table shows its grid: 1px cell borders that stay at least 3:1 against the
+editor in light and dark (`--grey-700`), a shaded header row, a minimum cell size so an empty table
+is a visible grid, an outline on the cell the cursor is in, and a soft highlight on the cells of a
+selected range. While the editor is editable the borders are **dashed**, so an empty grid reads as
+a place to write; in the reader's view (Preview), in print, and wherever the editor is read-only
+they are solid. In forced-colours mode the grid uses the system colours, with a heavier line under
+the header. Set the tokens on any ancestor of the editor:
+
+| Token                          | Default                             | What it does                                     |
+| ------------------------------ | ----------------------------------- | ------------------------------------------------ |
+| `--kg-table-border-color`      | `--grey-700`                        | Cell border colour                               |
+| `--kg-table-border-style`      | `solid`                             | Cell border style in the reader's view and print |
+| `--kg-table-edit-border-style` | `dashed`                            | Cell border style while the editor is editable   |
+| `--kg-table-header-bg`         | `--grey-200` (`--grey-900` in dark) | Header row background                            |
+| `--kg-table-selected-bg`       | selection colour at 14%             | Background of the selected cells                 |
+
+The table, its rows and cells carry the classes `kg-table`, `kg-table-row`, `kg-table-cell`,
+`kg-table-cell-header` and `kg-table-cell-selected` for your own rules, and the cell the cursor is
+in has `data-kg-active-cell`. The saved HTML is a plain `table`: to show it with the same look on
+your own page, wrap it in an element with the class `koenig-lexical` (the stylesheet is scoped to
+it), or copy the border and header rules from the tokens above.
+
 ## 🖼️ Gallery and header cards
 
 Both are in the default card set, so they are in the "+" and slash menus (`/gallery`, `/header`).

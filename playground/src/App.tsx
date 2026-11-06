@@ -247,6 +247,7 @@ export function App() {
   const editorStyle = {
     "--kg-rem": "0.625rem",
     ...(settings.selection ? { "--kg-selection-color": settings.selection } : {}),
+    "--kg-table-edit-border-style": settings.tableBorder,
   } as React.CSSProperties;
 
   const cardOn = (card: string) => !catalog.cards.length || settings.cards.includes(card);

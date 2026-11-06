@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $findMatchingParent } from "@lexical/utils";
 import {
   $deleteTableColumnAtSelection,
   $deleteTableRowAtSelection,
@@ -86,6 +87,43 @@ const useCellScope = (): void => {
   }, [editor]);
 };
 
+const ACTIVE_CELL = "data-kg-active-cell";
+
+/**
+ * Marks the cell the cursor is in with `data-kg-active-cell`, one at a time. The whole document is
+ * one editable area, so the browser's focus never sits inside a cell and `:focus-within` cannot
+ * draw the cell the cursor is in; the mark can.
+ */
+const useActiveCell = (): void => {
+  const [editor] = useLexicalComposerContext();
+  useEffect(() => {
+    let marked: HTMLElement | null = null;
+    const mark = (element: HTMLElement | null) => {
+      if (element === marked) return;
+      marked?.removeAttribute(ACTIVE_CELL);
+      element?.setAttribute(ACTIVE_CELL, "");
+      marked = element;
+    };
+    const unregister = editor.registerUpdateListener(({ editorState }) => {
+      const key = editorState.read(() => {
+        const selection = $getSelection();
+        if (!editor.isEditable() || !$isRangeSelection(selection)) return null;
+        return $findMatchingParent(selection.anchor.getNode(), $isTableCellNode)?.getKey() ?? null;
+      });
+      mark(key ? editor.getElementByKey(key) : null);
+    });
+    // Read-only (the reader's view) has no cursor to show.
+    const unregisterEditable = editor.registerEditableListener((editable) => {
+      if (!editable) mark(null);
+    });
+    return () => {
+      unregister();
+      unregisterEditable();
+      mark(null);
+    };
+  }, [editor]);
+};
+
 interface Anchor {
   header: boolean;
   key: NodeKey;
@@ -98,6 +136,7 @@ export const TableActionsPlugin = () => {
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const [style, setStyle] = useState<CSSProperties>({ opacity: 0 });
   useCellScope();
+  useActiveCell();
 
   useEffect(
     () =>
