@@ -28,7 +28,7 @@ import {
   type KoenigCommentThread,
 } from "node-koenig-editor";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { catalog, useWordCount } from "./catalog";
+import { catalog, usePreview, useWordCount } from "./catalog";
 import { ConfirmDialog, Toast } from "./dialogs";
 import { EditorErrorBoundary } from "./EditorErrorBoundary";
 import { GuidePage } from "./GuidePage";
@@ -39,6 +39,7 @@ import {
   defaultSettings,
   parseSettings,
   serializeSettings,
+  type PreviewWidth,
   type Settings,
 } from "./config";
 import {
@@ -70,6 +71,16 @@ const REBUILD: (keyof Settings)[] = [
 
 // The enabled cards, or null when the package does not list its cards (every card is on).
 const enabledCards = (settings: Settings) => (catalog.cards.length ? settings.cards : null);
+
+// Hands the top bar's width choice to the editor; the editor reports its own changes through
+// onPreviewOptionsChange, so the two never disagree for long.
+function PreviewWidthBridge({ width }: { width: PreviewWidth }) {
+  const preview = usePreview?.();
+  useEffect(() => {
+    if (preview && preview.options.width !== width) preview.setOptions({ width });
+  }, [preview, width]);
+  return null;
+}
 
 function WordCount() {
   // Only rendered when the package has the hook, which does not change while the page is open.
@@ -239,9 +250,20 @@ export function App() {
     [state],
   );
   // `tools` is missing from older builds' types, so it is passed loosely and only when offered.
+  const previewAvailable =
+    catalog.tools.includes("preview") && settings.tools.includes("preview") && !settings.readOnly;
   const optionalProps: Record<string, unknown> = catalog.tools.length
     ? { tools: settings.tools }
     : {};
+  if (previewAvailable) {
+    // The bar's switch and width presets drive the editor, and the editor's own Preview button
+    // and bar report back, so the two stay one state.
+    optionalProps.preview = settings.preview;
+    optionalProps.previewOptions = { width: settings.previewWidth };
+    optionalProps.onPreviewChange = (preview: boolean) => update({ preview });
+    optionalProps.onPreviewOptionsChange = (options: { width: PreviewWidth }) =>
+      update({ previewWidth: options.width });
+  }
   const snippet = useMemo(() => buildSnippet(settings, catalog), [settings]);
 
   const editorStyle = {
@@ -257,6 +279,7 @@ export function App() {
       <TopBar
         catalog={catalog}
         galleryOn={cardOn("gallery")}
+        previewAvailable={previewAvailable}
         settings={settings}
         page={route.page}
         onChange={update}
@@ -304,6 +327,7 @@ export function App() {
           toolbarActions={settings.toolbarActions ? toolbarActions : undefined}
           {...optionalProps}
         >
+          {previewAvailable && usePreview && <PreviewWidthBridge width={settings.previewWidth} />}
           <div className="page" hidden={route.page === "guide"}>
             <main>
               <div className="editor-box" style={editorStyle}>
