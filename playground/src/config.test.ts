@@ -25,6 +25,10 @@ import {
   buildSnippet,
   defaultSettings,
   parseSettings,
+  PRESETS,
+  applyPreset,
+  presetOf,
+  SELECTION_COLORS,
   serializeSettings,
   SIZES,
   type Catalog,
@@ -130,5 +134,48 @@ describe("code snippet", () => {
     const bare: Catalog = { cards: catalog.cards, tools: [] };
     const code = buildSnippet(defaultSettings(bare), bare);
     expect(code).not.toContain("tools=");
+  });
+});
+
+describe("selection colour", () => {
+  it("is the editor's own colour until one is picked", () => {
+    expect(defaultSettings(catalog).selection).toBe("");
+  });
+
+  it("travels in the address as a palette colour without the #", () => {
+    const color = SELECTION_COLORS[2]!.value;
+    const s = { ...defaultSettings(catalog), selection: color };
+    const query = serializeSettings(s, catalog);
+    expect(query).toBe(`selection=${color.slice(1)}`);
+    expect(parseSettings(query, catalog).selection).toBe(color);
+  });
+
+  it("ignores a colour that is not in the palette", () => {
+    expect(parseSettings("selection=123456", catalog).selection).toBe("");
+    expect(parseSettings("selection=zzz", catalog).selection).toBe("");
+  });
+});
+
+describe("card presets", () => {
+  it("lists all cards first, then smaller sets", () => {
+    expect(PRESETS[0]?.id).toBe("all");
+    expect(PRESETS.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("keeps only cards the package has, in the package's order", () => {
+    expect(applyPreset("all", catalog)).toEqual(catalog.cards);
+    const media = applyPreset("media", catalog);
+    expect(media).toEqual(["image", "gallery", "header", "divider"]);
+    expect(applyPreset("text", { cards: ["divider"], tools: [] })).toEqual(["divider"]);
+  });
+
+  it("names the preset a card list matches, or custom", () => {
+    expect(presetOf(catalog.cards, catalog)).toBe("all");
+    expect(presetOf(["image", "gallery", "header", "divider"], catalog)).toBe("media");
+    expect(presetOf(["image"], catalog)).toBe("custom");
+    expect(presetOf(["header", "image", "gallery", "divider"], catalog)).toBe("custom");
+    expect(PRESETS.every((p) => p.cards === null || p.cards.includes("divider" as never))).toBe(
+      true,
+    );
   });
 });

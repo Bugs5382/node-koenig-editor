@@ -1,0 +1,211 @@
+/* Styles for controls.tsx. Colours come from the page's custom properties, so dark mode follows. */
+.ctl-button,
+.ctl-switch,
+.ctl-segment {
+  font: inherit;
+  color: var(--fg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ctl-button:focus-visible,
+.ctl-switch:focus-visible,
+.ctl-segment:focus-visible,
+.ctl-option:focus-visible,
+.ctl-swatch-choice:focus-visible,
+.ctl-listbox:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ctl-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  white-space: nowrap;
+  transition:
+    background-color 0.12s,
+    border-color 0.12s,
+    box-shadow 0.12s;
+}
+.ctl-button:hover:not(:disabled) {
+  background: var(--hover);
+  border-color: var(--line-strong);
+}
+.ctl-button:active:not(:disabled) {
+  background: var(--press);
+}
+.ctl-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ctl-button-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.ctl-button-primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+.ctl-button-primary:active:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+.ctl-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  white-space: nowrap;
+}
+.ctl-switch:hover {
+  background: var(--hover);
+}
+.ctl-switch-track {
+  position: relative;
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--track);
+  transition: background-color 0.15s;
+}
+.ctl-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  transition: transform 0.15s;
+}
+.ctl-switch[aria-checked="true"] .ctl-switch-track {
+  background: var(--accent);
+}
+.ctl-switch[aria-checked="true"] .ctl-switch-thumb {
+  transform: translateX(14px);
+}
+
+.ctl-segmented {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--bg);
+}
+.ctl-segment {
+  min-width: 30px;
+  height: 26px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  font-size: 12px;
+}
+.ctl-segment:hover:not(.is-selected) {
+  background: var(--hover);
+}
+.ctl-segment.is-selected {
+  background: var(--panel);
+  box-shadow:
+    0 0 0 1px var(--line),
+    0 1px 2px rgb(0 0 0 / 0.12);
+  font-weight: 600;
+}
+
+.ctl-pop {
+  position: relative;
+}
+.ctl-popup {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 1;
+  min-width: 100%;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+}
+.ctl-listbox {
+  list-style: none;
+  min-width: 190px;
+  outline: none;
+}
+.ctl-listbox-label {
+  color: var(--muted);
+}
+.ctl-option {
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ctl-option.is-active {
+  background: var(--hover);
+}
+.ctl-option.is-selected {
+  font-weight: 600;
+}
+.ctl-option[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: default;
+}
+.ctl-caret {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  opacity: 0.6;
+}
+
+.ctl-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgb(0 0 0 / 0.25);
+  border-radius: 50%;
+  padding: 0;
+}
+.ctl-swatch.is-empty {
+  background: repeating-linear-gradient(135deg, var(--panel) 0 3px, var(--line) 3px 6px);
+}
+.ctl-swatches {
+  display: grid;
+  grid-template-columns: repeat(7, 28px);
+  gap: 6px;
+  padding: 8px;
+  width: max-content;
+}
+.ctl-swatch-choice {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+.ctl-swatch-choice:hover {
+  transform: scale(1.08);
+}
+.ctl-swatch-choice.is-selected {
+  box-shadow:
+    0 0 0 2px var(--panel),
+    0 0 0 4px var(--fg);
+}
+.ctl-pop-end .ctl-popup {
+  left: auto;
+  right: 0;
+}

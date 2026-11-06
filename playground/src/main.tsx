@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 import "node-koenig-editor/styles.css";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import "./controls.css";
 import "./app.css";
 
 const root = document.getElementById("root");

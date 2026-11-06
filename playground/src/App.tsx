@@ -29,12 +29,12 @@ import {
 } from "node-koenig-editor";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { catalog, useWordCount } from "./catalog";
+import { EditorErrorBoundary } from "./EditorErrorBoundary";
 import {
   buildSnippet,
   defaultSettings,
   parseSettings,
   serializeSettings,
-  SIZES,
   type Settings,
 } from "./config";
 import {
@@ -47,6 +47,7 @@ import {
   type CardNode,
 } from "./seed";
 import { SettingsPanel } from "./SettingsPanel";
+import { TopBar } from "./TopBar";
 import { ThreadList } from "./ThreadList";
 import { toolbarActions } from "./toolbarActions";
 import { fileUploader, setSampleUploads } from "./uploader";
@@ -156,104 +157,86 @@ export function App() {
     : {};
   const snippet = useMemo(() => buildSnippet(settings, catalog), [settings]);
 
+  const editorStyle = {
+    "--kg-rem": "0.625rem",
+    ...(settings.selection ? { "--kg-selection-color": settings.selection } : {}),
+  } as React.CSSProperties;
+
   const cardOn = (card: string) => !catalog.cards.length || settings.cards.includes(card);
 
   return (
     <>
-      <header className="bar">
-        <h1>Koenig playground</h1>
-        <label>
-          <input
-            type="checkbox"
-            checked={settings.dark}
-            onChange={(e) => update({ dark: e.target.checked })}
-          />{" "}
-          Dark
-        </label>
-        <label>
-          Text size{" "}
-          <select value={settings.size} onChange={(e) => update({ size: Number(e.target.value) })}>
-            {SIZES.map((s, i) => (
-              <option key={s} value={s}>
-                {i + 1}: {s}px
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          disabled={!cardOn("gallery")}
-          title={cardOn("gallery") ? undefined : "The gallery card is switched off"}
-          onClick={() => addCard(galleryNode(SAMPLES))}
+      <TopBar
+        catalog={catalog}
+        galleryOn={cardOn("gallery")}
+        settings={settings}
+        onChange={update}
+        onCopyLink={() => void navigator.clipboard?.writeText(window.location.href)}
+        onLoadSamples={() => addCard(galleryNode(SAMPLES))}
+        onReset={() => update(defaultSettings(catalog))}
+      />
+      <EditorErrorBoundary key={rebuilds}>
+        <KoenigComposer
+          cards={catalog.cards.length ? (settings.cards as KoenigCardName[]) : undefined}
+          comments={settings.comments ? comments : undefined}
+          darkMode={settings.dark}
+          editable={!settings.readOnly}
+          fileUploader={fileUploader}
+          initialEditorState={initial}
+          toolbarActions={settings.toolbarActions ? toolbarActions : undefined}
+          {...optionalProps}
         >
-          Load sample images
-        </button>
-      </header>
-      <KoenigComposer
-        key={rebuilds}
-        cards={catalog.cards.length ? (settings.cards as KoenigCardName[]) : undefined}
-        comments={settings.comments ? comments : undefined}
-        darkMode={settings.dark}
-        editable={!settings.readOnly}
-        fileUploader={fileUploader}
-        initialEditorState={initial}
-        toolbarActions={settings.toolbarActions ? toolbarActions : undefined}
-        {...optionalProps}
-      >
-        <div className="page">
-          <main>
-            <div className="editor-box" style={{ "--kg-rem": "0.625rem" } as React.CSSProperties}>
-              <KoenigEditor readOnly={settings.readOnly} onChange={onChange} />
-            </div>
-            {catalog.wordCount && settings.wordCount && <WordCount />}
-          </main>
-          <aside>
-            <section className="card">
-              <h2>Options</h2>
-              <SettingsPanel
-                catalog={catalog}
-                settings={settings}
-                onChange={update}
-                onReset={() => update(defaultSettings(catalog))}
-              />
-            </section>
-            <section className="card">
-              <h2>Code for this setup</h2>
-              <pre className="code">{snippet}</pre>
-              <div className="row">
-                <button onClick={() => void navigator.clipboard?.writeText(snippet)}>
-                  Copy code
-                </button>
+          <div className="page">
+            <main>
+              <div className="editor-box" style={editorStyle}>
+                <KoenigEditor readOnly={settings.readOnly} onChange={onChange} />
               </div>
-            </section>
-            <section className="card">
-              <h2>Sample images</h2>
-              <p className="muted">
-                Ten pictures drawn by the demo. Click one to add it as an image card.
-              </p>
-              <div className="samples">
-                {SAMPLES.map((sample) => (
-                  <button
-                    key={sample.id}
-                    disabled={!cardOn("image")}
-                    title={`Add sample ${sample.id} (${sample.width} x ${sample.height})`}
-                    onClick={() => addCard(imageNode(sample))}
-                  >
-                    <img src={sample.url} alt={sample.alt} loading="lazy" />
+              {catalog.wordCount && settings.wordCount && <WordCount />}
+            </main>
+            <aside>
+              <section className="card">
+                <h2>Options</h2>
+                <SettingsPanel catalog={catalog} settings={settings} onChange={update} />
+              </section>
+              <section className="card">
+                <h2>Code for this setup</h2>
+                <pre className="code">{snippet}</pre>
+                <div className="row">
+                  <button onClick={() => void navigator.clipboard?.writeText(snippet)}>
+                    Copy code
                   </button>
-                ))}
-              </div>
-            </section>
-            <section className="card">
-              <h2>Comment threads</h2>
-              <ThreadList events={events} />
-            </section>
-            <section className="card">
-              <h2>Saved state</h2>
-              <pre className="json">{json}</pre>
-            </section>
-          </aside>
-        </div>
-      </KoenigComposer>
+                </div>
+              </section>
+              <section className="card">
+                <h2>Sample images</h2>
+                <p className="muted">
+                  Ten pictures drawn by the demo. Click one to add it as an image card.
+                </p>
+                <div className="samples">
+                  {SAMPLES.map((sample) => (
+                    <button
+                      key={sample.id}
+                      disabled={!cardOn("image")}
+                      title={`Add sample ${sample.id} (${sample.width} x ${sample.height})`}
+                      onClick={() => addCard(imageNode(sample))}
+                    >
+                      <img src={sample.url} alt={sample.alt} loading="lazy" />
+                    </button>
+                  ))}
+                </div>
+              </section>
+              <section className="card">
+                <h2>Comment threads</h2>
+                <ThreadList events={events} />
+              </section>
+              <section className="card">
+                <h2>Saved state</h2>
+                <pre className="json">{json}</pre>
+              </section>
+            </aside>
+          </div>
+        </KoenigComposer>
+      </EditorErrorBoundary>
     </>
   );
 }

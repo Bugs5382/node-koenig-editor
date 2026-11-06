@@ -26,6 +26,40 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 export const SIZES = [12, 14, 16, 18, 20] as const;
 const DEFAULT_SIZE = 16;
 
+/** The swatches offered for the selection colour. */
+export const SELECTION_COLORS = [
+  { label: "Blue", value: "#2f80ed" },
+  { label: "Green", value: "#27ae60" },
+  { label: "Pink", value: "#e0457b" },
+  { label: "Orange", value: "#f2994a" },
+  { label: "Purple", value: "#9b51e0" },
+  { label: "Teal", value: "#14a3a3" },
+] as const;
+
+/** Card sets to try without ticking each box. A preset only lists cards the package has. Every
+ *  preset keeps the divider: a composer built without it fails to start. */
+export const PRESETS = [
+  { id: "all", label: "All cards", cards: null },
+  { id: "text", label: "Text and structure", cards: ["callout", "divider", "toggle", "table"] },
+  { id: "media", label: "Pictures", cards: ["image", "gallery", "header", "divider"] },
+  { id: "minimal", label: "Divider only", cards: ["divider"] },
+] as const;
+
+export type PresetId = (typeof PRESETS)[number]["id"];
+
+/** The cards a preset turns on, in the package's order. */
+export function applyPreset(id: PresetId, catalog: Catalog): string[] {
+  const preset = PRESETS.find((p) => p.id === id);
+  const wanted: readonly string[] | null = preset?.cards ?? null;
+  return catalog.cards.filter((card) => !wanted || wanted.includes(card));
+}
+
+/** The preset whose cards are exactly `cards` (as a list in the package's order), or "custom". */
+export function presetOf(cards: readonly string[], catalog: Catalog): PresetId | "custom" {
+  const same = PRESETS.find((p) => sameList(applyPreset(p.id, catalog), cards));
+  return same ? same.id : "custom";
+}
+
 /** What the package under test offers. Tools and the word count exist only in newer builds. */
 export interface Catalog {
   cards: readonly string[];
@@ -42,6 +76,8 @@ export interface Settings {
   readOnly: boolean;
   dark: boolean;
   sampleUploads: boolean;
+  /** A colour from SELECTION_COLORS for the editor's text selection; empty keeps the editor's own. */
+  selection: string;
   size: number;
 }
 
@@ -55,6 +91,7 @@ export function defaultSettings(catalog: Catalog): Settings {
     readOnly: false,
     dark: false,
     sampleUploads: true,
+    selection: "",
     size: DEFAULT_SIZE,
   };
 }
@@ -93,6 +130,10 @@ export function parseSettings(search: string, catalog: Catalog): Settings {
     else if (value === "0") settings[flag] = false;
   }
 
+  const selection = params.get("selection");
+  const color = SELECTION_COLORS.find((c) => c.value.slice(1) === selection?.toLowerCase());
+  if (color) settings.selection = color.value;
+
   const size = Number(params.get("size"));
   if ((SIZES as readonly number[]).includes(size)) settings.size = size;
   return settings;
@@ -107,6 +148,8 @@ export function serializeSettings(settings: Settings, catalog: Catalog): string 
   for (const flag of FLAGS) {
     if (settings[flag] !== defaults[flag]) params.set(flag, settings[flag] ? "1" : "0");
   }
+  if (settings.selection !== defaults.selection)
+    params.set("selection", settings.selection.slice(1));
   if (settings.size !== defaults.size) params.set("size", String(settings.size));
   // Commas stay readable in the address bar.
   return params.toString().replaceAll("%2C", ",");

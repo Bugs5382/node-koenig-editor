@@ -810,7 +810,11 @@ one, apply the change by hand, and update the commit here. Upstream history is n
 
 A demo app in `playground/` runs the editor in your browser, with a checkbox for every card and
 tool, the toolbar actions, comments, word count and read-only mode, and the matching code next to
-them. The setup lives in the page address, so copying the link shares it.
+them. The page splits 50/50 under a sticky top bar (the editor on the left, the options, code,
+sample images, comments and saved state stacked on the right, each side scrolling on its own; under
+1000px the right side drops below the editor). The bar holds the switches (dark, read only), a
+text-size control, a selection colour picker, a card preset list, and the Load sample images, Copy
+link and Reset buttons. The setup lives in the page address, so copying the link shares it.
 
 The demo starts with a header and a gallery made of ten sample pictures (small PNGs it draws itself, no
 network: `npm --prefix playground run samples` rebuilds them). A "Load sample images" button adds a

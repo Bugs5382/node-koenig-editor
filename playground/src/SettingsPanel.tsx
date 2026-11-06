@@ -26,14 +26,13 @@ import type { Catalog, Settings } from "./config";
 interface Props {
   catalog: Catalog;
   onChange: (patch: Partial<Settings>) => void;
-  onReset: () => void;
   settings: Settings;
 }
 
 const toggle = (list: string[], name: string, on: boolean, order: readonly string[]) =>
   order.filter((n) => (n === name ? on : list.includes(n)));
 
-export function SettingsPanel({ catalog, onChange, onReset, settings }: Props) {
+export function SettingsPanel({ catalog, onChange, settings }: Props) {
   return (
     <div className="settings">
       <fieldset>
@@ -125,12 +124,6 @@ export function SettingsPanel({ catalog, onChange, onReset, settings }: Props) {
           </label>
         </div>
       </fieldset>
-      <div className="row">
-        <button onClick={() => void navigator.clipboard?.writeText(window.location.href)}>
-          Copy link to this setup
-        </button>
-        <button onClick={onReset}>Reset</button>
-      </div>
     </div>
   );
 }

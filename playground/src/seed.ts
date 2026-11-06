@@ -92,6 +92,7 @@ export const headerNode = (sample: Sample): CardNode => ({
   style: "image",
   header: "Koenig playground",
   subheader: "Pictures are samples drawn by the demo, nothing is uploaded",
+  textColor: "#FFFFFF",
   backgroundImageSrc: sample.url,
   backgroundImageWidth: sample.width,
   backgroundImageHeight: sample.height,
