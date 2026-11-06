@@ -7,6 +7,7 @@ import {$getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, DELETE_CHARACTER
 import {LinkActionToolbar} from './LinkActionToolbar.jsx';
 import {LinkActionToolbarWithSearch} from './LinkActionToolbarWithSearch.jsx';
 import {SnippetActionToolbar} from './SnippetActionToolbar';
+import {$saveSelection, replaceSavedSelection} from '../../../additions/toolbarActions/selection';
 import {mergeRegister} from '@lexical/utils';
 
 // don't show the toolbar until the mouse has moved a certain distance,
@@ -16,7 +17,8 @@ const MOUSE_MOVE_THRESHOLD = 5;
 export const toolbarItemTypes = {
     snippet: 'snippet',
     link: 'link',
-    text: 'text'
+    text: 'text',
+    action: 'action'
 };
 
 export function FloatingFormatToolbar({
@@ -32,6 +34,41 @@ export function FloatingFormatToolbar({
     const isLinkSearchEnabled = typeof cardConfig?.searchLinks === 'function' || false;
 
     const toolbarRef = React.useRef(null);
+
+    // a host action's card: the selection is remembered when the button is pressed so the
+    // card can replace that text after focus has moved into it
+    const [activeAction, setActiveAction] = React.useState(null);
+    const closeAction = React.useCallback(() => {
+        setActiveAction(null);
+        setToolbarItemType(null);
+    }, [setToolbarItemType]);
+    const startAction = (action) => {
+        let saved = null;
+        editor.getEditorState().read(() => {
+            saved = $saveSelection();
+        });
+        if (!saved) {
+            return;
+        }
+        const selection = {
+            editor,
+            text: saved.text,
+            close: closeAction,
+            replaceSelection: (text) => {
+                const replaced = replaceSavedSelection(editor, saved, text);
+                if (replaced) {
+                    closeAction();
+                }
+                return replaced;
+            }
+        };
+        if (action.Card) {
+            setActiveAction({action, selection});
+            setToolbarItemType(toolbarItemTypes.action);
+        } else {
+            action.onSelect?.(selection);
+        }
+    };
 
     const isLinkSearchToolbarVisible = toolbarItemType === toolbarItemTypes.link && isLinkSearchEnabled;
 
@@ -134,6 +171,7 @@ export function FloatingFormatToolbar({
     const isSnippetToolbar = toolbarItemTypes.snippet === toolbarItemType;
     const isLinkToolbar = toolbarItemTypes.link === toolbarItemType;
     const isTextToolbar = toolbarItemTypes.text === toolbarItemType;
+    const isActionToolbar = toolbarItemTypes.action === toolbarItemType && !!activeAction;
 
     const showTextToolbar = isTextToolbar || (isLinkSearchEnabled && isLinkToolbar);
 
@@ -168,12 +206,19 @@ export function FloatingFormatToolbar({
                     />
                 )}
 
+                {isActionToolbar && (
+                    <div className="not-kg-prose rounded-lg bg-white font-sans text-md text-black shadow-md dark:bg-grey-950 dark:text-white" data-kg-toolbar-action-card={activeAction.action.id}>
+                        <activeAction.action.Card {...activeAction.selection} />
+                    </div>
+                )}
+
                 {showTextToolbar && (
                     <FormatToolbar
                         editor={editor}
                         hiddenFormats={hiddenFormats}
                         isLinkSelected={!!href || (isLinkSearchEnabled && isLinkToolbar)}
                         isSnippetsEnabled={isSnippetsEnabled}
+                        onActionClick={startAction}
                         onLinkClick={() => setToolbarItemType(toolbarItemTypes.link)}
                         onSnippetClick={() => setToolbarItemType(toolbarItemTypes.snippet)}
                     />

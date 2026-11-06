@@ -70,7 +70,8 @@ the sources.
 | `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
-| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `heading2`, `heading3`, `quote`, `link`, `snippet`.                                                                                |
+| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `heading1` to `heading5` (headings stop at H5), `quote`, `link`, `snippet`.                                                        |
+| `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
 | `collaboration`      | `KoenigCollaboration \| null`     | `null`          | The Yjs provider factory. Without it the editor works alone and asks for no provider.                                                                                            |
 | `nodes`              | `EditorNodes`                     | `DEFAULT_NODES` | The base node set the `cards` choice filters. `BASIC_NODES` and `MINIMAL_NODES` are smaller sets.                                                                                |
 | `initialEditorState` | `string \| SerializedEditorState` | empty           | The document to open. In a collaborative session it seeds the room only while the room is empty.                                                                                 |
@@ -96,7 +97,7 @@ the sources.
 ### Wording
 
 `DEFAULT_STRINGS` holds every piece of text the editor shows, grouped as `placeholder`,
-`nestedPlaceholder`, `cards` (each card's menu `label` and `desc`), `menu`, `toolbar`, `card`
+`nestedPlaceholder`, `errorFallback` (the message a failed card shows; `{card}` is replaced with the card's name), `cards` (each card's menu `label` and `desc`), `menu`, `toolbar`, `table` (the table card's controls), `card`
 (card toolbar buttons), `link`, `image`, `callout`, `toggle` and `snippet`. Plug your i18n in by
 building the `strings` object from your translations. Your own cards read the wording in effect
 with `useKoenigStrings()`.
@@ -248,6 +249,58 @@ export function MyEditor({
 }
 ```
 
+## 🧰 Toolbar actions
+
+`toolbarActions` adds your own buttons to the toolbar that appears over selected text, after
+Bold, Italic, the headings, Quote and Link. A button either runs a function or opens a card
+under the toolbar. This is how a host adds, for example, an AI card that rewrites the selection.
+
+```tsx
+const actions: KoenigToolbarAction[] = [
+  {
+    id: "rewrite",
+    label: "Rewrite",
+    Icon: WandIcon, // optional; the first letters of the label show otherwise
+    Card: ({ text, replaceSelection, close }) => (
+      <RewriteCard
+        text={text}
+        onAccept={(rewritten) => replaceSelection(rewritten)}
+        onCancel={close}
+      />
+    ),
+  },
+];
+
+<KoenigComposer toolbarActions={actions} />;
+```
+
+The card gets the selected `text`, `replaceSelection(text)`, `close()` and the `editor`.
+`replaceSelection` puts the text in place of what was selected when the button was pressed, even
+after focus has moved into your card or the answer arrives later. It returns `false` and changes
+nothing when that text has been edited or removed in the meantime. Set `hidden: true` to leave
+a button out for the person using it (permissions, a feature switch). An action with no `Card`
+calls `onSelect` with the same object. The button's `data-kg-toolbar-button` value is its `id`.
+
+## 📋 Tables
+
+The `table` card (on by default, `cards` to leave it out) inserts a 3 by 3 table with a header
+row from the "+" and slash menus. While the cursor is in a table, a toolbar above it adds and
+removes rows and columns, switches the header row on and off, and deletes the table. Tables are
+simple: no merged cells and no cell colours.
+
+- Keyboard: Tab and Shift+Tab move between cells, the arrow keys move within and between them,
+  and Alt+F10 moves focus to the table toolbar (Escape returns to the cell).
+- Markup: a real `table` with `th scope="col"` header cells and `td` body cells; the controls are
+  buttons in a labelled `role="toolbar"`. The wording is `strings.table`.
+- Document: a table is stock `@lexical/table` nodes, so it saves and loads with the rest of the
+  document, header row included.
+
+## 🔠 Headings
+
+Headings run from H1 to H5 and no deeper. The toolbar has a button for each level (hide any with
+`toolbar`), and a Heading 6 that arrives from a stored document, a paste, a markdown shortcut or
+a collaborator is set to Heading 5.
+
 ## 💬 Inline comments
 
 Comment on any selected text, like comments in a word processor. Pass `comments` to the composer and
@@ -395,9 +448,35 @@ variables (`--kg-accent-color: var(--color-primary)`), and opacity variants foll
 | `--kg-font-serif`      | `Georgia, Times, serif`                                    |
 | `--kg-font-mono`       | `Consolas, Liberation Mono, Menlo, Courier, monospace`     |
 
-`--kg-accent-color` colours links, the selection outline and accent cards. The `grey` scale
+`--kg-accent-color` colours links and accent cards; `--kg-selection-color` colours selection and focus. The `grey` scale
 carries text, borders and backgrounds, light and dark. Dark styles apply when `darkMode` is set
 on the composer.
+
+### Sizing, type and selection tokens
+
+The stylesheet is written for a 10px root (upstream sets `html { font-size: 62.5% }`). Every
+length is a multiple of `--kg-rem` so the editor follows your page instead: on the browser's 16px
+root one unit is `0.625rem`, i.e. 10px, and it grows with the person's text-size setting. Host
+pages that already use the 62.5% root set `--kg-rem: 1rem`. Set these on any ancestor of the
+editor.
+
+| Token                  | Default                        | What it sets                                                                                                                 |
+| ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `--kg-rem`             | `0.625rem`                     | The length unit for everything the editor draws; the single scale knob.                                                      |
+| `--kg-font-size`       | `2rem` (in `--kg-rem` units)   | Body text size (paragraphs, quotes, lists).                                                                                  |
+| `--kg-line-height`     | `1.6em`                        | Body line height.                                                                                                            |
+| `--kg-font-body`       | `Georgia, Times, serif`        | Body font family (the menus and toolbars use `--kg-font-sans`).                                                              |
+| `--kg-font-size-h1`    | `4.4rem` (in `--kg-rem` units) | Heading sizes, H1 to H5: `--kg-font-size-h1` through `--kg-font-size-h5`.                                                    |
+| `--kg-selection-color` | black (white in dark mode)     | The colour of selected and focused cards, active toolbar buttons, drop lines and focus outlines. There is no built-in green. |
+| `--kg-menu-width`      | `28rem` (in `--kg-rem` units)  | Width of the "+" and slash menus.                                                                                            |
+| `--kg-menu-max-height` | `32rem` (in `--kg-rem` units)  | Tallest the menus grow before they scroll; they also shrink to fit the room.                                                 |
+| `--kg-plus-size`       | `2.2rem` (in `--kg-rem` units) | Diameter of the "+" button beside an empty line.                                                                             |
+
+The `--kg-font-size-h2`, `--kg-font-size-h3`, `--kg-font-size-h4` and `--kg-font-size-h5`
+defaults are `3.2rem`, `2.5rem`, `2.2rem` and `2rem`. The editor itself sets `--kg-menu-fit`
+(the room left for an open menu) on the menu; leave it alone. The "+" and slash menus are drawn in a portal inside the editor's root, positioned
+against the viewport: they are never clipped by the editor's overflow (an empty document
+included), open above the line when there is no room below, and scroll when taller than the room.
 
 ## 🔗 Upstream
 

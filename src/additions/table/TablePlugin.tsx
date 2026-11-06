@@ -24,6 +24,8 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { TablePlugin as LexicalTablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 
+import { TableActionsPlugin } from "./TableActionsPlugin";
+
 // Mounts Lexical's own table behaviour (cell selection, tab navigation, the insert command)
 // when the editor registers the table nodes. Nested editors that leave them out render nothing.
 export const TablePlugin = () => {
@@ -32,7 +34,14 @@ export const TablePlugin = () => {
     return null;
   }
   return (
-    <LexicalTablePlugin hasCellBackgroundColor={true} hasCellMerge={true} hasTabHandler={true} />
+    <>
+      <LexicalTablePlugin
+        hasCellBackgroundColor={false}
+        hasCellMerge={false}
+        hasTabHandler={true}
+      />
+      <TableActionsPlugin />
+    </>
   );
 };
 

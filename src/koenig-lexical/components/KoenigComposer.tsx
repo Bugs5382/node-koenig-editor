@@ -45,6 +45,7 @@ const KoenigComposer = ({
     menuItems,
     strings: hostStrings,
     toolbar,
+    toolbarActions,
     onError = defaultOnError,
     fileUploader = {},
     cardConfig = {},
@@ -114,7 +115,8 @@ const KoenigComposer = ({
                     darkMode,
                     collaboration,
                     menuItems,
-                    toolbar
+                    toolbar,
+                    toolbarActions
                 }}>
                     <KoenigStringsContext.Provider value={strings}>
                         <KoenigCommentsContext.Provider value={commentStore}>

@@ -660,8 +660,8 @@ export class DragDropHandler {
         if (!dropIndicator) {
             dropIndicator = document.createElement('div');
             dropIndicator.id = constants.DROP_INDICATOR_ID;
-            // "rounded-full bg-green" kept as classes so Tailwind picks up usage
-            dropIndicator.className = 'rounded-full bg-green';
+            // "rounded-full bg-selection" kept as classes so Tailwind picks up usage
+            dropIndicator.className = 'rounded-full bg-selection';
             Object.assign(dropIndicator.style, {
                 position: 'absolute',
                 opacity: 0,

@@ -41,7 +41,44 @@ export type KoenigCardName = "callout" | "divider" | "image" | "table" | "toggle
 
 /** The format toolbar's buttons. Pass a list as the composer's `toolbar` to show only those. */
 export type KoenigToolbarItem =
-  "bold" | "heading2" | "heading3" | "italic" | "link" | "quote" | "snippet";
+  | "bold"
+  | "heading1"
+  | "heading2"
+  | "heading3"
+  | "heading4"
+  | "heading5"
+  | "italic"
+  | "link"
+  | "quote"
+  | "snippet";
+
+/** What a host's toolbar button or card gets when the person uses it on a text selection. */
+export interface KoenigToolbarSelection {
+  /** Closes the card and the toolbar. */
+  close: () => void;
+  editor: LexicalEditor;
+  /** Puts `text` in place of the text that was selected when the button was pressed, even after
+   *  focus has moved into your card. Closes the card and returns true; returns false, changing
+   *  nothing, when that text has since been edited or removed. */
+  replaceSelection: (text: string) => boolean;
+  /** The selected text when the button was pressed. */
+  text: string;
+}
+
+/** A button the host adds to the selection toolbar, after the built-in ones. */
+export interface KoenigToolbarAction {
+  /** Opens under the toolbar when the button is pressed. Without it the button calls `onSelect`. */
+  Card?: FC<KoenigToolbarSelection>;
+  /** True leaves the button out, for example when the person may not use it. */
+  hidden?: boolean;
+  /** The button's icon; without one the first letters of `label` show. */
+  Icon?: FC<{ className?: string }>;
+  /** Names the button: it becomes the `data-kg-toolbar-button` value. */
+  id: string;
+  /** The button's accessible name and tooltip. */
+  label: string;
+  onSelect?: (selection: KoenigToolbarSelection) => void;
+}
 
 /** A menu entry's wording. */
 export interface KoenigCardText {
@@ -59,6 +96,18 @@ export interface KoenigStrings {
   cards: Record<KoenigCardName, KoenigCardText>;
   menu: { addCard: string; removeSnippet: string; sections: Record<string, string> };
   toolbar: Record<KoenigToolbarItem, string>;
+  /** The table card's controls; `toolbar` names the group for screen readers. */
+  table: {
+    addColumnLeft: string;
+    addColumnRight: string;
+    addRowAbove: string;
+    addRowBelow: string;
+    deleteColumn: string;
+    deleteRow: string;
+    deleteTable: string;
+    headerRow: string;
+    toolbar: string;
+  };
   card: {
     edit: string;
     fullWidth: string;
@@ -226,6 +275,8 @@ export interface KoenigComposerProps {
   strings?: KoenigStringsInput;
   /** The format toolbar buttons to show. Default: all of them. */
   toolbar?: readonly KoenigToolbarItem[];
+  /** The host's own buttons and cards on the selection toolbar. */
+  toolbarActions?: readonly KoenigToolbarAction[];
 }
 
 export interface KoenigEditorAPI {

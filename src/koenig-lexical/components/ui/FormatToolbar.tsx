@@ -34,13 +34,21 @@ const blockTypeToBlockName = {
     h3: 'Heading 3',
     h4: 'Heading 4',
     h5: 'Heading 5',
-    h6: 'Heading 6',
     number: 'Numbered List',
     paragraph: 'Normal',
     quote: 'Quote',
     'extended-quote': 'Quote',
     aside: 'Aside'
 };
+
+// H1 to H5 and no deeper: the editor clamps anything lower (see HeadingLimitPlugin).
+const HEADING_LEVELS = [
+    {tag: 'h1', item: 'heading1', icon: 'headingOne', key: '1'},
+    {tag: 'h2', item: 'heading2', icon: 'headingTwo', key: '2'},
+    {tag: 'h3', item: 'heading3', icon: 'headingThree', key: '3'},
+    {tag: 'h4', item: 'heading4', icon: 'headingFour', key: '4'},
+    {tag: 'h5', item: 'heading5', icon: 'headingFive', key: '5'}
+];
 
 function quoteIcon(blockType = '') {
     if (blockType.endsWith?.('quote')) {
@@ -58,13 +66,14 @@ export default function FormatToolbar({
     isLinkSelected,
     onLinkClick,
     onSnippetClick,
+    onActionClick,
     hiddenFormats = []
 }) {
     const strings = useKoenigStrings();
     const [isBold, setIsBold] = React.useState(false);
     const [isItalic, setIsItalic] = React.useState(false);
     const [blockType, setBlockType] = React.useState('paragraph');
-    const {cardConfig: {createSnippet}, toolbar} = React.useContext(KoenigComposerContext);
+    const {cardConfig: {createSnippet}, toolbar, toolbarActions} = React.useContext(KoenigComposerContext);
     // the host's `toolbar` option names the buttons to show; leaving it out shows them all
     const isHidden = item => isToolbarItemHidden(toolbar, item);
 
@@ -198,24 +207,18 @@ export default function FormatToolbar({
                 shortcutKeys={[ctrlOrCmdSymbol(), 'I']}
                 onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
             />
-            <ToolbarMenuItem
-                data-kg-toolbar-button="h2"
-                hide={hideHeading || isHidden('heading2')}
-                icon="headingTwo"
-                isActive={blockType === 'h2'}
-                label={strings.toolbar.heading2}
-                shortcutKeys={[ctrlOrSymbol(), altOrOption(), '2']}
-                onClick={() => (blockType === 'h2' ? formatParagraph() : formatHeading('h2'))}
-            />
-            <ToolbarMenuItem
-                data-kg-toolbar-button="h3"
-                hide={hideHeading || isHidden('heading3')}
-                icon="headingThree"
-                isActive={blockType === 'h3'}
-                label={strings.toolbar.heading3}
-                shortcutKeys={[ctrlOrSymbol(), altOrOption(), '3']}
-                onClick={() => (blockType === 'h3' ? formatParagraph() : formatHeading('h3'))}
-            />
+            {HEADING_LEVELS.map(({tag, item, icon, key}) => (
+                <ToolbarMenuItem
+                    key={tag}
+                    data-kg-toolbar-button={tag}
+                    hide={hideHeading || isHidden(item)}
+                    icon={icon}
+                    isActive={blockType === tag}
+                    label={strings.toolbar[item]}
+                    shortcutKeys={[ctrlOrSymbol(), altOrOption(), key]}
+                    onClick={() => (blockType === tag ? formatParagraph() : formatHeading(tag))}
+                />
+            ))}
             <ToolbarMenuSeparator hide={hideQuotes || isHidden('quote')} />
             <ToolbarMenuItem
                 data-kg-toolbar-button="quote"
@@ -236,6 +239,18 @@ export default function FormatToolbar({
                 shortcutKeys={[ctrlOrCmdSymbol(), 'K']}
                 onClick={onLinkClick}
             />
+
+            {(toolbarActions || []).filter(action => !action.hidden).map(action => (
+                <ToolbarMenuItem
+                    key={action.id}
+                    CustomIcon={action.Icon}
+                    data-kg-toolbar-button={action.id}
+                    icon={action.id}
+                    isActive={false}
+                    label={action.label}
+                    onClick={() => onActionClick?.(action)}
+                />
+            ))}
 
             <ToolbarMenuSeparator hide={hideSnippets} />
             <ToolbarMenuItem

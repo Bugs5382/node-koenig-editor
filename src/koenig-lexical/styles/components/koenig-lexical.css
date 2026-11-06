@@ -58,8 +58,8 @@
     }
 
     em-emoji-picker {
-        /* --green */
-        --rgb-accent: 48, 207, 67;
+        /* --black */
+        --rgb-accent: 21, 23, 26;
         /* --grey-950 */
         --rgb-background: 35, 41, 47;
         /* --grey-300 */

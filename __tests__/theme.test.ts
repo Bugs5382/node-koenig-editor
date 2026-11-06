@@ -58,7 +58,7 @@ describe("theme tokens", () => {
       const values = typeof value === "string" ? [value] : Object.values(value);
       for (const color of values) {
         if (color === "transparent" || color === "currentColor") continue;
-        expect(color).toMatch(/var\(--kg-(color-[\w-]+|accent-color),/);
+        expect(color).toMatch(/var\(--kg-(color-[\w-]+|accent-color|selection)[,)]/);
       }
     }
   });

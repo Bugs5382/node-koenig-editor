@@ -246,7 +246,7 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
             >
                 <ImageUploadForm
                     fileInputRef={toolbarFileInputRef}
-                    mimeTypes={fileUploader.fileTypes.image?.mimeTypes}
+                    mimeTypes={fileUploader.fileTypes?.image?.mimeTypes}
                     onFileChange={onFileChange}
                 />
                 <ToolbarMenu>
