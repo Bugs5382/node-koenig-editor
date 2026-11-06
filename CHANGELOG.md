@@ -6,6 +6,7 @@
 
 #### 🚀 Features
 
+- feat(editor): file, video, audio, button and markdown cards, word count, image editor and emoji picker @Bugs5382 (#34)
 - feat(editor): image gallery and header cards in the default set, with host-replaceable layout @Bugs5382 (#33)
 
 ### Extra
