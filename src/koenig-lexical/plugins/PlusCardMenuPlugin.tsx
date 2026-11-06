@@ -2,6 +2,7 @@ import KoenigComposerContext from '../context/KoenigComposerContext.jsx';
 import React from 'react';
 import {$getSelection, $isParagraphNode, $isRangeSelection, $setSelection} from 'lexical';
 import {AnchoredMenu} from '../../additions/placement/AnchoredMenu';
+import {placePlus} from '../../additions/placement/placePlus';
 import {CardMenu} from '../components/ui/CardMenu';
 import {PlusButton, PlusMenu} from '../components/ui/PlusMenu';
 import {buildCardMenu} from '../utils/buildCardMenu';
@@ -10,10 +11,14 @@ import {getEditorCardNodes} from '../utils/getEditorCardNodes';
 import {getSelectedNode} from '../utils/getSelectedNode';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
+// Used before the button has been measured (its size is a theme variable).
+const FALLBACK_PLUS_SIZE = 22;
+
 function usePlusCardMenu(editor) {
     const [isShowingButton, setIsShowingButton] = React.useState(false);
     const [isShowingMenu, setIsShowingMenu] = React.useState(false);
     const [topPosition, setTopPosition] = React.useState(0);
+    const [leftPosition, setLeftPosition] = React.useState(0);
     const [cachedRange, setCachedRange] = React.useState(null);
     const [cardMenu, setCardMenu] = React.useState({});
     const containerRef = React.useRef(null);
@@ -27,6 +32,16 @@ function usePlusCardMenu(editor) {
         const containerRect = elem.parentNode.getBoundingClientRect();
 
         return elemRect.top - containerRect.top;
+    }
+
+    // The button stays inside the editor's box: before the empty line when the padding leaves
+    // room for it, else at the box's left edge (see placePlus).
+    function getLeftPosition(elem) {
+        const box = (elem.closest('.koenig-lexical') || elem.parentNode.parentNode || elem.parentNode).getBoundingClientRect();
+        const line = elem.getBoundingClientRect();
+        const measured = buttonRef.current?.firstElementChild?.firstElementChild?.getBoundingClientRect().width;
+        const origin = containerRef.current?.offsetParent?.getBoundingClientRect().left;
+        return placePlus(line, box, measured || FALLBACK_PLUS_SIZE, undefined, origin);
     }
 
     function getElementRange(elem) {
@@ -107,6 +122,7 @@ function usePlusCardMenu(editor) {
             }
 
             setTopPosition(getTopPosition(p));
+            setLeftPosition(getLeftPosition(p));
             showButton(p);
         });
     }, [editor, showButton, hideButton]);
@@ -182,6 +198,7 @@ function usePlusCardMenu(editor) {
             if (hoveredElem?.tagName === 'P' && hoveredElem.textContent === '') {
                 // place cursor next to the hovered paragraph
                 setTopPosition(getTopPosition(hoveredElem));
+                setLeftPosition(getLeftPosition(hoveredElem));
                 showButton(hoveredElem);
             } else {
                 // reset button based on cursor position
@@ -243,6 +260,7 @@ function usePlusCardMenu(editor) {
     }, [cardConfig, editor, setCardMenu, menuItems, strings]);
 
     const style = {
+        left: `${leftPosition}px`,
         top: `${topPosition}px`
     };
 
