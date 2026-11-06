@@ -21,7 +21,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { describe, expect, it } from "vitest";
-import { appendCard, dropCards, imageNode, seedDocument, SAMPLES, galleryNode } from "./seed";
+import {
+  appendCard,
+  dropCards,
+  emptyDocument,
+  galleryNode,
+  imageNode,
+  isEmptyDocument,
+  SAMPLES,
+  seedDocument,
+} from "./seed";
 
 type Node = { type: string; [key: string]: unknown };
 const childrenOf = (json: string): Node[] => JSON.parse(json).root.children;
@@ -43,12 +52,12 @@ describe("start document", () => {
     expect(header.style).toBe("image");
   });
 
-  it("fills the gallery up to the card's nine-image limit, in rows of three", () => {
+  it("puts all ten pictures in the gallery, in rows of three", () => {
     const gallery = childrenOf(seedDocument(null)).find((n) => n.type === "gallery") as Node;
     const images = gallery.images as { row: number; src: string; width: number }[];
-    expect(images).toHaveLength(9);
-    expect(images.map((i) => i.row)).toEqual([0, 0, 0, 1, 1, 1, 2, 2, 2]);
-    expect(new Set(images.map((i) => i.src)).size).toBe(9);
+    expect(images).toHaveLength(10);
+    expect(images.map((i) => i.row)).toEqual([0, 0, 0, 1, 1, 1, 2, 2, 2, 3]);
+    expect(new Set(images.map((i) => i.src)).size).toBe(10);
     expect(images.every((i) => i.width > 0)).toBe(true);
   });
 
@@ -89,5 +98,28 @@ describe("cards that were switched off", () => {
   it("leaves other cards alone", () => {
     const doc = appendCard(undefined, { type: "callout" });
     expect(typesOf(dropCards(doc, []))).toEqual(["callout"]);
+  });
+});
+
+describe("empty document", () => {
+  it("is a single empty paragraph", () => {
+    const children = childrenOf(emptyDocument());
+    expect(children).toHaveLength(1);
+    expect(children[0]).toMatchObject({ type: "paragraph", children: [] });
+  });
+
+  it("is recognised as empty, and nothing else is", () => {
+    expect(isEmptyDocument(emptyDocument())).toBe(true);
+    expect(isEmptyDocument(undefined)).toBe(true);
+    expect(isEmptyDocument("")).toBe(true);
+    expect(isEmptyDocument(seedDocument(null))).toBe(false);
+    expect(isEmptyDocument(appendCard(emptyDocument(), imageNode(SAMPLES[0]!)))).toBe(false);
+  });
+
+  it("is not empty once there is text, or a card in place of the paragraph", () => {
+    const withText = JSON.parse(emptyDocument());
+    withText.root.children[0].children = [{ type: "text", text: "hi", version: 1 }];
+    expect(isEmptyDocument(JSON.stringify(withText))).toBe(false);
+    expect(isEmptyDocument(appendCard(undefined, imageNode(SAMPLES[0]!)))).toBe(false);
   });
 });

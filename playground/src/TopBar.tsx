@@ -38,6 +38,7 @@ interface Props {
   catalog: Catalog;
   galleryOn: boolean;
   onChange: (patch: Partial<Settings>) => void;
+  onClear: () => void;
   onCopyLink: () => void;
   onHelp: () => void;
   onLoadKitchenSink: () => void;
@@ -50,6 +51,7 @@ export function TopBar({
   catalog,
   galleryOn,
   onChange,
+  onClear,
   onCopyLink,
   onHelp,
   onLoadKitchenSink,
@@ -125,7 +127,12 @@ export function TopBar({
           Load the kitchen sink
         </Button>
         <Button onClick={onCopyLink}>Copy link</Button>
-        <Button onClick={onReset}>Reset</Button>
+        <Button title="Empty the document, keep the settings" onClick={onClear}>
+          Clear
+        </Button>
+        <Button title="Empty document and default settings" onClick={onReset}>
+          Reset
+        </Button>
         <Button onClick={onHelp}>Help</Button>
       </div>
     </header>

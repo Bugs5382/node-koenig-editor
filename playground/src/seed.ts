@@ -42,8 +42,6 @@ export const SAMPLES: readonly Sample[] = SAMPLE_SPECS.map((spec) => ({
   width: spec.width,
 }));
 
-// A gallery card holds at most nine pictures.
-export const GALLERY_MAX = 9;
 const PER_ROW = 3;
 
 export type CardNode = { type: string; [key: string]: unknown };
@@ -74,7 +72,7 @@ export const galleryNode = (samples: readonly Sample[]): CardNode => ({
   type: "gallery",
   version: 1,
   caption: "",
-  images: samples.slice(0, GALLERY_MAX).map((sample, index) => ({
+  images: samples.map((sample, index) => ({
     alt: sample.alt,
     caption: "",
     fileName: sample.file,
@@ -103,6 +101,21 @@ const documentOf = (children: CardNode[]) => ({
 });
 
 const allowed = (cards: readonly string[] | null, card: string) => !cards || cards.includes(card);
+
+/** Nothing written yet: one empty paragraph. */
+export function emptyDocument(): string {
+  return JSON.stringify(documentOf([{ ...paragraph(""), children: [] }]));
+}
+
+/** True for no document at all, or one that is a single empty paragraph. */
+export function isEmptyDocument(state: string | undefined): boolean {
+  if (!state) return true;
+  const children = JSON.parse(state).root?.children ?? [];
+  return (
+    children.length === 0 ||
+    (children.length === 1 && children[0].type === "paragraph" && !children[0].children?.length)
+  );
+}
 
 /** The document the page starts with. `cards` is the enabled list; null means every card. */
 export function seedDocument(cards: readonly string[] | null): string {

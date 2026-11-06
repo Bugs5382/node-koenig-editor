@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "./App";
 
@@ -62,6 +62,7 @@ describe("playground", () => {
     window.history.replaceState(null, "", "/?comments=0");
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    fireEvent.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Reset" }));
     expect(window.location.search).toBe("");
     expect(snippet()).toContain("comments={comments}");
   });

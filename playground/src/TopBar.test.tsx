@@ -179,6 +179,7 @@ describe("buttons", () => {
     window.history.replaceState(null, "", "/?dark=1&size=20&selection=e0457b&readOnly=1");
     render(<App />);
     fireEvent.click(within(bar()).getByRole("button", { name: "Reset" }));
+    fireEvent.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Reset" }));
     expect(window.location.search).toBe("");
   });
 
@@ -199,6 +200,9 @@ describe("buttons", () => {
       render(<App />);
       expect(screen.getByRole("alert").textContent).toContain("could not start");
       fireEvent.click(within(bar()).getByRole("button", { name: "Reset" }));
+      fireEvent.click(
+        within(screen.getByRole("alertdialog")).getByRole("button", { name: "Reset" }),
+      );
       expect(screen.queryByRole("alert")).toBeNull();
       expect(document.querySelector('[contenteditable="true"]')).not.toBeNull();
     } finally {
@@ -232,5 +236,105 @@ describe("buttons", () => {
     expect(editor.querySelector("table")).toBeNull();
     expect(editor.querySelector('[data-kg-card="callout"]')).toBeNull();
     expect(editor.querySelector('[data-kg-card="image"]')).not.toBeNull();
+  });
+});
+
+const toast = () => document.querySelector(".toast") as HTMLElement;
+const editorText = () =>
+  (document.querySelector('[contenteditable="true"]') as HTMLElement | null)?.textContent ?? "";
+const confirmButton = (name: string) =>
+  within(screen.getByRole("alertdialog")).getByRole("button", { name });
+
+describe("Clear", () => {
+  it("asks first when there is something in the document, and Cancel keeps it", () => {
+    render(<App />);
+    expect(editorText()).toContain("Try the cards below");
+    fireEvent.click(within(bar()).getByRole("button", { name: "Clear" }));
+    const dialog = screen.getByRole("alertdialog");
+    expect(dialog.textContent).toContain("Clear the document?");
+    expect(dialog.textContent).toContain("settings stay");
+    fireEvent.click(confirmButton("Cancel"));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(editorText()).toContain("Try the cards below");
+  });
+
+  it("empties the document and keeps the settings", () => {
+    window.history.replaceState(null, "", "/?dark=1&size=20");
+    render(<App />);
+    fireEvent.click(within(bar()).getByRole("button", { name: "Clear" }));
+    fireEvent.click(confirmButton("Clear"));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(editorText()).toBe("");
+    expect(window.location.search).toContain("dark=1");
+    expect(window.location.search).toContain("size=20");
+    expect(toast().textContent).toContain("Document cleared");
+  });
+
+  it("is undone with one press of Undo", () => {
+    render(<App />);
+    fireEvent.click(within(bar()).getByRole("button", { name: "Clear" }));
+    fireEvent.click(confirmButton("Clear"));
+    expect(editorText()).toBe("");
+    fireEvent.click(within(toast()).getByRole("button", { name: "Undo" }));
+    expect(editorText()).toContain("Try the cards below");
+    expect(document.querySelector(".toast")).toBeNull();
+  });
+
+  it("does not ask when the document is already empty", () => {
+    render(<App />);
+    fireEvent.click(within(bar()).getByRole("button", { name: "Clear" }));
+    fireEvent.click(confirmButton("Clear"));
+    fireEvent.click(within(bar()).getByRole("button", { name: "Clear" }));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+  });
+
+  it("Escape cancels the question", () => {
+    render(<App />);
+    fireEvent.click(within(bar()).getByRole("button", { name: "Clear" }));
+    fireEvent.keyDown(screen.getByRole("alertdialog"), { key: "Escape" });
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(editorText()).toContain("Try the cards below");
+  });
+});
+
+describe("Reset", () => {
+  it("returns to an empty document and the default settings, after asking", () => {
+    window.history.replaceState(null, "", "/?dark=1&size=20&cards=image,divider");
+    render(<App />);
+    fireEvent.click(within(bar()).getByRole("button", { name: "Reset" }));
+    const dialog = screen.getByRole("alertdialog");
+    expect(dialog.textContent).toContain("Reset to an empty document?");
+    expect(dialog.textContent).toContain("default");
+    fireEvent.click(confirmButton("Reset"));
+    expect(editorText()).toBe("");
+    expect(window.location.search).toBe("");
+    expect(document.documentElement.classList.contains("dark")).toBe(false);
+    expect(toast().textContent).toContain("Reset");
+  });
+
+  it("is undone with one press of Undo, document and settings together", () => {
+    window.history.replaceState(null, "", "/?dark=1&size=20");
+    render(<App />);
+    fireEvent.click(within(bar()).getByRole("button", { name: "Reset" }));
+    fireEvent.click(confirmButton("Reset"));
+    expect(window.location.search).toBe("");
+    fireEvent.click(within(toast()).getByRole("button", { name: "Undo" }));
+    expect(editorText()).toContain("Try the cards below");
+    expect(window.location.search).toContain("dark=1");
+    expect(window.location.search).toContain("size=20");
+  });
+
+  it("asks when only the settings changed, and does nothing when nothing changed at all", () => {
+    window.history.replaceState(null, "", "/?size=20");
+    render(<App />);
+    fireEvent.click(within(bar()).getByRole("button", { name: "Clear" }));
+    fireEvent.click(confirmButton("Clear")); // document is empty now, settings are not default
+    fireEvent.click(within(toast()).getByRole("button", { name: "Dismiss" }));
+    fireEvent.click(within(bar()).getByRole("button", { name: "Reset" }));
+    fireEvent.click(confirmButton("Reset"));
+    expect(window.location.search).toBe("");
+    fireEvent.click(within(toast()).getByRole("button", { name: "Dismiss" }));
+    fireEvent.click(within(bar()).getByRole("button", { name: "Reset" }));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
   });
 });

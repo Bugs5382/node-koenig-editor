@@ -29,6 +29,7 @@ import {
 } from "node-koenig-editor";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { catalog, useWordCount } from "./catalog";
+import { ConfirmDialog, Toast } from "./dialogs";
 import { EditorErrorBoundary } from "./EditorErrorBoundary";
 import { HelpSheet } from "./HelpSheet";
 import { kitchenSink } from "./kitchenSink";
@@ -42,8 +43,10 @@ import {
 import {
   appendCard,
   dropCards,
+  emptyDocument,
   galleryNode,
   imageNode,
+  isEmptyDocument,
   SAMPLES,
   seedDocument,
   type CardNode,
@@ -81,6 +84,8 @@ export function App() {
   const [settings, setSettings] = useState(() => parseSettings(window.location.search, catalog));
   const settingsRef = useRef(settings);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [confirm, setConfirm] = useState<"clear" | "reset" | null>(null);
+  const [toast, setToast] = useState<{ message: string; undo: () => void } | null>(null);
   const [state, setState] = useState<unknown>(null);
   const [events, setEvents] = useState<string[]>([]);
   const [rebuilds, setRebuilds] = useState(0);
@@ -141,6 +146,56 @@ export function App() {
     rebuild(kitchenSink(catalog.cards, enabledCards(settingsRef.current)));
   }, [rebuild]);
 
+  // Clear and Reset throw work away, so they ask first when there is something to lose, and they
+  // leave an Undo that puts back the document, the settings and the comment threads together.
+  const snapshot = () => ({
+    doc: docRef.current,
+    settings: settingsRef.current,
+    threads: [...threadsRef.current],
+  });
+
+  const restore = useCallback(
+    (snap: ReturnType<typeof snapshot>) => {
+      settingsRef.current = snap.settings;
+      setSettings(snap.settings);
+      threadsRef.current = snap.threads;
+      setToast(null);
+      rebuild(snap.doc);
+    },
+    [rebuild],
+  );
+
+  const requestClear = () => {
+    if (!isEmptyDocument(docRef.current)) setConfirm("clear");
+  };
+  const requestReset = () => {
+    if (!isEmptyDocument(docRef.current) || serializeSettings(settingsRef.current, catalog)) {
+      setConfirm("reset");
+    }
+  };
+
+  const doClear = () => {
+    const snap = snapshot();
+    setConfirm(null);
+    threadsRef.current = [];
+    rebuild(emptyDocument());
+    setToast({ message: "Document cleared.", undo: () => restore(snap) });
+  };
+
+  const doReset = () => {
+    const snap = snapshot();
+    const defaults = defaultSettings(catalog);
+    setConfirm(null);
+    settingsRef.current = defaults;
+    setSettings(defaults);
+    threadsRef.current = [];
+    rebuild(emptyDocument());
+    setToast({
+      message: "Reset to an empty document and the default settings.",
+      undo: () => restore(snap),
+    });
+  };
+
   const onEvent = useCallback((event: KoenigCommentEvent) => {
     const thread = event.thread;
     if (thread) {
@@ -185,8 +240,35 @@ export function App() {
         onHelp={() => setHelpOpen(true)}
         onLoadKitchenSink={loadKitchenSink}
         onLoadSamples={() => addCard(galleryNode(SAMPLES))}
-        onReset={() => update(defaultSettings(catalog))}
+        onClear={requestClear}
+        onReset={requestReset}
       />
+      {confirm === "clear" && (
+        <ConfirmDialog
+          title="Clear the document?"
+          message="The text and cards in the editor are removed. Your settings stay. You can undo this right after."
+          confirmLabel="Clear"
+          onCancel={() => setConfirm(null)}
+          onConfirm={doClear}
+        />
+      )}
+      {confirm === "reset" && (
+        <ConfirmDialog
+          title="Reset to an empty document?"
+          message="The editor is emptied and every setting goes back to its default. You can undo this right after."
+          confirmLabel="Reset"
+          onCancel={() => setConfirm(null)}
+          onConfirm={doReset}
+        />
+      )}
+      {toast && (
+        <Toast
+          message={toast.message}
+          actionLabel="Undo"
+          onAction={toast.undo}
+          onDismiss={() => setToast(null)}
+        />
+      )}
       <HelpSheet open={helpOpen} onClose={() => setHelpOpen(false)} />
       <EditorErrorBoundary key={rebuilds}>
         <KoenigComposer
