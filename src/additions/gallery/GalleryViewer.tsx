@@ -151,7 +151,6 @@ export const GalleryViewer = ({
   const go = (next: number) => onIndexChange(Math.min(Math.max(next, 0), last));
   const close = () => {
     onClose();
-    opener?.focus();
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
@@ -231,6 +230,7 @@ export const GalleryViewer = ({
       onKeyDown={onKeyDown}
       onKeyUp={(event) => event.stopPropagation()}
       onRequestClose={close}
+      returnFocusTo={opener}
     >
       <div
         className="flex items-center justify-between gap-4 pb-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(0.75rem,env(safe-area-inset-top))]"

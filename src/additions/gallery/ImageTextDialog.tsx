@@ -73,12 +73,10 @@ export const ImageTextDialog = ({
 
   const close = () => {
     onClose();
-    opener?.focus();
   };
   const save = () => {
     onSave({ alt: altValue.trim(), caption: captionValue.trim(), title: titleValue.trim() });
     onClose();
-    opener?.focus();
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
@@ -127,6 +125,7 @@ export const ImageTextDialog = ({
       onKeyDown={onKeyDown}
       onKeyUp={(event) => event.stopPropagation()}
       onRequestClose={close}
+      returnFocusTo={opener}
     >
       <div className="flex w-[min(92vw,44rem)] flex-col gap-4 rounded-lg bg-white p-6 font-sans shadow-xl dark:bg-grey-950">
         <h2 className="m-0 text-lg font-semibold text-grey-900 dark:text-grey-200" id={headingId}>

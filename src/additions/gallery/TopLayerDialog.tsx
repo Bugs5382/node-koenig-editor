@@ -28,6 +28,9 @@ interface TopLayerDialogProps extends Omit<DialogHTMLAttributes<HTMLDialogElemen
   children: ReactNode;
   /** Called when the person asks to close it: Escape, or the browser's own cancel. */
   onRequestClose: () => void;
+  /** Where focus goes once the dialog is gone. It cannot go sooner: while a modal dialog is open
+   *  everything outside it is inert, and focusing something there does nothing. */
+  returnFocusTo?: HTMLElement | null;
   /** Where the editor's own root is, so the theme tokens and dark mode reach it. */
   to: Element;
 }
@@ -38,10 +41,18 @@ interface TopLayerDialogProps extends Omit<DialogHTMLAttributes<HTMLDialogElemen
  * highest z-index, say) can cover a modal's controls. Where the browser has no native dialog it is
  * the same element held `open` with `position: fixed`, which is only as good as the page's z-index.
  */
-export const TopLayerDialog = ({ children, onRequestClose, to, ...props }: TopLayerDialogProps) => {
+export const TopLayerDialog = ({
+  children,
+  onRequestClose,
+  returnFocusTo,
+  to,
+  ...props
+}: TopLayerDialogProps) => {
   const ref = useRef<HTMLDialogElement>(null);
   const closeRef = useRef(onRequestClose);
   closeRef.current = onRequestClose;
+  const returnRef = useRef(returnFocusTo);
+  returnRef.current = returnFocusTo;
 
   useEffect(() => {
     const dialog = ref.current;
@@ -61,6 +72,8 @@ export const TopLayerDialog = ({ children, onRequestClose, to, ...props }: TopLa
     return () => {
       dialog.removeEventListener("cancel", onCancel);
       if (typeof dialog.close === "function" && dialog.open) dialog.close();
+      // now the page is live again, so focus can go back
+      returnRef.current?.focus();
     };
   }, []);
 

@@ -422,6 +422,13 @@ const withNativeDialog = () => {
   const calls = { close: 0, showModal: 0 };
   const proto = HTMLDialogElement.prototype as unknown as Record<string, unknown>;
   const saved = { close: proto.close, showModal: proto.showModal };
+  // While a modal dialog is open the rest of the page is inert: focusing it does nothing.
+  const realFocus = HTMLElement.prototype.focus;
+  HTMLElement.prototype.focus = function (this: HTMLElement, ...args: [FocusOptions?]) {
+    const modal = document.querySelector("dialog[open]");
+    if (modal && !modal.contains(this)) return;
+    realFocus.apply(this, args);
+  };
   proto.showModal = function (this: HTMLDialogElement) {
     calls.showModal += 1;
     this.setAttribute("open", "");
@@ -433,6 +440,7 @@ const withNativeDialog = () => {
   return {
     calls,
     restore: () => {
+      HTMLElement.prototype.focus = realFocus;
       proto.close = saved.close;
       proto.showModal = saved.showModal;
     },
