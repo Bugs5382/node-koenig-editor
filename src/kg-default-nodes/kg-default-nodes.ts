@@ -5,6 +5,8 @@ import * as callout from './nodes/callout/CalloutNode.js';
 import * as aside from './nodes/aside/AsideNode.js';
 import * as horizontalrule from './nodes/horizontalrule/HorizontalRuleNode.js';
 import * as toggle from './nodes/toggle/ToggleNode.js';
+import * as gallery from './nodes/gallery/GalleryNode.js';
+import * as header from './nodes/header/HeaderNode.js';
 
 import linebreakSerializers from './serializers/linebreak.js';
 import paragraphSerializers from './serializers/paragraph.js';
@@ -16,6 +18,8 @@ export * from './nodes/callout/CalloutNode.js';
 export * from './nodes/aside/AsideNode.js';
 export * from './nodes/horizontalrule/HorizontalRuleNode.js';
 export * from './nodes/toggle/ToggleNode.js';
+export * from './nodes/gallery/GalleryNode.js';
+export * from './nodes/header/HeaderNode.js';
 
 // export utility functions that are useful in other packages or tests
 import * as visibilityUtils from './utils/visibility.js';
@@ -49,5 +53,7 @@ export const DEFAULT_NODES = [
     callout.CalloutNode,
     aside.AsideNode,
     horizontalrule.HorizontalRuleNode,
-    toggle.ToggleNode
+    toggle.ToggleNode,
+    gallery.GalleryNode,
+    header.HeaderNode
 ];

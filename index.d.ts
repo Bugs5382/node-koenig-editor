@@ -37,7 +37,8 @@ import type { Context, FC, ReactNode, RefObject } from "react";
 import type { Doc, XmlText } from "yjs";
 
 /** The cards the package ships. Pass a list as the composer's `cards` to register only those. */
-export type KoenigCardName = "callout" | "divider" | "image" | "table" | "toggle";
+export type KoenigCardName =
+  "callout" | "divider" | "gallery" | "header" | "image" | "table" | "toggle";
 
 /** The format toolbar's buttons. Pass a list as the composer's `toolbar` to show only those. */
 export type KoenigToolbarItem =
@@ -134,6 +135,35 @@ export interface KoenigStrings {
     dropToReplace: string;
     select: string;
     uploadLabel: string;
+  };
+  gallery: {
+    addImages: string;
+    altPlaceholder: string;
+    captionPlaceholder: string;
+    dismiss: string;
+    dropToAdd: string;
+    fileTypeError: string;
+    imageCaptionPlaceholder: string;
+    /** `{max}` is replaced with the image limit. */
+    limitError: string;
+    moveEarlier: string;
+    moveLater: string;
+    select: string;
+    uploadError: string;
+  };
+  header: {
+    alignCenter: string;
+    alignLeft: string;
+    alignment: string;
+    backgroundColor: string;
+    backgroundImage: string;
+    button: string;
+    buttonText: string;
+    buttonUrl: string;
+    removeImage: string;
+    subtitlePlaceholder: string;
+    titlePlaceholder: string;
+    uploadError: string;
   };
   callout: { background: string; emoji: string; placeholder: string };
   toggle: { contentPlaceholder: string; headingPlaceholder: string };
@@ -250,7 +280,98 @@ export interface KoenigCommentsController {
   subscribe: (listener: () => void) => () => void;
 }
 
+/** One image in a gallery. `previewSrc` is set only while the image is still uploading. */
+export interface KoenigGalleryImage {
+  alt: string;
+  /** Plain text escaped as HTML, because the gallery's HTML output writes it as is. */
+  caption: string;
+  fileName: string;
+  height: null | number;
+  previewSrc?: string;
+  row?: number;
+  /** The address the host's uploader returned; empty until the upload finishes. */
+  src?: string;
+  width: null | number;
+}
+
+/** What the composer's `cardRenderers.gallery` component receives. It draws the gallery; the
+ *  editor keeps the node, the uploads and the limits. */
+export interface KoenigGalleryRenderProps {
+  /** Adds files: each one is checked against `mimeTypes` and the limit, then sent to the
+   *  host's uploader on its own. */
+  addFiles: (files: File[] | FileList) => Promise<void>;
+  /** The gallery's own caption editor, ready to place. */
+  caption: ReactNode;
+  clearError: () => void;
+  errorMessage: null | string;
+  images: readonly KoenigGalleryImage[];
+  isSelected: boolean;
+  isUploading: boolean;
+  maxImages: number;
+  /** The image types the host's uploader accepts; empty means any. */
+  mimeTypes: readonly string[];
+  /** Moves the image at `from` to position `to`. */
+  moveImage: (from: number, to: number) => void;
+  progress: number;
+  removeImage: (index: number) => void;
+  updateImage: (
+    index: number,
+    changes: Partial<Pick<KoenigGalleryImage, "alt" | "caption">>,
+  ) => void;
+}
+
+/** What the composer's `cardRenderers.header` component receives. */
+export interface KoenigHeaderRenderProps {
+  alignment: string;
+  backgroundColor: string;
+  backgroundImageSrc: string;
+  buttonColor: string;
+  buttonEnabled: boolean;
+  buttonText: string;
+  buttonTextColor: string;
+  buttonUrl: string;
+  isEditing: boolean;
+  isSelected: boolean;
+  layout: string;
+  /** The subtitle as plain text. */
+  subtitle: string;
+  textColor: string;
+  /** The title as plain text. */
+  title: string;
+  /** Saves changes to the card; `title` and `subtitle` are plain text. */
+  update: (
+    changes: Partial<
+      Pick<
+        KoenigHeaderRenderProps,
+        | "alignment"
+        | "backgroundColor"
+        | "backgroundImageSrc"
+        | "buttonColor"
+        | "buttonEnabled"
+        | "buttonText"
+        | "buttonTextColor"
+        | "buttonUrl"
+        | "layout"
+        | "subtitle"
+        | "textColor"
+        | "title"
+      >
+    > & { backgroundImageHeight?: null | number; backgroundImageWidth?: null | number },
+  ) => void;
+  /** Sends the file to the host's uploader and sets it as the background image. */
+  uploadBackgroundImage: (file: File) => Promise<void>;
+  uploadError: null | string;
+}
+
+/** The host's own layout for the cards that have one. Without an entry the default draws. */
+export interface KoenigCardRenderers {
+  gallery?: FC<KoenigGalleryRenderProps>;
+  header?: FC<KoenigHeaderRenderProps>;
+}
+
 export interface KoenigComposerProps {
+  /** Replaces how a shipped card is drawn; see `KoenigCardRenderers`. */
+  cardRenderers?: KoenigCardRenderers;
   cardConfig?: Record<string, unknown>;
   /** The shipped cards to register, and so list in the menus. Default: all of them. */
   cards?: readonly KoenigCardName[];

@@ -590,6 +590,11 @@
     inset: 0px;
 }
 
+.koenig-lexical .inset-x-0 {
+    left: 0px;
+    right: 0px;
+}
+
 .koenig-lexical .inset-x-\[-1px\] {
     left: -1px;
     right: -1px;
@@ -841,6 +846,10 @@
     margin-left: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .ml-2 {
+    margin-left: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .ml-3 {
     margin-left: calc(1.2 * var(--kg-rem, 0.625rem));
 }
@@ -879,6 +888,10 @@
 
 .koenig-lexical .mt-3 {
     margin-top: calc(1.2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .mt-4 {
+    margin-top: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .mt-\[-1px\] {
@@ -1512,6 +1525,10 @@
     background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .bg-black\/60 {
+    background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.6 * 100%), transparent);
+}
+
 .koenig-lexical .bg-black\/80 {
     background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.8 * 100%), transparent);
 }
@@ -1601,6 +1618,11 @@
 
 .koenig-lexical .bg-purple\/20 {
     background-color: color-mix(in srgb, var(--kg-color-purple, #8E42FF) calc(0.2 * 100%), transparent);
+}
+
+.koenig-lexical .bg-red {
+    --tw-bg-opacity: 1;
+    background-color: color-mix(in srgb, var(--kg-color-red, #F50B23) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .bg-red\/10 {
@@ -1881,6 +1903,10 @@
 
 .koenig-lexical .pr-1 {
     padding-right: calc(0.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .pr-2 {
+    padding-right: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pr-5 {
@@ -3933,6 +3959,10 @@ em-emoji-picker {
 .koenig-lexical .focus-visible\:outline-none:focus-visible {
     outline: 2px solid transparent;
     outline-offset: 2px;
+}
+
+.koenig-lexical .disabled\:opacity-40:disabled {
+    opacity: 0.4;
 }
 
 .koenig-lexical :is(.group\/image:hover .group-hover\/image\:visible) {
