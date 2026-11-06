@@ -95,6 +95,24 @@ describe("settings in the page address", () => {
   });
 });
 
+describe("table border style in the page address", () => {
+  it("is dashed while editing by default and writes nothing for that", () => {
+    const settings = parseSettings("", catalog);
+    expect(settings.tableBorder).toBe("dashed");
+    expect(serializeSettings(settings, catalog)).toBe("");
+  });
+
+  it("round-trips solid and ignores an unknown style", () => {
+    const search = serializeSettings(
+      { ...parseSettings("", catalog), tableBorder: "solid" },
+      catalog,
+    );
+    expect(search).toBe("tableBorder=solid");
+    expect(parseSettings(search, catalog).tableBorder).toBe("solid");
+    expect(parseSettings("tableBorder=dotted", catalog).tableBorder).toBe("dashed");
+  });
+});
+
 describe("code snippet", () => {
   it("shows the bare composer for the defaults", () => {
     const code = buildSnippet(defaultSettings(catalog), catalog);

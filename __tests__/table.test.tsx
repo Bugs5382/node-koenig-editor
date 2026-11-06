@@ -91,6 +91,45 @@ const press = async (name: string) => {
   });
 };
 
+describe("the cell the cursor is in", () => {
+  const active = () => [...document.querySelectorAll("[data-kg-active-cell]")];
+
+  it("is marked, one cell at a time, and the mark follows the cursor", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 1);
+    expect(active()).toHaveLength(1);
+    const first = active()[0] as HTMLTableCellElement;
+    expect(first.tagName).toBe("TD");
+    expect((first.parentElement as HTMLTableRowElement).rowIndex).toBe(1);
+    expect(first.cellIndex).toBe(1);
+    await focusCell(api, 0, 0);
+    expect(active()).toHaveLength(1);
+    expect((active()[0] as HTMLElement).tagName).toBe("TH");
+  });
+
+  it("is not marked when the cursor is outside a table or the editor is read-only", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 1);
+    await act(async () => {
+      api.editorInstance.setEditable(false);
+    });
+    expect(active()).toHaveLength(0);
+  });
+});
+
+describe("table class hooks", () => {
+  it("puts stable classes on the table, its cells and the header cells", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    const table = document.querySelector("[contenteditable] table") as HTMLElement;
+    expect(table.classList.contains("kg-table")).toBe(true);
+    expect(table.querySelector("th")?.classList.contains("kg-table-cell-header")).toBe(true);
+    expect(table.querySelector("td")?.classList.contains("kg-table-cell")).toBe(true);
+  });
+});
+
 describe("table card", () => {
   it("inserts a 3 by 3 table with a header row", async () => {
     const { api } = await mount();

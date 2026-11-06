@@ -30,6 +30,7 @@ import {
   PRESETS,
   SELECTION_COLORS,
   SIZES,
+  TABLE_BORDERS,
   type Catalog,
   type PresetId,
   type Settings,
@@ -107,6 +108,16 @@ export function TopBar({
               label="Read only"
               checked={settings.readOnly}
               onChange={(readOnly) => onChange({ readOnly })}
+            />
+            <Segmented
+              label="Table borders while editing"
+              value={settings.tableBorder}
+              options={TABLE_BORDERS.map((border) => ({
+                label: border.charAt(0).toUpperCase() + border.slice(1),
+                value: border,
+                title: `Cell borders are ${border} while editing; the reader's view is always solid`,
+              }))}
+              onChange={(tableBorder) => onChange({ tableBorder })}
             />
             {catalog.cards.length > 0 && (
               <Listbox<PresetId | "custom">

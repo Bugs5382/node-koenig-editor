@@ -15,7 +15,7 @@ cards.
 | Callout | A box that stands out | `/callout` | Nine colours, optional emoji |
 | Toggle | Text that opens and closes | `/toggle` | A header and hidden content |
 | Divider | A line between sections | `/hr` or type `---` | No settings |
-| Table | Rows and columns | `/table` | Header row, no merged cells |
+| Table | Rows and columns | `/table` | Dashed grid while editing, header row, no merged cells |
 | File | A download | `/file` | Title, description, name and size |
 | Video | A video you upload | `/video` | Needs captions or a transcript |
 | Audio | A sound file you upload | `/audio` | Needs captions or a transcript |
@@ -132,10 +132,15 @@ you press the header's arrow.
 **What it can do:** while the cursor is in a table, a toolbar above it adds or removes rows and
 columns, turns the header row on and off, and deletes the table. No merged cells and no cell
 colours.
+**How it looks:** the grid is drawn dashed while you write, so an empty table shows where to type,
+and solid for a reader, in print and in the reader's view (Preview). The header row is shaded; the
+cell you are in has an outline, and selected cells are highlighted.
 **Keyboard:** Tab and Shift+Tab move between cells; the arrow keys move within and between cells;
 **Alt+F10** moves focus to the table toolbar and Escape returns to the cell.
 **Accessibility:** the header row is marked up as column headers; the toolbar buttons have names.
-**Developer:** `cards` leaves it out; the wording is `strings.table`.
+**Developer:** `cards` leaves it out; the wording is `strings.table`. The borders and header colour
+are tokens (`--kg-table-edit-border-style` for the dashed editing line, `--kg-table-border-color`,
+`--kg-table-header-bg`); see the README.
 
 ## File
 

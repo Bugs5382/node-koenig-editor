@@ -164,10 +164,14 @@ em-emoji-picker {
     display: none;
 }
 
-/* Table */
+/* Table. Every colour and the line style come from a token, so a host sets them once:
+   --kg-table-border-color, --kg-table-border-style (solid), --kg-table-edit-border-style (dashed,
+   only while the editor is editable), --kg-table-header-bg and --kg-table-selected-bg. */
 .koenig-lexical table {
+    border-collapse: collapse;
     font-size: 1.75rem;
     margin: 0;
+    width: 100%;
     font-family: georgia,Times,serif;
     letter-spacing: .02rem;
     line-height: 1.6em;
@@ -176,13 +180,66 @@ em-emoji-picker {
 .koenig-lexical table tr td,
 .koenig-lexical table tr th {
     vertical-align: top;
-    border-bottom: 1px solid var(--grey-200);
+    min-width: 6rem;
+    padding: 0.8rem 1.2rem;
+    border: 1px var(--kg-table-border-style, solid) var(--kg-table-border-color, var(--grey-700));
 }
 
-.koenig-lexical > .dark, .koenig-lexical.dark, .dark .koenig-lexical {
-    table tr td,
-    table tr th {
-        border-bottom: 1px solid var(--grey-900);
+/* While editing, the grid is drawn dashed so an empty table reads as a place to write. */
+.koenig-lexical [contenteditable="true"] table tr td,
+.koenig-lexical [contenteditable="true"] table tr th {
+    border-style: var(--kg-table-edit-border-style, dashed);
+}
+
+.koenig-lexical table tr th {
+    background: var(--kg-table-header-bg, var(--grey-200));
+    font-weight: 700;
+    text-align: left;
+}
+
+.koenig-lexical > .dark table tr th,
+.koenig-lexical.dark table tr th,
+.dark .koenig-lexical table tr th {
+    background: var(--kg-table-header-bg, var(--grey-900));
+}
+
+/* The cell the cursor is in, and the cells of a selected range. */
+.koenig-lexical table tr td[data-kg-active-cell],
+.koenig-lexical table tr th[data-kg-active-cell] {
+    outline: 2px solid var(--kg-selection);
+    outline-offset: -2px;
+}
+
+.koenig-lexical .kg-table-cell-selected {
+    background: var(--kg-table-selected-bg, color-mix(in srgb, var(--kg-selection) 14%, transparent));
+}
+
+/* On paper the grid is solid, the header keeps its shade and nothing is lost to the editing look. */
+@media print {
+    .koenig-lexical table tr td,
+    .koenig-lexical table tr th {
+        border-style: solid !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+/* Forced colours: system colours for the grid, a heavier line under the header, and the selection
+   in the system highlight. */
+@media (forced-colors: active) {
+    .koenig-lexical table tr td,
+    .koenig-lexical table tr th {
+        border-color: CanvasText;
+        background: Canvas;
+    }
+
+    .koenig-lexical table tr th {
+        border-bottom-width: 3px;
+    }
+
+    .koenig-lexical .kg-table-cell-selected {
+        background: Highlight;
+        color: HighlightText;
     }
 }
 

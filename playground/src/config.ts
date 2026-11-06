@@ -79,7 +79,12 @@ export interface Settings {
   /** A colour from SELECTION_COLORS for the editor's text selection; empty keeps the editor's own. */
   selection: string;
   size: number;
+  /** The table's cell border while editing (--kg-table-edit-border-style). */
+  tableBorder: TableBorder;
 }
+
+export const TABLE_BORDERS = ["dashed", "solid"] as const;
+export type TableBorder = (typeof TABLE_BORDERS)[number];
 
 export function defaultSettings(catalog: Catalog): Settings {
   return {
@@ -93,6 +98,7 @@ export function defaultSettings(catalog: Catalog): Settings {
     sampleUploads: true,
     selection: "",
     size: DEFAULT_SIZE,
+    tableBorder: "dashed",
   };
 }
 
@@ -136,6 +142,9 @@ export function parseSettings(search: string, catalog: Catalog): Settings {
 
   const size = Number(params.get("size"));
   if ((SIZES as readonly number[]).includes(size)) settings.size = size;
+
+  const border = TABLE_BORDERS.find((b) => b === params.get("tableBorder"));
+  if (border) settings.tableBorder = border;
   return settings;
 }
 
@@ -151,6 +160,8 @@ export function serializeSettings(settings: Settings, catalog: Catalog): string 
   if (settings.selection !== defaults.selection)
     params.set("selection", settings.selection.slice(1));
   if (settings.size !== defaults.size) params.set("size", String(settings.size));
+  if (settings.tableBorder !== defaults.tableBorder)
+    params.set("tableBorder", settings.tableBorder);
   // Commas stay readable in the address bar.
   return params.toString().replaceAll("%2C", ",");
 }
