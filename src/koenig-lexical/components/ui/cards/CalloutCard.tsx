@@ -3,7 +3,8 @@ import KoenigNestedEditor from '../../KoenigNestedEditor';
 import React from 'react';
 import {ColorOptionSetting, SettingsPanel, ToggleSetting} from '../SettingsPanel';
 import {ReadOnlyOverlay} from '../ReadOnlyOverlay';
-import {useKoenigStrings} from '../../../../additions/options';
+import {EmojiPicker} from '../../../../additions/emojiPicker/EmojiPicker';
+import {useKoenigStrings, useKoenigTool} from '../../../../additions/options';
 
 export const CALLOUT_COLORS = {
     white: 'bg-transparent border-grey/30',
@@ -98,6 +99,7 @@ export function CalloutCard({
 }) {
     const strings = useKoenigStrings();
     const emojiButtonRef = React.useRef(null);
+    const emojiPickerOn = useKoenigTool('emojiPicker');
     const {darkMode} = React.useContext(KoenigComposerContext);
 
     React.useEffect(() => {
@@ -109,7 +111,7 @@ export function CalloutCard({
     return (
         <>
             <div className={`flex rounded-md border px-7 py-5 ${CALLOUT_COLORS[color]} `} data-testid={`callout-bg-${color}`}>
-                <div>
+                <div className="relative">
                     {hasEmoji &&
                     <>
                         <button
@@ -121,6 +123,11 @@ export function CalloutCard({
                         >
                             {calloutEmoji}
                         </button>
+                        {emojiPickerOn && showEmojiPicker && isEditing && (
+                            <div className="absolute left-0 top-full z-50 mt-1">
+                                <EmojiPicker onClose={toggleEmojiPicker} onSelect={changeEmoji} />
+                            </div>
+                        )}
                     </>}
                 </div>
                 <KoenigNestedEditor

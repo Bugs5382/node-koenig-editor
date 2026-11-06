@@ -1,0 +1,27 @@
+import type {LexicalNode} from 'lexical';
+import {safeMediaUrl} from '../../../additions/media/safeMediaUrl';
+import {sizeToBytes} from '../../utils/size-byte-converter.js';
+
+export function parseFileNode(FileNode: new (data: Record<string, unknown>) => LexicalNode) {
+    return {
+        div: (nodeElem: HTMLElement) => {
+            const isKgFileCard = nodeElem.classList?.contains('kg-file-card');
+            if (nodeElem.tagName === 'DIV' && isKgFileCard) {
+                return {
+                    conversion(domNode: HTMLElement) {
+                        const link = domNode.querySelector('a');
+                        const src = safeMediaUrl(link?.getAttribute('href') ?? '');
+                        const fileTitle = domNode.querySelector('.kg-file-card-title')?.textContent || '';
+                        const fileCaption = domNode.querySelector('.kg-file-card-caption')?.textContent || '';
+                        const fileName = domNode.querySelector('.kg-file-card-filename')?.textContent || '';
+                        const fileSize = sizeToBytes(domNode.querySelector('.kg-file-card-filesize')?.textContent || '');
+                        const node = new FileNode({src, fileTitle, fileCaption, fileName, fileSize});
+                        return {node};
+                    },
+                    priority: 1 as const
+                };
+            }
+            return null;
+        }
+    };
+}

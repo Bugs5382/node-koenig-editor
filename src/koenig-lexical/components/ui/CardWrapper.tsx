@@ -1,13 +1,22 @@
 import React from 'react';
 import VisibilityIndicator from '../../assets/icons/kg-indicator-visibility.svg?react';
 
+// Wide and full cards break out of the content column. Upstream sized them from the viewport,
+// which assumes the editor spans the page; in a host that puts it in a narrower card they spilled
+// out of it. The width is now the smaller of that and the content plus --kg-breakout-room on each
+// side (default 1.8rem), so a card stays near its column. A host that gives the editor the whole
+// page sets --kg-breakout-room large (for example 100vw) to get the viewport widths back.
+// Written out in full: Tailwind finds class names by reading the source, not by running it.
 const CARD_WIDTH_CLASSES = {
     wide: [
-        'w-[calc(75vw-var(--kg-breakout-adjustment-with-fallback)+2px)] mx-[calc(50%-(50vw-var(--kg-breakout-adjustment-with-fallback))-.8rem)] min-w-[calc(100%+3.6rem)] translate-x-[calc(50vw-50%+.8rem-var(--kg-breakout-adjustment-with-fallback))]',
-        'md:min-w-[calc(100%+10rem)]',
-        'lg:min-w-[calc(100%+18rem)]'
+        'w-[min(calc(75vw-var(--kg-breakout-adjustment-with-fallback)+2px),calc(100%+2*var(--kg-breakout-room-with-fallback)))] mx-[calc(50%-(50vw-var(--kg-breakout-adjustment-with-fallback))-.8rem)] min-w-[min(calc(100%+3.6rem),calc(100%+2*var(--kg-breakout-room-with-fallback)))] translate-x-[calc(50vw-50%+.8rem-var(--kg-breakout-adjustment-with-fallback))]',
+        'md:min-w-[min(calc(100%+10rem),calc(100%+2*var(--kg-breakout-room-with-fallback)))]',
+        'lg:min-w-[min(calc(100%+18rem),calc(100%+2*var(--kg-breakout-room-with-fallback)))]'
     ].join(' '),
-    full: 'inset-x-[-1px] mx-[calc(50%-50vw)] w-[calc(100vw+2px)] lg:mx-[calc(50%-50vw+(var(--kg-breakout-adjustment-with-fallback)/2))] lg:w-[calc(100vw-var(--kg-breakout-adjustment-with-fallback)+2px)]'
+    full: [
+        'inset-x-[-1px] [--kg-card-w:min(calc(100vw+2px),calc(100%+2*var(--kg-breakout-room-with-fallback)))] w-[var(--kg-card-w)] ml-[calc((100%-var(--kg-card-w))/2)]',
+        'lg:[--kg-card-w:min(calc(100vw-var(--kg-breakout-adjustment-with-fallback)+2px),calc(100%+2*var(--kg-breakout-room-with-fallback)))]'
+    ].join(' ')
 };
 
 const DEFAULT_INDICATOR_POSITION = {

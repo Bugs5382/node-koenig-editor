@@ -605,6 +605,14 @@
     bottom: 0px;
 }
 
+.koenig-lexical .-bottom-1 {
+    bottom: calc(-0.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .-right-1 {
+    right: calc(-0.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .-right-3 {
     right: calc(-1.2 * var(--kg-rem, 0.625rem));
 }
@@ -621,6 +629,14 @@
     bottom: 0px;
 }
 
+.koenig-lexical .bottom-1 {
+    bottom: calc(0.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .bottom-2 {
+    bottom: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .bottom-full {
     bottom: 100%;
 }
@@ -633,8 +649,12 @@
     left: 50%;
 }
 
-.koenig-lexical .left-\[-28px\] {
-    left: -28px;
+.koenig-lexical .left-2 {
+    left: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .left-3 {
+    left: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .left-\[-6rem\] {
@@ -649,12 +669,24 @@
     right: 0px;
 }
 
+.koenig-lexical .right-1 {
+    right: calc(0.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .right-2 {
+    right: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .right-3 {
     right: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .top-0 {
     top: 0px;
+}
+
+.koenig-lexical .top-3 {
+    top: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .top-\[-\.6rem\] {
@@ -665,16 +697,16 @@
     top: -46px;
 }
 
-.koenig-lexical .top-\[0\] {
-    top: 0;
-}
-
 .koenig-lexical .top-\[1\.5rem\] {
     top: calc(1.5 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .top-\[3px\] {
     top: 3px;
+}
+
+.koenig-lexical .top-full {
+    top: 100%;
 }
 
 .koenig-lexical .z-0 {
@@ -703,6 +735,10 @@
 
 .koenig-lexical .z-\[1000\] {
     z-index: 1000;
+}
+
+.koenig-lexical .z-\[2147483647\] {
+    z-index: 2147483647;
 }
 
 .koenig-lexical .z-\[9999999\] {
@@ -769,11 +805,6 @@
     margin-right: calc(50% - (50vw - var(--kg-breakout-adjustment-with-fallback)) - calc(.8 * var(--kg-rem, 0.625rem)));
 }
 
-.koenig-lexical .mx-\[calc\(50\%-50vw\)\] {
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-}
-
 .koenig-lexical .mx-auto {
     margin-left: auto;
     margin-right: auto;
@@ -782,6 +813,11 @@
 .koenig-lexical .my-1 {
     margin-top: calc(0.4 * var(--kg-rem, 0.625rem));
     margin-bottom: calc(0.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .my-3 {
+    margin-top: calc(1.2 * var(--kg-rem, 0.625rem));
+    margin-bottom: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .my-\[\.2rem\] {
@@ -858,6 +894,10 @@
     margin-left: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .ml-\[calc\(\(100\%-var\(--kg-card-w\)\)\/2\)\] {
+    margin-left: calc((100% - var(--kg-card-w)) / 2);
+}
+
 .koenig-lexical .ml-auto {
     margin-left: auto;
 }
@@ -872,6 +912,10 @@
 
 .koenig-lexical .mr-3 {
     margin-right: calc(1.2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .mt-0 {
+    margin-top: 0px;
 }
 
 .koenig-lexical .mt-0\.5 {
@@ -945,6 +989,11 @@
     display: none;
 }
 
+.koenig-lexical .size-11 {
+    width: calc(4.4 * var(--kg-rem, 0.625rem));
+    height: calc(4.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .size-14 {
     width: calc(5.6 * var(--kg-rem, 0.625rem));
     height: calc(5.6 * var(--kg-rem, 0.625rem));
@@ -995,6 +1044,11 @@
     height: calc(3.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .size-9 {
+    width: calc(3.6 * var(--kg-rem, 0.625rem));
+    height: calc(3.6 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .size-\[1\.4rem\] {
     width: calc(1.4 * var(--kg-rem, 0.625rem));
     height: calc(1.4 * var(--kg-rem, 0.625rem));
@@ -1034,6 +1088,14 @@
     height: 0px;
 }
 
+.koenig-lexical .h-11 {
+    height: calc(4.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .h-14 {
+    height: calc(5.6 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .h-3 {
     height: calc(1.2 * var(--kg-rem, 0.625rem));
 }
@@ -1062,6 +1124,14 @@
     height: 1px;
 }
 
+.koenig-lexical .h-\[2\.6rem\] {
+    height: calc(2.6 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .h-\[3rem\] {
+    height: calc(3 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .h-auto {
     height: auto;
 }
@@ -1070,20 +1140,56 @@
     height: 100%;
 }
 
+.koenig-lexical .max-h-56 {
+    max-height: calc(22.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .max-h-\[30vh\] {
     max-height: 30vh;
+}
+
+.koenig-lexical .max-h-\[95vh\] {
+    max-height: 95vh;
 }
 
 .koenig-lexical .max-h-\[min\(var\(--kg-menu-max-height\2c 32rem\)\2c var\(--kg-menu-fit\2c 100vh\)\)\] {
     max-height: min(var(--kg-menu-max-height,calc(32 * var(--kg-rem, 0.625rem))), var(--kg-menu-fit,100vh));
 }
 
+.koenig-lexical .max-h-full {
+    max-height: 100%;
+}
+
+.koenig-lexical .max-h-none {
+    max-height: none;
+}
+
+.koenig-lexical .min-h-0 {
+    min-height: 0px;
+}
+
+.koenig-lexical .min-h-\[16rem\] {
+    min-height: calc(16 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .min-h-\[40px\] {
     min-height: 40px;
 }
 
+.koenig-lexical .min-h-\[8rem\] {
+    min-height: calc(8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .w-11\/12 {
     width: 91.666667%;
+}
+
+.koenig-lexical .w-20 {
+    width: calc(8 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .w-24 {
+    width: calc(9.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .w-3 {
@@ -1092,6 +1198,10 @@
 
 .koenig-lexical .w-3\/5 {
     width: 60%;
+}
+
+.koenig-lexical .w-40 {
+    width: calc(16 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .w-5 {
@@ -1118,12 +1228,24 @@
     width: 320px;
 }
 
-.koenig-lexical .w-\[calc\(100vw\+2px\)\] {
-    width: calc(100vw + 2px);
+.koenig-lexical .w-\[min\(20rem\2c 90vw\)\] {
+    width: min(calc(20 * var(--kg-rem, 0.625rem)), 90vw);
 }
 
-.koenig-lexical .w-\[calc\(75vw-var\(--kg-breakout-adjustment-with-fallback\)\+2px\)\] {
-    width: calc(75vw - var(--kg-breakout-adjustment-with-fallback) + 2px);
+.koenig-lexical .w-\[min\(34rem\2c 95vw\)\] {
+    width: min(calc(34 * var(--kg-rem, 0.625rem)), 95vw);
+}
+
+.koenig-lexical .w-\[min\(92vw\2c 44rem\)\] {
+    width: min(92vw, calc(44 * var(--kg-rem, 0.625rem)));
+}
+
+.koenig-lexical .w-\[min\(calc\(75vw-var\(--kg-breakout-adjustment-with-fallback\)\+2px\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+    width: min(calc(75vw - var(--kg-breakout-adjustment-with-fallback) + 2px), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
+}
+
+.koenig-lexical .w-\[var\(--kg-card-w\)\] {
+    width: var(--kg-card-w);
 }
 
 .koenig-lexical .w-\[var\(--kg-menu-width\2c 28rem\)\] {
@@ -1142,6 +1264,10 @@
     min-width: 0px;
 }
 
+.koenig-lexical .min-w-11 {
+    min-width: calc(4.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .min-w-\[296px\] {
     min-width: 296px;
 }
@@ -1154,8 +1280,8 @@
     min-width: auto;
 }
 
-.koenig-lexical .min-w-\[calc\(100\%\+3\.6rem\)\] {
-    min-width: calc(100% + calc(3.6 * var(--kg-rem, 0.625rem)));
+.koenig-lexical .min-w-\[min\(calc\(100\%\+3\.6rem\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+    min-width: min(calc(100% + calc(3.6 * var(--kg-rem, 0.625rem))), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
 }
 
 .koenig-lexical .min-w-full {
@@ -1166,12 +1292,32 @@
     max-width: calc(67.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .max-w-3xl {
+    max-width: calc(76.8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .max-w-\[240px\] {
     max-width: 240px;
 }
 
+.koenig-lexical .max-w-\[30rem\] {
+    max-width: calc(30 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .max-w-\[65\%\] {
     max-width: 65%;
+}
+
+.koenig-lexical .max-w-\[calc\(100vw-16px\)\] {
+    max-width: calc(100vw - 16px);
+}
+
+.koenig-lexical .max-w-full {
+    max-width: 100%;
+}
+
+.koenig-lexical .max-w-none {
+    max-width: none;
 }
 
 .koenig-lexical .flex-1 {
@@ -1243,6 +1389,14 @@
     cursor: default;
 }
 
+.koenig-lexical .cursor-move {
+    cursor: move;
+}
+
+.koenig-lexical .cursor-nwse-resize {
+    cursor: nwse-resize;
+}
+
 .koenig-lexical .cursor-pointer {
     cursor: pointer;
 }
@@ -1257,6 +1411,10 @@
 
 .koenig-lexical .select-none {
     user-select: none;
+}
+
+.koenig-lexical .resize-y {
+    resize: vertical;
 }
 
 .koenig-lexical .resize {
@@ -1275,6 +1433,10 @@
     appearance: none;
 }
 
+.koenig-lexical .grid-cols-8 {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
 .koenig-lexical .flex-row {
     flex-direction: row;
 }
@@ -1287,12 +1449,24 @@
     flex-direction: column;
 }
 
+.koenig-lexical .flex-wrap {
+    flex-wrap: wrap;
+}
+
 .koenig-lexical .items-start {
     align-items: flex-start;
 }
 
+.koenig-lexical .items-end {
+    align-items: flex-end;
+}
+
 .koenig-lexical .items-center {
     align-items: center;
+}
+
+.koenig-lexical .justify-start {
+    justify-content: flex-start;
 }
 
 .koenig-lexical .justify-end {
@@ -1339,12 +1513,20 @@
     align-self: stretch;
 }
 
+.koenig-lexical .overflow-auto {
+    overflow: auto;
+}
+
 .koenig-lexical .overflow-hidden {
     overflow: hidden;
 }
 
 .koenig-lexical .overflow-visible {
     overflow: visible;
+}
+
+.koenig-lexical .overflow-x-auto {
+    overflow-x: auto;
 }
 
 .koenig-lexical .overflow-y-auto {
@@ -1367,6 +1549,10 @@
 
 .koenig-lexical .whitespace-nowrap {
     white-space: nowrap;
+}
+
+.koenig-lexical .break-words {
+    overflow-wrap: break-word;
 }
 
 .koenig-lexical .rounded {
@@ -1510,6 +1696,14 @@
     border-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .border-white\/10 {
+    border-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.1 * 100%), transparent);
+}
+
+.koenig-lexical .border-white\/80 {
+    border-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.8 * 100%), transparent);
+}
+
 .koenig-lexical .border-b-red {
     --tw-border-opacity: 1;
     border-bottom-color: color-mix(in srgb, var(--kg-color-red, #F50B23) calc(var(--tw-border-opacity, 1) * 100%), transparent);
@@ -1525,12 +1719,24 @@
     background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .bg-black\/40 {
+    background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.4 * 100%), transparent);
+}
+
+.koenig-lexical .bg-black\/50 {
+    background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.5 * 100%), transparent);
+}
+
 .koenig-lexical .bg-black\/60 {
     background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.6 * 100%), transparent);
 }
 
 .koenig-lexical .bg-black\/80 {
     background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.8 * 100%), transparent);
+}
+
+.koenig-lexical .bg-black\/90 {
+    background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.9 * 100%), transparent);
 }
 
 .koenig-lexical .bg-blue\/10 {
@@ -1647,6 +1853,14 @@
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .bg-white\/10 {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.1 * 100%), transparent);
+}
+
+.koenig-lexical .bg-white\/15 {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.15 * 100%), transparent);
+}
+
 .koenig-lexical .bg-white\/30 {
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.3 * 100%), transparent);
 }
@@ -1738,6 +1952,14 @@
     stroke-width: 3px;
 }
 
+.koenig-lexical .object-contain {
+    object-fit: contain;
+}
+
+.koenig-lexical .object-cover {
+    object-fit: cover;
+}
+
 .koenig-lexical .p-0 {
     padding: 0px;
 }
@@ -1748,10 +1970,6 @@
 
 .koenig-lexical .p-2 {
     padding: calc(0.8 * var(--kg-rem, 0.625rem));
-}
-
-.koenig-lexical .p-20 {
-    padding: calc(8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .p-3 {
@@ -1782,6 +2000,10 @@
     padding: 4px;
 }
 
+.koenig-lexical .p-\[clamp\(1\.6rem\2c 8\%\2c 5rem\)\] {
+    padding: clamp(calc(1.6 * var(--kg-rem, 0.625rem)), 8%, calc(5 * var(--kg-rem, 0.625rem)));
+}
+
 .koenig-lexical .\!px-3 {
     padding-left: calc(1.2 * var(--kg-rem, 0.625rem)) !important;
     padding-right: calc(1.2 * var(--kg-rem, 0.625rem)) !important;
@@ -1790,6 +2012,11 @@
 .koenig-lexical .px-1 {
     padding-left: calc(0.4 * var(--kg-rem, 0.625rem));
     padding-right: calc(0.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .px-1\.5 {
+    padding-left: calc(0.6 * var(--kg-rem, 0.625rem));
+    padding-right: calc(0.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .px-2 {
@@ -1877,6 +2104,10 @@
     padding-bottom: 7px;
 }
 
+.koenig-lexical .pb-1 {
+    padding-bottom: calc(0.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .pb-2 {
     padding-bottom: calc(0.8 * var(--kg-rem, 0.625rem));
 }
@@ -1889,6 +2120,10 @@
     padding-bottom: calc(.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .pb-\[max\(0\.75rem\2c env\(safe-area-inset-bottom\)\)\] {
+    padding-bottom: max(calc(0.75 * var(--kg-rem, 0.625rem)), env(safe-area-inset-bottom));
+}
+
 .koenig-lexical .pl-2 {
     padding-left: calc(0.8 * var(--kg-rem, 0.625rem));
 }
@@ -1897,12 +2132,24 @@
     padding-left: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .pl-4 {
+    padding-left: calc(1.6 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .pl-\[1rem\] {
     padding-left: calc(1 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .pl-\[max\(1rem\2c env\(safe-area-inset-left\)\)\] {
+    padding-left: max(calc(1 * var(--kg-rem, 0.625rem)), env(safe-area-inset-left));
+}
+
 .koenig-lexical .pr-1 {
     padding-right: calc(0.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .pr-14 {
+    padding-right: calc(5.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pr-2 {
@@ -1917,6 +2164,14 @@
     padding-right: calc(3.6 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .pr-\[max\(1rem\2c env\(safe-area-inset-right\)\)\] {
+    padding-right: max(calc(1 * var(--kg-rem, 0.625rem)), env(safe-area-inset-right));
+}
+
+.koenig-lexical .pr-\[min\(2\.75rem\2c 28\%\)\] {
+    padding-right: min(calc(2.75 * var(--kg-rem, 0.625rem)), 28%);
+}
+
 .koenig-lexical .pt-3 {
     padding-top: calc(1.2 * var(--kg-rem, 0.625rem));
 }
@@ -1929,6 +2184,10 @@
     padding-top: calc(.6 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .pt-\[max\(0\.75rem\2c env\(safe-area-inset-top\)\)\] {
+    padding-top: max(calc(0.75 * var(--kg-rem, 0.625rem)), env(safe-area-inset-top));
+}
+
 .koenig-lexical .text-left {
     text-align: left;
 }
@@ -1937,8 +2196,16 @@
     text-align: center;
 }
 
+.koenig-lexical .text-right {
+    text-align: right;
+}
+
 .koenig-lexical .\!font-sans {
     font-family: var(--kg-font-sans, Inter, -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif) !important;
+}
+
+.koenig-lexical .font-mono {
+    font-family: var(--kg-font-mono, Consolas, Liberation Mono, Menlo, Courier, monospace);
 }
 
 .koenig-lexical .font-sans {
@@ -1965,6 +2232,10 @@
     font-size: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .text-\[0\.7rem\] {
+    font-size: calc(0.7 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .text-\[1\.1rem\] {
     font-size: calc(1.1 * var(--kg-rem, 0.625rem));
 }
@@ -1983,6 +2254,11 @@
 
 .koenig-lexical .text-\[1\.6rem\] {
     font-size: calc(1.6 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .text-base {
+    font-size: calc(1 * var(--kg-rem, 0.625rem));
+    line-height: calc(1.5 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-lg {
@@ -2045,12 +2321,21 @@
     font-style: italic;
 }
 
+.koenig-lexical .tabular-nums {
+    --tw-numeric-spacing: tabular-nums;
+    font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction);
+}
+
 .koenig-lexical .\!leading-\[1\.1\] {
     line-height: 1.1 !important;
 }
 
 .koenig-lexical .\!leading-\[1\.6em\] {
     line-height: 1.6em !important;
+}
+
+.koenig-lexical .leading-4 {
+    line-height: calc(1 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .leading-7 {
@@ -2212,6 +2497,14 @@
     opacity: 0.5;
 }
 
+.koenig-lexical .opacity-60 {
+    opacity: 0.6;
+}
+
+.koenig-lexical .opacity-70 {
+    opacity: 0.7;
+}
+
 .koenig-lexical .opacity-80 {
     opacity: 0.8;
 }
@@ -2225,6 +2518,12 @@
 .koenig-lexical .shadow-\[0_0_0_2px\] {
     --tw-shadow: 0 0 0 2px;
     --tw-shadow-colored: 0 0 0 2px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.koenig-lexical .shadow-\[0_0_0_9999px_rgba\(0\2c 0\2c 0\2c 0\.5\)\] {
+    --tw-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+    --tw-shadow-colored: 0 0 0 9999px var(--tw-shadow-color);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
@@ -2243,6 +2542,12 @@
 .koenig-lexical .shadow-sm {
     --tw-shadow: 0px 2px 5px -1px rgba(50, 50, 93, 0.2), 0px 1px 3px -1px rgba(0, 0, 0, 0.25);
     --tw-shadow-colored: 0px 2px 5px -1px var(--tw-shadow-color), 0px 1px 3px -1px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.koenig-lexical .shadow-xl {
+    --tw-shadow: 0 2.8px 2.2px rgba(0, 0, 0, 0.02), 0 6.7px 5.3px rgba(0, 0, 0, 0.028), 0 12.5px 10px rgba(0, 0, 0, 0.035), 0 22.3px 17.9px rgba(0, 0, 0, 0.042), 0 41.8px 33.4px rgba(0, 0, 0, 0.05), 0 100px 80px rgba(0, 0, 0, 0.07);
+    --tw-shadow-colored: 0 2.8px 2.2px var(--tw-shadow-color), 0 6.7px 5.3px var(--tw-shadow-color), 0 12.5px 10px var(--tw-shadow-color), 0 22.3px 17.9px var(--tw-shadow-color), 0 41.8px 33.4px var(--tw-shadow-color), 0 100px 80px var(--tw-shadow-color);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
@@ -2266,12 +2571,22 @@
     outline-style: solid;
 }
 
+.koenig-lexical .outline-0 {
+    outline-width: 0px;
+}
+
 .koenig-lexical .outline-2 {
     outline-width: 2px;
 }
 
 .koenig-lexical .outline-selection {
     outline-color: color-mix(in srgb, var(--kg-selection) calc(1 * 100%), transparent);
+}
+
+.koenig-lexical .ring {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
 .koenig-lexical .blur {
@@ -2281,6 +2596,12 @@
 
 .koenig-lexical .filter {
     filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.koenig-lexical .backdrop-blur-sm {
+    --tw-backdrop-blur: blur(4px);
+    -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+    backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
 
 .koenig-lexical .transition {
@@ -2307,8 +2628,18 @@
     transition-duration: 150ms;
 }
 
+.koenig-lexical .transition-opacity {
+    transition-property: opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
 .koenig-lexical .duration-100 {
     transition-duration: 100ms;
+}
+
+.koenig-lexical .duration-150 {
+    transition-duration: 150ms;
 }
 
 .koenig-lexical .duration-200 {
@@ -2323,8 +2654,16 @@
     transition-timing-function: linear;
 }
 
+.koenig-lexical .ease-out {
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
 .koenig-lexical .will-change-transform {
     will-change: transform;
+}
+
+.koenig-lexical .\[--kg-card-w\:min\(calc\(100vw\+2px\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+    --kg-card-w: min(calc(100vw + 2px), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
 }
 
 .koenig-lexical {
@@ -2504,14 +2843,50 @@ em-emoji-picker {
         border-bottom: 1px solid var(--grey-900);
     }
 
+/* A gallery photo's title and caption sit over the bottom of the photo on screen. On paper they
+   print under the photo, in the text's own colour, whether or not they were collapsed. */
+@media print {
+    .koenig-lexical [data-gallery-image-text-wrap] {
+        position: static !important;
+    }
+
+    .koenig-lexical [data-gallery-image-text] {
+        background: transparent !important;
+        clip: auto !important;
+        clip-path: none !important;
+        color: inherit !important;
+        height: auto !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        padding: 0.4em 0 0 !important;
+        position: static !important;
+        white-space: normal !important;
+        width: auto !important;
+    }
+
+    .koenig-lexical [data-gallery-image-text-toggle],
+    .koenig-lexical [data-gallery-text-toggle-all],
+    .koenig-lexical [data-gallery-image-text-edit] {
+        display: none !important;
+    }
+}
+
+/* The header card's title and subtitle are nested editors, and the wrappers and prose styles around
+   them set a grey of their own. Under the card's text colour that was 2.7:1 on a dark background;
+   they take the card's colour instead, so contrast is whatever the colours the person chose give.
+   Links keep their own colour. */
+.koenig-lexical [data-header-title],
+.koenig-lexical [data-header-title] *:not(a),
+.koenig-lexical [data-header-subtitle],
+.koenig-lexical [data-header-subtitle] *:not(a) {
+    color: inherit;
+}
 /* Content Styles
     /*
     /* We use only margin-top to set the vertical spacings. The styles below
     /* set up the margin for content pairs (e.g. paragraph preceded by a heading).
     /* -------------------------------------------------------------------- */
-
 /* Reset margins */
-
 .koenig-lexical .kg-prose :where(
             p,
             h1,
@@ -2527,10 +2902,8 @@ em-emoji-picker {
             min-width: 100%;
             max-width: 100%;
         }
-
 /* Heading
         /* -------------------------------------------------------------------- */
-
 .koenig-lexical .kg-prose :where(
             h1,
             h2,
@@ -2543,7 +2916,6 @@ em-emoji-picker {
             font-weight: 700;
             color: var(--black);
         }
-
 .koenig-lexical .kg-prose :where(
             h1 strong,
             h2 strong,
@@ -2554,49 +2926,40 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-weight: 800;
         }
-
 /* H1 should be almost the same size as the post title to suggest avoid using it */
-
 .koenig-lexical .kg-prose :where(h1):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: var(--kg-font-size-h1, calc(4.4 * var(--kg-rem, 0.625rem)));
             line-height: 1.15em;
             letter-spacing: -0.015em;
         }
-
 .koenig-lexical .kg-prose :where(h2):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: var(--kg-font-size-h2, calc(3.2 * var(--kg-rem, 0.625rem)));
             line-height: 1.2em;
             letter-spacing: -0.014em;
         }
-
 .koenig-lexical .kg-prose :where(h3):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: var(--kg-font-size-h3, calc(2.5 * var(--kg-rem, 0.625rem)));
             line-height: 1.3em;
             letter-spacing: -0.013em;
         }
-
 /* H4 is almost the same size as H3 to discourage using it */
-
 .koenig-lexical .kg-prose :where(h4):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: var(--kg-font-size-h4, calc(2.2 * var(--kg-rem, 0.625rem)));
             line-height: 1.35em;
             letter-spacing: -0.011em;
         }
-
 .koenig-lexical .kg-prose :where(h5):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: var(--kg-font-size-h5, calc(2.0 * var(--kg-rem, 0.625rem)));
             line-height: 1.35em;
             font-weight: 700;
             letter-spacing: -0.011em;
         }
-
 .koenig-lexical .kg-prose :where(h6):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: calc(1.85 * var(--kg-rem, 0.625rem));
             line-height: 1.4em;
             font-weight: 700;
             letter-spacing: -0.008em;
         }
-
 .koenig-lexical .kg-prose :where(
             p + h1,
             p + h2,
@@ -2635,49 +2998,40 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 /* Heading 1 vertical rhythm */
-
 .koenig-lexical .kg-prose :where(
             h1 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h2 + h1,
             h3 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h4 + h1,
             h5 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h6 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.6 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             div + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 /* Heading 2 */
-
 .koenig-lexical .kg-prose :where(
             h1 + h2
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.6 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h2 + h2,
             h3 + h2,
@@ -2686,21 +3040,17 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h6 + h2
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             div + h2
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 /* Heading 3 - 6 (share common styles) */
-
 .koenig-lexical .kg-prose :where(
             h1 + h3,
             h2 + h3,
@@ -2716,13 +3066,11 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h3 + h4
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h3 + h3,
             h4 + h3,
@@ -2740,13 +3088,11 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h5 + h6
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h6 + h3,
             h6 + h4,
@@ -2755,7 +3101,6 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             div + h3,
             div + h4,
@@ -2764,9 +3109,7 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 /* Headings right after post title */
-
 .koenig-lexical .kg-prose :where(
             h1:first-child,
             h2:first-child,
@@ -2777,7 +3120,6 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin-top: 0;
         }
-
 @media (max-width: 500px) {
             .koenig-lexical .kg-prose :where(h1):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
                 font-size: calc(3.2 * var(--kg-rem, 0.625rem));
@@ -2803,10 +3145,8 @@ em-emoji-picker {
                 font-size: calc(1.9 * var(--kg-rem, 0.625rem));
             }
         }
-
 /* Paragraph
         /* -------------------------------------------------------------------- */
-
 .koenig-lexical .kg-prose :where(
             p,
             blockquote,
@@ -2819,7 +3159,6 @@ em-emoji-picker {
             line-height: var(--kg-line-height, 1.6em);
             font-size: var(--kg-font-size, calc(2.0 * var(--kg-rem, 0.625rem)));
         }
-
 .koenig-lexical .kg-prose :where(
             p strong,
             blockquote strong,
@@ -2829,19 +3168,16 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-weight: 700;
         }
-
 .koenig-lexical .kg-prose :where(
             h1 + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h2 + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h3 + p,
             h4 + p,
@@ -2850,7 +3186,6 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             p + p,
             blockquote + p,
@@ -2860,31 +3195,24 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 /*  Cards can be addressed by their wrapper div element */
-
 .koenig-lexical .kg-prose :where(
             div + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 /*  Cards can be addressed by their wrapper div element */
-
 .koenig-lexical .kg-prose :where(
             div + figure
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 /* Paragraph right after title */
-
 .koenig-lexical .kg-prose :where(
             p:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin-top: 0;
         }
-
 @media (max-width: 500px) {
             .koenig-lexical .kg-prose :where(
                 p,
@@ -2896,10 +3224,8 @@ em-emoji-picker {
                 font-size: calc(1.8 * var(--kg-rem, 0.625rem));
             }
         }
-
 /* Lists
         /* -------------------------------------------------------------------- */
-
 .koenig-lexical .kg-prose :where(
             ul,
             ol
@@ -2909,7 +3235,6 @@ em-emoji-picker {
             min-width: 100%;
             max-width: 100%;
         }
-
 .koenig-lexical .kg-prose :where(
             ul li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -2919,25 +3244,21 @@ em-emoji-picker {
             padding: 0 0 0 calc(0.6 * var(--kg-rem, 0.625rem));
             line-height: calc(3.2 * var(--kg-rem, 0.625rem));
         }
-
 .koenig-lexical .kg-prose :where(
             ul li:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: 0 0 0 calc(2.4 * var(--kg-rem, 0.625rem));
         }
-
 .koenig-lexical .kg-prose :where(
             ul ul li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             list-style-type: circle;
         }
-
 .koenig-lexical .kg-prose :where(
             ul ul ul li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             list-style-type: square;
         }
-
 .koenig-lexical .kg-prose :where(
             ol li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -2947,32 +3268,27 @@ em-emoji-picker {
             padding: 0 0 0 calc(0.8 * var(--kg-rem, 0.625rem));
             line-height: calc(3.2 * var(--kg-rem, 0.625rem));
         }
-
 .koenig-lexical .kg-prose :where(
             ol li:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: 0 0 0 calc(2.2 * var(--kg-rem, 0.625rem));
         }
-
 .koenig-lexical .kg-prose :where(
             ol ol li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             list-style-type: lower-alpha;
         }
-
 .koenig-lexical .kg-prose :where(
             ol ol ol li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             list-style-type: lower-roman;
         }
-
 .koenig-lexical .kg-prose :where(
             p + ul,
             p + ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(3.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             ul + ul,
             ul + ol,
@@ -2985,7 +3301,6 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(3.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h1 + ul,
             h1 + ol,
@@ -2994,7 +3309,6 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h3 + ul,
             h3 + ol,
@@ -3007,14 +3321,12 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             div + ul,
             div + ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             ul ul,
             ul ol,
@@ -3023,44 +3335,35 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 calc(2 * var(--kg-rem, 0.625rem));
         }
-
 /* Lists right after title */
-
 .koenig-lexical .kg-prose :where(
             ul:first-child,
             ol:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin-top: 0;
         }
-
 /* Links
         /* -------------------------------------------------------------------- */
-
 /* Uses accent color defined by React, else fallback to default color. */
-
 .koenig-lexical .kg-prose :where(
             a
         ):not(.dark a):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             color: var(--kg-accent-color, #ff0095);
             text-decoration: underline;
         }
-
 .koenig-lexical .kg-prose :where(
             .dark a
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-weight: 600;
             text-decoration: underline;
         }
-
 /* Blockquote
         /* -------------------------------------------------------------------- */
-
 .koenig-lexical .kg-prose :where(
             blockquote p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: 0;
         }
-
 .koenig-lexical .kg-prose :where(
             blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3068,14 +3371,12 @@ em-emoji-picker {
             padding-left: calc(2.0 * var(--kg-rem, 0.625rem));
             font-style: italic;
         }
-
 .koenig-lexical .kg-prose :where(
             h1 + blockquote,
             h2 + blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h3 + blockquote,
             h4 + blockquote,
@@ -3084,31 +3385,25 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             p + blockquote,
             blockquote + blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 /* Cards can be selected by their wrapper div element */
-
 .koenig-lexical .kg-prose :where(
             div + blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 /* Aside, Blockquote Alternative
         /* -------------------------------------------------------------------- */
-
 .koenig-lexical .kg-prose :where(
             aside p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: 0;
         }
-
 .koenig-lexical .kg-prose :where(
             aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3119,14 +3414,12 @@ em-emoji-picker {
             font-size: calc(2.4 * var(--kg-rem, 0.625rem));
             color: var(--grey-500);
         }
-
 .koenig-lexical .kg-prose :where(
             h1 + aside,
             h2 + aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h3 + aside,
             h4 + aside,
@@ -3135,14 +3428,12 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             p + aside,
             blockquote + aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 @media (max-width: 800px) {
             .koenig-lexical .kg-prose :where(
                 aside
@@ -3151,7 +3442,6 @@ em-emoji-picker {
                 padding-right: calc(6 * var(--kg-rem, 0.625rem));
             }
         }
-
 @media (max-width: 500px) {
             .koenig-lexical .kg-prose :where(
                 aside
@@ -3159,37 +3449,30 @@ em-emoji-picker {
                 font-size: calc(2.2 * var(--kg-rem, 0.625rem));
             }
         }
-
 /* cards can be selected by their wrapper div element */
-
 .koenig-lexical .kg-prose :where(
             div + aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 /* Cards in general
         /* -------------------------------------------------------------------- */
-
 .koenig-lexical .kg-prose :where(
             > div
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             line-height: 0;
             min-width: 100%;
         }
-
 .koenig-lexical .kg-prose > :where(
             div + div
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             padding: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose > :where(
             div[data-kg-card-width="full"] + div[data-kg-card-width="full"]
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             padding: 0;
         }
-
 .koenig-lexical .kg-prose :where(
             p + div,
             blockquote + div,
@@ -3199,13 +3482,11 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             padding: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h1 + div
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             padding: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             h2 + div,
             h3 + div,
@@ -3215,7 +3496,6 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             padding: calc(1.6 * var(--kg-rem, 0.625rem)) 0 0;
         }
-
 .koenig-lexical .kg-prose :where(
             hr
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3224,10 +3504,8 @@ em-emoji-picker {
             border: 0;
             border-top: 1px solid var(--grey-300);
         }
-
 /* Code
         /* -------------------------------------------------------------------- */
-
 .koenig-lexical .kg-prose :where(
             code
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3242,10 +3520,8 @@ em-emoji-picker {
             vertical-align: middle;
             white-space: pre-wrap;
         }
-
 /* Code
         /* -------------------------------------------------------------------- */
-
 .koenig-lexical .kg-prose :where(
             pre
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3259,19 +3535,15 @@ em-emoji-picker {
             vertical-align: middle;
             white-space: pre-wrap;
         }
-
 /* Images
         /* -------------------------------------------------------------------- */
-
 .koenig-lexical .kg-prose :where(
             img
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             display: inline;
         }
-
 /* Dark mode
     /* -------------------------------------------------------------------- */
-
 .koenig-lexical .dark :where(
                 h1,
                 h2,
@@ -3282,7 +3554,6 @@ em-emoji-picker {
             ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
                 color: var(--white);
             }
-
 .koenig-lexical .dark :where(
             code
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3681,6 +3952,7 @@ em-emoji-picker {
     --kg-selection: var(--kg-selection-color, #000);
 
     --kg-breakout-adjustment-with-fallback: var(--kg-breakout-adjustment, 0px);
+    --kg-breakout-room-with-fallback: var(--kg-breakout-room, calc(1.8 * var(--kg-rem, 0.625rem)));
 }
 
 /*
@@ -3854,6 +4126,10 @@ em-emoji-picker {
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .focus-within\:opacity-100:focus-within {
+    opacity: 1;
+}
+
 .koenig-lexical .focus-within\:shadow-\[0_0_0_2px_rgba\(48\2c 207\2c 67\2c \.25\)\]:focus-within {
     --tw-shadow: 0 0 0 2px rgba(48,207,67,.25);
     --tw-shadow-colored: 0 0 0 2px var(--tw-shadow-color);
@@ -3868,6 +4144,11 @@ em-emoji-picker {
 .koenig-lexical .hover\:-mx-3:hover {
     margin-left: calc(-1.2 * var(--kg-rem, 0.625rem));
     margin-right: calc(-1.2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .hover\:-translate-y-px:hover {
+    --tw-translate-y: -1px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 .koenig-lexical .hover\:scale-105:hover {
@@ -3889,6 +4170,11 @@ em-emoji-picker {
 .koenig-lexical .hover\:border-grey-800:hover {
     --tw-border-opacity: 1;
     border-color: color-mix(in srgb, var(--kg-color-grey-800, #626D79) calc(var(--tw-border-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .hover\:bg-black:hover {
+    --tw-bg-opacity: 1;
+    background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .hover\:bg-grey-100:hover {
@@ -3914,6 +4200,10 @@ em-emoji-picker {
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .hover\:bg-white\/20:hover {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.2 * 100%), transparent);
+}
+
 .koenig-lexical .hover\:px-3:hover {
     padding-left: calc(1.2 * var(--kg-rem, 0.625rem));
     padding-right: calc(1.2 * var(--kg-rem, 0.625rem));
@@ -3927,6 +4217,10 @@ em-emoji-picker {
 .koenig-lexical .hover\:text-selection:hover {
     --tw-text-opacity: 1;
     color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-text-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .hover\:opacity-100:hover {
+    opacity: 1;
 }
 
 .koenig-lexical .hover\:shadow-\[0_0_0_1px\]:hover {
@@ -3945,6 +4239,11 @@ em-emoji-picker {
     border-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .focus\:bg-grey-100:focus {
+    --tw-bg-opacity: 1;
+    background-color: color-mix(in srgb, var(--kg-color-grey-100, #F4F5F6) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
+}
+
 .koenig-lexical .focus\:bg-white:focus {
     --tw-bg-opacity: 1;
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
@@ -3956,13 +4255,75 @@ em-emoji-picker {
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+.koenig-lexical .focus\:outline-none:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
 .koenig-lexical .focus-visible\:outline-none:focus-visible {
     outline: 2px solid transparent;
     outline-offset: 2px;
 }
 
-.koenig-lexical .disabled\:opacity-40:disabled {
-    opacity: 0.4;
+.koenig-lexical .focus-visible\:outline:focus-visible {
+    outline-style: solid;
+}
+
+.koenig-lexical .focus-visible\:outline-2:focus-visible {
+    outline-width: 2px;
+}
+
+.koenig-lexical .focus-visible\:outline-offset-2:focus-visible {
+    outline-offset: 2px;
+}
+
+.koenig-lexical .focus-visible\:outline-selection:focus-visible {
+    outline-color: color-mix(in srgb, var(--kg-selection) calc(1 * 100%), transparent);
+}
+
+.koenig-lexical .focus-visible\:outline-transparent:focus-visible {
+    outline-color: transparent;
+}
+
+.koenig-lexical .focus-visible\:ring-2:focus-visible {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.koenig-lexical .focus-visible\:ring-selection:focus-visible {
+    --tw-ring-opacity: 1;
+    --tw-ring-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-ring-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .focus-visible\:ring-white\/40:focus-visible {
+    --tw-ring-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.4 * 100%), transparent);
+}
+
+.koenig-lexical .active\:translate-y-0:active {
+    --tw-translate-y: 0px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.koenig-lexical .disabled\:cursor-default:disabled {
+    cursor: default;
+}
+
+.koenig-lexical .disabled\:opacity-30:disabled {
+    opacity: 0.3;
+}
+
+.koenig-lexical .disabled\:opacity-50:disabled {
+    opacity: 0.5;
+}
+
+.koenig-lexical .disabled\:hover\:translate-y-0:hover:disabled {
+    --tw-translate-y: 0px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.koenig-lexical .disabled\:hover\:bg-white\/10:hover:disabled {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.1 * 100%), transparent);
 }
 
 .koenig-lexical :is(.group\/image:hover .group-hover\/image\:visible) {
@@ -3975,6 +4336,10 @@ em-emoji-picker {
 
 .koenig-lexical :is(.group:hover .group-hover\:block) {
     display: block;
+}
+
+.koenig-lexical :is(.group:hover .group-hover\:flex) {
+    display: flex;
 }
 
 .koenig-lexical :is(.group:hover .group-hover\:text-grey-800) {
@@ -3990,6 +4355,10 @@ em-emoji-picker {
     opacity: 1;
 }
 
+.koenig-lexical :is(.group:focus-visible .group-focus-visible\:flex) {
+    display: flex;
+}
+
 .koenig-lexical :is(.peer:checked ~ .peer-checked\:bg-black) {
     --tw-bg-opacity: 1;
     background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
@@ -3999,6 +4368,31 @@ em-emoji-picker {
     content: var(--tw-content);
     --tw-translate-x: 12px;
     transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.koenig-lexical :is(.peer:hover ~ .peer-hover\:flex) {
+    display: flex;
+}
+
+.koenig-lexical :is(.peer:focus-visible ~ .peer-focus-visible\:flex) {
+    display: flex;
+}
+
+.koenig-lexical .aria-pressed\:bg-grey-100[aria-pressed="true"] {
+    --tw-bg-opacity: 1;
+    background-color: color-mix(in srgb, var(--kg-color-grey-100, #F4F5F6) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .koenig-lexical .motion-reduce\:transition-none {
+        transition-property: none;
+    }
+
+    .koenig-lexical .motion-reduce\:hover\:translate-y-0:hover {
+        --tw-translate-y: 0px;
+        transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+    }
 }
 
 .koenig-lexical .dark\:border-grey-800:is(.dark *) {
@@ -4105,6 +4499,11 @@ em-emoji-picker {
 .koenig-lexical .dark\:text-grey-300:is(.dark *) {
     --tw-text-opacity: 1;
     color: color-mix(in srgb, var(--kg-color-grey-300, #DDE1E5) calc(var(--tw-text-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .dark\:text-grey-400:is(.dark *) {
+    --tw-text-opacity: 1;
+    color: color-mix(in srgb, var(--kg-color-grey-400, #CED4D9) calc(var(--tw-text-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .dark\:text-grey-50:is(.dark *) {
@@ -4262,14 +4661,32 @@ em-emoji-picker {
     background-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
-@media (min-width: 500px) {
+.koenig-lexical .dark\:aria-pressed\:bg-grey-900[aria-pressed="true"]:is(.dark *) {
+    --tw-bg-opacity: 1;
+    background-color: color-mix(in srgb, var(--kg-color-grey-900, #394047) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
+}
 
-    .koenig-lexical .xs\:left-\[-44px\] {
-        left: -44px;
-    }
+@media (min-width: 500px) {
 
     .koenig-lexical .xs\:overflow-visible {
         overflow: visible;
+    }
+}
+
+@media (min-width: 640px) {
+
+    .koenig-lexical .sm\:inline {
+        display: inline;
+    }
+
+    .koenig-lexical .sm\:px-16 {
+        padding-left: calc(6.4 * var(--kg-rem, 0.625rem));
+        padding-right: calc(6.4 * var(--kg-rem, 0.625rem));
+    }
+
+    .koenig-lexical .sm\:px-4 {
+        padding-left: calc(1.6 * var(--kg-rem, 0.625rem));
+        padding-right: calc(1.6 * var(--kg-rem, 0.625rem));
     }
 }
 
@@ -4291,8 +4708,12 @@ em-emoji-picker {
         width: var(--kg-menu-width,calc(28 * var(--kg-rem, 0.625rem)));
     }
 
-    .koenig-lexical .md\:min-w-\[calc\(100\%\+10rem\)\] {
-        min-width: calc(100% + calc(10 * var(--kg-rem, 0.625rem)));
+    .koenig-lexical .md\:min-w-\[min\(calc\(100\%\+10rem\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+        min-width: min(calc(100% + calc(10 * var(--kg-rem, 0.625rem))), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
+    }
+
+    .koenig-lexical .md\:grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .koenig-lexical .md\:gap-y-\[\.2rem\] {
@@ -4320,16 +4741,11 @@ em-emoji-picker {
         top: calc(3.2 * var(--kg-rem, 0.625rem));
     }
 
-    .koenig-lexical .lg\:mx-\[calc\(50\%-50vw\+\(var\(--kg-breakout-adjustment-with-fallback\)\/2\)\)\] {
-        margin-left: calc(50% - 50vw + (var(--kg-breakout-adjustment-with-fallback) / 2));
-        margin-right: calc(50% - 50vw + (var(--kg-breakout-adjustment-with-fallback) / 2));
+    .koenig-lexical .lg\:min-w-\[min\(calc\(100\%\+18rem\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+        min-width: min(calc(100% + calc(18 * var(--kg-rem, 0.625rem))), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
     }
 
-    .koenig-lexical .lg\:w-\[calc\(100vw-var\(--kg-breakout-adjustment-with-fallback\)\+2px\)\] {
-        width: calc(100vw - var(--kg-breakout-adjustment-with-fallback) + 2px);
-    }
-
-    .koenig-lexical .lg\:min-w-\[calc\(100\%\+18rem\)\] {
-        min-width: calc(100% + calc(18 * var(--kg-rem, 0.625rem)));
+    .koenig-lexical .lg\:\[--kg-card-w\:min\(calc\(100vw-var\(--kg-breakout-adjustment-with-fallback\)\+2px\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+        --kg-card-w: min(calc(100vw - var(--kg-breakout-adjustment-with-fallback) + 2px), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
     }
 }

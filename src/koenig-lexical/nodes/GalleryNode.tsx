@@ -1,6 +1,7 @@
 import GalleryCardIcon from '../assets/icons/kg-card-type-gallery.svg?react';
 import KoenigCardWrapper from '../components/KoenigCardWrapper';
 import MINIMAL_NODES from './MinimalNodes';
+import {GALLERY_NODE_IMAGE_CEILING} from '../../additions/gallery/limits';
 import pick from 'lodash/pick';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {GalleryNode as BaseGalleryNode} from '#kg-default-nodes';
@@ -11,11 +12,12 @@ import {populateNestedEditor, setupNestedEditor} from '../utils/nested-editors';
 
 export const INSERT_GALLERY_COMMAND = createCommand();
 
-export const MAX_IMAGES = 9;
+// A stored gallery is never cut to the host's limit, only to this ceiling (see additions/gallery/limits).
+export const MAX_IMAGES = GALLERY_NODE_IMAGE_CEILING;
 export const MAX_PER_ROW = 3;
 
 // ensure we don't save client-side only properties such as preview blob urls
-export const ALLOWED_IMAGE_PROPS = ['row', 'src', 'width', 'height', 'alt', 'caption', 'fileName'];
+export const ALLOWED_IMAGE_PROPS = ['row', 'src', 'width', 'height', 'alt', 'title', 'caption', 'fileName'];
 
 export function recalculateImageRows(images) {
     images.forEach((image, idx) => {

@@ -14,6 +14,7 @@ interface GalleryImage {
     height: number;
     alt?: string;
     title?: string;
+    caption?: string;
     row: number;
     href?: string;
 }
@@ -21,6 +22,7 @@ interface GalleryImage {
 interface GalleryNodeData {
     images: GalleryImage[];
     caption: string;
+    maxImages?: number;
 }
 
 interface GalleryRenderOptions extends ExportDOMOptions {
@@ -32,6 +34,10 @@ interface GalleryRenderOptions extends ExportDOMOptions {
 }
 
 const MAX_IMG_PER_ROW = 3;
+
+// The editor stores an image's caption with &, < and > escaped; the output wants the text itself,
+// set with textContent so it can never become markup.
+const unescapeText = (value: string) => value.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 
 function isValidImage(image: unknown): image is GalleryImage {
     if (typeof image !== 'object' || image === null) {
@@ -82,13 +88,18 @@ export function renderGalleryNode(node: GalleryNodeData, options: GalleryRenderO
     addCreateDocumentOption(options);
     const document = options.createDocument!();
 
-    const validImages = node.images.filter(isValidImage);
+    // the gallery's own limit: the output never shows more photos than the gallery allows
+    const limit = Number.isInteger(node.maxImages) && (node.maxImages as number) > 0 ? (node.maxImages as number) : 0;
+    const validImages = node.images.filter(isValidImage).slice(0, limit || undefined);
     if (!validImages.length) {
         return renderEmptyContainer(document);
     }
 
     const figure = document.createElement('figure');
     figure.setAttribute('class', 'kg-card kg-gallery-card kg-width-wide');
+    if (limit) {
+        figure.setAttribute('data-kg-max-images', String(limit));
+    }
 
     const container = document.createElement('div');
     container.setAttribute('class', 'kg-gallery-container');
@@ -111,7 +122,7 @@ export function renderGalleryNode(node: GalleryNodeData, options: GalleryRenderO
             img.setAttribute('loading', 'lazy');
             img.setAttribute('alt', image.alt || '');
             if (image.title) {
-                img.setAttribute('title', image.title);
+                img.setAttribute('title', unescapeText(image.title));
             }
 
             // images can be resized to max width, if that's the case output
@@ -186,6 +197,27 @@ export function renderGalleryNode(node: GalleryNodeData, options: GalleryRenderO
                 imgDiv.appendChild(a);
             } else {
                 imgDiv.appendChild(img);
+            }
+
+            // The image's own title and caption go in normal flow under the picture, so they also
+            // print under it. Not a figcaption: that is the gallery's caption, and a reader of this
+            // markup would take the first one for the whole gallery.
+            if (image.title || image.caption) {
+                const text = document.createElement('div');
+                text.setAttribute('class', 'kg-gallery-image-text');
+                if (image.title) {
+                    const title = document.createElement('strong');
+                    title.setAttribute('class', 'kg-gallery-image-title');
+                    title.textContent = unescapeText(image.title);
+                    text.appendChild(title);
+                }
+                if (image.caption) {
+                    const caption = document.createElement('span');
+                    caption.setAttribute('class', 'kg-gallery-image-caption');
+                    caption.textContent = unescapeText(image.caption);
+                    text.appendChild(caption);
+                }
+                imgDiv.appendChild(text);
             }
             rowDiv.appendChild(imgDiv);
         });

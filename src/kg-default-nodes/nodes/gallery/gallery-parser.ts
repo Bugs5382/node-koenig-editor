@@ -8,6 +8,18 @@ function readGalleryImageAttributesFromElement(element: HTMLImageElement, imgNum
     image.fileName = element.src.match(/[^/]*$/)![0];
     image.row = Math.floor(imgNum / 3);
 
+    // the image's own title and caption, written under it by the renderer
+    const block = element.closest('.kg-gallery-image');
+    const title = block?.querySelector('.kg-gallery-image-title')?.textContent;
+    const caption = block?.querySelector('.kg-gallery-image-caption')?.textContent;
+    const escapeText = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (title) {
+        image.title = escapeText(title);
+    }
+    if (caption) {
+        image.caption = escapeText(caption);
+    }
+
     return image;
 }
 
@@ -23,6 +35,10 @@ export function parseGalleryNode(GalleryNode: new (data: Record<string, unknown>
 
                         payload.images = imgs.map(readGalleryImageAttributesFromElement);
                         payload.caption = readCaptionFromElement(domNode);
+                        const limit = parseInt(domNode.getAttribute('data-kg-max-images') || '', 10);
+                        if (limit > 0) {
+                            payload.maxImages = limit;
+                        }
 
                         const node = new GalleryNode(payload);
                         return {node};

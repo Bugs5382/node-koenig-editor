@@ -2,7 +2,8 @@ import CardContext from '../context/CardContext';
 import KoenigComposerContext from '../context/KoenigComposerContext';
 import React from 'react';
 import {$getNodeByKey, $getRoot} from 'lexical';
-import {HeaderCard} from '../components/ui/cards/HeaderCard';
+import KoenigCaptionEditor from '../components/KoenigCaptionEditor';
+import {KoenigHeaderCard} from '../components/KoenigHeaderCard';
 import {getImageDimensions} from '../utils/getImageDimensions';
 import {populateNestedEditor} from '../utils/nested-editors';
 import {useKoenigStrings} from '../../additions/options';
@@ -39,6 +40,8 @@ function HeaderNodeComponent({
     const strings = useKoenigStrings();
     const imageUploader = fileUploader.useFileUpload('image');
     const [uploadError, setUploadError] = React.useState(null);
+    const [readOnly, setReadOnly] = React.useState(() => !editor.isEditable());
+    React.useEffect(() => editor.registerEditableListener(editable => setReadOnly(!editable)), [editor]);
 
     // the title and subtitle are only typed into while the card is being edited
     React.useEffect(() => {
@@ -100,33 +103,39 @@ function HeaderNodeComponent({
         isEditing: Boolean(isEditing),
         isSelected: Boolean(isSelected),
         layout,
+        readOnly,
         subtitle: textOf(subheaderTextEditor),
+        subtitleField: (
+            <KoenigCaptionEditor
+                captionEditor={subheaderTextEditor}
+                captionEditorInitialState={subheaderTextEditorInitialState}
+                placeholderText={strings.header.subtitlePlaceholder}
+            />
+        ),
         textColor,
         title: textOf(headerTextEditor),
+        titleField: (
+            <KoenigCaptionEditor
+                captionEditor={headerTextEditor}
+                captionEditorInitialState={headerTextEditorInitialState}
+                placeholderText={strings.header.titlePlaceholder}
+            />
+        ),
         update,
-        uploadBackgroundImage
+        uploadBackgroundImage,
+        uploadError
     };
 
     const Custom = cardRenderers?.header;
     if (Custom) {
         return (
             <div data-kg-card="header" data-kg-header-custom>
-                <Custom {...common} uploadError={uploadError} />
+                <Custom {...common} />
             </div>
         );
     }
 
-    return (
-        <HeaderCard
-            {...common}
-            headerTextEditor={headerTextEditor}
-            headerTextEditorInitialState={headerTextEditorInitialState}
-            strings={strings.header}
-            subheaderTextEditor={subheaderTextEditor}
-            subheaderTextEditorInitialState={subheaderTextEditorInitialState}
-            uploadError={uploadError}
-        />
-    );
+    return <KoenigHeaderCard {...common} />;
 }
 
 function setNestedText(node, property, nestedEditor, text) {

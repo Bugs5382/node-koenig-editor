@@ -185,3 +185,42 @@ em-emoji-picker {
         border-bottom: 1px solid var(--grey-900);
     }
 }
+
+/* A gallery photo's title and caption sit over the bottom of the photo on screen. On paper they
+   print under the photo, in the text's own colour, whether or not they were collapsed. */
+@media print {
+    .koenig-lexical [data-gallery-image-text-wrap] {
+        position: static !important;
+    }
+
+    .koenig-lexical [data-gallery-image-text] {
+        background: transparent !important;
+        clip: auto !important;
+        clip-path: none !important;
+        color: inherit !important;
+        height: auto !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        padding: 0.4em 0 0 !important;
+        position: static !important;
+        white-space: normal !important;
+        width: auto !important;
+    }
+
+    .koenig-lexical [data-gallery-image-text-toggle],
+    .koenig-lexical [data-gallery-text-toggle-all],
+    .koenig-lexical [data-gallery-image-text-edit] {
+        display: none !important;
+    }
+}
+
+/* The header card's title and subtitle are nested editors, and the wrappers and prose styles around
+   them set a grey of their own. Under the card's text colour that was 2.7:1 on a dark background;
+   they take the card's colour instead, so contrast is whatever the colours the person chose give.
+   Links keep their own colour. */
+.koenig-lexical [data-header-title],
+.koenig-lexical [data-header-title] *:not(a),
+.koenig-lexical [data-header-subtitle],
+.koenig-lexical [data-header-subtitle] *:not(a) {
+    color: inherit;
+}

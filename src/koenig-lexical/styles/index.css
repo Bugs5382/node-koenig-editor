@@ -35,6 +35,7 @@
     --kg-selection: var(--kg-selection-color, #000);
 
     --kg-breakout-adjustment-with-fallback: var(--kg-breakout-adjustment, 0px);
+    --kg-breakout-room-with-fallback: var(--kg-breakout-room, 1.8rem);
 
     /*
         Tailwind v4 "translate" classes use `translate` rather than `transform`,

@@ -4,7 +4,9 @@ import {renderGalleryNode} from './gallery-renderer.js';
 
 const galleryProperties = [
     {name: 'images', default: [] as unknown[]},
-    {name: 'caption', default: '', wordCount: true}
+    {name: 'caption', default: '', wordCount: true},
+    // This gallery's own limit on photos; 0 means the host's limit applies.
+    {name: 'maxImages', default: 0}
 ] as const satisfies readonly DecoratorNodeProperty[];
 
 export type GalleryData = DecoratorNodeData<typeof galleryProperties>;

@@ -3,6 +3,8 @@ import KoenigCardWrapper from './components/KoenigCardWrapper';
 import KoenigComposableEditor from './components/KoenigComposableEditor';
 import KoenigComposer from './components/KoenigComposer';
 import KoenigEditor from './components/KoenigEditor';
+import {KoenigGalleryCard} from './components/KoenigGalleryCard';
+import {KoenigHeaderCard} from './components/KoenigHeaderCard';
 import KoenigNestedComposer from './components/KoenigNestedComposer';
 
 /* Plugins */
@@ -47,6 +49,8 @@ export {
     KoenigComposableEditor,
     KoenigComposer,
     KoenigEditor,
+    KoenigGalleryCard,
+    KoenigHeaderCard,
     KoenigNestedComposer,
     KoenigCardWrapper,
 

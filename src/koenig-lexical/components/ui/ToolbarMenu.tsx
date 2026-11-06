@@ -56,7 +56,7 @@ export function ToolbarMenu({children, hide, ...props}) {
     }
 
     return (
-        <ul className="relative m-0 flex items-center justify-evenly gap-1 rounded-lg bg-white px-1 font-sans text-md font-normal text-black shadow-md dark:bg-grey-950" {...props}>
+        <ul className="relative m-0 flex max-w-full flex-wrap items-center justify-evenly gap-1 rounded-lg bg-white px-1 font-sans text-md font-normal text-black shadow-md dark:bg-grey-950" {...props}>
             {children}
         </ul>
     );

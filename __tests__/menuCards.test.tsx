@@ -86,6 +86,11 @@ describe.each(Object.keys(configs))("every card the slash menu offers (%s)", (na
         "Toggle",
         "Gallery",
         "Header",
+        "Button",
+        "Markdown",
+        "File",
+        "Video",
+        "Audio",
       ]),
     );
     for (const label of labels) {

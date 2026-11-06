@@ -1,13 +1,12 @@
 import CardContext from '../context/CardContext';
 import KoenigComposerContext from '../context/KoenigComposerContext';
 import React from 'react';
-import useFileDragAndDrop from '../hooks/useFileDragAndDrop';
-import useGalleryReorder from '../hooks/useGalleryReorder';
 import {$getNodeByKey} from 'lexical';
 import {ActionToolbar} from '../components/ui/ActionToolbar';
 import {CardCaptionEditor} from '../components/ui/CardCaptionEditor';
-import {GalleryCard} from '../components/ui/cards/GalleryCard';
-import {MAX_IMAGES, recalculateImageRows} from './GalleryNode';
+import {KoenigGalleryCard} from '../components/KoenigGalleryCard';
+import {GALLERY_UPLOAD_CONCURRENCY, resolveMaxImages} from '../../additions/gallery/limits';
+import {recalculateImageRows} from './GalleryNode';
 import {SnippetActionToolbar} from '../components/ui/SnippetActionToolbar';
 import {ToolbarMenu, ToolbarMenuItem, ToolbarMenuSeparator} from '../components/ui/ToolbarMenu';
 import {getImageDimensions} from '../utils/getImageDimensions';
@@ -29,7 +28,8 @@ const dimensionsOf = async (url) => {
 
 export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorInitialState}) {
     const [editor] = useLexicalComposerContext();
-    const {fileUploader, cardConfig, cardRenderers} = React.useContext(KoenigComposerContext);
+    const {fileUploader, cardConfig, cardRenderers, gallery} = React.useContext(KoenigComposerContext);
+    const hostMaxImages = resolveMaxImages(gallery?.maxImages);
     const {isSelected} = React.useContext(CardContext);
     const strings = useKoenigStrings();
     const fileInputRef = React.useRef();
@@ -44,6 +44,12 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
     });
     // uploads finish after the render that started them, so they read the latest list from here
     const imagesRef = React.useRef(images);
+
+    // This gallery's own limit is saved in the card; the host's is the ceiling it cannot exceed.
+    const [ownMax, setOwnMaxState] = React.useState(() => editor.getEditorState().read(() => $getNodeByKey(nodeKey)?.maxImages || 0));
+    const maxImages = Math.min(ownMax > 0 ? ownMax : hostMaxImages, hostMaxImages);
+    const [readOnly, setReadOnly] = React.useState(() => !editor.isEditable());
+    React.useEffect(() => editor.registerEditableListener(editable => setReadOnly(!editable)), [editor]);
 
     const imageUploader = fileUploader.useFileUpload('image');
     const mimeTypes = fileUploader.fileTypes?.image?.mimeTypes;
@@ -88,17 +94,34 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
         commit(list);
     };
 
+    // The most it can be set to is the host's limit; the least is what it already holds.
+    const setMaxImages = (value) => {
+        // an empty box or text that is not a number changes nothing
+        const wanted = String(value ?? '').trim() === '' ? NaN : Math.round(Number(value));
+        if (!Number.isFinite(wanted)) {
+            return;
+        }
+        const next = Math.min(Math.max(wanted, imagesRef.current.length, 1), hostMaxImages);
+        setOwnMaxState(next);
+        editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if (node) {
+                node.maxImages = next;
+            }
+        });
+    };
+
     const addFiles = async (files) => {
         const incoming = Array.prototype.slice.call(files);
         const allowedType = file => !mimeTypes?.length || mimeTypes.includes(file.type);
         const accepted = incoming.filter(allowedType);
-        const room = MAX_IMAGES - imagesRef.current.length;
+        const room = maxImages - imagesRef.current.length;
         const chosen = accepted.slice(0, Math.max(room, 0));
 
         if (accepted.length < incoming.length) {
             setErrorMessage(strings.gallery.fileTypeError);
         } else if (chosen.length < accepted.length) {
-            setErrorMessage(strings.gallery.limitError.replace('{max}', String(MAX_IMAGES)));
+            setErrorMessage(strings.gallery.limitError.replace('{max}', String(maxImages)));
         }
 
         if (chosen.length === 0) {
@@ -106,17 +129,17 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
         }
 
         // previews first, so the person sees the images straight away
-        const pending = [];
-        for (const file of chosen) {
+        const pending = await Promise.all(chosen.map(async (file) => {
             const previewSrc = URL.createObjectURL(file);
             const {width, height} = await dimensionsOf(previewSrc);
-            pending.push({file, image: {fileName: file.name, previewSrc, width, height, alt: '', caption: ''}});
-        }
+            return {file, image: {fileName: file.name, previewSrc, width, height, alt: '', caption: ''}};
+        }));
         setImages([...imagesRef.current, ...pending.map(p => p.image)]);
 
-        // the host's uploader is called once for each image
+        // The host's uploader is called once for each image, a few at a time: many photos go up
+        // faster, but a host's upload hook can be asked to run more than one upload at once.
         setIsUploading(true);
-        for (const {file, image} of pending) {
+        const uploadOne = async ({file, image}) => {
             let result = null;
             try {
                 result = await imageUploader.upload([file]);
@@ -127,21 +150,21 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
             if (!url) {
                 setErrorMessage(strings.gallery.uploadError);
                 setImages(imagesRef.current.filter(i => i !== image));
-                continue;
+            } else {
+                commit(imagesRef.current.map(i => (i === image ? {...i, src: url} : i)));
             }
-            const list = imagesRef.current.map(i => (i === image ? {...i, src: url} : i));
-            commit(list);
-        }
+            // the preview is no longer needed once the real address (or a failure) is known
+            URL.revokeObjectURL?.(image.previewSrc);
+        };
+        const queue = [...pending];
+        const workers = Array.from({length: Math.min(GALLERY_UPLOAD_CONCURRENCY, queue.length)}, async () => {
+            while (queue.length) {
+                await uploadOne(queue.shift());
+            }
+        });
+        await Promise.all(workers);
         setIsUploading(false);
     };
-
-    const galleryReorder = useGalleryReorder({
-        images,
-        updateImages: commit,
-        isSelected,
-        maxImages: MAX_IMAGES
-    });
-    const imageFilesDropper = useFileDragAndDrop({handleDrop: files => addFiles(files)});
 
     const onFileChange = async (e) => {
         const files = e.target.files;
@@ -158,72 +181,67 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
         fileInputRef.current.click();
     }
 
-    const hideToolbar =
-        !isSelected ||
-        imageFilesDropper.isDraggedOver ||
-        galleryReorder.isDraggedOver ||
-        images.length <= 0;
+    const hideToolbar = !isSelected || readOnly || images.length <= 0;
+
+    // What a host's component gets. Title and caption go out as plain text and come back as plain
+    // text; the card keeps them escaped, because the HTML output writes them as they are.
+    const plain = list => list.map(image => ({
+        ...image,
+        title: unescapeHtml(image.title || ''),
+        caption: unescapeHtml(image.caption || '')
+    }));
+    const stored = (changes) => ({
+        ...(changes.alt !== undefined ? {alt: changes.alt} : {}),
+        ...(changes.title !== undefined ? {title: escapeHtml(changes.title)} : {}),
+        ...(changes.caption !== undefined ? {caption: escapeHtml(changes.caption)} : {})
+    });
+    const replaceImages = list => commit(list.map(image => ({
+        ...image,
+        ...(image.title !== undefined ? {title: escapeHtml(image.title)} : {}),
+        ...(image.caption !== undefined ? {caption: escapeHtml(image.caption)} : {})
+    })));
 
     const Custom = cardRenderers?.gallery;
+    const Renderer = Custom || KoenigGalleryCard;
+    const rendered = (
+        <Renderer
+            addFiles={addFiles}
+            caption={(
+                <CardCaptionEditor
+                    captionEditor={captionEditor}
+                    captionEditorInitialState={captionEditorInitialState}
+                    captionPlaceholder={strings.gallery.captionPlaceholder}
+                    dataTestId="gallery-card-caption"
+                    isSelected={isSelected}
+                />
+            )}
+            clearError={() => setErrorMessage(null)}
+            errorMessage={errorMessage}
+            hostMaxImages={hostMaxImages}
+            images={plain(images)}
+            isSelected={Boolean(isSelected)}
+            isUploading={isUploading}
+            maxImages={maxImages}
+            mimeTypes={mimeTypes ?? []}
+            moveImage={moveImage}
+            progress={imageUploader.progress ?? 0}
+            readOnly={readOnly}
+            removeImage={removeImage}
+            replaceImages={replaceImages}
+            setMaxImages={setMaxImages}
+            updateImage={(index, changes) => updateImage(index, stored(changes))}
+        />
+    );
 
     return (
         <>
-            {Custom ? (
-                <figure data-kg-gallery-custom>
-                    <Custom
-                        addFiles={addFiles}
-                        caption={(
-                            <CardCaptionEditor
-                                captionEditor={captionEditor}
-                                captionEditorInitialState={captionEditorInitialState}
-                                captionPlaceholder={strings.gallery.captionPlaceholder}
-                                dataTestId="gallery-card-caption"
-                                isSelected={isSelected}
-                            />
-                        )}
-                        clearError={() => setErrorMessage(null)}
-                        errorMessage={errorMessage}
-                        images={images}
-                        isSelected={Boolean(isSelected)}
-                        isUploading={isUploading}
-                        maxImages={MAX_IMAGES}
-                        mimeTypes={mimeTypes ?? []}
-                        moveImage={moveImage}
-                        progress={imageUploader.progress ?? 0}
-                        removeImage={removeImage}
-                        updateImage={updateImage}
-                    />
-                </figure>
-            ) : (
-                <GalleryCard
-                    captionEditor={captionEditor}
-                    captionEditorInitialState={captionEditorInitialState}
-                    clearErrorMessage={() => setErrorMessage(null)}
-                    deleteImage={image => removeImage(imagesRef.current.indexOf(image))}
-                    errorMessage={errorMessage}
-                    fileInputRef={fileInputRef}
-                    filesDropper={imageFilesDropper}
-                    imageMimeTypes={mimeTypes}
-                    images={images}
-                    isSelected={isSelected}
-                    moveImage={moveImage}
-                    reorderHandler={galleryReorder}
-                    strings={strings.gallery}
-                    unescapeHtml={unescapeHtml}
-                    updateImageText={(index, changes) => updateImage(index, {
-                        ...(changes.alt !== undefined ? {alt: changes.alt} : {}),
-                        ...(changes.caption !== undefined ? {caption: escapeHtml(changes.caption)} : {})
-                    })}
-                    uploader={imageUploader}
-                    onFileChange={onFileChange}
-                />
-            )}
+            {Custom ? <figure data-kg-gallery-custom>{rendered}</figure> : rendered}
 
-            {Custom ? (
+            {readOnly ? null : (
                 <form hidden>
                     <input ref={fileInputRef} name="image-input" type="file" hidden multiple onChange={onFileChange} />
                 </form>
-            ) : null}
+            )}
 
             <ActionToolbar
                 data-kg-card-toolbar="gallery"

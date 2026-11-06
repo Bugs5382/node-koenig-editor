@@ -38,7 +38,33 @@ import type { Doc, XmlText } from "yjs";
 
 /** The cards the package ships. Pass a list as the composer's `cards` to register only those. */
 export type KoenigCardName =
-  "callout" | "divider" | "gallery" | "header" | "image" | "table" | "toggle";
+  | "audio"
+  | "button"
+  | "callout"
+  | "divider"
+  | "file"
+  | "gallery"
+  | "header"
+  | "image"
+  | "markdown"
+  | "table"
+  | "toggle"
+  | "video";
+
+/** Features that are not cards. Pass a list as the composer's `tools` to keep only those. */
+export type KoenigTool = "emojiPicker" | "imageEditor";
+
+/** The emoji picker's groups, in tab order. */
+export type KoenigEmojiCategory =
+  | "activities"
+  | "animals"
+  | "flags"
+  | "food"
+  | "objects"
+  | "people"
+  | "smileys"
+  | "symbols"
+  | "travel";
 
 /** The format toolbar's buttons. Pass a list as the composer's `toolbar` to show only those. */
 export type KoenigToolbarItem =
@@ -85,6 +111,21 @@ export interface KoenigToolbarAction {
 export interface KoenigCardText {
   desc: string;
   label: string;
+}
+
+/** The wording the video and audio cards share. */
+export interface KoenigMediaStrings {
+  /** The notice shown while the card has neither a captions track nor a transcript. */
+  captionsMissing: string;
+  select: string;
+  sizeError: string;
+  trackError: string;
+  trackLabel: string;
+  trackLanguage: string;
+  trackRemove: string;
+  trackUpload: string;
+  transcriptPlaceholder: string;
+  typeError: string;
 }
 
 /** Every piece of wording the editor shows, with English defaults in `DEFAULT_STRINGS`. */
@@ -138,18 +179,56 @@ export interface KoenigStrings {
   };
   gallery: {
     addImages: string;
-    altPlaceholder: string;
     captionPlaceholder: string;
     dismiss: string;
+    /** `{max}` is replaced with the gallery's image limit. */
     dropToAdd: string;
     fileTypeError: string;
     imageCaptionPlaceholder: string;
     /** `{max}` is replaced with the image limit. */
     limitError: string;
-    moveEarlier: string;
-    moveLater: string;
+    /** `{max}` is replaced with the gallery's image limit. */
     select: string;
     uploadError: string;
+    /** Names the icon that opens the title and caption dialog for one photo. */
+    editImageText: string;
+    hideAllImageText: string;
+    hideImageText: string;
+    imageCaptionLabel: string;
+    imageTextCancel: string;
+    imageTextDialogTitle: string;
+    imageTextSave: string;
+    imageTitleLabel: string;
+    showAllImageText: string;
+    showImageText: string;
+    imageAltLabel: string;
+    /** `{n}` and `{total}` are replaced with the photo's place and the number of photos. */
+    imageAtEnd: string;
+    imageAtStart: string;
+    imageLabel: string;
+    /** As above, and `{other}` with the place of the photo it moved past. */
+    imageMovedAfter: string;
+    imageMovedBefore: string;
+    /** Help in the title, caption and alt text dialog, including how to move a photo. */
+    imageTextHelp: string;
+    /** `{n}` is the number of photos and `{max}` the gallery's limit. */
+    countOf: string;
+    /** `{host}` is the host's ceiling and `{n}` the number of photos already in the gallery. */
+    maxImagesHint: string;
+    maxImagesLabel: string;
+    /** The button that opens the full-screen viewer, on the gallery and on each photo. */
+    openGalleryFullScreen: string;
+    openImageFullScreen: string;
+    /** The exit control: its label, its tooltip, and its text on wide screens. */
+    viewerClose: string;
+    /** The key shown in the exit control's tooltip. */
+    viewerCloseHint: string;
+    viewerLabel: string;
+    viewerNext: string;
+    viewerPrevious: string;
+    /** `{n}` is the photo's place in the gallery. */
+    viewerThumbnail: string;
+    viewerThumbnails: string;
   };
   header: {
     alignCenter: string;
@@ -165,9 +244,58 @@ export interface KoenigStrings {
     titlePlaceholder: string;
     uploadError: string;
   };
+  /** The button card; its link must be http, https or mailto. */
+  button: {
+    alignCenter: string;
+    alignLeft: string;
+    alignment: string;
+    invalidUrl: string;
+    text: string;
+    textPlaceholder: string;
+    url: string;
+  };
+  markdown: { editorLabel: string; empty: string; placeholder: string; previewLabel: string };
+  /** Wording for `useKoenigWordCount`; `{count}` and `{minutes}` are filled in. */
+  wordCount: { readLessThanMinute: string; readMinutes: string; word: string; words: string };
+  file: {
+    descriptionPlaceholder: string;
+    select: string;
+    /** `{name}` is replaced with the file name and `{limit}` with the size limit. */
+    sizeError: string;
+    titlePlaceholder: string;
+    /** `{name}` is replaced with the file name. */
+    typeError: string;
+  };
+  video: KoenigMediaStrings & { captionPlaceholder: string };
+  audio: KoenigMediaStrings & { titlePlaceholder: string };
   callout: { background: string; emoji: string; placeholder: string };
   toggle: { contentPlaceholder: string; headingPlaceholder: string };
   snippet: { namePlaceholder: string; replaceExisting: string };
+  imageEditor: {
+    apply: string;
+    aspectFree: string;
+    aspectLabel: string;
+    aspectOriginal: string;
+    cancel: string;
+    cropHelp: string;
+    cropLabel: string;
+    exportError: string;
+    loadError: string;
+    loading: string;
+    rotateLeft: string;
+    rotateRight: string;
+    title: string;
+  };
+  emojiPicker: {
+    categories: Record<KoenigEmojiCategory, string>;
+    categoriesLabel: string;
+    label: string;
+    loadError: string;
+    loading: string;
+    noResults: string;
+    searchLabel: string;
+    searchPlaceholder: string;
+  };
 }
 
 /** Every field optional, all the way down. */
@@ -194,7 +322,8 @@ export type EditorNodes = readonly (Klass<LexicalNode> | LexicalNodeReplacement)
 
 /** A file upload hook, as cards call it: `useFileUpload("image")`. */
 export interface FileUploader {
-  fileTypes?: Record<string, { extensions: string[]; mimeTypes: string[] }>;
+  /** Per upload type. `maxSize` (bytes) is checked by the file, video and audio cards before upload. */
+  fileTypes?: Record<string, { extensions: string[]; maxSize?: number; mimeTypes: string[] }>;
   useFileUpload: (type: string) => {
     errors: { filename?: string; message: string }[];
     isLoading: boolean;
@@ -282,8 +411,9 @@ export interface KoenigCommentsController {
 
 /** One image in a gallery. `previewSrc` is set only while the image is still uploading. */
 export interface KoenigGalleryImage {
+  /** Describes the photo for people who cannot see it. */
   alt: string;
-  /** Plain text escaped as HTML, because the gallery's HTML output writes it as is. */
+  /** Plain text. The card keeps it escaped, because the HTML output writes it as it is. */
   caption: string;
   fileName: string;
   height: null | number;
@@ -291,32 +421,60 @@ export interface KoenigGalleryImage {
   row?: number;
   /** The address the host's uploader returned; empty until the upload finishes. */
   src?: string;
+  /** Plain text, shown over the bottom of the photo and under it in the HTML output. */
+  title: string;
   width: null | number;
 }
 
-/** What the composer's `cardRenderers.gallery` component receives. It draws the gallery; the
- *  editor keeps the node, the uploads and the limits. */
+/**
+ * What the composer's `cardRenderers.gallery` component receives. It draws the gallery; the
+ * editor keeps the node, the uploads, the limits and the saving. The props are the contract, in
+ * four groups:
+ *
+ * - **What to show:** `images` (each with `alt`, `title` and `caption`, as plain text), `caption`
+ *   (the gallery's own caption editor, ready to place), `errorMessage`, `isUploading`, `progress`.
+ * - **State:** `isSelected`, and `readOnly`, true when the editor is not editable (a reader's view:
+ *   draw no editing controls).
+ * - **Settings:** `maxImages` (this gallery's limit), `hostMaxImages` (the host's ceiling for it)
+ *   and `mimeTypes` (the image types the host's uploader accepts).
+ * - **Callbacks:** `addFiles`, `removeImage`, `moveImage`, `replaceImages`, `updateImage`,
+ *   `setMaxImages`, `clearError`.
+ *
+ * Draw it yourself, or wrap the default with `KoenigGalleryCard`.
+ */
 export interface KoenigGalleryRenderProps {
   /** Adds files: each one is checked against `mimeTypes` and the limit, then sent to the
-   *  host's uploader on its own. */
+   *  host's uploader on its own, a few at a time. */
   addFiles: (files: File[] | FileList) => Promise<void>;
   /** The gallery's own caption editor, ready to place. */
   caption: ReactNode;
   clearError: () => void;
   errorMessage: null | string;
+  /** The host's ceiling for `maxImages`: the most this gallery's own limit can be set to. */
+  hostMaxImages: number;
   images: readonly KoenigGalleryImage[];
   isSelected: boolean;
   isUploading: boolean;
+  /** This gallery's limit on photos: its own setting, never above `hostMaxImages`. Adding past it
+   *  is refused with a message. */
   maxImages: number;
   /** The image types the host's uploader accepts; empty means any. */
   mimeTypes: readonly string[];
   /** Moves the image at `from` to position `to`. */
   moveImage: (from: number, to: number) => void;
   progress: number;
+  /** True when the editor is not editable: draw a reader's view, with no editing controls. */
+  readOnly: boolean;
   removeImage: (index: number) => void;
+  /** Replaces the whole list, in the order given: for your own drag and drop. */
+  replaceImages: (images: readonly KoenigGalleryImage[]) => void;
+  /** Sets this gallery's limit, kept between `max(photos in the gallery, 1)` and `hostMaxImages`.
+   *  Text that is not a number changes nothing. */
+  setMaxImages: (value: number | string) => void;
+  /** Saves changes to one image; `title` and `caption` are plain text. */
   updateImage: (
     index: number,
-    changes: Partial<Pick<KoenigGalleryImage, "alt" | "caption">>,
+    changes: Partial<Pick<KoenigGalleryImage, "alt" | "caption" | "title">>,
   ) => void;
 }
 
@@ -333,11 +491,17 @@ export interface KoenigHeaderRenderProps {
   isEditing: boolean;
   isSelected: boolean;
   layout: string;
+  /** True when the editor is not editable: draw a reader's view, with no settings. */
+  readOnly: boolean;
   /** The subtitle as plain text. */
   subtitle: string;
+  /** The subtitle's editor, ready to place. */
+  subtitleField: ReactNode;
   textColor: string;
   /** The title as plain text. */
   title: string;
+  /** The title's editor, ready to place. */
+  titleField: ReactNode;
   /** Saves changes to the card; `title` and `subtitle` are plain text. */
   update: (
     changes: Partial<
@@ -364,6 +528,14 @@ export interface KoenigHeaderRenderProps {
 }
 
 /** The host's own layout for the cards that have one. Without an entry the default draws. */
+/** The host's options for the gallery card. */
+export interface KoenigGalleryOptions {
+  /** The most photos a gallery takes: the ceiling for each gallery's own setting. A positive whole
+   *  number; anything else means the default, 50. It limits adding photos, never cuts off the
+   *  photos a stored document already has. */
+  maxImages?: number;
+}
+
 export interface KoenigCardRenderers {
   gallery?: FC<KoenigGalleryRenderProps>;
   header?: FC<KoenigHeaderRenderProps>;
@@ -372,6 +544,8 @@ export interface KoenigCardRenderers {
 export interface KoenigComposerProps {
   /** Replaces how a shipped card is drawn; see `KoenigCardRenderers`. */
   cardRenderers?: KoenigCardRenderers;
+  /** Options for the gallery card. */
+  gallery?: KoenigGalleryOptions;
   cardConfig?: Record<string, unknown>;
   /** The shipped cards to register, and so list in the menus. Default: all of them. */
   cards?: readonly KoenigCardName[];
@@ -398,6 +572,9 @@ export interface KoenigComposerProps {
   toolbar?: readonly KoenigToolbarItem[];
   /** The host's own buttons and cards on the selection toolbar. */
   toolbarActions?: readonly KoenigToolbarAction[];
+  /** The features that are not cards: `imageEditor` (crop and rotate before upload) and
+   *  `emojiPicker`. Default: both. Pass a list to keep only those. */
+  tools?: readonly KoenigTool[];
 }
 
 export interface KoenigEditorAPI {
@@ -439,6 +616,29 @@ export declare const MINIMAL_NODES: EditorNodes;
 
 /** The shipped card names, in menu order. */
 export declare const KOENIG_CARD_NAMES: readonly KoenigCardName[];
+
+/** The default gallery, drawn from the props of `cardRenderers.gallery`, for a host to wrap. */
+export declare const KoenigGalleryCard: FC<KoenigGalleryRenderProps>;
+
+/** The default header, drawn from the props of `cardRenderers.header`, for a host to wrap. */
+export declare const KoenigHeaderCard: FC<KoenigHeaderRenderProps>;
+/** The tool names, `imageEditor` and `emojiPicker`. */
+export declare const KOENIG_TOOLS: readonly KoenigTool[];
+/** Whether a tool is on for the composer this component sits in. */
+export declare const useKoenigTool: (tool: KoenigTool) => boolean;
+/** The offline emoji picker. Calls `onSelect` with the chosen emoji and `onClose` on Escape. */
+export declare const EmojiPicker: FC<{
+  onClose?: () => void;
+  onSelect: (emoji: { native: string }) => void;
+}>;
+/** Inserts an emoji at the editor's selection (replacing a range selection). */
+export declare const insertEmoji: (editor: LexicalEditor, emoji: string) => boolean;
+/** The crop and rotate dialog. `onApply` gets the edited copy of `file`. */
+export declare const ImageEditorDialog: FC<{
+  file: File;
+  onApply: (file: File) => void;
+  onCancel: () => void;
+}>;
 /** The format toolbar's button names, in toolbar order. */
 export declare const KOENIG_TOOLBAR_ITEMS: readonly KoenigToolbarItem[];
 /** The English wording. */
@@ -450,6 +650,37 @@ export declare const useKoenigStrings: () => KoenigStrings;
 
 /** The comment controller, the threads and the active thread, re-rendering the caller on change.
  *  Null outside a composer that was given `comments`. */
+/** True for an absolute http, https or mailto URL: the only links the button and Markdown cards keep. */
+export declare const isSafeUrl: (value: unknown) => boolean;
+/** The URL cleaned the way a browser reads it, or an empty string when it is not allowed. */
+export declare const toSafeUrl: (value: unknown) => string;
+/** Markdown to HTML as the Markdown card shows and exports it: raw HTML escaped, links checked, headings to H5. */
+export declare const renderMarkdown: (source: null | string | undefined) => string;
+
+export interface KoenigWordCountOptions {
+  /** Reading speed. Default: `DEFAULT_WORDS_PER_MINUTE`. */
+  wordsPerMinute?: number;
+}
+export interface KoenigWordCount {
+  /** Whole minutes to read, rounded up; 0 for an empty document. */
+  minutes: number;
+  /** "3 min read", or "Less than a minute", in the host's `strings.wordCount`. */
+  readingTimeLabel: string;
+  words: number;
+  /** "1 word" or "5 words", in the host's `strings.wordCount`. */
+  wordsLabel: string;
+}
+/** 238 words per minute. */
+export declare const DEFAULT_WORDS_PER_MINUTE: number;
+/** Words in a piece of text. */
+export declare const countWords: (text: string) => number;
+/** Whole minutes to read `words`, rounded up; 0 for none. */
+export declare const getReadingTime: (words: number, wordsPerMinute?: number) => number;
+/** Words in the document's own text; cards and what they hold are not counted. */
+export declare const getWordCount: (editorState: LexicalEditorState) => number;
+/** Word count and reading time for the editor it is placed under, live. Place it inside `KoenigComposer`. */
+export declare const useKoenigWordCount: (options?: KoenigWordCountOptions) => KoenigWordCount;
+
 export declare const useKoenigComments: () => {
   activeThreadId: null | string;
   controller: KoenigCommentsController;

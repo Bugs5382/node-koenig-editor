@@ -8,7 +8,7 @@ import {KoenigSelectedCardContext} from '../context/KoenigSelectedCardContext';
 import {LexicalCollaboration} from '@lexical/react/LexicalCollaborationContext';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {CommentsPlugin, KoenigCommentsContext, useCommentsStoreFor} from '../../additions/comments';
-import {KoenigStringsContext, resolveStrings, selectEditorNodes} from '../../additions/options';
+import {KoenigStringsContext, KoenigToolsContext, resolveStrings, resolveTools, selectEditorNodes} from '../../additions/options';
 import {MarkNode} from '@lexical/mark';
 
 // Catch any errors that occur during Lexical updates and log them
@@ -44,9 +44,11 @@ const KoenigComposer = ({
     customNodes,
     menuItems,
     cardRenderers,
+    gallery,
     strings: hostStrings,
     toolbar,
     toolbarActions,
+    tools,
     onError = defaultOnError,
     fileUploader = {},
     cardConfig = {},
@@ -64,6 +66,7 @@ const KoenigComposer = ({
     }, [baseNodes, cards, customNodes, hasComments]);
     const commentStore = useCommentsStoreFor(comments);
     const strings = React.useMemo(() => resolveStrings(hostStrings), [hostStrings]);
+    const enabledTools = React.useMemo(() => resolveTools(tools), [tools]);
 
     const initialConfig = React.useMemo(() => {
         let editorState = initialEditorState;
@@ -117,10 +120,12 @@ const KoenigComposer = ({
                     collaboration,
                     menuItems,
                     cardRenderers,
+                    gallery,
                     toolbar,
                     toolbarActions
                 }}>
                     <KoenigStringsContext.Provider value={strings}>
+                        <KoenigToolsContext.Provider value={enabledTools}>
                         <KoenigCommentsContext.Provider value={commentStore}>
                         <KoenigSelectedCardContext>
                             {commentStore ? <CommentsPlugin store={commentStore} /> : null}
@@ -139,6 +144,7 @@ const KoenigComposer = ({
                             {children}
                         </KoenigSelectedCardContext>
                         </KoenigCommentsContext.Provider>
+                        </KoenigToolsContext.Provider>
                     </KoenigStringsContext.Provider>
                 </KoenigComposerContext.Provider>
             </LexicalComposer>

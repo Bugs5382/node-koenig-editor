@@ -171,7 +171,7 @@ export const CardMenu = ({menu = new Map(), insert = () => {}, selectedItemIndex
     }
 
     return (
-        <ul className="not-kg-prose z-[9999999] m-0 mb-3 max-h-[min(var(--kg-menu-max-height,32rem),var(--kg-menu-fit,100vh))] w-[var(--kg-menu-width,28rem)] scroll-p-2 flex-col overflow-y-auto overflow-x-hidden rounded-lg bg-white bg-clip-padding p-0 font-sans text-sm shadow-md after:block after:pb-1 dark:bg-grey-950 md:w-[var(--kg-menu-width,28rem)]" role="menu">
+        <ul className="not-kg-prose z-[9999999] m-0 mb-3 max-h-[min(var(--kg-menu-max-height,32rem),var(--kg-menu-fit,100vh))] w-[var(--kg-menu-width,28rem)] max-w-[calc(100vw-16px)] scroll-p-2 flex-col overflow-y-auto overflow-x-hidden rounded-lg bg-white bg-clip-padding p-0 font-sans text-sm shadow-md after:block after:pb-1 dark:bg-grey-950 md:w-[var(--kg-menu-width,28rem)]" role="menu">
             {CardMenuSections}
         </ul>
     );

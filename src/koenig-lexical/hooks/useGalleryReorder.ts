@@ -14,7 +14,7 @@ export default function useGalleryReorder({images, updateImages, isSelected = fa
     const onDragStart = (draggableInfo) => {
         // enable dropping when an image is dragged in from outside of this card
         const isImageDrag = draggableInfo.type === 'image' || draggableInfo.cardName === 'image';
-        if (isImageDrag && draggableInfo.dataset.src && images.length !== maxImages) {
+        if (isImageDrag && draggableInfo.dataset.src && images.length < maxImages) {
             dragDropContainer.current.enableDrag();
         }
     };

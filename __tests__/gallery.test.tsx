@@ -108,9 +108,11 @@ describe("the gallery card", () => {
     ]);
   });
 
-  it("stops at nine images and says so", async () => {
+  it("stops at the host's limit and says so", async () => {
     const calls: string[][] = [];
-    const { api } = await insertGallery({ composer: { fileUploader: recordingUploader(calls) } });
+    const { api } = await insertGallery({
+      composer: { fileUploader: recordingUploader(calls), gallery: { maxImages: 9 } },
+    });
     await addFiles(Array.from({ length: 11 }, (_, index) => png(`${index}.png`)));
     await waitFor(() => expect(galleryOf(api.serialize())?.images).toHaveLength(9));
     expect(calls).toHaveLength(9);
@@ -127,30 +129,54 @@ describe("the gallery card", () => {
     expect(calls).toHaveLength(0);
   });
 
-  it("keeps an alt text and a caption for each image", async () => {
+  it("keeps an alt text, a title and a caption for each image, set in one dialog", async () => {
     const calls: string[][] = [];
     const { api } = await insertGallery({ composer: { fileUploader: recordingUploader(calls) } });
     await addFiles([png("a.png"), png("b.png")]);
     await waitFor(() => expect(galleryOf(api.serialize())?.images).toHaveLength(2));
-    const alts = document.querySelectorAll<HTMLInputElement>("[data-gallery-image-alt]");
-    const captions = document.querySelectorAll<HTMLInputElement>("[data-gallery-image-caption]");
-    expect(alts).toHaveLength(2);
+    // There is no alt, caption or arrow box under the images any more.
+    for (const hook of [
+      "[data-gallery-image-alt]",
+      "[data-gallery-image-caption]",
+      "[data-gallery-image-earlier]",
+      "[data-gallery-image-later]",
+      "[data-row-controls]",
+    ]) {
+      expect(document.querySelector(hook)).toBeNull();
+    }
     await act(async () => {
-      fireEvent.change(alts[1] as Element, { target: { value: "Second picture" } });
-      fireEvent.change(captions[1] as Element, { target: { value: "Taken on site" } });
+      fireEvent.click(document.querySelectorAll("[data-gallery-image-text-edit]")[1] as Element);
+    });
+    const box = document.querySelector('[role="dialog"]') as HTMLElement;
+    await act(async () => {
+      fireEvent.change(box.querySelector("[data-gallery-text-title]") as Element, {
+        target: { value: "Site visit" },
+      });
+      fireEvent.change(box.querySelector("textarea") as Element, {
+        target: { value: "Taken on site" },
+      });
+      fireEvent.change(box.querySelector("[data-gallery-text-alt]") as Element, {
+        target: { value: "Second picture" },
+      });
+      fireEvent.click(box.querySelector("[data-gallery-text-save]") as Element);
     });
     const images = galleryOf(api.serialize()).images;
     expect(images[0]).toMatchObject({ alt: "", caption: "" });
-    expect(images[1]).toMatchObject({ alt: "Second picture", caption: "Taken on site" });
+    expect(images[1]).toMatchObject({
+      alt: "Second picture",
+      caption: "Taken on site",
+      title: "Site visit",
+    });
   });
 
-  it("moves an image earlier and later", async () => {
+  it("moves an image with Alt and the arrow keys", async () => {
     const calls: string[][] = [];
     const { api } = await insertGallery({ composer: { fileUploader: recordingUploader(calls) } });
     await addFiles([png("a.png"), png("b.png"), png("c.png")]);
     await waitFor(() => expect(galleryOf(api.serialize())?.images).toHaveLength(3));
+    const third = document.querySelectorAll("[data-gallery-image]")[2] as HTMLElement;
     await act(async () => {
-      fireEvent.click(document.querySelectorAll("[data-gallery-image-earlier]")[2] as Element);
+      fireEvent.keyDown(third, { altKey: true, key: "ArrowLeft" });
     });
     const names = galleryOf(api.serialize()).images.map((image: { src: string }) =>
       image.src.split("/").pop(),
@@ -181,7 +207,7 @@ describe("the gallery card", () => {
     });
     expect(document.querySelector("[data-custom-gallery]")).not.toBeNull();
     expect(document.querySelector("[data-gallery]")).toBeNull();
-    expect(seen?.maxImages).toBe(9);
+    expect(seen?.maxImages).toBe(50);
     await act(async () => {
       await seen?.addFiles([png("a.png"), png("b.png")]);
     });

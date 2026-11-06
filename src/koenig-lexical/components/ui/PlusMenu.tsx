@@ -4,7 +4,7 @@ import {useKoenigStrings} from '../../../additions/options';
 export function PlusButton({onClick}) {
     const strings = useKoenigStrings();
     return (
-        <div className="absolute left-[-28px] top-[0] xs:left-[-44px]" data-kg-plus-button>
+        <div className="absolute left-0 top-0" data-kg-plus-button>
             <button
                 aria-label={strings.menu.addCard}
                 className="group relative flex size-[var(--kg-plus-size,2.2rem)] cursor-pointer items-center justify-center rounded-full border border-grey transition-all ease-linear hover:border-grey-800 dark:border-grey-800 dark:hover:border-grey-400"
