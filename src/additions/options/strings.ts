@@ -143,8 +143,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     aspectLabel: "Crop shape",
     aspectOriginal: "Original",
     cancel: "Cancel",
-    cropHelp:
-      "Arrow keys move the crop. Shift with the arrow keys makes it larger or smaller.",
+    cropHelp: "Arrow keys move the crop. Shift with the arrow keys makes it larger or smaller.",
     cropLabel: "Crop area",
     exportError: "The edited image could not be saved. Try again.",
     loadError: "This image could not be opened for editing.",

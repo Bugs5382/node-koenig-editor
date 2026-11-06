@@ -438,6 +438,9 @@ export interface KoenigComposerProps {
   toolbar?: readonly KoenigToolbarItem[];
   /** The host's own buttons and cards on the selection toolbar. */
   toolbarActions?: readonly KoenigToolbarAction[];
+  /** The features that are not cards: `imageEditor` (crop and rotate before upload) and
+   *  `emojiPicker`. Default: both. Pass a list to keep only those. */
+  tools?: readonly KoenigTool[];
 }
 
 export interface KoenigEditorAPI {
