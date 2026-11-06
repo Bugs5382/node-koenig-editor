@@ -6,6 +6,7 @@
 
 #### 🚀 Features
 
+- feat(editor): host theming, toolbar actions, H1 to H5, table controls and named card errors @Bugs5382 (#22)
 - feat(editor): inline comment threads anchored to selected text @Bugs5382 (#13)
 
 ### Extra
