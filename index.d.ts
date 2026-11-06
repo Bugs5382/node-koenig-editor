@@ -137,11 +137,77 @@ export interface KoenigCollaboration {
   username?: string;
 }
 
+/** One message in a comment thread. Timestamps are ISO 8601 strings. */
+export interface KoenigCommentMessage {
+  /** Whatever the host uses to name the author; the package never reads it. */
+  author?: string;
+  body: string;
+  createdAt: string;
+  id: string;
+}
+
+/** A discussion anchored on a range of text. The anchor itself lives in the editor state,
+ *  as a mark node carrying `id`; the thread's content lives wherever the host stores it. */
+export interface KoenigCommentThread {
+  createdAt: string;
+  id: string;
+  messages: KoenigCommentMessage[];
+  /** The text the thread was anchored on when it was created. */
+  quote: string;
+  resolved: boolean;
+}
+
+/** What the host hears about. `anchor-lost` and `anchor-restored` fire when the anchored text
+ *  is deleted or comes back (undo, collaboration). */
+export type KoenigCommentEvent =
+  | { thread: KoenigCommentThread; type: "thread-added" }
+  | { thread: KoenigCommentThread; type: "thread-removed" }
+  | { thread: KoenigCommentThread; type: "thread-resolved" }
+  | { thread: KoenigCommentThread; type: "thread-reopened" }
+  | { message: KoenigCommentMessage; thread: KoenigCommentThread; type: "reply-added" }
+  | { thread: KoenigCommentThread | null; type: "thread-focused" }
+  | { thread: KoenigCommentThread; type: "anchor-lost" }
+  | { thread: KoenigCommentThread; type: "anchor-restored" };
+
+/** Turns inline comments on. Without it the editor registers no comment nodes. */
+export interface KoenigCommentsOptions {
+  /** Called for every change, so the host can persist threads. */
+  onEvent?: (event: KoenigCommentEvent) => void;
+  /** The saved threads. Replaced (without events) whenever this array's identity changes. */
+  threads?: readonly KoenigCommentThread[];
+}
+
+export interface KoenigCommentInput {
+  author?: string;
+  body: string;
+}
+
+/** Works in read-only mode too: the host decides who may call it. */
+export interface KoenigCommentsController {
+  /** Anchors a new thread on the current text selection. Null when no text is selected. */
+  addThread: (input: KoenigCommentInput & { id?: string }) => KoenigCommentThread | null;
+  /** Scrolls the thread's highlight into view and marks it active; null clears it. */
+  focusThread: (id: null | string) => void;
+  getActiveThreadId: () => null | string;
+  getThread: (id: string) => KoenigCommentThread | undefined;
+  getThreads: () => readonly KoenigCommentThread[];
+  /** Whether the thread's highlight is currently in the document. */
+  isAnchored: (id: string) => boolean;
+  /** Removes the thread and its highlight, leaving the text. False if unknown. */
+  removeThread: (id: string) => boolean;
+  reply: (id: string, input: KoenigCommentInput) => KoenigCommentMessage | null;
+  /** Resolves a thread, or reopens it with `false`. False if unknown. */
+  resolveThread: (id: string, resolved?: boolean) => boolean;
+  subscribe: (listener: () => void) => () => void;
+}
+
 export interface KoenigComposerProps {
   cardConfig?: Record<string, unknown>;
   /** The shipped cards to register, and so list in the menus. Default: all of them. */
   cards?: readonly KoenigCardName[];
   children?: ReactNode;
+  /** Inline comment threads anchored on selected text. Off unless given. */
+  comments?: KoenigCommentsOptions;
   /** Optional: with no value the editor works alone and asks for no provider. */
   collaboration?: KoenigCollaboration | null;
   /** The host's own nodes, registered after the shipped ones. A node with a static
@@ -163,6 +229,8 @@ export interface KoenigComposerProps {
 }
 
 export interface KoenigEditorAPI {
+  /** The comment controller; null unless the composer was given `comments`. */
+  comments?: KoenigCommentsController | null;
   editorInstance: LexicalEditor;
   editorIsEmpty: () => boolean;
   focusEditor: (options?: { position?: "bottom" | "top" }) => void;
@@ -207,6 +275,14 @@ export declare const DEFAULT_STRINGS: KoenigStrings;
 export declare const KoenigStringsContext: Context<KoenigStrings>;
 /** The wording in effect, for a host's own cards and plugins. */
 export declare const useKoenigStrings: () => KoenigStrings;
+
+/** The comment controller, the threads and the active thread, re-rendering the caller on change.
+ *  Null outside a composer that was given `comments`. */
+export declare const useKoenigComments: () => {
+  activeThreadId: null | string;
+  controller: KoenigCommentsController;
+  threads: readonly KoenigCommentThread[];
+} | null;
 
 /** Lexical's editor state, as `onChange` and `registerAPI` hand it over. */
 export type EditorState = LexicalEditorState;

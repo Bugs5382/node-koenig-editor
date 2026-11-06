@@ -34,6 +34,7 @@ or off, adds its own nodes, wording and theme. Two things to know before changin
 - `src/index.ts` - the runtime entry: re-exports only
 - `src/additions/options/` - the host options (cards, strings, toolbar, menu entries)
 - `src/additions/table/` - Lexical's table nodes as a card
+- `src/additions/comments/` - inline comment threads on mark nodes: store, plugin, hook (opt-in through the composer's `comments`)
 - `src/koenig-lexical/`, `src/kg-default-nodes/`, `src/kg-default-transforms/` - upstream Koenig
 - `src/generated/koenig.css` - the stylesheet, built by `npm run build:css` and committed
 - `tailwind.config.cjs` - upstream's Tailwind 3 theme, with the palette and fonts on CSS tokens

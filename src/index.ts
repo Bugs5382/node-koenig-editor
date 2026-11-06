@@ -30,3 +30,4 @@ export {
   KoenigStringsContext,
   useKoenigStrings,
 } from "./additions/options";
+export { useKoenigComments } from "./additions/comments";
