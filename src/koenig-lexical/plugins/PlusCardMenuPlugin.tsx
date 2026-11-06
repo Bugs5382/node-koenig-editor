@@ -34,13 +34,31 @@ function usePlusCardMenu(editor) {
         return elemRect.top - containerRect.top;
     }
 
-    // The button stays inside the editor's box: before the empty line when the padding leaves
-    // room for it, else at the box's left edge (see placePlus).
+    // The button stays inside the box the person sees: the nearest ancestor of the editor that
+    // clips, has a background or has a left border (a host's padded card), else the editor itself,
+    // and never outside the window. It goes before the empty line when there is room (see placePlus).
+    function getVisibleBox(elem) {
+        const editorBox = elem.closest('.koenig-lexical') || elem.parentNode.parentNode || elem.parentNode;
+        let box = editorBox;
+        for (let ancestor = editorBox.parentElement; ancestor && ancestor !== document.body; ancestor = ancestor.parentElement) {
+            const style = window.getComputedStyle(ancestor);
+            const transparent = ['', 'rgba(0, 0, 0, 0)', 'transparent'].includes(style.backgroundColor);
+            if (style.overflowX !== 'visible' || !transparent || parseFloat(style.borderLeftWidth) > 0) {
+                box = ancestor;
+                break;
+            }
+        }
+        const rect = box.getBoundingClientRect();
+        const left = Math.max(rect.left, 0);
+        const right = Math.min(rect.right, document.documentElement.clientWidth || rect.right);
+        return {left, width: Math.max(right - left, 0)};
+    }
+
     function getLeftPosition(elem) {
-        const box = (elem.closest('.koenig-lexical') || elem.parentNode.parentNode || elem.parentNode).getBoundingClientRect();
+        const box = getVisibleBox(elem);
         const line = elem.getBoundingClientRect();
         const measured = buttonRef.current?.firstElementChild?.firstElementChild?.getBoundingClientRect().width;
-        const origin = containerRef.current?.offsetParent?.getBoundingClientRect().left;
+        const origin = (containerRef.current?.offsetParent || elem.closest('.koenig-lexical'))?.getBoundingClientRect().left;
         return placePlus(line, box, measured || FALLBACK_PLUS_SIZE, undefined, origin);
     }
 

@@ -773,11 +773,6 @@
     margin-right: calc(50% - (50vw - var(--kg-breakout-adjustment-with-fallback)) - calc(.8 * var(--kg-rem, 0.625rem)));
 }
 
-.koenig-lexical .mx-\[calc\(50\%-50vw\)\] {
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-}
-
 .koenig-lexical .mx-auto {
     margin-left: auto;
     margin-right: auto;
@@ -865,6 +860,10 @@
 
 .koenig-lexical .ml-4 {
     margin-left: calc(1.6 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .ml-\[calc\(\(100\%-var\(--kg-card-w\)\)\/2\)\] {
+    margin-left: calc((100% - var(--kg-card-w)) / 2);
 }
 
 .koenig-lexical .ml-auto {
@@ -1163,20 +1162,20 @@
     width: 320px;
 }
 
-.koenig-lexical .w-\[calc\(100vw\+2px\)\] {
-    width: calc(100vw + 2px);
-}
-
-.koenig-lexical .w-\[calc\(75vw-var\(--kg-breakout-adjustment-with-fallback\)\+2px\)\] {
-    width: calc(75vw - var(--kg-breakout-adjustment-with-fallback) + 2px);
-}
-
 .koenig-lexical .w-\[min\(20rem\2c 90vw\)\] {
     width: min(calc(20 * var(--kg-rem, 0.625rem)), 90vw);
 }
 
 .koenig-lexical .w-\[min\(34rem\2c 95vw\)\] {
     width: min(calc(34 * var(--kg-rem, 0.625rem)), 95vw);
+}
+
+.koenig-lexical .w-\[min\(calc\(75vw-var\(--kg-breakout-adjustment-with-fallback\)\+2px\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+    width: min(calc(75vw - var(--kg-breakout-adjustment-with-fallback) + 2px), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
+}
+
+.koenig-lexical .w-\[var\(--kg-card-w\)\] {
+    width: var(--kg-card-w);
 }
 
 .koenig-lexical .w-\[var\(--kg-menu-width\2c 28rem\)\] {
@@ -1207,8 +1206,8 @@
     min-width: auto;
 }
 
-.koenig-lexical .min-w-\[calc\(100\%\+3\.6rem\)\] {
-    min-width: calc(100% + calc(3.6 * var(--kg-rem, 0.625rem)));
+.koenig-lexical .min-w-\[min\(calc\(100\%\+3\.6rem\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+    min-width: min(calc(100% + calc(3.6 * var(--kg-rem, 0.625rem))), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
 }
 
 .koenig-lexical .min-w-full {
@@ -2438,6 +2437,10 @@
 
 .koenig-lexical .will-change-transform {
     will-change: transform;
+}
+
+.koenig-lexical .\[--kg-card-w\:min\(calc\(100vw\+2px\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+    --kg-card-w: min(calc(100vw + 2px), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
 }
 
 .koenig-lexical {
@@ -3794,6 +3797,7 @@ em-emoji-picker {
     --kg-selection: var(--kg-selection-color, #000);
 
     --kg-breakout-adjustment-with-fallback: var(--kg-breakout-adjustment, 0px);
+    --kg-breakout-room-with-fallback: var(--kg-breakout-room, calc(1.8 * var(--kg-rem, 0.625rem)));
 }
 
 /*
@@ -4451,8 +4455,8 @@ em-emoji-picker {
         width: var(--kg-menu-width,calc(28 * var(--kg-rem, 0.625rem)));
     }
 
-    .koenig-lexical .md\:min-w-\[calc\(100\%\+10rem\)\] {
-        min-width: calc(100% + calc(10 * var(--kg-rem, 0.625rem)));
+    .koenig-lexical .md\:min-w-\[min\(calc\(100\%\+10rem\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+        min-width: min(calc(100% + calc(10 * var(--kg-rem, 0.625rem))), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
     }
 
     .koenig-lexical .md\:grid-cols-2 {
@@ -4484,16 +4488,11 @@ em-emoji-picker {
         top: calc(3.2 * var(--kg-rem, 0.625rem));
     }
 
-    .koenig-lexical .lg\:mx-\[calc\(50\%-50vw\+\(var\(--kg-breakout-adjustment-with-fallback\)\/2\)\)\] {
-        margin-left: calc(50% - 50vw + (var(--kg-breakout-adjustment-with-fallback) / 2));
-        margin-right: calc(50% - 50vw + (var(--kg-breakout-adjustment-with-fallback) / 2));
+    .koenig-lexical .lg\:min-w-\[min\(calc\(100\%\+18rem\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+        min-width: min(calc(100% + calc(18 * var(--kg-rem, 0.625rem))), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
     }
 
-    .koenig-lexical .lg\:w-\[calc\(100vw-var\(--kg-breakout-adjustment-with-fallback\)\+2px\)\] {
-        width: calc(100vw - var(--kg-breakout-adjustment-with-fallback) + 2px);
-    }
-
-    .koenig-lexical .lg\:min-w-\[calc\(100\%\+18rem\)\] {
-        min-width: calc(100% + calc(18 * var(--kg-rem, 0.625rem)));
+    .koenig-lexical .lg\:\[--kg-card-w\:min\(calc\(100vw-var\(--kg-breakout-adjustment-with-fallback\)\+2px\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
+        --kg-card-w: min(calc(100vw - var(--kg-breakout-adjustment-with-fallback) + 2px), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
     }
 }

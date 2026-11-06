@@ -72,6 +72,36 @@ const showPlus = async (box: DOMRect, line: DOMRect) => {
 };
 
 describe("the plus button stays inside the editor's box", () => {
+  it("sits in the host's padding, before the placeholder, not over it", async () => {
+    // The editor starts at the text; the 56px of padding belongs to a host card around it.
+    const { api } = await mount();
+    const root = api.editorInstance.getRootElement() as HTMLElement;
+    const wrapper = root.closest(".koenig-lexical") as HTMLElement;
+    // The host card is the element around the editor (here the render container).
+    const card = wrapper.parentElement as HTMLElement;
+    card.style.backgroundColor = "rgb(255, 255, 255)";
+    vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: Element,
+    ) {
+      if (this === card) return rect(0, 700);
+      if (this.matches(".koenig-lexical")) return rect(56, 600);
+      if (this.tagName === "P") return rect(56, 600);
+      if (this.closest("[data-kg-plus-button]") && this.tagName === "BUTTON") return rect(0, 22);
+      return rect(0, 0);
+    });
+    await act(async () => {
+      root.focus();
+      api.editorInstance.update(() => {
+        $getRoot().getFirstChild()?.selectStart();
+      });
+    });
+    const container = document.querySelector("[data-kg-plus-container]") as HTMLElement | null;
+    expect(container).not.toBeNull();
+    // The container is positioned against .koenig-lexical, which starts at the text (56).
+    // The button belongs 22 + 8 before the text, inside the card.
+    expect(Number.parseFloat(container!.style.left)).toBe(-(22 + 8));
+  });
+
   it("sits before the empty line when the padding leaves room", async () => {
     const container = await showPlus(rect(0, 600), rect(80, 520));
     expect(container).not.toBeNull();

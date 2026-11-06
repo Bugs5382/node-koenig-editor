@@ -135,6 +135,15 @@ describe("the gallery card", () => {
     const alts = document.querySelectorAll<HTMLInputElement>("[data-gallery-image-alt]");
     const captions = document.querySelectorAll<HTMLInputElement>("[data-gallery-image-caption]");
     expect(alts).toHaveLength(2);
+    // The boxes sit in a strip under the row, not inside an image's own box (which is only as
+    // tall as the picture, so they would spill over the next row), one per image in order.
+    for (const field of [...alts, ...captions]) {
+      expect(field.closest("[data-image]")).toBeNull();
+      expect(field.closest("[data-gallery-image-controls]")).not.toBeNull();
+    }
+    const row = document.querySelector("[data-row]") as HTMLElement;
+    expect(row.nextElementSibling?.matches("[data-row-controls]")).toBe(true);
+    expect(row.nextElementSibling?.children).toHaveLength(row.children.length);
     await act(async () => {
       fireEvent.change(alts[1] as Element, { target: { value: "Second picture" } });
       fireEvent.change(captions[1] as Element, { target: { value: "Taken on site" } });

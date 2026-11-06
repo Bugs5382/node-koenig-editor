@@ -15,9 +15,82 @@ function GalleryRow({index, images, deleteImage, isDragging, isSelected, listInd
         return <GalleryImage key={image.fileName + (image.src || image.previewSrc)} deleteImage={deleteImage} image={image} isDragging={isDragging} isSelected={isSelected} listIndex={listIndexOf(image)} moveImage={moveImage} position={position} strings={strings} total={total} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
     });
 
+    const GalleryControls = isSelected && !isDragging ? (
+        <div className="flex flex-row justify-center" data-row-controls={index}>
+            {images.map((image, idx) => {
+                const position =
+                    images.length === 1 ? 'single' :
+                        idx === 0 ? 'first' :
+                            idx === images.length - 1 ? 'last' :
+                                'middle';
+                return <GalleryImageControls key={image.fileName + (image.src || image.previewSrc)} image={image} listIndex={listIndexOf(image)} moveImage={moveImage} position={position} strings={strings} total={total} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
+            })}
+        </div>
+    ) : null;
+
     return (
-        <div className={`flex flex-row justify-center ${index !== 0 && 'mt-4'}`} data-row={index}>
-            {GalleryImages}
+        <div className={index !== 0 ? 'mt-4' : ''}>
+            <div className="flex flex-row justify-center" data-row={index}>
+                {GalleryImages}
+            </div>
+            {GalleryControls}
+        </div>
+    );
+}
+
+// The alt, caption and reorder controls for one image. They sit in a strip under the row, not inside
+// the image's own box: that box is only as tall as the picture, so controls inside it spilled over
+// the next row. Each one takes the same width share and side padding as the image above it.
+function GalleryImageControls({image, position, listIndex, total, moveImage, updateImageText, strings, unescapeHtml}) {
+    const aspectRatio = (image.width || 1) / (image.height || 1);
+    const sides = {
+        first: 'pr-2',
+        middle: 'pl-2 pr-2',
+        last: 'pl-2'
+    }[position] || '';
+
+    return (
+        <div className={`min-w-0 ${sides}`} data-gallery-image-controls style={{flex: `${aspectRatio} 1 0%`}}>
+            <div className="not-kg-prose flex min-w-0 flex-col gap-1" data-koenig-dnd-disabled>
+                <div className="flex gap-1">
+                    <button
+                        aria-label={strings.moveEarlier}
+                        className="cursor-pointer rounded border border-grey-300 px-2 font-sans text-sm disabled:opacity-40"
+                        data-gallery-image-earlier
+                        disabled={listIndex <= 0}
+                        type="button"
+                        onClick={() => moveImage(listIndex, listIndex - 1)}
+                    >
+                        &larr;
+                    </button>
+                    <button
+                        aria-label={strings.moveLater}
+                        className="cursor-pointer rounded border border-grey-300 px-2 font-sans text-sm disabled:opacity-40"
+                        data-gallery-image-later
+                        disabled={listIndex >= total - 1}
+                        type="button"
+                        onClick={() => moveImage(listIndex, listIndex + 1)}
+                    >
+                        &rarr;
+                    </button>
+                </div>
+                <input
+                    className="w-full rounded border border-grey-300 bg-transparent px-2 font-sans text-sm"
+                    data-gallery-image-alt
+                    placeholder={strings.altPlaceholder}
+                    type="text"
+                    value={image.alt || ''}
+                    onChange={e => updateImageText(listIndex, {alt: e.target.value})}
+                />
+                <input
+                    className="w-full rounded border border-grey-300 bg-transparent px-2 font-sans text-sm"
+                    data-gallery-image-caption
+                    placeholder={strings.imageCaptionPlaceholder}
+                    type="text"
+                    value={unescapeHtml(image.caption || '')}
+                    onChange={e => updateImageText(listIndex, {caption: e.target.value})}
+                />
+            </div>
         </div>
     );
 }
@@ -70,48 +143,6 @@ function GalleryImage({image, deleteImage, position, isDragging, isSelected, lis
                 </div>
             )}
 
-            {isSelected && !isDragging ? (
-                <div className="not-kg-prose mt-2 flex flex-col gap-1" data-koenig-dnd-disabled>
-                    <div className="flex gap-1">
-                        <button
-                            aria-label={strings.moveEarlier}
-                            className="cursor-pointer rounded border border-grey-300 px-2 font-sans text-sm disabled:opacity-40"
-                            data-gallery-image-earlier
-                            disabled={listIndex <= 0}
-                            type="button"
-                            onClick={() => moveImage(listIndex, listIndex - 1)}
-                        >
-                            &larr;
-                        </button>
-                        <button
-                            aria-label={strings.moveLater}
-                            className="cursor-pointer rounded border border-grey-300 px-2 font-sans text-sm disabled:opacity-40"
-                            data-gallery-image-later
-                            disabled={listIndex >= total - 1}
-                            type="button"
-                            onClick={() => moveImage(listIndex, listIndex + 1)}
-                        >
-                            &rarr;
-                        </button>
-                    </div>
-                    <input
-                        className="w-full rounded border border-grey-300 bg-transparent px-2 font-sans text-sm"
-                        data-gallery-image-alt
-                        placeholder={strings.altPlaceholder}
-                        type="text"
-                        value={image.alt || ''}
-                        onChange={e => updateImageText(listIndex, {alt: e.target.value})}
-                    />
-                    <input
-                        className="w-full rounded border border-grey-300 bg-transparent px-2 font-sans text-sm"
-                        data-gallery-image-caption
-                        placeholder={strings.imageCaptionPlaceholder}
-                        type="text"
-                        value={unescapeHtml(image.caption || '')}
-                        onChange={e => updateImageText(listIndex, {caption: e.target.value})}
-                    />
-                </div>
-            ) : null}
         </div>
     );
 }
