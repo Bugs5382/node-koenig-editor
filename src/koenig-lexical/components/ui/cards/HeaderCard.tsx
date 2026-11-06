@@ -13,6 +13,27 @@ const fieldStyle = {
     width: '100%'
 };
 
+// One row of the settings panel: a label that never wraps and a control that takes the rest, so a
+// long wording or a big text size cannot break a label mid-word.
+const rowStyle = {
+    alignItems: 'center',
+    columnGap: rem(1.2),
+    display: 'grid',
+    fontSize: rem(1.3),
+    gridTemplateColumns: 'max-content minmax(0, 1fr)'
+};
+const labelStyle = {whiteSpace: 'nowrap'};
+
+const choiceStyle = (checked) => ({
+    ...fieldStyle,
+    alignItems: 'center',
+    borderColor: checked ? 'var(--kg-selection, #000)' : 'var(--kg-color-grey-300, #DDE1E5)',
+    cursor: 'pointer',
+    display: 'flex',
+    fontWeight: checked ? 600 : 400,
+    justifyContent: 'center'
+});
+
 function Settings({backgroundColor, backgroundImageSrc, buttonEnabled, buttonText, buttonUrl, alignment, strings, update, uploadBackgroundImage, uploadError}) {
     const fileInputRef = React.useRef(null);
 
@@ -24,9 +45,10 @@ function Settings({backgroundColor, backgroundImageSrc, buttonEnabled, buttonTex
             data-koenig-dnd-disabled
             style={{display: 'grid', gap: rem(0.8), padding: rem(1.2), fontFamily: 'var(--kg-font-sans, sans-serif)'}}
         >
-            <label style={{display: 'flex', alignItems: 'center', gap: rem(0.8), fontSize: rem(1.3)}}>
-                {strings.backgroundColor}
+            <label style={rowStyle}>
+                <span data-header-label style={labelStyle}>{strings.backgroundColor}</span>
                 <input
+                    style={{justifySelf: 'start'}}
                     data-header-background-color
                     type="color"
                     value={backgroundColor}
@@ -57,16 +79,29 @@ function Settings({backgroundColor, backgroundImageSrc, buttonEnabled, buttonTex
                 />
             </div>
             {uploadError ? <p data-header-error style={{fontSize: rem(1.3), color: 'var(--kg-color-red, #F50B23)'}}>{uploadError}</p> : null}
-            <label style={{display: 'flex', alignItems: 'center', gap: rem(0.8), fontSize: rem(1.3)}}>
-                {strings.alignment}
-                <select style={fieldStyle} value={alignment} onChange={e => update({alignment: e.target.value})}>
-                    <option value="left">{strings.alignLeft}</option>
-                    <option value="center">{strings.alignCenter}</option>
-                </select>
-            </label>
-            <label style={{display: 'flex', alignItems: 'center', gap: rem(0.8), fontSize: rem(1.3)}}>
+            <div style={rowStyle}>
+                <span data-header-label style={labelStyle}>{strings.alignment}</span>
+                {/* Two choices: a radio group opens nothing, so there is no list to land in the wrong place,
+                    and the arrow keys move between the choices. */}
+                <div aria-label={strings.alignment} role="radiogroup" style={{display: 'grid', gap: rem(0.8), gridTemplateColumns: '1fr 1fr'}}>
+                    {[['left', strings.alignLeft], ['center', strings.alignCenter]].map(([value, text]) => (
+                        <label key={value} style={choiceStyle(alignment === value)}>
+                            <input
+                                checked={alignment === value}
+                                name="kg-header-alignment"
+                                style={{margin: `0 ${rem(0.6)} 0 0`}}
+                                type="radio"
+                                value={value}
+                                onChange={() => update({alignment: value})}
+                            />
+                            {text}
+                        </label>
+                    ))}
+                </div>
+            </div>
+            <label style={{...rowStyle, gridTemplateColumns: 'max-content minmax(0, 1fr)', justifyContent: 'start'}}>
                 <input checked={buttonEnabled} data-header-button-toggle type="checkbox" onChange={e => update({buttonEnabled: e.target.checked})} />
-                {strings.button}
+                <span data-header-label style={labelStyle}>{strings.button}</span>
             </label>
             {buttonEnabled ? (
                 <>

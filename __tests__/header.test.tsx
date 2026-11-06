@@ -92,3 +92,44 @@ describe("the header card", () => {
     });
   });
 });
+
+describe("the header card's settings", () => {
+  it("offers alignment as a radio group, not a native list that opens somewhere else", async () => {
+    const { api } = await insertHeader();
+    await waitFor(() => expect(document.querySelector("[data-kg-settings-panel]")).not.toBeNull());
+    const panel = document.querySelector("[data-kg-settings-panel]") as HTMLElement;
+    expect(panel.querySelector("select")).toBeNull();
+    const group = panel.querySelector('[role="radiogroup"]') as HTMLElement;
+    expect(group, "the alignment radio group").not.toBeNull();
+    expect(group.getAttribute("aria-label")).toBe("Alignment");
+    const radios = [...group.querySelectorAll<HTMLInputElement>('input[type="radio"]')];
+    expect(radios.map((radio) => radio.closest("label")?.textContent?.trim())).toEqual([
+      "Left",
+      "Centered",
+    ]);
+    expect(radios.find((radio) => radio.checked)?.value).toBe("center");
+    await act(async () => {
+      fireEvent.click(radios[0] as Element);
+    });
+    expect(headerOf(api.serialize()).alignment).toBe("left");
+    expect(
+      (
+        document.querySelectorAll(
+          '[data-kg-settings-panel] [role="radiogroup"] input',
+        )[0] as HTMLInputElement
+      ).checked,
+    ).toBe(true);
+  });
+
+  it("keeps every setting label on one line", async () => {
+    await insertHeader();
+    await waitFor(() => expect(document.querySelector("[data-kg-settings-panel]")).not.toBeNull());
+    const labels = document.querySelectorAll<HTMLElement>(
+      "[data-kg-settings-panel] [data-header-label]",
+    );
+    expect(labels.length).toBeGreaterThanOrEqual(3);
+    for (const label of labels) {
+      expect(label.style.whiteSpace).toBe("nowrap");
+    }
+  });
+});
