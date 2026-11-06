@@ -29,4 +29,5 @@ export {
   resolveStrings,
   useKoenigStrings,
 } from "./strings";
+export { KOENIG_TOOLS, KoenigToolsContext, resolveTools, useKoenigTool } from "./tools";
 export { isToolbarItemHidden, KOENIG_TOOLBAR_ITEMS } from "./toolbar";
