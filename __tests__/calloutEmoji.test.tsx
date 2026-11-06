@@ -64,6 +64,19 @@ describe("the callout card's emoji button", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it("places the picker in the floating layer, inside the window", async () => {
+    await insertCallout();
+    await act(async () => {
+      fireEvent.click(emojiButton());
+    });
+    const panel = await screen.findByRole("dialog", { name: "Emoji picker" });
+    const layer = panel.closest("[data-kg-menu-portal]") as HTMLElement | null;
+    expect(layer).not.toBeNull();
+    expect(layer!.style.opacity).toBe("1");
+    expect(Number.parseFloat(layer!.style.left)).toBeGreaterThanOrEqual(0);
+    expect(layer!.style.top).not.toBe("");
+  });
+
   it("closes the picker with Escape", async () => {
     await insertCallout();
     await act(async () => {

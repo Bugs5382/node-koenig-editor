@@ -1148,16 +1148,16 @@
     height: 100%;
 }
 
-.koenig-lexical .max-h-56 {
-    max-height: calc(22.4 * var(--kg-rem, 0.625rem));
-}
-
 .koenig-lexical .max-h-\[30vh\] {
     max-height: 30vh;
 }
 
 .koenig-lexical .max-h-\[95vh\] {
     max-height: 95vh;
+}
+
+.koenig-lexical .max-h-\[min\(22\.4rem\2c 40vh\)\] {
+    max-height: min(calc(22.4 * var(--kg-rem, 0.625rem)), 40vh);
 }
 
 .koenig-lexical .max-h-\[min\(var\(--kg-menu-max-height\2c 32rem\)\2c var\(--kg-menu-fit\2c 100vh\)\)\] {
@@ -1240,12 +1240,12 @@
     width: 320px;
 }
 
-.koenig-lexical .w-\[min\(20rem\2c 90vw\)\] {
-    width: min(calc(20 * var(--kg-rem, 0.625rem)), 90vw);
-}
-
 .koenig-lexical .w-\[min\(34rem\2c 95vw\)\] {
     width: min(calc(34 * var(--kg-rem, 0.625rem)), 95vw);
+}
+
+.koenig-lexical .w-\[min\(36rem\2c 92vw\)\] {
+    width: min(calc(36 * var(--kg-rem, 0.625rem)), 92vw);
 }
 
 .koenig-lexical .w-\[min\(92vw\2c 44rem\)\] {
@@ -1445,8 +1445,8 @@
     appearance: none;
 }
 
-.koenig-lexical .grid-cols-8 {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+.koenig-lexical .grid-cols-\[repeat\(auto-fill\2c minmax\(3\.4rem\2c 1fr\)\)\] {
+    grid-template-columns: repeat(auto-fill,minmax(calc(3.4 * var(--kg-rem, 0.625rem)),1fr));
 }
 
 .koenig-lexical .flex-row {

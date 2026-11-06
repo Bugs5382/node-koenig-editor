@@ -3,6 +3,7 @@ import KoenigNestedEditor from '../../KoenigNestedEditor';
 import React from 'react';
 import {ColorOptionSetting, SettingsPanel, ToggleSetting} from '../SettingsPanel';
 import {ReadOnlyOverlay} from '../ReadOnlyOverlay';
+import {AnchoredMenu} from '../../../../additions/placement/AnchoredMenu';
 import {EmojiPicker} from '../../../../additions/emojiPicker/EmojiPicker';
 import {useKoenigEditable} from '../../../../additions/preview/PreviewContext';
 import {useKoenigStrings, useKoenigTool} from '../../../../additions/options';
@@ -100,6 +101,7 @@ export function CalloutCard({
 }) {
     const strings = useKoenigStrings();
     const emojiButtonRef = React.useRef(null);
+    const emojiPickerRef = React.useRef(null);
     const emojiPickerOn = useKoenigTool('emojiPicker');
     const editable = useKoenigEditable();
     const {darkMode} = React.useContext(KoenigComposerContext);
@@ -131,9 +133,11 @@ export function CalloutCard({
                             <span className="mr-2 px-2 text-xl" data-testid="callout-emoji">{calloutEmoji}</span>
                         )}
                         {emojiPickerOn && showEmojiPicker && isEditing && (
-                            <div className="absolute left-0 top-full z-50 mt-1">
+                            // In the editor's floating layer, placed inside the window and clear of a
+                            // host's clipping box; it flips above the button when there is no room below.
+                            <AnchoredMenu anchor={emojiButtonRef.current} containerRef={emojiPickerRef} measure="whole">
                                 <EmojiPicker onClose={toggleEmojiPicker} onSelect={changeEmoji} />
-                            </div>
+                            </AnchoredMenu>
                         )}
                     </>}
                 </div>

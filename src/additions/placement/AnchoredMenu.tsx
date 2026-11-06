@@ -37,13 +37,25 @@ interface AnchoredMenuProps {
   anchor: Element | null;
   children: ReactNode;
   containerRef: RefObject<HTMLDivElement | null>;
+  /**
+   * What counts as the menu's height when it is placed. "list" (the default) is the list inside
+   * the menu, which scrolls to fit `--kg-menu-fit`; "whole" is everything in it, for a panel with
+   * a search box and a strip around its list, which limits its own height and is placed again
+   * whenever its size changes.
+   */
+  measure?: "list" | "whole";
 }
 
 // A menu drawn in a portal at the editor's own root, positioned fixed against the viewport:
 // the editor's overflow can't clip it, and it flips above the anchor or shrinks and scrolls
 // when there isn't room below. It sits inside the host's themed tree, so --kg-* tokens set
 // on an ancestor reach it. The editor sets no tokens of its own here.
-export const AnchoredMenu = ({ anchor, children, containerRef }: AnchoredMenuProps) => {
+export const AnchoredMenu = ({
+  anchor,
+  children,
+  containerRef,
+  measure = "list",
+}: AnchoredMenuProps) => {
   const [editor] = useLexicalComposerContext();
   const [style, setStyle] = useState<CSSProperties>({ opacity: 0 });
   const root = editor.getRootElement();
@@ -55,7 +67,9 @@ export const AnchoredMenu = ({ anchor, children, containerRef }: AnchoredMenuPro
       const menu = containerRef.current;
       if (!menu) return;
       const rect = anchor.getBoundingClientRect();
-      const natural = menu.firstElementChild?.firstElementChild as HTMLElement | null;
+      const natural = (
+        measure === "whole" ? menu.firstElementChild : menu.firstElementChild?.firstElementChild
+      ) as HTMLElement | null;
       const placed = placeFloating(
         { bottom: rect.bottom, left: rect.left, top: rect.top },
         {
@@ -74,11 +88,18 @@ export const AnchoredMenu = ({ anchor, children, containerRef }: AnchoredMenuPro
     place();
     window.addEventListener("resize", place);
     window.addEventListener("scroll", place, true);
+    // A panel that fills in after it opens (the emoji are loaded on first use) is placed again
+    // once it has its real height, so it flips or moves to fit.
+    const watched = measure === "whole" ? containerRef.current : null;
+    const observer =
+      watched && typeof ResizeObserver !== "undefined" ? new ResizeObserver(place) : null;
+    if (watched) observer?.observe(watched);
     return () => {
       window.removeEventListener("resize", place);
       window.removeEventListener("scroll", place, true);
+      observer?.disconnect();
     };
-  }, [anchor, containerRef, children]);
+  }, [anchor, containerRef, children, measure]);
 
   return (
     <FloatingPortal to={target}>

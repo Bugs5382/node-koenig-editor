@@ -25,6 +25,8 @@ import { $getRoot, $setSelection } from "lexical";
 import { EmojiPicker, insertEmoji, KoenigComposer } from "node-koenig-editor";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { readFileSync } from "node:fs";
+
 import { searchEmoji } from "../src/additions/emojiPicker/data";
 import { mount, typeAtEnd } from "./__utils__/mount";
 
@@ -185,5 +187,57 @@ describe("inserting an emoji into the text", () => {
       done = insertEmoji(api.editorInstance, "\u{1F600}");
     });
     expect(done).toBe(false);
+  });
+});
+
+describe("the emoji picker has room, and never scrolls sideways", () => {
+  const css = readFileSync("src/generated/koenig.css", "utf8");
+
+  it("is sized in the editor's own scale and capped by the window, not at 20 units", async () => {
+    await openPicker();
+    const panel = screen.getByRole("dialog");
+    expect(panel.className).toContain("w-[min(36rem,92vw)]");
+    expect(panel.className).not.toContain("w-[min(20rem,90vw)]");
+  });
+
+  it("wraps its columns to what fits and scrolls only down", async () => {
+    await openPicker();
+    const grid = screen.getByRole("listbox");
+    expect(grid.className).toContain("grid-cols-[repeat(auto-fill,minmax(3.4rem,1fr))]");
+    expect(grid.className).toContain("overflow-y-auto");
+    expect(grid.className).toContain("overflow-x-hidden");
+  });
+
+  it("wraps the category strip instead of overflowing", async () => {
+    await openPicker();
+    const strip = screen.getByRole("group");
+    expect(strip.className).toContain("flex-wrap");
+  });
+
+  it("has those rules in the built stylesheet", () => {
+    expect(css).toContain("repeat(auto-fill,minmax(calc(3.4 * var(--kg-rem");
+    expect(css).toContain("min(calc(36 * var(--kg-rem");
+    expect(css).toContain("overflow-x: hidden");
+  });
+
+  it("moves between rows by the number of columns that fit", async () => {
+    await openPicker();
+    const grid = screen.getByRole("listbox");
+    const real = window.getComputedStyle.bind(window);
+    vi.spyOn(window, "getComputedStyle").mockImplementation((element, pseudo) => {
+      const style = real(element, pseudo);
+      return element === grid
+        ? new Proxy(style, {
+            get: (target, key) =>
+              key === "gridTemplateColumns" ? "30px 30px 30px 30px 30px" : Reflect.get(target, key),
+          })
+        : style;
+    });
+    const options = screen.getAllByRole("option");
+    options[0]?.focus();
+    fireEvent.keyDown(options[0] as HTMLElement, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(options[5]);
+    fireEvent.keyDown(options[5] as HTMLElement, { key: "ArrowUp" });
+    expect(document.activeElement).toBe(options[0]);
   });
 });
