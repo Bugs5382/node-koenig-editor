@@ -32,6 +32,8 @@ export default tseslint.config(
       "coverage",
       "docs",
       "node_modules",
+      // The demo app has its own package.json, lint and tests.
+      "playground",
       // Upstream Koenig code keeps upstream's style; it is carried over, not linted.
       "src/koenig-lexical",
       "src/kg-default-nodes",

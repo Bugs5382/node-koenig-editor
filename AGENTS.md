@@ -45,12 +45,14 @@ or off, adds its own nodes, wording and theme. Two things to know before changin
 - `tailwind.config.cjs` - upstream's Tailwind 3 theme, with the palette and fonts on CSS tokens
 - `__tests__/` - vitest + jsdom tests, helpers in `__tests__/__utils__/`
 - `scripts/` - `build-css.mjs` and the pack checks
+- `playground/` - the demo app (own `package.json`, lint and tests; not published). It runs against `src/` by default; `npm run playground:published` uses the npm build. Keep its settings (`playground/src/config.ts`) in step with the composer's options
 
 ## Build, test, lint
 
 - Build: `npm run build` (Vite library build to `dist/index.js`, plus `index.d.ts` and `styles.css`)
 - Stylesheet: `npm run build:css` after changing a class name or `tailwind.config.cjs`
 - Test: `npm test` (jsdom; no services needed)
+- Demo app: `npm run playground` (checks: `npm run playground:check`)
 - Lint: `npm run lint`; types: `npm run typecheck` (both skip the upstream folders)
 - Package checks (npm packages), after a build: `npm run check:pack` (contents and ceiling),
   `npm run check:pack:growth` (growth against the last release), `npm run check:install`

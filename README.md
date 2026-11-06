@@ -806,6 +806,20 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   that paragraph, because cards sit at the top level. Its `src`, `alt`, `width` and `height` are
   kept.
 
+## 🧪 Playground
+
+A demo app in `playground/` runs the editor in your browser, with a checkbox for every card and
+tool, the toolbar actions, comments, word count and read-only mode, and the matching code next to
+them. The setup lives in the page address, so copying the link shares it.
+
+```bash
+npm run playground            # or: task playground, against the source in this repo
+npm run playground:published  # against the latest published node-koenig-editor
+```
+
+It opens on http://127.0.0.1:5178. The demo has its own `package.json`, lint and tests
+(`npm run playground:check`), and it is not part of the published package.
+
 ## 🛠 Develop
 
 ```bash

@@ -45,7 +45,7 @@ const DEFAULT_MAX_UNPACKED_BYTES = 250_000;
 const FORBIDDEN = [
   { pattern: /\.map$/, reason: "source map" },
   {
-    pattern: /^(src|__tests__|test|tests|docs|scripts|coverage|temp|\.github)\//,
+    pattern: /^(src|__tests__|test|tests|docs|scripts|coverage|temp|playground|\.github)\//,
     reason: "non-runtime folder",
   },
   { pattern: /\.(test|spec)\.[cm]?[jt]sx?$/, reason: "test file" },
