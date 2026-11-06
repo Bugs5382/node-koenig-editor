@@ -71,7 +71,7 @@ export const ImageTextDialog = ({
     opener?.focus();
   };
   const save = () => {
-    onSave({ caption: captionValue, title: titleValue });
+    onSave({ caption: captionValue.trim(), title: titleValue.trim() });
     onClose();
     opener?.focus();
   };
