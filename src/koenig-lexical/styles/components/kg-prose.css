@@ -766,25 +766,31 @@
     /* Dark mode
     /* -------------------------------------------------------------------- */
 
+    /* `dark` can sit on the editor itself (the composer's darkMode), on an ancestor (a host's
+       page), or on a descendant, so all three are matched. */
+    &.dark,
+    .dark &,
     .dark {
-        :where(
-                h1,
-                h2,
-                h3,
-                h4,
-                h5,
-                h6
-            ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                color: var(--white);
-            }
+        .kg-prose {
+            :where(
+                    h1,
+                    h2,
+                    h3,
+                    h4,
+                    h5,
+                    h6
+                ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
+                    color: var(--white);
+                }
 
-        :where(
-            code
-        ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            background: var(--grey-900);
-            border: 1px solid var(--grey-900);
-            border-radius: 2px;
-            color: var(--grey-300);
+            :where(
+                code
+            ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
+                background: var(--grey-900);
+                border: 1px solid var(--grey-900);
+                border-radius: 2px;
+                color: var(--grey-300);
+            }
         }
     }
 }
