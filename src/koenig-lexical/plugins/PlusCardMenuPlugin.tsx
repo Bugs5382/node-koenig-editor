@@ -25,6 +25,14 @@ function usePlusCardMenu(editor) {
     const lineRef = React.useRef(null);
     const menuRef = React.useRef(null);
     const buttonRef = React.useRef(null);
+    // The menu hangs from the button. Kept in state, not read from the ref during render: pressing
+    // the plus clears the selection, which remounts the button, and a ref read in that render is
+    // still null, so the menu would never be placed (issue 39).
+    const [buttonElement, setButtonElement] = React.useState(null);
+    const setButtonNode = React.useCallback((node) => {
+        buttonRef.current = node;
+        setButtonElement(node);
+    }, []);
     const {cardConfig, menuItems} = React.useContext(KoenigComposerContext);
     const strings = useKoenigStrings();
 
@@ -302,9 +310,9 @@ function usePlusCardMenu(editor) {
     if (isShowingButton) {
         return (
             <div ref={containerRef} className="absolute z-50" style={style} data-kg-plus-container>
-                {isShowingButton && <div ref={buttonRef}><PlusButton onClick={openMenu} /></div>}
+                {isShowingButton && <div ref={setButtonNode}><PlusButton onClick={openMenu} /></div>}
                 {isShowingMenu && (
-                    <AnchoredMenu anchor={buttonRef.current} containerRef={menuRef}>
+                    <AnchoredMenu anchor={buttonElement} containerRef={menuRef}>
                         <PlusMenu>
                             <CardMenu closeMenu={closeMenu} insert={insert} menu={cardMenu.menu} />
                         </PlusMenu>
