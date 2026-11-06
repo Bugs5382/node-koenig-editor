@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { act, cleanup } from "@testing-library/react";
+import { act, cleanup, fireEvent } from "@testing-library/react";
 import { $getRoot } from "lexical";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -120,5 +120,33 @@ describe("the plus button stays inside the editor's box", () => {
     const left = Number.parseFloat(container!.style.left);
     expect(left).toBeGreaterThanOrEqual(0);
     expect(left + 22).toBeLessThanOrEqual(40);
+  });
+});
+
+describe("pressing the plus button opens the card list", () => {
+  const portal = () => document.querySelector("[data-kg-menu-portal]") as HTMLElement | null;
+  const button = () => document.querySelector("[data-kg-plus-button] button") as HTMLButtonElement;
+
+  it("places and shows the list after a click", async () => {
+    await showPlus(rect(0, 600), rect(80, 520));
+    await act(async () => {
+      fireEvent.click(button());
+    });
+    const menu = portal();
+    expect(menu).not.toBeNull();
+    expect(menu!.querySelector("[data-kg-plus-menu]")).not.toBeNull();
+    expect(menu!.style.opacity).toBe("1");
+    expect(menu!.style.top).not.toBe("");
+    expect(menu!.style.left).not.toBe("");
+  });
+
+  it("opens on Enter while the button has focus", async () => {
+    await showPlus(rect(0, 600), rect(80, 520));
+    await act(async () => {
+      button().focus();
+      fireEvent.keyDown(button(), { key: "Enter" });
+      fireEvent.click(button());
+    });
+    expect(portal()?.style.opacity).toBe("1");
   });
 });
