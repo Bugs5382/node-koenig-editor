@@ -1138,6 +1138,10 @@
     width: 91.666667%;
 }
 
+.koenig-lexical .w-20 {
+    width: calc(8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .w-24 {
     width: calc(9.6 * var(--kg-rem, 0.625rem));
 }
@@ -2055,6 +2059,10 @@
 
 .koenig-lexical .text-center {
     text-align: center;
+}
+
+.koenig-lexical .text-right {
+    text-align: right;
 }
 
 .koenig-lexical .\!font-sans {

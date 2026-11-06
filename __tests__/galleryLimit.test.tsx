@@ -20,6 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
+import { $generateHtmlFromNodes } from "@lexical/html";
 import { act, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import type { FileUploader } from "node-koenig-editor";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -61,7 +62,7 @@ const photo = (index: number, extra: Record<string, unknown> = {}) => ({
   ...extra,
 });
 
-const galleryDocument = (count: number) =>
+const galleryDocument = (count: number, extra: Record<string, unknown> = {}) =>
   JSON.stringify({
     root: {
       children: [
@@ -70,6 +71,7 @@ const galleryDocument = (count: number) =>
           caption: "",
           images: Array.from({ length: count }, (_, index) => photo(index)),
           type: "gallery",
+          ...extra,
           version: 1,
         },
         { children: [], direction: null, format: "", indent: 0, type: "paragraph", version: 1 },
@@ -248,5 +250,134 @@ describe("sending many files", () => {
       expect(image.getAttribute("loading")).toBe("lazy");
       expect(image.getAttribute("decoding")).toBe("async");
     }
+  });
+});
+
+const selectGallery = async () => {
+  await act(async () => {
+    fireEvent.click(document.querySelector('[data-kg-card="gallery"] img') as Element);
+  });
+  await waitFor(() =>
+    expect(
+      document.querySelector('[data-kg-card="gallery"]')?.getAttribute("data-kg-card-selected"),
+    ).toBe("true"),
+  );
+};
+
+const maxInput = () =>
+  document.querySelector("[data-gallery-max-input]") as HTMLInputElement | null;
+const countText = () => document.querySelector("[data-gallery-count]")?.textContent;
+
+const setMax = async (value: string) => {
+  await act(async () => {
+    fireEvent.change(maxInput() as Element, { target: { value } });
+  });
+  await act(async () => {
+    fireEvent.blur(maxInput() as Element);
+  });
+};
+
+describe("a gallery's own maximum", () => {
+  it("shows how many photos it holds of how many it may hold", async () => {
+    await mount({ composer: { initialEditorState: galleryDocument(3) } });
+    expect(countText()).toBe("3 of 50");
+  });
+
+  it("offers a control to the editor, in a settings panel, not in read-only mode", async () => {
+    await mount({ composer: { initialEditorState: galleryDocument(3) } });
+    expect(maxInput()).toBeNull();
+    await selectGallery();
+    const input = maxInput() as HTMLInputElement;
+    expect(input).not.toBeNull();
+    expect(input.closest("[data-kg-settings-panel]")).not.toBeNull();
+    expect(input.value).toBe("50");
+    expect(input.min).toBe("3");
+    expect(input.max).toBe("50");
+    expect(document.querySelector("label [data-gallery-max-input]")).not.toBeNull();
+  });
+
+  it("saves the value in the card and uses it as the limit", async () => {
+    const state = { calls: [] as string[], inFlight: 0, peak: 0 };
+    const { api } = await mount({
+      composer: { fileUploader: trackingUploader(state), initialEditorState: galleryDocument(3) },
+    });
+    await selectGallery();
+    await setMax("5");
+    expect(galleryOf(api.serialize()).maxImages).toBe(5);
+    expect(countText()).toBe("3 of 5");
+    await addFiles([png("a.png"), png("b.png"), png("c.png")]);
+    await waitFor(() => expect(galleryOf(api.serialize())?.images).toHaveLength(5));
+    expect(state.calls).toHaveLength(2);
+    const message = document.querySelector('[data-testid="gallery-error"]')?.textContent ?? "";
+    expect(message).toContain("limited to 5");
+    expect(countText()).toBe("5 of 5");
+  });
+
+  it("cannot go above the host's limit", async () => {
+    const { api } = await mount({
+      composer: { gallery: { maxImages: 8 }, initialEditorState: galleryDocument(3) },
+    });
+    await selectGallery();
+    await setMax("20");
+    expect(galleryOf(api.serialize()).maxImages).toBe(8);
+    expect(maxInput()?.value).toBe("8");
+    expect(maxInput()?.max).toBe("8");
+  });
+
+  it("uses the host's limit when a stored value is higher than it", async () => {
+    await mount({
+      composer: {
+        gallery: { maxImages: 8 },
+        initialEditorState: galleryDocument(3, { maxImages: 100 }),
+      },
+    });
+    expect(countText()).toBe("3 of 8");
+  });
+
+  it("cannot go below the number of photos it already holds", async () => {
+    const { api } = await mount({ composer: { initialEditorState: galleryDocument(6) } });
+    await selectGallery();
+    await setMax("3");
+    expect(galleryOf(api.serialize()).maxImages).toBe(6);
+    expect(maxInput()?.value).toBe("6");
+  });
+
+  it("ignores text that is not a number", async () => {
+    const { api } = await mount({
+      composer: { initialEditorState: galleryDocument(3, { maxImages: 10 }) },
+    });
+    await selectGallery();
+    await setMax("many");
+    expect(galleryOf(api.serialize()).maxImages).toBe(10);
+    expect(maxInput()?.value).toBe("10");
+  });
+
+  it("shows the count but no control to a read-only viewer", async () => {
+    await mount({
+      composer: { editable: false, initialEditorState: galleryDocument(3, { maxImages: 12 }) },
+    });
+    expect(maxInput()).toBeNull();
+    expect(document.querySelector("[data-kg-settings-panel]")).toBeNull();
+  });
+
+  it("is written into the HTML output, which keeps to it", async () => {
+    const { api } = await mount({
+      composer: { initialEditorState: galleryDocument(8, { maxImages: 5 }) },
+    });
+    const editor = api.editorInstance;
+    const html = editor.getEditorState().read(() => $generateHtmlFromNodes(editor, null));
+    const holder = document.createElement("div");
+    holder.innerHTML = html;
+    const figure = holder.querySelector("figure.kg-gallery-card") as HTMLElement;
+    expect(figure.getAttribute("data-kg-max-images")).toBe("5");
+    expect(figure.querySelectorAll("img")).toHaveLength(5);
+  });
+
+  it("writes no attribute when the gallery has no limit of its own", async () => {
+    const { api } = await mount({ composer: { initialEditorState: galleryDocument(3) } });
+    const editor = api.editorInstance;
+    const html = editor.getEditorState().read(() => $generateHtmlFromNodes(editor, null));
+    expect(html).not.toContain("data-kg-max-images");
+    expect(galleryOf(api.serialize()).maxImages ?? 0).toBe(0);
   });
 });

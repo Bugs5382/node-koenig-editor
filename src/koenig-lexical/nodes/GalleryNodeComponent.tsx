@@ -31,7 +31,7 @@ const dimensionsOf = async (url) => {
 export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorInitialState}) {
     const [editor] = useLexicalComposerContext();
     const {fileUploader, cardConfig, cardRenderers, gallery} = React.useContext(KoenigComposerContext);
-    const maxImages = resolveMaxImages(gallery?.maxImages);
+    const hostMaxImages = resolveMaxImages(gallery?.maxImages);
     const {isSelected} = React.useContext(CardContext);
     const strings = useKoenigStrings();
     const fileInputRef = React.useRef();
@@ -46,6 +46,12 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
     });
     // uploads finish after the render that started them, so they read the latest list from here
     const imagesRef = React.useRef(images);
+
+    // This gallery's own limit is saved in the card; the host's is the ceiling it cannot exceed.
+    const [ownMax, setOwnMaxState] = React.useState(() => editor.getEditorState().read(() => $getNodeByKey(nodeKey)?.maxImages || 0));
+    const maxImages = Math.min(ownMax > 0 ? ownMax : hostMaxImages, hostMaxImages);
+    const [readOnly, setReadOnly] = React.useState(() => !editor.isEditable());
+    React.useEffect(() => editor.registerEditableListener(editable => setReadOnly(!editable)), [editor]);
 
     const imageUploader = fileUploader.useFileUpload('image');
     const mimeTypes = fileUploader.fileTypes?.image?.mimeTypes;
@@ -88,6 +94,23 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
     const updateImage = (index, changes) => {
         const list = imagesRef.current.map((image, i) => (i === index ? {...image, ...changes} : image));
         commit(list);
+    };
+
+    // The most it can be set to is the host's limit; the least is what it already holds.
+    const setMaxImages = (value) => {
+        // an empty box or text that is not a number changes nothing
+        const wanted = String(value ?? '').trim() === '' ? NaN : Math.round(Number(value));
+        if (!Number.isFinite(wanted)) {
+            return;
+        }
+        const next = Math.min(Math.max(wanted, imagesRef.current.length, 1), hostMaxImages);
+        setOwnMaxState(next);
+        editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if (node) {
+                node.maxImages = next;
+            }
+        });
     };
 
     const addFiles = async (files) => {
@@ -196,11 +219,14 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
                         images={images}
                         isSelected={Boolean(isSelected)}
                         isUploading={isUploading}
+                        hostMaxImages={hostMaxImages}
                         maxImages={maxImages}
                         mimeTypes={mimeTypes ?? []}
                         moveImage={moveImage}
                         progress={imageUploader.progress ?? 0}
+                        readOnly={readOnly}
                         removeImage={removeImage}
+                        setMaxImages={setMaxImages}
                         updateImage={updateImage}
                     />
                 </figure>
@@ -213,9 +239,12 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
                     errorMessage={errorMessage}
                     fileInputRef={fileInputRef}
                     filesDropper={imageFilesDropper}
+                    hostMaxImages={hostMaxImages}
                     imageMimeTypes={mimeTypes}
                     images={images}
                     maxImages={maxImages}
+                    readOnly={readOnly}
+                    setMaxImages={setMaxImages}
                     isSelected={isSelected}
                     moveImage={moveImage}
                     reorderHandler={galleryReorder}

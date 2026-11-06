@@ -253,6 +253,44 @@ function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, 
     );
 }
 
+// The editor's setting for how many photos this gallery takes. The host's limit is the most it can
+// be; the number already in the gallery is the least, so lowering it never drops a photo.
+function GallerySettings({count, hostMaxImages, maxImages, setMaxImages, strings}) {
+    const [draft, setDraft] = React.useState(String(maxImages));
+    React.useEffect(() => setDraft(String(maxImages)), [maxImages]);
+    const commit = () => {
+        setMaxImages(draft);
+        setDraft(String(maxImages));
+    };
+
+    return (
+        <div className="not-kg-prose mt-2 flex flex-col gap-1 font-sans text-sm" data-kg-allow-clickthrough data-kg-settings-panel data-koenig-dnd-disabled>
+            <label className="flex items-center gap-2">
+                <span className="whitespace-nowrap">{strings.maxImagesLabel}</span>
+                <input
+                    className="w-20 rounded border border-grey-300 bg-transparent px-2 py-1"
+                    data-gallery-max-input
+                    inputMode="numeric"
+                    max={hostMaxImages}
+                    min={Math.max(count, 1)}
+                    type="number"
+                    value={draft}
+                    onBlur={commit}
+                    onChange={e => setDraft(e.target.value)}
+                    onKeyDown={(e) => {
+                        e.stopPropagation();
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            commit();
+                        }
+                    }}
+                />
+            </label>
+            <span className="text-grey-600">{fill(strings.maxImagesHint, {host: hostMaxImages, n: count})}</span>
+        </div>
+    );
+}
+
 function EmptyGalleryCard({openFilePicker, isDraggedOver, maxImages, reorderHandler, strings}) {
     return (
         <MediaPlaceholder
@@ -298,7 +336,10 @@ export function GalleryCard({
     errorMessage,
     fileInputRef,
     imageMimeTypes = [],
+    hostMaxImages,
     maxImages,
+    readOnly = false,
+    setMaxImages,
     images = [],
     isSelected,
     moveImage,
@@ -352,6 +393,12 @@ export function GalleryCard({
                 </form>
             </div>
 
+            {!readOnly && images.length ? (
+                <div className="not-kg-prose mt-1 text-right font-sans text-xs text-grey-600" data-gallery-count>
+                    {fill(strings.countOf, {n: images.length, max: maxImages})}
+                </div>
+            ) : null}
+
             <CardCaptionEditor
                 captionEditor={captionEditor}
                 captionEditorInitialState={captionEditorInitialState}
@@ -359,6 +406,10 @@ export function GalleryCard({
                 dataTestId="gallery-card-caption"
                 isSelected={isSelected}
             />
+
+            {!readOnly && isSelected && images.length ? (
+                <GallerySettings count={images.length} hostMaxImages={hostMaxImages} maxImages={maxImages} setMaxImages={setMaxImages} strings={strings} />
+            ) : null}
         </figure>
     );
 }

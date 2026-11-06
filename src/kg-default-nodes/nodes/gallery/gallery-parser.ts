@@ -35,6 +35,10 @@ export function parseGalleryNode(GalleryNode: new (data: Record<string, unknown>
 
                         payload.images = imgs.map(readGalleryImageAttributesFromElement);
                         payload.caption = readCaptionFromElement(domNode);
+                        const limit = parseInt(domNode.getAttribute('data-kg-max-images') || '', 10);
+                        if (limit > 0) {
+                            payload.maxImages = limit;
+                        }
 
                         const node = new GalleryNode(payload);
                         return {node};

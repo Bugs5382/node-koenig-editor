@@ -211,6 +211,11 @@ export interface KoenigStrings {
     imageMovedBefore: string;
     /** Help in the title, caption and alt text dialog, including how to move a photo. */
     imageTextHelp: string;
+    /** `{n}` is the number of photos and `{max}` the gallery's limit. */
+    countOf: string;
+    /** `{host}` is the host's ceiling and `{n}` the number of photos already in the gallery. */
+    maxImagesHint: string;
+    maxImagesLabel: string;
   };
   header: {
     alignCenter: string;

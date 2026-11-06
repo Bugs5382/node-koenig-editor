@@ -104,6 +104,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
   gallery: {
     addImages: "Add images",
     captionPlaceholder: "Type caption for gallery (optional)",
+    countOf: "{n} of {max}",
     dismiss: "Dismiss",
     dropToAdd: "Drop to add up to {max} images",
     editImageText: "Edit title, caption and alt text",
@@ -125,6 +126,8 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     imageTextSave: "Save",
     imageTitleLabel: "Title",
     limitError: "Galleries are limited to {max} images",
+    maxImagesHint: "Up to {host}, and at least the {n} already here.",
+    maxImagesLabel: "Maximum number of images",
     select: "Click to select up to {max} images",
     showAllImageText: "Show all titles and captions",
     showImageText: "Show title and caption",

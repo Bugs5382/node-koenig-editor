@@ -22,6 +22,7 @@ interface GalleryImage {
 interface GalleryNodeData {
     images: GalleryImage[];
     caption: string;
+    maxImages?: number;
 }
 
 interface GalleryRenderOptions extends ExportDOMOptions {
@@ -87,13 +88,18 @@ export function renderGalleryNode(node: GalleryNodeData, options: GalleryRenderO
     addCreateDocumentOption(options);
     const document = options.createDocument!();
 
-    const validImages = node.images.filter(isValidImage);
+    // the gallery's own limit: the output never shows more photos than the gallery allows
+    const limit = Number.isInteger(node.maxImages) && (node.maxImages as number) > 0 ? (node.maxImages as number) : 0;
+    const validImages = node.images.filter(isValidImage).slice(0, limit || undefined);
     if (!validImages.length) {
         return renderEmptyContainer(document);
     }
 
     const figure = document.createElement('figure');
     figure.setAttribute('class', 'kg-card kg-gallery-card kg-width-wide');
+    if (limit) {
+        figure.setAttribute('data-kg-max-images', String(limit));
+    }
 
     const container = document.createElement('div');
     container.setAttribute('class', 'kg-gallery-container');
