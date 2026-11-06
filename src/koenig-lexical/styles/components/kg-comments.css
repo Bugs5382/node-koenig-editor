@@ -1,0 +1,16 @@
+/* Inline comment highlights (see src/additions/comments). The host can restyle them with
+   --kg-comment-highlight, --kg-comment-highlight-active and --kg-comment-highlight-resolved. */
+.koenig-lexical mark[data-kg-comment-ids] {
+    background: var(--kg-comment-highlight, rgb(255 212 0 / 0.35));
+    border-radius: 2px;
+    color: inherit;
+    cursor: pointer;
+}
+
+.koenig-lexical mark[data-kg-comment-resolved] {
+    background: var(--kg-comment-highlight-resolved, rgb(128 128 128 / 0.15));
+}
+
+.koenig-lexical mark[data-kg-comment-active] {
+    background: var(--kg-comment-highlight-active, rgb(255 190 0 / 0.65));
+}

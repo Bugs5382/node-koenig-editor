@@ -7,7 +7,9 @@ import {DEFAULT_CONFIG} from '#kg-default-nodes';
 import {KoenigSelectedCardContext} from '../context/KoenigSelectedCardContext';
 import {LexicalCollaboration} from '@lexical/react/LexicalCollaborationContext';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
+import {CommentsPlugin, KoenigCommentsContext, useCommentsStoreFor} from '../../additions/comments';
 import {KoenigStringsContext, resolveStrings, selectEditorNodes} from '../../additions/options';
+import {MarkNode} from '@lexical/mark';
 
 // Catch any errors that occur during Lexical updates and log them
 // or throw them as needed. If you don't throw them, Lexical will
@@ -48,13 +50,17 @@ const KoenigComposer = ({
     cardConfig = {},
     darkMode = false,
     collaboration = null,
+    comments,
     editable = true,
     children
 }) => {
-    const nodes = React.useMemo(
-        () => selectEditorNodes(baseNodes, cards, customNodes),
-        [baseNodes, cards, customNodes]
-    );
+    const hasComments = Boolean(comments);
+    const nodes = React.useMemo(() => {
+        const selected = selectEditorNodes(baseNodes, cards, customNodes);
+        // Comment anchors are mark nodes; they are registered only when comments are on.
+        return hasComments && !selected.includes(MarkNode) ? [...selected, MarkNode] : selected;
+    }, [baseNodes, cards, customNodes, hasComments]);
+    const commentStore = useCommentsStoreFor(comments);
     const strings = React.useMemo(() => resolveStrings(hostStrings), [hostStrings]);
 
     const initialConfig = React.useMemo(() => {
@@ -111,7 +117,9 @@ const KoenigComposer = ({
                     toolbar
                 }}>
                     <KoenigStringsContext.Provider value={strings}>
+                        <KoenigCommentsContext.Provider value={commentStore}>
                         <KoenigSelectedCardContext>
+                            {commentStore ? <CommentsPlugin store={commentStore} /> : null}
                             {collaboration ? (
                                 <CollaborationPlugin
                                     cursorColor={collaboration.cursorColor}
@@ -126,6 +134,7 @@ const KoenigComposer = ({
                             ) : null}
                             {children}
                         </KoenigSelectedCardContext>
+                        </KoenigCommentsContext.Provider>
                     </KoenigStringsContext.Provider>
                 </KoenigComposerContext.Provider>
             </LexicalComposer>
