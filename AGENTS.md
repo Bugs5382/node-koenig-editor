@@ -36,6 +36,7 @@ or off, adds its own nodes, wording and theme. Two things to know before changin
 - `src/additions/table/` - Lexical's table nodes as a card, plus its editing toolbar (rows, columns, header row)
 - `src/additions/placement/` - `placeFloating` (viewport-safe menu placement) and the portal the "+" and slash menus use
 - `src/additions/toolbarActions/` - saving and restoring the selection for host toolbar actions
+- `src/koenig-lexical/nodes/GalleryNode*.tsx`, `HeaderNode*.tsx` - the gallery and header cards (ported from upstream); the composer's `cardRenderers` option swaps their layout
 - `src/additions/headings/` - the H1 to H5 limit
 - `src/additions/comments/` - inline comment threads on mark nodes: store, plugin, hook (opt-in through the composer's `comments`)
 - `src/koenig-lexical/`, `src/kg-default-nodes/`, `src/kg-default-transforms/` - upstream Koenig

@@ -78,7 +78,15 @@ describe.each(Object.keys(configs))("every card the slash menu offers (%s)", (na
     const labels = await openSlashMenu(api);
     cleanup();
     expect(labels).toEqual(
-      expect.arrayContaining(["Image", "Divider", "Table", "Callout", "Toggle"]),
+      expect.arrayContaining([
+        "Image",
+        "Divider",
+        "Table",
+        "Callout",
+        "Toggle",
+        "Gallery",
+        "Header",
+      ]),
     );
     for (const label of labels) {
       const { api: fresh } = await mount(configs[name]!());

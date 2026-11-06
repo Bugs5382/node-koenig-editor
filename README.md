@@ -11,7 +11,7 @@ editor works alone.
 
 ## ✨ Highlights
 
-- 🧱 **Pick your cards** — image, divider, callout, toggle and table, on by default, off one by one.
+- 🧱 **Pick your cards** — image, gallery, header, divider, callout, toggle and table, on by default, off one by one.
 - 🧩 **Bring your own nodes** — register custom nodes and cards, and add your own "+" and slash menu entries.
 - 🗣️ **Your wording** — every label, placeholder and menu text comes from a `strings` option with English defaults.
 - 🎛️ **Your toolbar** — show only the format buttons you want.
@@ -65,7 +65,8 @@ the sources.
 
 | Prop                 | Type                              | Default         | What it does                                                                                                                                                                     |
 | -------------------- | --------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `divider`, `callout`, `toggle`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
+| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `divider`, `callout`, `toggle`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
+| `cardRenderers`      | `KoenigCardRenderers`             | none            | Your own layout for the `gallery` and `header` cards; see [Gallery and header cards](#-gallery-and-header-cards). |
 | `customNodes`        | `EditorNodes`                     | none            | Your own node classes, registered after the shipped ones. A node with a static `kgMenu` (a `CardMenuItem` or a list) is listed in the menus.                                     |
 | `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
@@ -295,6 +296,63 @@ simple: no merged cells and no cell colours.
 - Document: a table is stock `@lexical/table` nodes, so it saves and loads with the rest of the
   document, header row included.
 
+## 🖼️ Gallery and header cards
+
+Both are in the default card set, so they are in the "+" and slash menus (`/gallery`, `/header`).
+`cards` leaves either out, like any other card.
+
+**Gallery.** Up to nine images. Select the card to reorder (drag, or the earlier and later
+buttons), and to give each image its own alt text and caption. A gallery has its own caption too.
+The host's `fileUploader` is called once per image, so a progress bar or a failure belongs to one
+picture. Files outside `fileUploader.fileTypes.image.mimeTypes`, and images past the ninth, are
+refused with a message (`strings.gallery`) before the uploader is called.
+
+**Header.** A section opener: title, subtitle, a background colour or image, and an optional
+button. Its sizes are multiples of `--kg-rem` and its type uses `--kg-font-sans` and
+`--kg-font-size-h1`, so it follows the [theme tokens](#-styles-and-theme-tokens). The title is
+not a heading node: the H1 to H5 limit and any outline numbering a host builds from headings do
+not see it. The background image goes through the host's `fileUploader`.
+
+### Replacing the layout
+
+Pass `cardRenderers` to draw either card yourself, with no fork. A renderer is a React component;
+the editor keeps the node, the uploads, the limits and the saving, and hands the component what
+it needs. Without an entry the default layout draws.
+
+```tsx
+import type { KoenigGalleryRenderProps } from "node-koenig-editor";
+
+const Strip = ({ images, addFiles, removeImage, updateImage, moveImage, caption, maxImages }: KoenigGalleryRenderProps) => (
+  <div className="my-gallery">
+    {images.map((image, index) => (
+      <figure key={image.fileName}>
+        <img alt={image.alt} src={image.previewSrc ?? image.src} />
+        <input value={image.alt} onChange={(e) => updateImage(index, { alt: e.target.value })} />
+        <button onClick={() => moveImage(index, index - 1)}>Earlier</button>
+        <button onClick={() => removeImage(index)}>Remove</button>
+      </figure>
+    ))}
+    {images.length < maxImages ? <input multiple type="file" onChange={(e) => addFiles(e.target.files!)} /> : null}
+    {caption}
+  </div>
+);
+
+<KoenigComposer cardRenderers={{ gallery: Strip }} fileUploader={uploader}>
+```
+
+`KoenigGalleryRenderProps` carries `images`, `maxImages`, `mimeTypes`, `addFiles`, `removeImage`,
+`moveImage`, `updateImage` (alt and caption), `caption` (the gallery's own caption editor),
+`isSelected`, `isUploading`, `progress` and `errorMessage` with `clearError`.
+`KoenigHeaderRenderProps` carries the card's values (`title`, `subtitle`, `backgroundColor`,
+`backgroundImageSrc`, `buttonText`, `buttonUrl`, `alignment` and the colours), `isEditing`,
+`isSelected`, `update(changes)` and `uploadBackgroundImage(file)`. A custom renderer changes how
+the card looks in the editor; the saved document and the HTML output are the same.
+
+Not included: the parts of upstream's header and gallery that need a Ghost site or service
+(Unsplash, the Pintura image editor, the version 1 header editor).
+A version 1 header in a saved document still loads and exports; the card edits it with the
+current controls.
+
 ## 🔠 Headings
 
 Headings run from H1 to H5 and no deeper. The toolbar has a button for each level (hide any with
@@ -506,6 +564,11 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   fixed).
 - Stock node type names are kept: `text`, `heading`, `quote` and the rest save under their stock
   names (upstream swaps in `extended-*` replacements). Code blocks are stock `code` nodes.
+- Gallery and header: `src/kg-default-nodes` and `src/koenig-lexical` carry upstream's gallery
+  node, parser and renderer and the header node, parser and renderers from the same commit. The
+  gallery card uploads one image at a time, has per-image alt text and caption, and reorders with
+  buttons as well as drag. The header card is a smaller editor than upstream's (no image editor,
+  no version 1 controls), and both take a host layout through `cardRenderers`.
 - Tables: `@lexical/table`'s `table`, `tablerow` and `tablecell` are registered, with Lexical's
   table plugin and a Table entry in the "+" and slash menus (`src/additions/table/`).
 - Collaboration: the composer takes a `collaboration` prop instead of opening its own websocket.
@@ -515,7 +578,7 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   card selection, drag to reorder, remote carets, and the image, callout, toggle, divider and
   aside cards.
 - Removed: cards that need a Ghost site or service (membership, signup, product, paywall, email
-  and email CTA, call to action, button, header, bookmark, embed, audio, video, file, gallery,
+  and email CTA, call to action, button, bookmark, embed, audio, video, file,
   HTML, Markdown, Transistor, Ghost's code block card), the GIF and Unsplash pickers, the Pintura
   image editor, the emoji picker, the TK and at-link nodes, word counts, replacement strings, the
   demo, stories and upstream's tests.

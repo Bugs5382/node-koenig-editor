@@ -32,6 +32,8 @@ export const KOENIG_CARD_NAMES: readonly KoenigCardName[] = [
   "callout",
   "toggle",
   "table",
+  "gallery",
+  "header",
 ];
 
 // The node types each card registers. Leaving a card out leaves these out, and
@@ -39,6 +41,8 @@ export const KOENIG_CARD_NAMES: readonly KoenigCardName[] = [
 export const CARD_NODE_TYPES: Record<KoenigCardName, readonly string[]> = {
   callout: ["callout"],
   divider: ["horizontalrule"],
+  gallery: ["gallery"],
+  header: ["header"],
   image: ["image"],
   table: ["table", "tablerow", "tablecell"],
   toggle: ["toggle"],
