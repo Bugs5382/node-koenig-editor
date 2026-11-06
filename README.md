@@ -11,7 +11,7 @@ editor works alone.
 
 ## ✨ Highlights
 
-- 🧱 **Pick your cards** — image, gallery, header, button, markdown, divider, callout, toggle and table, on by default, off one by one.
+- 🧱 **Pick your cards** — image, gallery, header, file, video, audio, button, markdown, divider, callout, toggle and table, on by default, off one by one.
 - 🧩 **Bring your own nodes** — register custom nodes and cards, and add your own "+" and slash menu entries.
 - 🗣️ **Your wording** — every label, placeholder and menu text comes from a `strings` option with English defaults.
 - 🎛️ **Your toolbar** — show only the format buttons you want.
@@ -65,7 +65,7 @@ the sources.
 
 | Prop                 | Type                              | Default         | What it does                                                                                                                                                                     |
 | -------------------- | --------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `button`, `markdown`, `divider`, `callout`, `toggle`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
+| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `file`, `video`, `audio`, `button`, `markdown`, `divider`, `callout`, `toggle`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
 | `cardRenderers`      | `KoenigCardRenderers`             | none            | Your own layout for the `gallery` and `header` cards; see [Gallery and header cards](#-gallery-and-header-cards). |
 | `customNodes`        | `EditorNodes`                     | none            | Your own node classes, registered after the shipped ones. A node with a static `kgMenu` (a `CardMenuItem` or a list) is listed in the menus.                                     |
 | `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
@@ -405,6 +405,40 @@ and link, callout and toggle text, and the source of a Markdown card add nothing
 between spaces ("well-known" is one); Chinese, Japanese and Thai text is split with the browser's
 word segmenter.
 
+
+## 📎 File, video and audio cards
+
+All three are in the default card set (`/file`, `/video`, `/audio`) and upload through your
+`fileUploader`: `useFileUpload("file")`, `useFileUpload("video")` and `useFileUpload("audio")`.
+Nothing is embedded from outside and nothing is fetched from a third party; a video or audio file
+plays from the url your uploader returned.
+
+- **Limits.** If `fileUploader.fileTypes.file` (or `.video`, `.audio`) is set, the card checks the
+  chosen file against its `extensions`, `mimeTypes` and an optional `maxSize` in bytes *before*
+  uploading, and names the file in the message (`strings.file.typeError`, `strings.file.sizeError`).
+  A host with no `fileTypes` gets no pre-check; the uploader has the last word.
+- **File.** A title, a description, and the file name and size. It saves as a download link.
+- **Video and audio** play in the browser's own player, so play, seek, volume and mute work from the
+  keyboard and show the browser's focus ring. Captions are required for accessibility: a card has a
+  **transcript** field and a **WebVTT (`.vtt`) track upload**, saved as a
+  `<track kind="captions">`. A card with neither shows `strings.video.captionsMissing` (or
+  `strings.audio.captionsMissing`) until one is added. The track file goes through
+  `useFileUpload("file")`, so allow `.vtt` there. The transcript is plain text.
+- **Safe urls.** Every source is checked in the editor, on import and in the HTML output: `http`,
+  `https` or a path on your own origin. `javascript:`, `data:`, `blob:` and protocol-relative urls
+  are dropped.
+- **Switch off** any of them with `cards`, for example `cards={["image", "video"]}`.
+
+```tsx
+const uploader = {
+  fileTypes: {
+    file: { extensions: [".pdf", ".zip"], mimeTypes: ["application/pdf", "application/zip"], maxSize: 20_000_000 },
+    video: { extensions: [".mp4", ".webm"], mimeTypes: ["video/mp4", "video/webm"], maxSize: 200_000_000 },
+  },
+  useFileUpload: (type) => useMyUploader(type), // returns { upload, isLoading, progress, errors }
+};
+```
+
 ## 🔠 Headings
 
 Headings run from H1 to H5 and no deeper. The toolbar has a button for each level (hide any with
@@ -621,6 +655,9 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   gallery card uploads one image at a time, has per-image alt text and caption, and reorders with
   buttons as well as drag. The header card is a smaller editor than upstream's (no image editor,
   no version 1 controls), and both take a host layout through `cardRenderers`.
+- File, video and audio: the file card is upstream's, without the email table. Video and audio are
+  written for this package (upstream's depend on Ghost's thumbnails and player script): the
+  browser's own player, a captions track and a transcript, no loop, autoplay or outside embeds.
 - Tables: `@lexical/table`'s `table`, `tablerow` and `tablecell` are registered, with Lexical's
   table plugin and a Table entry in the "+" and slash menus (`src/additions/table/`).
 - Collaboration: the composer takes a `collaboration` prop instead of opening its own websocket.
@@ -630,7 +667,7 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   card selection, drag to reorder, remote carets, and the image, callout, toggle, divider and
   aside cards.
 - Removed: cards that need a Ghost site or service (membership, signup, product, paywall, email
-  and email CTA, call to action, bookmark, embed, audio, video, file,
+  and email CTA, call to action, bookmark, embed,
   HTML, Transistor, Ghost's code block card), the GIF and Unsplash pickers, the Pintura
   image editor, the emoji picker, the TK and at-link nodes, replacement strings, the
   demo, stories and upstream's tests.

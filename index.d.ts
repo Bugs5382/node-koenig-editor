@@ -38,15 +38,18 @@ import type { Doc, XmlText } from "yjs";
 
 /** The cards the package ships. Pass a list as the composer's `cards` to register only those. */
 export type KoenigCardName =
+  | "audio"
   | "button"
   | "callout"
   | "divider"
+  | "file"
   | "gallery"
   | "header"
   | "image"
   | "markdown"
   | "table"
-  | "toggle";
+  | "toggle"
+  | "video";
 
 /** The format toolbar's buttons. Pass a list as the composer's `toolbar` to show only those. */
 export type KoenigToolbarItem =
@@ -93,6 +96,21 @@ export interface KoenigToolbarAction {
 export interface KoenigCardText {
   desc: string;
   label: string;
+}
+
+/** The wording the video and audio cards share. */
+export interface KoenigMediaStrings {
+  /** The notice shown while the card has neither a captions track nor a transcript. */
+  captionsMissing: string;
+  select: string;
+  sizeError: string;
+  trackError: string;
+  trackLabel: string;
+  trackLanguage: string;
+  trackRemove: string;
+  trackUpload: string;
+  transcriptPlaceholder: string;
+  typeError: string;
 }
 
 /** Every piece of wording the editor shows, with English defaults in `DEFAULT_STRINGS`. */
@@ -186,6 +204,17 @@ export interface KoenigStrings {
   markdown: { editorLabel: string; empty: string; placeholder: string; previewLabel: string };
   /** Wording for `useKoenigWordCount`; `{count}` and `{minutes}` are filled in. */
   wordCount: { readLessThanMinute: string; readMinutes: string; word: string; words: string };
+  file: {
+    descriptionPlaceholder: string;
+    select: string;
+    /** `{name}` is replaced with the file name and `{limit}` with the size limit. */
+    sizeError: string;
+    titlePlaceholder: string;
+    /** `{name}` is replaced with the file name. */
+    typeError: string;
+  };
+  video: KoenigMediaStrings & { captionPlaceholder: string };
+  audio: KoenigMediaStrings & { titlePlaceholder: string };
   callout: { background: string; emoji: string; placeholder: string };
   toggle: { contentPlaceholder: string; headingPlaceholder: string };
   snippet: { namePlaceholder: string; replaceExisting: string };
@@ -215,7 +244,8 @@ export type EditorNodes = readonly (Klass<LexicalNode> | LexicalNodeReplacement)
 
 /** A file upload hook, as cards call it: `useFileUpload("image")`. */
 export interface FileUploader {
-  fileTypes?: Record<string, { extensions: string[]; mimeTypes: string[] }>;
+  /** Per upload type. `maxSize` (bytes) is checked by the file, video and audio cards before upload. */
+  fileTypes?: Record<string, { extensions: string[]; maxSize?: number; mimeTypes: string[] }>;
   useFileUpload: (type: string) => {
     errors: { filename?: string; message: string }[];
     isLoading: boolean;
