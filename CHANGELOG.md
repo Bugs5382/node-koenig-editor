@@ -10,6 +10,10 @@
 - feat(editor): file, video, audio, button and markdown cards, word count, image editor and emoji picker @Bugs5382 (#34)
 - feat(editor): image gallery and header cards in the default set, with host-replaceable layout @Bugs5382 (#33)
 
+#### 🐛 Bug Fixes
+
+- fix(editor): the plus button opens the card list @Bugs5382 (#40)
+
 ### Extra
 
 **Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.1.0...v1.2.0
