@@ -21,7 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getRoot, $createParagraphNode, type LexicalNode } from "lexical";
+import {
+  $createParagraphNode,
+  $getRoot,
+  $getSelection,
+  $isNodeSelection,
+  COMMAND_PRIORITY_HIGH,
+  KEY_ENTER_COMMAND,
+  type LexicalNode,
+} from "lexical";
 import { useEffect } from "react";
 
 // Koenig cards mark themselves with `isKoenigCard()`; stock nodes do not have it.
@@ -29,40 +37,27 @@ const isCard = (node: LexicalNode | null): boolean =>
   !!node && (node as { isKoenigCard?: () => boolean }).isKoenigCard?.() === true;
 
 /**
- * Gives every top-level card an empty paragraph before and after it: at the start and the end
- * of the document and between two cards. A card with no paragraph beside it leaves no place for
- * the cursor, so the person cannot type above or below it, and clicking, the arrow keys and
- * Enter have nowhere to go. Returns how many paragraphs it added.
+ * A card at the very start or end of the document has no line beside it, so the cursor cannot
+ * go above or below it. This adds an empty paragraph there, only when there is none, and returns
+ * how many it added. Between two cards it adds nothing: a gap there is the person's to keep or
+ * delete, and one that was deleted is never put back.
  */
 export const $ensureCardSpace = (): number => {
+  const root = $getRoot();
   let added = 0;
-  for (const child of $getRoot().getChildren()) {
-    if (!isCard(child)) continue;
-    const before = child.getPreviousSibling();
-    if (before === null || isCard(before)) {
-      child.insertBefore($createParagraphNode());
-      added += 1;
-    }
-    const after = child.getNextSibling();
-    if (after === null || isCard(after)) {
-      child.insertAfter($createParagraphNode());
-      added += 1;
-    }
+  if (isCard(root.getFirstChild())) {
+    root.getFirstChild()!.insertBefore($createParagraphNode());
+    added += 1;
+  }
+  if (isCard(root.getLastChild())) {
+    root.getLastChild()!.insertAfter($createParagraphNode());
+    added += 1;
   }
   return added;
 };
 
 const needsSpace = (): boolean =>
-  $getRoot()
-    .getChildren()
-    .some(
-      (child) =>
-        isCard(child) &&
-        (child.getPreviousSibling() === null ||
-          isCard(child.getPreviousSibling()) ||
-          child.getNextSibling() === null ||
-          isCard(child.getNextSibling())),
-    );
+  isCard($getRoot().getFirstChild()) || isCard($getRoot().getLastChild());
 
 // Collaborators' changes arrive tagged; the editor that made the change adds the space, so two
 // editors do not both add one.
@@ -74,6 +69,7 @@ export const CardSpacePlugin = () => {
     if (editor._parentEditor) return undefined;
     const fix = () => {
       if (!editor.isEditable()) return;
+      // "history-merge" keeps the paragraph in the same undo step as the change that needed it.
       editor.update(
         () => {
           $ensureCardSpace();
@@ -82,10 +78,36 @@ export const CardSpacePlugin = () => {
       );
     };
     fix();
-    return editor.registerUpdateListener(({ editorState, tags }) => {
+    const stopUpdates = editor.registerUpdateListener(({ editorState, tags }) => {
       if (!editor.isEditable() || REMOTE_TAGS.some((tag) => tags.has(tag))) return;
       if (editorState.read(needsSpace)) fix();
     });
+    // Enter on a selected card with no paragraph after it makes one and moves the cursor into it.
+    // A card that already has a paragraph below it is left to the editor's own handling.
+    const stopEnter = editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      (event) => {
+        if (!editor.isEditable() || event?.shiftKey || event?.metaKey || event?.ctrlKey)
+          return false;
+        const selection = $getSelection();
+        if (!$isNodeSelection(selection)) return false;
+        const nodes = selection.getNodes();
+        const target = nodes.length === 1 ? nodes[0]! : null;
+        if (!target || !isCard(target)) return false;
+        const next = target.getNextSibling();
+        if (next !== null && !isCard(next)) return false;
+        event?.preventDefault?.();
+        const paragraph = $createParagraphNode();
+        target.insertAfter(paragraph);
+        paragraph.selectStart();
+        return true;
+      },
+      COMMAND_PRIORITY_HIGH,
+    );
+    return () => {
+      stopUpdates();
+      stopEnter();
+    };
   }, [editor]);
   return null;
 };
