@@ -30,7 +30,7 @@ export const KoenigPreviewBar = () => {
   if (!available || !showToggle) return null;
   return (
     <div
-      className="koenig-lexical mb-2 flex flex-wrap items-center justify-end gap-2"
+      className="koenig-lexical mb-2 flex flex-wrap items-center justify-end gap-x-4 gap-y-2"
       data-kg-preview-bar
     >
       <KoenigPreviewOptionsPanel />

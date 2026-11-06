@@ -170,8 +170,19 @@ const PreviewController = ({
   useEffect(() => {
     const root = editor.getRootElement();
     const getElement = (key: string) => editor.getElementByKey(key) as HTMLElement | null;
+    // Layout is not done when the mode flips (lazy images and the reflow of a new width land a
+    // moment later), so the scroll is put back once the frame has settled and again shortly after,
+    // unless the person has scrolled in between.
     const settle = (action: () => void) =>
-      window.requestAnimationFrame(() => window.requestAnimationFrame(action));
+      window.requestAnimationFrame(() =>
+        window.requestAnimationFrame(() => {
+          action();
+          const at = window.scrollY;
+          window.setTimeout(() => {
+            if (Math.abs(window.scrollY - at) < 1) action();
+          }, 250);
+        }),
+      );
 
     if (first.current) {
       first.current = false;
