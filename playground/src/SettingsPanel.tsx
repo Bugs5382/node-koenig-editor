@@ -83,14 +83,6 @@ export function SettingsPanel({ catalog, onChange, settings }: Props) {
           <label>
             <input
               type="checkbox"
-              checked={settings.toolbarActions}
-              onChange={(e) => onChange({ toolbarActions: e.target.checked })}
-            />{" "}
-            toolbar actions
-          </label>
-          <label>
-            <input
-              type="checkbox"
               checked={settings.comments}
               onChange={(e) => onChange({ comments: e.target.checked })}
             />{" "}

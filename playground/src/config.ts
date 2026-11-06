@@ -70,7 +70,6 @@ export interface Catalog {
 export interface Settings {
   cards: string[];
   tools: string[];
-  toolbarActions: boolean;
   comments: boolean;
   wordCount: boolean;
   readOnly: boolean;
@@ -97,7 +96,6 @@ export function defaultSettings(catalog: Catalog): Settings {
   return {
     cards: [...catalog.cards],
     tools: [...catalog.tools],
-    toolbarActions: true,
     comments: true,
     wordCount: true,
     readOnly: false,
@@ -111,15 +109,7 @@ export function defaultSettings(catalog: Catalog): Settings {
   };
 }
 
-const FLAGS = [
-  "toolbarActions",
-  "comments",
-  "wordCount",
-  "readOnly",
-  "dark",
-  "sampleUploads",
-  "preview",
-] as const;
+const FLAGS = ["comments", "wordCount", "readOnly", "dark", "sampleUploads", "preview"] as const;
 
 const sameList = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((v, i) => v === b[i]);
@@ -190,7 +180,6 @@ export function buildSnippet(settings: Settings, catalog: Catalog): string {
   if (catalog.tools.length && !sameList(settings.tools, catalog.tools)) {
     props.push(`tools={${list(settings.tools)}}`);
   }
-  if (settings.toolbarActions) props.push("toolbarActions={toolbarActions}");
   if (settings.comments) props.push("comments={comments}");
   if (settings.readOnly) props.push("editable={false}");
   props.push("fileUploader={fileUploader}");

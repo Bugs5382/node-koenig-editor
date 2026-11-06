@@ -266,18 +266,18 @@ export function MyEditor({
 
 `toolbarActions` adds your own buttons to the toolbar that appears over selected text, after
 Bold, Italic, the headings, Quote and Link. A button either runs a function or opens a card
-under the toolbar. This is how a host adds, for example, an AI card that rewrites the selection.
+under the toolbar. This is how a host adds, for example, a card that marks the selection as a note.
 
 ```tsx
 const actions: KoenigToolbarAction[] = [
   {
-    id: "rewrite",
-    label: "Rewrite",
-    Icon: WandIcon, // optional; the first letters of the label show otherwise
+    id: "highlight-note",
+    label: "Highlight note",
+    Icon: NoteIcon, // optional; the first letters of the label show otherwise
     Card: ({ text, replaceSelection, close }) => (
-      <RewriteCard
+      <NoteCard
         text={text}
-        onAccept={(rewritten) => replaceSelection(rewritten)}
+        onAccept={(note) => replaceSelection(note)}
         onCancel={close}
       />
     ),
@@ -877,8 +877,7 @@ one, apply the change by hand, and update the commit here. Upstream history is n
 ## 🧪 Playground
 
 A demo app in `playground/` runs the editor in your browser, with a checkbox for every card and
-tool, the toolbar actions, comments, word count and read-only mode, and the matching code next to
-them. The page splits 50/50 under a sticky top bar (the editor on the left, the options, code,
+tool, comments, word count and read-only mode, and the matching code next to them. The page splits 50/50 under a sticky top bar (the editor on the left, the options, code,
 sample images, comments and saved state stacked on the right, each side scrolling on its own; under
 1000px the right side drops below the editor). The bar holds the Editor and Guide tabs, the switches (dark, read only), a
 text-size control, a selection colour picker, a card preset list, and the Load sample images, Load
@@ -900,6 +899,15 @@ npm run playground:published  # against the latest published node-koenig-editor
 
 It opens on http://127.0.0.1:5178. The demo has its own `package.json`, lint and tests
 (`npm run playground:check`), and it is not part of the published package.
+
+### Build your own playground
+
+The demo is generic on purpose: it shows what the package does and nothing that belongs to one
+product. An app that wants a playground of its own (with its own toolbar actions, its own cards, its
+own tokens and its own sample content) builds one. Start from `playground/`: copy the folder into
+your app, point its `node-koenig-editor` import at your install, and swap in your options. The
+settings panel, the page-address sync and the code view are plain React and have no dependency on
+the rest of this repo.
 
 ## 🛠 Develop
 

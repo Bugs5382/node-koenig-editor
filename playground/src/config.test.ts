@@ -46,7 +46,6 @@ describe("settings in the page address", () => {
     expect(s.tools).toEqual(catalog.tools);
     expect(s).toMatchObject({
       comments: true,
-      toolbarActions: true,
       readOnly: false,
       sampleUploads: true,
       size: 16,
@@ -143,7 +142,6 @@ describe("code snippet", () => {
     expect(code).toContain("<KoenigComposer");
     expect(code).not.toContain("cards=");
     expect(code).not.toContain("tools=");
-    expect(code).toContain("toolbarActions={toolbarActions}");
     expect(code).toContain("comments={comments}");
   });
 
@@ -159,7 +157,6 @@ describe("code snippet", () => {
       ...defaultSettings(catalog),
       cards: [],
       tools: [],
-      toolbarActions: false,
       comments: false,
       readOnly: true,
     };
@@ -168,7 +165,6 @@ describe("code snippet", () => {
     expect(code).toContain("tools={[]}");
     expect(code).toContain("editable={false}");
     expect(code).toContain("<KoenigEditor readOnly />");
-    expect(code).not.toContain("toolbarActions");
     expect(code).not.toContain("comments=");
   });
 

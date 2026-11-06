@@ -56,18 +56,10 @@ import {
 import { SettingsPanel } from "./SettingsPanel";
 import { TopBar } from "./TopBar";
 import { ThreadList } from "./ThreadList";
-import { toolbarActions } from "./toolbarActions";
 import { fileUploader, setSampleUploads } from "./uploader";
 
 // Everything but the text size changes what the composer is built with, so it rebuilds.
-const REBUILD: (keyof Settings)[] = [
-  "cards",
-  "tools",
-  "toolbarActions",
-  "comments",
-  "readOnly",
-  "dark",
-];
+const REBUILD: (keyof Settings)[] = ["cards", "tools", "comments", "readOnly", "dark"];
 
 // The enabled cards, or null when the package does not list its cards (every card is on).
 const enabledCards = (settings: Settings) => (catalog.cards.length ? settings.cards : null);
@@ -324,7 +316,6 @@ export function App() {
           editable={!settings.readOnly}
           fileUploader={fileUploader}
           initialEditorState={initial}
-          toolbarActions={settings.toolbarActions ? toolbarActions : undefined}
           {...optionalProps}
         >
           {previewAvailable && usePreview && <PreviewWidthBridge width={settings.previewWidth} />}
