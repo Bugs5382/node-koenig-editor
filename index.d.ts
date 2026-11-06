@@ -52,7 +52,7 @@ export type KoenigCardName =
   | "video";
 
 /** Features that are not cards. Pass a list as the composer's `tools` to keep only those. */
-export type KoenigTool = "emojiPicker" | "imageEditor";
+export type KoenigTool = "emojiPicker" | "imageEditor" | "preview";
 
 /** The emoji picker's groups, in tab order. */
 export type KoenigEmojiCategory =
@@ -136,6 +136,7 @@ export interface KoenigStrings {
   close: string;
   searching: string;
   cards: Record<KoenigCardName, KoenigCardText>;
+  preview: { toggle: string };
   menu: { addCard: string; removeSnippet: string; sections: Record<string, string> };
   toolbar: Record<KoenigToolbarItem, string>;
   /** The table card's controls; `toolbar` names the group for screen readers. */
@@ -541,7 +542,32 @@ export interface KoenigCardRenderers {
   header?: FC<KoenigHeaderRenderProps>;
 }
 
+/** The reader's view: how wide the frame is, light or dark, and the text size. */
+export interface KoenigPreviewOptions {
+  /** The root text size in px, 12 to 20 in steps of 2. */
+  textSize: 12 | 14 | 16 | 18 | 20;
+  theme: "dark" | "light";
+  width: "desktop" | "phone" | "tablet";
+}
+
 export interface KoenigComposerProps {
+  /** Starts with the reader's view on, when the host does not control `preview`. */
+  defaultPreview?: boolean;
+  /** Called when the person turns the reader's view on or off (or the API does). */
+  onPreviewChange?: (preview: boolean) => void;
+  /** Called when the reader simulation options change. */
+  onPreviewOptionsChange?: (options: KoenigPreviewOptions) => void;
+  /** Controls the reader's view: when given, the editor only changes with this prop and reports a
+   *  request to change through `onPreviewChange`. */
+  preview?: boolean;
+  /** Show the inline comment highlights in the reader's view. Off by default: a reader of the
+   *  published document does not see them. */
+  previewComments?: boolean;
+  /** The reader simulation the view starts with. */
+  previewOptions?: Partial<KoenigPreviewOptions>;
+  /** Put the Preview button above the editor. Default true; pass false to place a
+   *  `KoenigPreviewToggle` yourself. The `preview` tool must be on either way. */
+  showPreviewToggle?: boolean;
   /** Replaces how a shipped card is drawn; see `KoenigCardRenderers`. */
   cardRenderers?: KoenigCardRenderers;
   /** Options for the gallery card. */
@@ -578,6 +604,11 @@ export interface KoenigComposerProps {
 }
 
 export interface KoenigEditorAPI {
+  /** Whether the reader's view (preview) is showing. */
+  isPreview: () => boolean;
+  /** Turns the reader's view on or off. Does nothing when the `preview` tool is off or the editor
+   *  is not editable. */
+  setPreview: (on: boolean) => void;
   /** The comment controller; null unless the composer was given `comments`. */
   comments?: KoenigCommentsController | null;
   editorInstance: LexicalEditor;
@@ -616,6 +647,21 @@ export declare const MINIMAL_NODES: EditorNodes;
 
 /** The shipped card names, in menu order. */
 export declare const KOENIG_CARD_NAMES: readonly KoenigCardName[];
+
+/** The Preview button, for a host to place inside the composer. Renders nothing when preview is
+ *  not available. */
+export declare const KoenigPreviewToggle: FC<{ className?: string }>;
+
+/** The preview state: for a host's own control or status. */
+export declare const useKoenigPreview: () => {
+  available: boolean;
+  options: KoenigPreviewOptions;
+  preview: boolean;
+  previewComments: boolean;
+  setOptions: (changes: Partial<KoenigPreviewOptions>) => void;
+  setPreview: (on: boolean) => void;
+  showToggle: boolean;
+};
 
 /** The default gallery, drawn from the props of `cardRenderers.gallery`, for a host to wrap. */
 export declare const KoenigGalleryCard: FC<KoenigGalleryRenderProps>;

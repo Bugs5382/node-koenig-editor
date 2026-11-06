@@ -215,6 +215,9 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     emoji: "Emoji",
     placeholder: "Callout text...",
   },
+  preview: {
+    toggle: "Preview",
+  },
   toggle: {
     contentPlaceholder: "Collapsible content",
     headingPlaceholder: "Toggle header",
