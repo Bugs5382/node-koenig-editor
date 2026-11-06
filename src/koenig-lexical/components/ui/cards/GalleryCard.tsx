@@ -6,7 +6,7 @@ import {MediaPlaceholder} from '../MediaPlaceholder';
 import {ImageTextDialog} from '../../../../additions/gallery/ImageTextDialog';
 import {ProgressBar} from '../ProgressBar';
 import {Tooltip} from '../Tooltip';
-import {useGalleryText} from '../../../../additions/gallery/galleryText';
+import {photoKey, useGalleryText} from '../../../../additions/gallery/galleryText';
 
 function TextIcon({className}) {
     return (
@@ -24,7 +24,7 @@ function ChevronIcon({className, up}) {
     );
 }
 
-function GalleryRow({index, images, deleteImage, isDragging, isSelected, listIndexOf, total, moveImage, text, updateImageText, strings, unescapeHtml}) {
+function GalleryRow({index, images, deleteImage, isDragging, isSelected, listIndexOf, total, moveImage, text, announce, updateImageText, strings, unescapeHtml}) {
     const GalleryImages = images.map((image, idx) => {
         const position =
             images.length === 1 ? 'single' :
@@ -32,82 +32,63 @@ function GalleryRow({index, images, deleteImage, isDragging, isSelected, listInd
                     idx === images.length - 1 ? 'last' :
                         'middle';
 
-        return <GalleryImage key={image.fileName + (image.src || image.previewSrc)} deleteImage={deleteImage} image={image} isDragging={isDragging} isSelected={isSelected} listIndex={listIndexOf(image)} moveImage={moveImage} position={position} strings={strings} text={text} total={total} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
+        return <GalleryImage key={image.fileName + (image.src || image.previewSrc)} deleteImage={deleteImage} image={image} isDragging={isDragging} isSelected={isSelected} listIndex={listIndexOf(image)} moveImage={moveImage} announce={announce} position={position} strings={strings} text={text} total={total} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
     });
 
-    const GalleryControls = isSelected && !isDragging ? (
-        <div className="flex flex-row justify-center" data-row-controls={index}>
-            {images.map((image, idx) => {
-                const position =
-                    images.length === 1 ? 'single' :
-                        idx === 0 ? 'first' :
-                            idx === images.length - 1 ? 'last' :
-                                'middle';
-                return <GalleryImageControls key={image.fileName + (image.src || image.previewSrc)} image={image} listIndex={listIndexOf(image)} moveImage={moveImage} position={position} strings={strings} total={total} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
-            })}
-        </div>
-    ) : null;
 
     return (
         <div className={index !== 0 ? 'mt-4' : ''}>
             <div className="flex flex-row justify-center" data-row={index}>
                 {GalleryImages}
             </div>
-            {GalleryControls}
         </div>
     );
 }
 
-// The alt, caption and reorder controls for one image. They sit in a strip under the row, not inside
-// the image's own box: that box is only as tall as the picture, so controls inside it spilled over
-// the next row. Each one takes the same width share and side padding as the image above it.
-function GalleryImageControls({image, position, listIndex, total, moveImage, updateImageText, strings, unescapeHtml}) {
-    const aspectRatio = (image.width || 1) / (image.height || 1);
-    const sides = {
-        first: 'pr-2',
-        middle: 'pl-2 pr-2',
-        last: 'pl-2'
-    }[position] || '';
+// Fills {n}, {total} and {other} in one of the gallery's wordings.
+const fill = (template, values) => template.replace(/\{(\w+)\}/g, (match, name) => (values[name] === undefined ? match : String(values[name])));
 
-    return (
-        <div className={`min-w-0 ${sides}`} data-gallery-image-controls style={{flex: `${aspectRatio} 1 0%`}}>
-            <div className="not-kg-prose flex min-w-0 flex-col gap-1" data-koenig-dnd-disabled>
-                <div className="flex gap-1">
-                    <button
-                        aria-label={strings.moveEarlier}
-                        className="cursor-pointer rounded border border-grey-300 px-2 font-sans text-sm disabled:opacity-40"
-                        data-gallery-image-earlier
-                        disabled={listIndex <= 0}
-                        type="button"
-                        onClick={() => moveImage(listIndex, listIndex - 1)}
-                    >
-                        &larr;
-                    </button>
-                    <button
-                        aria-label={strings.moveLater}
-                        className="cursor-pointer rounded border border-grey-300 px-2 font-sans text-sm disabled:opacity-40"
-                        data-gallery-image-later
-                        disabled={listIndex >= total - 1}
-                        type="button"
-                        onClick={() => moveImage(listIndex, listIndex + 1)}
-                    >
-                        &rarr;
-                    </button>
-                </div>
-                <input
-                    className="w-full rounded border border-grey-300 bg-transparent px-2 font-sans text-sm"
-                    data-gallery-image-alt
-                    placeholder={strings.altPlaceholder}
-                    type="text"
-                    value={image.alt || ''}
-                    onChange={e => updateImageText(listIndex, {alt: e.target.value})}
-                />
-            </div>
-        </div>
-    );
-}
+function GalleryImage({image, deleteImage, position, isDragging, isSelected, listIndex, total, moveImage, text, announce, updateImageText, strings, unescapeHtml}) {
+    const itemRef = React.useRef(null);
+    const keyRef = photoKey(image);
 
-function GalleryImage({image, deleteImage, position, isDragging, isSelected, listIndex, total, moveImage, text, updateImageText, strings, unescapeHtml}) {
+    // Alt with the left or right arrow moves the focused photo, for people who cannot drag. This
+    // listens on the photo itself, below the editor's own key handling, so the arrow keys do not
+    // also move the editor's cursor.
+    const latest = React.useRef({});
+    latest.current = {listIndex, total, moveImage, announce, strings};
+    React.useEffect(() => {
+        const element = itemRef.current;
+        if (!element) {
+            return undefined;
+        }
+        const onKeyDown = (event) => {
+            if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) {
+                return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            const {listIndex: from, total: count, moveImage: move, announce: say, strings: words} = latest.current;
+            const to = event.key === 'ArrowLeft' ? from - 1 : from + 1;
+            const values = {n: from + 1, total: count};
+            if (to < 0) {
+                say(fill(words.imageAtStart, values));
+                return;
+            }
+            if (to >= count) {
+                say(fill(words.imageAtEnd, values));
+                return;
+            }
+            move(from, to);
+            say(fill(to < from ? words.imageMovedBefore : words.imageMovedAfter, {...values, other: to + 1}));
+            // The moved photo may be a new element (it can change row); put focus back on it.
+            window.requestAnimationFrame(() => {
+                element.closest('[data-gallery]')?.querySelector(`[data-photo-key="${keyRef}"]`)?.focus();
+            });
+        };
+        element.addEventListener('keydown', onKeyDown);
+        return () => element.removeEventListener('keydown', onKeyDown);
+    }, [keyRef]);
     const editButtonRef = React.useRef(null);
     const [editingText, setEditingText] = React.useState(false);
     const panelId = React.useId();
@@ -139,10 +120,16 @@ function GalleryImage({image, deleteImage, position, isDragging, isSelected, lis
 
     return (
         <div
+            ref={itemRef}
+            aria-label={isSelected ? fill(strings.imageLabel, {n: listIndex + 1, total}) : undefined}
             className={`group/image relative ${classes.join(' ')}`}
-            data-testid="gallery-image"
-            style={style}
+            data-gallery-image
             data-image
+            data-photo-key={keyRef}
+            data-testid="gallery-image"
+            role={isSelected ? 'group' : undefined}
+            style={style}
+            tabIndex={isSelected ? 0 : undefined}
         >
             <img
                 alt={image.alt}
@@ -198,12 +185,13 @@ function GalleryImage({image, deleteImage, position, isDragging, isSelected, lis
 
             {editingText ? (
                 <ImageTextDialog
+                    alt={image.alt || ''}
                     caption={unescapeHtml(image.caption || '')}
                     opener={editButtonRef.current}
                     strings={strings}
                     title={unescapeHtml(image.title || '')}
                     onClose={() => setEditingText(false)}
-                    onSave={({title, caption}) => updateImageText(listIndex, {title, caption})}
+                    onSave={({title, caption, alt}) => updateImageText(listIndex, {title, caption, alt})}
                 />
             ) : null}
 
@@ -215,6 +203,7 @@ function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, 
     const rows = [];
     const withText = images.filter(image => image.title || image.caption);
     const text = useGalleryText(images, withText);
+    const [announcement, announce] = React.useState('');
     const noOfImages = images.length;
 
     // 3 images per row unless last row would have a single image in which
@@ -240,12 +229,13 @@ function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, 
 
     const GalleryRows = rows.map((rowImages, idx) => {
         // eslint-disable-next-line react/no-array-index-key
-        return <GalleryRow key={idx} deleteImage={deleteImage} images={rowImages} index={idx} isDragging={isDragging} isSelected={isSelected} listIndexOf={image => images.indexOf(image)} moveImage={moveImage} strings={strings} text={text} total={noOfImages} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
+        return <GalleryRow key={idx} deleteImage={deleteImage} images={rowImages} index={idx} isDragging={isDragging} isSelected={isSelected} listIndexOf={image => images.indexOf(image)} announce={announce} moveImage={moveImage} strings={strings} text={text} total={noOfImages} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
     });
 
     return (
         <div ref={reorderHandler.setContainerRef} className="not-kg-prose relative flex flex-col" data-gallery>
             {GalleryRows}
+            <div aria-live="polite" className="sr-only" data-gallery-announce role="status">{announcement}</div>
             {withText.length ? (
                 <button
                     aria-label={text.allCollapsed ? strings.showAllImageText : strings.hideAllImageText}

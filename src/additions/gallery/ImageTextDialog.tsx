@@ -25,19 +25,22 @@ import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 import { FloatingPortal } from "../placement/FloatingPortal";
 
 export interface ImageTextDialogStrings {
+  imageAltLabel: string;
   imageCaptionLabel: string;
   imageTextCancel: string;
   imageTextDialogTitle: string;
+  imageTextHelp: string;
   imageTextSave: string;
   imageTitleLabel: string;
 }
 
 interface ImageTextDialogProps {
+  alt: string;
   caption: string;
   /** The icon that opened the dialog; focus goes back to it on close. */
   opener: HTMLElement | null;
   onClose: () => void;
-  onSave: (text: { caption: string; title: string }) => void;
+  onSave: (text: { alt: string; caption: string; title: string }) => void;
   strings: ImageTextDialogStrings;
   title: string;
 }
@@ -48,6 +51,7 @@ const FOCUSABLE = "input, textarea, button, [href], select, [tabindex]:not([tabi
 // card: the card is a wide, transformed box, which would carry a fixed dialog off to the side, and
 // its events would reach the editor (Enter adding a paragraph, Backspace deleting the card).
 export const ImageTextDialog = ({
+  alt,
   caption,
   onClose,
   onSave,
@@ -56,10 +60,12 @@ export const ImageTextDialog = ({
   title,
 }: ImageTextDialogProps) => {
   const headingId = useId();
+  const helpId = useId();
   const boxRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const [titleValue, setTitleValue] = useState(title);
   const [captionValue, setCaptionValue] = useState(caption);
+  const [altValue, setAltValue] = useState(alt);
   const target = opener?.closest(".koenig-lexical") ?? document.body;
 
   useEffect(() => {
@@ -71,7 +77,7 @@ export const ImageTextDialog = ({
     opener?.focus();
   };
   const save = () => {
-    onSave({ caption: captionValue.trim(), title: titleValue.trim() });
+    onSave({ alt: altValue.trim(), caption: captionValue.trim(), title: titleValue.trim() });
     onClose();
     opener?.focus();
   };
@@ -119,6 +125,7 @@ export const ImageTextDialog = ({
       >
         <div
           ref={boxRef}
+          aria-describedby={helpId}
           aria-labelledby={headingId}
           aria-modal="true"
           className="flex w-[min(92vw,44rem)] flex-col gap-4 rounded-lg bg-white p-6 font-sans shadow-xl dark:bg-grey-950"
@@ -128,11 +135,19 @@ export const ImageTextDialog = ({
           <h2 className="m-0 text-lg font-semibold text-grey-900 dark:text-grey-200" id={headingId}>
             {strings.imageTextDialogTitle}
           </h2>
+          <p
+            className="m-0 text-sm text-grey-700 dark:text-grey-500"
+            data-gallery-text-help
+            id={helpId}
+          >
+            {strings.imageTextHelp}
+          </p>
           <label className="flex flex-col gap-1 text-sm font-medium text-grey-800 dark:text-grey-400">
             {strings.imageTitleLabel}
             <input
               ref={titleRef}
               className={field}
+              data-gallery-text-title
               type="text"
               value={titleValue}
               onChange={(event) => setTitleValue(event.target.value)}
@@ -144,6 +159,16 @@ export const ImageTextDialog = ({
               className={`${field} min-h-[8rem] resize-y`}
               value={captionValue}
               onChange={(event) => setCaptionValue(event.target.value)}
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm font-medium text-grey-800 dark:text-grey-400">
+            {strings.imageAltLabel}
+            <input
+              className={field}
+              data-gallery-text-alt
+              type="text"
+              value={altValue}
+              onChange={(event) => setAltValue(event.target.value)}
             />
           </label>
           <div className="flex justify-end gap-2">

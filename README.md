@@ -305,14 +305,15 @@ simple: no merged cells and no cell colours.
 Both are in the default card set, so they are in the "+" and slash menus (`/gallery`, `/header`).
 `cards` leaves either out, like any other card.
 
-**Gallery.** Up to nine images. Select the card to reorder (drag, or the earlier and later
-buttons) and to give each image its own alt text. A gallery has its own caption too. The host's
-`fileUploader` is called once per image, so a progress bar or a failure belongs to one picture.
-Files outside `fileUploader.fileTypes.image.mimeTypes`, and images past the ninth, are refused
-with a message (`strings.gallery`) before the uploader is called.
+**Gallery.** Up to nine images. Reorder by dragging. Without a mouse, select the card, focus a
+photo (Tab) and press Alt with the left or right arrow key; a short announcement follows ("Image
+2 of 5, moved before image 1"). The host's `fileUploader` is called once per image, so a progress
+bar or a failure belongs to one picture. Files outside `fileUploader.fileTypes.image.mimeTypes`,
+and images past the ninth, are refused with a message (`strings.gallery`) before the uploader is
+called. A gallery has its own caption too.
 
-*Title and caption.* Selecting a photo shows its icons: remove, and an icon that opens a dialog
-for that photo's title and caption (focus stays in the dialog, Escape closes it without saving,
+*Title, caption and alt text.* Selecting a photo shows its icons: remove, and an icon that opens a
+dialog for that photo's title, caption and alt text (its help text says how to move the photo; focus stays in the dialog, Escape closes it without saving,
 Enter in the title saves). The text shows as an overlay along the bottom of the photo, on a solid
 dark band so it reads on any picture. Each photo's overlay has a control that collapses it, and
 the gallery has one control that collapses or expands them all. Collapsing hides the text from
@@ -719,8 +720,8 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   names (upstream swaps in `extended-*` replacements). Code blocks are stock `code` nodes.
 - Gallery and header: `src/kg-default-nodes` and `src/koenig-lexical` carry upstream's gallery
   node, parser and renderer and the header node, parser and renderers from the same commit. The
-  gallery card uploads one image at a time, has per-image alt text, title and caption, and reorders with
-  buttons as well as drag. The header card is a smaller editor than upstream's (no image editor,
+  gallery card uploads one image at a time, has per-image alt text, title and caption (all in one
+  dialog), and reorders by drag or with Alt and the arrow keys. The header card is a smaller editor than upstream's (no image editor,
   no version 1 controls), and both take a host layout through `cardRenderers`.
 - File, video and audio: the file card is upstream's, without the email table. Video and audio are
   written for this package (upstream's depend on Ghost's thumbnails and player script): the

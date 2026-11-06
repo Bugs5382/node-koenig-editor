@@ -179,7 +179,6 @@ export interface KoenigStrings {
   };
   gallery: {
     addImages: string;
-    altPlaceholder: string;
     captionPlaceholder: string;
     dismiss: string;
     dropToAdd: string;
@@ -187,8 +186,6 @@ export interface KoenigStrings {
     imageCaptionPlaceholder: string;
     /** `{max}` is replaced with the image limit. */
     limitError: string;
-    moveEarlier: string;
-    moveLater: string;
     select: string;
     uploadError: string;
     /** Names the icon that opens the title and caption dialog for one photo. */
@@ -202,6 +199,16 @@ export interface KoenigStrings {
     imageTitleLabel: string;
     showAllImageText: string;
     showImageText: string;
+    imageAltLabel: string;
+    /** `{n}` and `{total}` are replaced with the photo's place and the number of photos. */
+    imageAtEnd: string;
+    imageAtStart: string;
+    imageLabel: string;
+    /** As above, and `{other}` with the place of the photo it moved past. */
+    imageMovedAfter: string;
+    imageMovedBefore: string;
+    /** Help in the title, caption and alt text dialog, including how to move a photo. */
+    imageTextHelp: string;
   };
   header: {
     alignCenter: string;

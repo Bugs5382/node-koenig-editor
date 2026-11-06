@@ -127,12 +127,14 @@ const openDialogFor = async (index: number) => {
 };
 
 describe("selecting a photo offers a title and caption dialog, not inline caption boxes", () => {
-  it("has no inline caption box under the images", async () => {
+  it("has no inline caption or alt box and no arrow buttons under the images", async () => {
     await open();
     await selectGallery();
     expect(document.querySelector("[data-gallery-image-caption]")).toBeNull();
-    // alt text stays where it was
-    expect(document.querySelectorAll("[data-gallery-image-alt]")).toHaveLength(3);
+    expect(document.querySelector("[data-gallery-image-alt]")).toBeNull();
+    expect(document.querySelector("[data-gallery-image-earlier]")).toBeNull();
+    expect(document.querySelector("[data-gallery-image-later]")).toBeNull();
+    expect(document.querySelector("[data-row-controls]")).toBeNull();
   });
 
   it("shows an edit icon for each photo when the gallery is selected, next to the remove icon", async () => {
@@ -140,7 +142,7 @@ describe("selecting a photo offers a title and caption dialog, not inline captio
     await selectGallery();
     expect(textButtons()).toHaveLength(3);
     for (const button of textButtons()) {
-      expect(button.getAttribute("aria-label")).toBe("Edit title and caption");
+      expect(button.getAttribute("aria-label")).toBe("Edit title, caption and alt text");
       expect(button.parentElement?.querySelector('[aria-label="Delete"]')).not.toBeNull();
     }
   });
@@ -151,20 +153,28 @@ describe("selecting a photo offers a title and caption dialog, not inline captio
     expect(box.getAttribute("aria-modal")).toBe("true");
     expect(box.getAttribute("aria-labelledby")).toBeTruthy();
     expect(document.getElementById(box.getAttribute("aria-labelledby") as string)).not.toBeNull();
-    const title = box.querySelector("input") as HTMLInputElement;
+    const title = box.querySelector("[data-gallery-text-title]") as HTMLInputElement;
     const caption = box.querySelector("textarea") as HTMLTextAreaElement;
+    const alt = box.querySelector("[data-gallery-text-alt]") as HTMLInputElement;
     expect(title.value).toBe("Alpha");
     expect(caption.value).toBe("First & best");
+    expect(alt.value).toBe("one");
     expect(document.activeElement).toBe(title);
+    expect(box.querySelector("label [data-gallery-text-alt]")).not.toBeNull();
   });
 
   it("saves the title and caption for that photo only", async () => {
     const { api } = await open();
     const box = await openDialogFor(1);
     await act(async () => {
-      fireEvent.change(box.querySelector("input") as Element, { target: { value: "Beta" } });
+      fireEvent.change(box.querySelector("[data-gallery-text-title]") as Element, {
+        target: { value: "Beta" },
+      });
       fireEvent.change(box.querySelector("textarea") as Element, {
         target: { value: "Tom & <Jerry>" },
+      });
+      fireEvent.change(box.querySelector("[data-gallery-text-alt]") as Element, {
+        target: { value: "A cat and a mouse" },
       });
     });
     await act(async () => {
@@ -173,7 +183,12 @@ describe("selecting a photo offers a title and caption dialog, not inline captio
     await waitFor(() => expect(dialog()).toBeNull());
     const images = galleryOf(api.serialize()).images;
     expect(images[0]).toMatchObject({ title: "Alpha", caption: "First &amp; best" });
-    expect(images[1]).toMatchObject({ title: "Beta", caption: "Tom &amp; &lt;Jerry&gt;" });
+    expect(images[1]).toMatchObject({
+      alt: "A cat and a mouse",
+      caption: "Tom &amp; &lt;Jerry&gt;",
+      title: "Beta",
+    });
+    expect(images[0]).toMatchObject({ alt: "one" });
     expect(images[2]).toMatchObject({ caption: "Third" });
   });
 
@@ -220,7 +235,7 @@ describe("typing in the dialog never reaches the document", () => {
     const { api } = await open();
     const before = JSON.parse(api.serialize());
     const box = await openDialogFor(0);
-    const title = box.querySelector("input") as HTMLInputElement;
+    const title = box.querySelector("[data-gallery-text-title]") as HTMLInputElement;
     const caption = box.querySelector("textarea") as HTMLTextAreaElement;
     // The caption takes every key; in the title, Enter saves, so it comes last.
     caption.focus();
@@ -348,5 +363,97 @@ describe("the title and caption show over the bottom of the photo", () => {
     } finally {
       Object.defineProperty(window, "localStorage", original);
     }
+  });
+});
+
+describe("the dialog also holds the alt text, and says how to move a photo", () => {
+  it("has three labelled fields and a help text about Alt and the arrow keys", async () => {
+    await open();
+    const box = await openDialogFor(0);
+    const labels = [...box.querySelectorAll("label")].map((label) =>
+      label.firstChild?.textContent?.trim(),
+    );
+    expect(labels).toEqual(["Title", "Caption", "Alt text"]);
+    const help = box.querySelector("[data-gallery-text-help]") as HTMLElement;
+    expect(help.textContent).toMatch(/Alt/);
+    expect(help.textContent).toMatch(/arrow/i);
+    expect(box.getAttribute("aria-describedby")).toBe(help.id);
+  });
+});
+
+const items = () => [...document.querySelectorAll<HTMLElement>("[data-gallery-image]")];
+const names = (api: { serialize: () => string }) =>
+  galleryOf(api.serialize()).images.map((photo: { fileName: string }) => photo.fileName);
+const live = () => document.querySelector("[data-gallery-announce]") as HTMLElement;
+
+const altArrow = async (item: HTMLElement, key: "ArrowLeft" | "ArrowRight") => {
+  await act(async () => {
+    fireEvent.keyDown(item, { altKey: true, key });
+  });
+};
+
+describe("Alt and the left or right arrow move the focused photo", () => {
+  it("makes each photo focusable only while the gallery is selected", async () => {
+    await open();
+    for (const item of items()) expect(item.getAttribute("tabindex")).toBeNull();
+    await selectGallery();
+    for (const item of items()) expect(item.getAttribute("tabindex")).toBe("0");
+    expect(items()[1]?.getAttribute("aria-label")).toBe("Image 2 of 3");
+  });
+
+  it("Alt+Left moves a photo before the one in front of it and announces it", async () => {
+    const { api } = await open();
+    await selectGallery();
+    items()[1]?.focus();
+    await altArrow(items()[1] as HTMLElement, "ArrowLeft");
+    expect(names(api)).toEqual(["two.gif", "one.gif", "three.gif"]);
+    expect(live().textContent).toBe("Image 2 of 3, moved before image 1");
+    expect(live().getAttribute("aria-live")).toBe("polite");
+  });
+
+  it("Alt+Right moves it after the next one, and focus stays on the moved photo", async () => {
+    const { api } = await open();
+    await selectGallery();
+    items()[0]?.focus();
+    await altArrow(items()[0] as HTMLElement, "ArrowRight");
+    expect(names(api)).toEqual(["two.gif", "one.gif", "three.gif"]);
+    expect(live().textContent).toBe("Image 1 of 3, moved after image 2");
+    await waitFor(() => {
+      expect(document.activeElement?.getAttribute("aria-label")).toBe("Image 2 of 3");
+    });
+    expect(document.activeElement?.querySelector("img")?.getAttribute("alt")).toBe("one");
+  });
+
+  it("says so at the ends and changes nothing", async () => {
+    const { api } = await open();
+    await selectGallery();
+    await altArrow(items()[0] as HTMLElement, "ArrowLeft");
+    expect(names(api)).toEqual(["one.gif", "two.gif", "three.gif"]);
+    expect(live().textContent).toBe("Image 1 of 3 is already first");
+    await altArrow(items()[2] as HTMLElement, "ArrowRight");
+    expect(names(api)).toEqual(["one.gif", "two.gif", "three.gif"]);
+    expect(live().textContent).toBe("Image 3 of 3 is already last");
+  });
+
+  it("leaves the arrows alone without Alt, and leaves the document's cursor keys alone", async () => {
+    const { api } = await open();
+    await selectGallery();
+    await act(async () => {
+      fireEvent.keyDown(items()[1] as HTMLElement, { key: "ArrowLeft" });
+    });
+    expect(names(api)).toEqual(["one.gif", "two.gif", "three.gif"]);
+    expect(live().textContent).toBe("");
+  });
+
+  it("does not move a photo while a field in the dialog has the keys", async () => {
+    const { api } = await open();
+    const box = await openDialogFor(1);
+    await act(async () => {
+      fireEvent.keyDown(box.querySelector("[data-gallery-text-title]") as Element, {
+        altKey: true,
+        key: "ArrowLeft",
+      });
+    });
+    expect(names(api)).toEqual(["one.gif", "two.gif", "three.gif"]);
   });
 });

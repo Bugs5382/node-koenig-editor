@@ -4082,10 +4082,6 @@ em-emoji-picker {
     --tw-ring-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-ring-opacity, 1) * 100%), transparent);
 }
 
-.koenig-lexical .disabled\:opacity-40:disabled {
-    opacity: 0.4;
-}
-
 .koenig-lexical .disabled\:opacity-50:disabled {
     opacity: 0.5;
 }

@@ -127,35 +127,34 @@ describe("the gallery card", () => {
     expect(calls).toHaveLength(0);
   });
 
-  it("keeps an alt text inline and a title and caption, set in a dialog, for each image", async () => {
+  it("keeps an alt text, a title and a caption for each image, set in one dialog", async () => {
     const calls: string[][] = [];
     const { api } = await insertGallery({ composer: { fileUploader: recordingUploader(calls) } });
     await addFiles([png("a.png"), png("b.png")]);
     await waitFor(() => expect(galleryOf(api.serialize())?.images).toHaveLength(2));
-    const alts = document.querySelectorAll<HTMLInputElement>("[data-gallery-image-alt]");
-    expect(alts).toHaveLength(2);
-    // The boxes for alt text and the reorder arrows sit in a strip under the row, not inside an
-    // image's own box (which is only as tall as the picture, so they would spill over the next
-    // row), one per image in order. The caption is no longer a box here: it has a dialog.
-    expect(document.querySelector("[data-gallery-image-caption]")).toBeNull();
-    for (const field of alts) {
-      expect(field.closest("[data-image]")).toBeNull();
-      expect(field.closest("[data-gallery-image-controls]")).not.toBeNull();
+    // There is no alt, caption or arrow box under the images any more.
+    for (const hook of [
+      "[data-gallery-image-alt]",
+      "[data-gallery-image-caption]",
+      "[data-gallery-image-earlier]",
+      "[data-gallery-image-later]",
+      "[data-row-controls]",
+    ]) {
+      expect(document.querySelector(hook)).toBeNull();
     }
-    const row = document.querySelector("[data-row]") as HTMLElement;
-    expect(row.nextElementSibling?.matches("[data-row-controls]")).toBe(true);
-    expect(row.nextElementSibling?.children).toHaveLength(row.children.length);
-    await act(async () => {
-      fireEvent.change(alts[1] as Element, { target: { value: "Second picture" } });
-    });
     await act(async () => {
       fireEvent.click(document.querySelectorAll("[data-gallery-image-text-edit]")[1] as Element);
     });
     const box = document.querySelector('[role="dialog"]') as HTMLElement;
     await act(async () => {
-      fireEvent.change(box.querySelector("input") as Element, { target: { value: "Site visit" } });
+      fireEvent.change(box.querySelector("[data-gallery-text-title]") as Element, {
+        target: { value: "Site visit" },
+      });
       fireEvent.change(box.querySelector("textarea") as Element, {
         target: { value: "Taken on site" },
+      });
+      fireEvent.change(box.querySelector("[data-gallery-text-alt]") as Element, {
+        target: { value: "Second picture" },
       });
       fireEvent.click(box.querySelector("[data-gallery-text-save]") as Element);
     });
@@ -168,13 +167,14 @@ describe("the gallery card", () => {
     });
   });
 
-  it("moves an image earlier and later", async () => {
+  it("moves an image with Alt and the arrow keys", async () => {
     const calls: string[][] = [];
     const { api } = await insertGallery({ composer: { fileUploader: recordingUploader(calls) } });
     await addFiles([png("a.png"), png("b.png"), png("c.png")]);
     await waitFor(() => expect(galleryOf(api.serialize())?.images).toHaveLength(3));
+    const third = document.querySelectorAll("[data-gallery-image]")[2] as HTMLElement;
     await act(async () => {
-      fireEvent.click(document.querySelectorAll("[data-gallery-image-earlier]")[2] as Element);
+      fireEvent.keyDown(third, { altKey: true, key: "ArrowLeft" });
     });
     const names = galleryOf(api.serialize()).images.map((image: { src: string }) =>
       image.src.split("/").pop(),
