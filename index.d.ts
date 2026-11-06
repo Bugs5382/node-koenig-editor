@@ -136,7 +136,20 @@ export interface KoenigStrings {
   close: string;
   searching: string;
   cards: Record<KoenigCardName, KoenigCardText>;
-  preview: { toggle: string };
+  /** The Preview button, and the reader simulation's controls. */
+  preview: {
+    dark: string;
+    desktop: string;
+    light: string;
+    phone: string;
+    /** Names the framed reader preview for a screen reader. */
+    region: string;
+    tablet: string;
+    textSize: string;
+    theme: string;
+    toggle: string;
+    width: string;
+  };
   menu: { addCard: string; removeSnippet: string; sections: Record<string, string> };
   toolbar: Record<KoenigToolbarItem, string>;
   /** The table card's controls; `toolbar` names the group for screen readers. */
@@ -270,7 +283,14 @@ export interface KoenigStrings {
   video: KoenigMediaStrings & { captionPlaceholder: string };
   audio: KoenigMediaStrings & { titlePlaceholder: string };
   callout: { background: string; emoji: string; placeholder: string };
-  toggle: { contentPlaceholder: string; headingPlaceholder: string };
+  toggle: {
+    /** The reader's button when the toggle is open. */
+    collapse: string;
+    contentPlaceholder: string;
+    /** The reader's button when the toggle is closed. */
+    expand: string;
+    headingPlaceholder: string;
+  };
   snippet: { namePlaceholder: string; replaceExisting: string };
   imageEditor: {
     apply: string;
@@ -653,6 +673,10 @@ export declare const KOENIG_CARD_NAMES: readonly KoenigCardName[];
 export declare const KoenigPreviewToggle: FC<{ className?: string }>;
 
 /** The preview state: for a host's own control or status. */
+/** The reader simulation's controls (width, theme and text size), for a host that places its own
+ *  toggle. Renders nothing unless preview is on. */
+export declare const KoenigPreviewOptionsPanel: FC<{ className?: string }>;
+
 export declare const useKoenigPreview: () => {
   available: boolean;
   options: KoenigPreviewOptions;

@@ -33,6 +33,7 @@ import {
   useState,
 } from "react";
 
+import KoenigComposerContext from "../../koenig-lexical/context/KoenigComposerContext";
 import { useKoenigTool } from "../options/tools";
 
 // The reader's view of the document, in the same live editor: made read-only with its editing
@@ -288,10 +289,20 @@ export const KoenigPreviewProvider = ({
     [available, options, preview, previewComments, setOptions, setPreview, showPreviewToggle],
   );
 
+  // Everything that reads the editor's dark mode (the editor, its menus, the viewer) follows the
+  // preview's theme while previewing, and the host's own darkMode the rest of the time.
+  const parent = useContext(KoenigComposerContext) as Record<string, unknown>;
+  const composerValue = useMemo(
+    () => (preview ? { ...parent, darkMode: options.theme === "dark" } : parent),
+    [parent, preview, options.theme],
+  );
+
   return (
     <PreviewContext.Provider value={value}>
       <PreviewController hostEditable={editable} preview={preview} onCardLet={onStart} />
-      {children}
+      <KoenigComposerContext.Provider value={composerValue}>
+        {children}
+      </KoenigComposerContext.Provider>
     </PreviewContext.Provider>
   );
 };

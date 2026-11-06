@@ -30,7 +30,12 @@ import {
   KEY_ARROW_DOWN_COMMAND,
   UNDO_COMMAND,
 } from "lexical";
-import { KoenigComposer, KoenigEditor, KoenigPreviewToggle } from "node-koenig-editor";
+import {
+  KoenigComposer,
+  KoenigEditor,
+  KoenigPreviewOptionsPanel,
+  KoenigPreviewToggle,
+} from "node-koenig-editor";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { documentOf, mount, openSlashMenu, uploader } from "./__utils__/mount";
@@ -611,5 +616,213 @@ describe("each card shows its reader form in preview", () => {
     expect(css).toMatch(
       /\[data-kg-preview\] \[data-kg-card\][^{]*\{[^}]*box-shadow: none !important/,
     );
+  });
+});
+
+describe("the toggle card opens and closes for a reader without touching the document", () => {
+  const toggleCard = {
+    content: "<p>The hidden content.</p>",
+    heading: "<p>The heading</p>",
+    type: "toggle",
+    version: 1,
+  };
+
+  it("shows both parts in editing, and a closed toggle in preview", async () => {
+    await mount({ composer: { initialEditorState: docWith(line("a"), toggleCard, line("b")) } });
+    const card = () => document.querySelector('[data-kg-card="toggle"]') as HTMLElement;
+    expect(card().textContent).toContain("The hidden content.");
+    expect(card().querySelector("[data-kg-toggle-button]")).toBeNull();
+    await press();
+    const button = card().querySelector("[data-kg-toggle-button]") as HTMLButtonElement;
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    expect(button.getAttribute("aria-label")).toBe("Show content");
+    const panel = document.getElementById(
+      button.getAttribute("aria-controls") as string,
+    ) as HTMLElement;
+    expect(panel.hasAttribute("hidden")).toBe(true);
+    expect(card().querySelector("[data-kg-card-overlay], [data-kg-read-only-overlay]")).toBeNull();
+  });
+
+  it("opens and closes from the button, and the document is not changed by it", async () => {
+    const { api } = await mount({
+      composer: { initialEditorState: docWith(line("a"), toggleCard, line("b")) },
+    });
+    await press();
+    const before = api.serialize();
+    const button = () => document.querySelector("[data-kg-toggle-button]") as HTMLButtonElement;
+    await act(async () => {
+      fireEvent.click(button());
+    });
+    expect(button().getAttribute("aria-expanded")).toBe("true");
+    expect(button().getAttribute("aria-label")).toBe("Hide content");
+    expect(
+      document
+        .getElementById(button().getAttribute("aria-controls") as string)
+        ?.hasAttribute("hidden"),
+    ).toBe(false);
+    expect(api.serialize()).toBe(before);
+    await act(async () => {
+      fireEvent.click(button());
+    });
+    expect(button().getAttribute("aria-expanded")).toBe("false");
+    expect(api.serialize()).toBe(before);
+  });
+
+  it("opens from a click on the heading too", async () => {
+    await mount({
+      composer: {
+        defaultPreview: true,
+        initialEditorState: docWith(line("a"), toggleCard, line("b")),
+      },
+    });
+    await act(async () => {
+      fireEvent.click(document.querySelector("[data-kg-toggle-heading]") as Element);
+    });
+    expect(document.querySelector("[data-kg-toggle-button]")?.getAttribute("aria-expanded")).toBe(
+      "true",
+    );
+  });
+
+  it("goes back to showing both parts when editing resumes", async () => {
+    await mount({ composer: { initialEditorState: docWith(line("a"), toggleCard, line("b")) } });
+    await press();
+    await press();
+    expect(document.querySelector("[data-kg-toggle-button]")).toBeNull();
+    expect(document.querySelector('[data-kg-card="toggle"]')?.textContent).toContain(
+      "The hidden content.",
+    );
+  });
+});
+
+const frame = () => document.querySelector("[data-kg-preview-frame]") as HTMLElement;
+const group = (name: string) =>
+  [...document.querySelectorAll<HTMLElement>('[role="radiogroup"]')].find(
+    (element) => element.getAttribute("aria-label") === name,
+  ) as HTMLElement;
+const choose = async (name: string, label: string) => {
+  const option = [...group(name).querySelectorAll<HTMLInputElement>('input[type="radio"]')].find(
+    (input) => input.closest("label")?.textContent?.trim() === label,
+  ) as HTMLInputElement;
+  await act(async () => {
+    fireEvent.click(option);
+  });
+};
+
+describe("the reader simulation: width, theme and text size", () => {
+  it("has a frame that is inert when preview is off, so the editor is never remounted", async () => {
+    await mount({ composer: { initialEditorState: documentOf("Hello") } });
+    expect(frame()).not.toBeNull();
+    expect(frame().style.width).toBe("");
+    expect(window.getComputedStyle(frame()).display).toBe("contents");
+    expect(document.querySelector('[role="radiogroup"]')).toBeNull();
+  });
+
+  it("offers width, theme and text size as radio groups in preview, and only there", async () => {
+    await mount({ composer: { initialEditorState: documentOf("Hello") } });
+    await press();
+    for (const name of ["Width", "Theme", "Text size"]) {
+      expect(group(name), name).toBeDefined();
+    }
+    const labels = (name: string) =>
+      [...group(name).querySelectorAll("label")].map((label) => label.textContent?.trim());
+    expect(labels("Width")).toEqual(["Desktop", "Tablet", "Phone"]);
+    expect(labels("Theme")).toEqual(["Light", "Dark"]);
+    expect(labels("Text size")).toEqual(["12", "14", "16", "18", "20"]);
+    await press();
+    expect(document.querySelector('[role="radiogroup"]')).toBeNull();
+  });
+
+  it("sets the frame's width from the preset", async () => {
+    await mount({ composer: { defaultPreview: true, initialEditorState: documentOf("Hello") } });
+    expect(frame().style.width).toBe("100%");
+    await choose("Width", "Tablet");
+    expect(frame().style.width).toBe("768px");
+    await choose("Width", "Phone");
+    expect(frame().style.width).toBe("390px");
+    expect(frame().style.maxWidth).toBe("100%");
+    await choose("Width", "Desktop");
+    expect(frame().style.width).toBe("100%");
+  });
+
+  it("switches the theme in the frame and in the editor itself, whatever the page's darkMode", async () => {
+    await mount({
+      composer: { darkMode: true, defaultPreview: true, initialEditorState: documentOf("Hello") },
+    });
+    // the host's dark editor, previewed in the default light theme
+    expect(frame().classList.contains("dark")).toBe(false);
+    expect(root().classList.contains("dark")).toBe(false);
+    await choose("Theme", "Dark");
+    expect(frame().classList.contains("dark")).toBe(true);
+    expect(root().classList.contains("dark")).toBe(true);
+    await press();
+    // out of preview the host's own darkMode applies again
+    expect(root().classList.contains("dark")).toBe(true);
+  });
+
+  it("is light in preview even when the editor was dark, and gives the host's mode back after", async () => {
+    await mount({ composer: { darkMode: true, initialEditorState: documentOf("Hello") } });
+    expect(root().classList.contains("dark")).toBe(true);
+    await press();
+    expect(root().classList.contains("dark")).toBe(false);
+    await press();
+    expect(root().classList.contains("dark")).toBe(true);
+  });
+
+  it("sets the text size through --kg-rem", async () => {
+    await mount({ composer: { defaultPreview: true, initialEditorState: documentOf("Hello") } });
+    expect(frame().style.getPropertyValue("--kg-rem")).toBe("10px");
+    await choose("Text size", "20");
+    expect(frame().style.getPropertyValue("--kg-rem")).toBe("12.5px");
+    await choose("Text size", "12");
+    expect(frame().style.getPropertyValue("--kg-rem")).toBe("7.5px");
+  });
+
+  it("starts with the host's options and tells it when they change", async () => {
+    const seen: unknown[] = [];
+    await mount({
+      composer: {
+        defaultPreview: true,
+        initialEditorState: documentOf("Hello"),
+        onPreviewOptionsChange: (options: unknown) => seen.push(options),
+        previewOptions: { textSize: 18, width: "tablet" },
+      },
+    });
+    expect(frame().style.width).toBe("768px");
+    expect(frame().style.getPropertyValue("--kg-rem")).toBe("11.25px");
+    await choose("Theme", "Dark");
+    expect(seen).toEqual([{ textSize: 18, theme: "dark", width: "tablet" }]);
+  });
+
+  it("keeps the options when preview is turned off and on again", async () => {
+    await mount({ composer: { initialEditorState: documentOf("Hello") } });
+    await press();
+    await choose("Width", "Phone");
+    await press();
+    await press();
+    expect(frame().style.width).toBe("390px");
+  });
+
+  it("is a labelled region, so a screen reader knows what it is", async () => {
+    await mount({ composer: { defaultPreview: true, initialEditorState: documentOf("Hello") } });
+    const region = frame().closest("[data-kg-preview-stage]") as HTMLElement;
+    expect(region.getAttribute("role")).toBe("region");
+    expect(region.getAttribute("aria-label")).toBe("Reader preview");
+  });
+
+  it("lets a host place the options panel with its own toggle", async () => {
+    await mount({
+      composer: {
+        defaultPreview: true,
+        initialEditorState: documentOf("Hello"),
+        showPreviewToggle: false,
+      },
+      extra: (
+        <div data-host-options>
+          <KoenigPreviewOptionsPanel />
+        </div>
+      ),
+    });
+    expect(document.querySelector("[data-host-options] [role='radiogroup']")).not.toBeNull();
+    expect(document.querySelector("[data-kg-preview-bar]")).toBeNull();
   });
 });

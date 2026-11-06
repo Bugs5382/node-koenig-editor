@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { useKoenigPreview } from "./PreviewContext";
+import { KoenigPreviewOptionsPanel } from "./PreviewOptionsPanel";
 import { KoenigPreviewToggle } from "./PreviewToggle";
 
 /** The default chrome above the editor: the Preview button, unless the host places its own. */
@@ -32,6 +33,7 @@ export const KoenigPreviewBar = () => {
       className="koenig-lexical mb-2 flex flex-wrap items-center justify-end gap-2"
       data-kg-preview-bar
     >
+      <KoenigPreviewOptionsPanel />
       <KoenigPreviewToggle />
     </div>
   );

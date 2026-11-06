@@ -42,6 +42,7 @@ export {
   useKoenigWordCount,
 } from "./additions/wordCount";
 export { KoenigPreviewToggle } from "./additions/preview/PreviewToggle";
+export { KoenigPreviewOptionsPanel } from "./additions/preview/PreviewOptionsPanel";
 export { useKoenigPreview } from "./additions/preview/PreviewContext";
 export { ImageEditorDialog } from "./additions/imageEditor/ImageEditorDialog";
 export { EmojiPicker } from "./additions/emojiPicker/EmojiPicker";
