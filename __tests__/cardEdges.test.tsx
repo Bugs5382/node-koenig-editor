@@ -253,4 +253,16 @@ describe("the keyboard reaches the space around a card", () => {
     expect(shape(api).at(-1)).toBe("gap");
     expect(selectionKind(api)).toMatch(/^text:/);
   });
+  it("Enter typed in a field inside the card does not add a paragraph", async () => {
+    const { api } = await mount({ composer: { initialEditorState: documentWith(callout()) } });
+    await selectNode(api, 1, true);
+    const before = shape(api);
+    const field = document.createElement("input");
+    const event = new KeyboardEvent("keydown", { key: "Enter" });
+    Object.defineProperty(event, "target", { value: field });
+    await act(async () => {
+      api.editorInstance.dispatchCommand(KEY_ENTER_COMMAND, event);
+    });
+    expect(shape(api)).toEqual(before);
+  });
 });

@@ -127,17 +127,18 @@ describe("the gallery card", () => {
     expect(calls).toHaveLength(0);
   });
 
-  it("keeps an alt text and a caption for each image", async () => {
+  it("keeps an alt text inline and a title and caption, set in a dialog, for each image", async () => {
     const calls: string[][] = [];
     const { api } = await insertGallery({ composer: { fileUploader: recordingUploader(calls) } });
     await addFiles([png("a.png"), png("b.png")]);
     await waitFor(() => expect(galleryOf(api.serialize())?.images).toHaveLength(2));
     const alts = document.querySelectorAll<HTMLInputElement>("[data-gallery-image-alt]");
-    const captions = document.querySelectorAll<HTMLInputElement>("[data-gallery-image-caption]");
     expect(alts).toHaveLength(2);
-    // The boxes sit in a strip under the row, not inside an image's own box (which is only as
-    // tall as the picture, so they would spill over the next row), one per image in order.
-    for (const field of [...alts, ...captions]) {
+    // The boxes for alt text and the reorder arrows sit in a strip under the row, not inside an
+    // image's own box (which is only as tall as the picture, so they would spill over the next
+    // row), one per image in order. The caption is no longer a box here: it has a dialog.
+    expect(document.querySelector("[data-gallery-image-caption]")).toBeNull();
+    for (const field of alts) {
       expect(field.closest("[data-image]")).toBeNull();
       expect(field.closest("[data-gallery-image-controls]")).not.toBeNull();
     }
@@ -146,11 +147,25 @@ describe("the gallery card", () => {
     expect(row.nextElementSibling?.children).toHaveLength(row.children.length);
     await act(async () => {
       fireEvent.change(alts[1] as Element, { target: { value: "Second picture" } });
-      fireEvent.change(captions[1] as Element, { target: { value: "Taken on site" } });
+    });
+    await act(async () => {
+      fireEvent.click(document.querySelectorAll("[data-gallery-image-text-edit]")[1] as Element);
+    });
+    const box = document.querySelector('[role="dialog"]') as HTMLElement;
+    await act(async () => {
+      fireEvent.change(box.querySelector("input") as Element, { target: { value: "Site visit" } });
+      fireEvent.change(box.querySelector("textarea") as Element, {
+        target: { value: "Taken on site" },
+      });
+      fireEvent.click(box.querySelector("[data-gallery-text-save]") as Element);
     });
     const images = galleryOf(api.serialize()).images;
     expect(images[0]).toMatchObject({ alt: "", caption: "" });
-    expect(images[1]).toMatchObject({ alt: "Second picture", caption: "Taken on site" });
+    expect(images[1]).toMatchObject({
+      alt: "Second picture",
+      caption: "Taken on site",
+      title: "Site visit",
+    });
   });
 
   it("moves an image earlier and later", async () => {

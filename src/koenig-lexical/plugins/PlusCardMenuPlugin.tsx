@@ -22,6 +22,7 @@ function usePlusCardMenu(editor) {
     const [cachedRange, setCachedRange] = React.useState(null);
     const [cardMenu, setCardMenu] = React.useState({});
     const containerRef = React.useRef(null);
+    const lineRef = React.useRef(null);
     const menuRef = React.useRef(null);
     const buttonRef = React.useRef(null);
     const {cardConfig, menuItems} = React.useContext(KoenigComposerContext);
@@ -78,6 +79,7 @@ function usePlusCardMenu(editor) {
     }, [cachedRange]);
 
     const showButton = React.useCallback((elem) => {
+        lineRef.current = elem;
         const range = getElementRange(elem);
         setCachedRange(range);
         setIsShowingButton(true);
@@ -144,6 +146,17 @@ function usePlusCardMenu(editor) {
             showButton(p);
         });
     }, [editor, showButton, hideButton]);
+
+    // The first placement uses the button's size from before it rendered (or from the previous text
+    // size); measure again once it is on screen so the gap before the line is right.
+    React.useLayoutEffect(() => {
+        if (isShowingButton && lineRef.current?.isConnected) {
+            const left = getLeftPosition(lineRef.current);
+            if (Math.abs(left - leftPosition) > 0.5) {
+                setLeftPosition(left);
+            }
+        }
+    });
 
     const insert = React.useCallback((insertCommand, {insertParams = {}} = {}) => {
         const commandParams = {...insertParams};

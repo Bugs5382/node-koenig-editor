@@ -8,6 +8,18 @@ function readGalleryImageAttributesFromElement(element: HTMLImageElement, imgNum
     image.fileName = element.src.match(/[^/]*$/)![0];
     image.row = Math.floor(imgNum / 3);
 
+    // the image's own title and caption, written under it by the renderer
+    const block = element.closest('.kg-gallery-image');
+    const title = block?.querySelector('.kg-gallery-image-title')?.textContent;
+    const caption = block?.querySelector('.kg-gallery-image-caption')?.textContent;
+    const escapeText = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (title) {
+        image.title = escapeText(title);
+    }
+    if (caption) {
+        image.caption = escapeText(caption);
+    }
+
     return image;
 }
 

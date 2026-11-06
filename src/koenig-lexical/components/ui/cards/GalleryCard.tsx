@@ -1,10 +1,30 @@
 import DeleteIcon from '../../../assets/icons/kg-trash.svg?react';
+import React from 'react';
 import {CardCaptionEditor} from '../CardCaptionEditor';
 import {IconButton} from '../IconButton';
 import {MediaPlaceholder} from '../MediaPlaceholder';
+import {ImageTextDialog} from '../../../../additions/gallery/ImageTextDialog';
 import {ProgressBar} from '../ProgressBar';
+import {Tooltip} from '../Tooltip';
+import {useGalleryText} from '../../../../additions/gallery/galleryText';
 
-function GalleryRow({index, images, deleteImage, isDragging, isSelected, listIndexOf, total, moveImage, updateImageText, strings, unescapeHtml}) {
+function TextIcon({className}) {
+    return (
+        <svg aria-hidden="true" className={className} fill="none" stroke="currentColor" viewBox="0 0 16 16">
+            <path d="M2 3.5h12M2 7.5h12M2 11.5h7" strokeLinecap="round" />
+        </svg>
+    );
+}
+
+function ChevronIcon({className, up}) {
+    return (
+        <svg aria-hidden="true" className={className} fill="none" stroke="currentColor" viewBox="0 0 16 16">
+            <path d={up ? 'M3.5 10.5 8 6l4.5 4.5' : 'M3.5 5.5 8 10l4.5-4.5'} strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    );
+}
+
+function GalleryRow({index, images, deleteImage, isDragging, isSelected, listIndexOf, total, moveImage, text, updateImageText, strings, unescapeHtml}) {
     const GalleryImages = images.map((image, idx) => {
         const position =
             images.length === 1 ? 'single' :
@@ -12,7 +32,7 @@ function GalleryRow({index, images, deleteImage, isDragging, isSelected, listInd
                     idx === images.length - 1 ? 'last' :
                         'middle';
 
-        return <GalleryImage key={image.fileName + (image.src || image.previewSrc)} deleteImage={deleteImage} image={image} isDragging={isDragging} isSelected={isSelected} listIndex={listIndexOf(image)} moveImage={moveImage} position={position} strings={strings} total={total} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
+        return <GalleryImage key={image.fileName + (image.src || image.previewSrc)} deleteImage={deleteImage} image={image} isDragging={isDragging} isSelected={isSelected} listIndex={listIndexOf(image)} moveImage={moveImage} position={position} strings={strings} text={text} total={total} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
     });
 
     const GalleryControls = isSelected && !isDragging ? (
@@ -82,20 +102,17 @@ function GalleryImageControls({image, position, listIndex, total, moveImage, upd
                     value={image.alt || ''}
                     onChange={e => updateImageText(listIndex, {alt: e.target.value})}
                 />
-                <input
-                    className="w-full rounded border border-grey-300 bg-transparent px-2 font-sans text-sm"
-                    data-gallery-image-caption
-                    placeholder={strings.imageCaptionPlaceholder}
-                    type="text"
-                    value={unescapeHtml(image.caption || '')}
-                    onChange={e => updateImageText(listIndex, {caption: e.target.value})}
-                />
             </div>
         </div>
     );
 }
 
-function GalleryImage({image, deleteImage, position, isDragging, isSelected, listIndex, total, moveImage, updateImageText, strings, unescapeHtml}) {
+function GalleryImage({image, deleteImage, position, isDragging, isSelected, listIndex, total, moveImage, text, updateImageText, strings, unescapeHtml}) {
+    const editButtonRef = React.useRef(null);
+    const [editingText, setEditingText] = React.useState(false);
+    const panelId = React.useId();
+    const hasText = Boolean(image.title || image.caption);
+    const collapsed = hasText && text.isCollapsed(image);
     const aspectRatio = (image.width || 1) / (image.height || 1);
     const style = {
         flex: `${aspectRatio} 1 0%`
@@ -136,12 +153,59 @@ function GalleryImage({image, deleteImage, position, isDragging, isSelected, lis
             />
 
             {isDragging ? null : (
-                <div className={`pointer-events-none invisible absolute inset-x-0 top-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-3 opacity-0 transition-all group-hover/image:visible group-hover/image:opacity-100 ${overlayClasses.join(' ')}`}>
+                <div className={`${isSelected ? 'visible opacity-100' : 'invisible opacity-0'} pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-3 transition-all focus-within:visible focus-within:opacity-100 group-hover/image:visible group-hover/image:opacity-100 ${overlayClasses.join(' ')}`}>
                     <div className="pointer-events-auto flex flex-row-reverse gap-1">
                         <IconButton Icon={DeleteIcon} label="Delete" onClick={() => deleteImage(image)} />
+                        <button
+                            ref={editButtonRef}
+                            aria-label={strings.editImageText}
+                            className="group pointer-events-auto relative flex h-8 w-9 cursor-pointer items-center justify-center rounded-md bg-white/90 text-grey-900 transition-all hover:bg-white hover:text-black"
+                            data-gallery-image-text-edit
+                            type="button"
+                            onClick={() => setEditingText(true)}
+                        >
+                            <TextIcon className="size-4 stroke-2" />
+                            <Tooltip label={strings.editImageText} />
+                        </button>
                     </div>
                 </div>
             )}
+
+            {hasText ? (
+                <div className={`pointer-events-none absolute inset-x-0 bottom-0 ${overlayClasses.join(' ')}`} data-gallery-image-text-wrap>
+                    <div
+                        className={collapsed ? 'sr-only' : 'pointer-events-auto bg-black/80 py-2 pl-3 pr-11 font-sans text-sm leading-snug text-white'}
+                        data-collapsed={collapsed ? 'true' : 'false'}
+                        data-gallery-image-text
+                        id={panelId}
+                    >
+                        {image.title ? <strong className="block font-semibold">{unescapeHtml(image.title)}</strong> : null}
+                        {image.caption ? <span className="block">{unescapeHtml(image.caption)}</span> : null}
+                    </div>
+                    <button
+                        aria-controls={panelId}
+                        aria-expanded={!collapsed}
+                        aria-label={collapsed ? strings.showImageText : strings.hideImageText}
+                        className="pointer-events-auto absolute bottom-1 right-1 flex size-8 cursor-pointer items-center justify-center rounded-md bg-black/80 text-white hover:bg-black"
+                        data-gallery-image-text-toggle
+                        type="button"
+                        onClick={() => text.toggleImage(image)}
+                    >
+                        <ChevronIcon className="size-4 stroke-2" up={collapsed} />
+                    </button>
+                </div>
+            ) : null}
+
+            {editingText ? (
+                <ImageTextDialog
+                    caption={unescapeHtml(image.caption || '')}
+                    opener={editButtonRef.current}
+                    strings={strings}
+                    title={unescapeHtml(image.title || '')}
+                    onClose={() => setEditingText(false)}
+                    onSave={({title, caption}) => updateImageText(listIndex, {title, caption})}
+                />
+            ) : null}
 
         </div>
     );
@@ -149,6 +213,8 @@ function GalleryImage({image, deleteImage, position, isDragging, isSelected, lis
 
 function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, isSelected, moveImage, updateImageText, strings, unescapeHtml}) {
     const rows = [];
+    const withText = images.filter(image => image.title || image.caption);
+    const text = useGalleryText(images, withText);
     const noOfImages = images.length;
 
     // 3 images per row unless last row would have a single image in which
@@ -174,12 +240,23 @@ function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, 
 
     const GalleryRows = rows.map((rowImages, idx) => {
         // eslint-disable-next-line react/no-array-index-key
-        return <GalleryRow key={idx} deleteImage={deleteImage} images={rowImages} index={idx} isDragging={isDragging} isSelected={isSelected} listIndexOf={image => images.indexOf(image)} moveImage={moveImage} strings={strings} total={noOfImages} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
+        return <GalleryRow key={idx} deleteImage={deleteImage} images={rowImages} index={idx} isDragging={isDragging} isSelected={isSelected} listIndexOf={image => images.indexOf(image)} moveImage={moveImage} strings={strings} text={text} total={noOfImages} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
     });
 
     return (
-        <div ref={reorderHandler.setContainerRef} className="not-kg-prose flex flex-col" data-gallery>
+        <div ref={reorderHandler.setContainerRef} className="not-kg-prose relative flex flex-col" data-gallery>
             {GalleryRows}
+            {withText.length ? (
+                <button
+                    aria-label={text.allCollapsed ? strings.showAllImageText : strings.hideAllImageText}
+                    className="absolute left-3 top-3 z-10 flex size-8 cursor-pointer items-center justify-center rounded-md bg-black/80 text-white hover:bg-black"
+                    data-gallery-text-toggle-all
+                    type="button"
+                    onClick={text.toggleAll}
+                >
+                    <TextIcon className="size-4 stroke-2" />
+                </button>
+            ) : null}
         </div>
     );
 }

@@ -185,3 +185,31 @@ em-emoji-picker {
         border-bottom: 1px solid var(--grey-900);
     }
 }
+
+/* A gallery photo's title and caption sit over the bottom of the photo on screen. On paper they
+   print under the photo, in the text's own colour, whether or not they were collapsed. */
+@media print {
+    .koenig-lexical [data-gallery-image-text-wrap] {
+        position: static !important;
+    }
+
+    .koenig-lexical [data-gallery-image-text] {
+        background: transparent !important;
+        clip: auto !important;
+        clip-path: none !important;
+        color: inherit !important;
+        height: auto !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        padding: 0.4em 0 0 !important;
+        position: static !important;
+        white-space: normal !important;
+        width: auto !important;
+    }
+
+    .koenig-lexical [data-gallery-image-text-toggle],
+    .koenig-lexical [data-gallery-text-toggle-all],
+    .koenig-lexical [data-gallery-image-text-edit] {
+        display: none !important;
+    }
+}

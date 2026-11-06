@@ -306,13 +306,28 @@ Both are in the default card set, so they are in the "+" and slash menus (`/gall
 `cards` leaves either out, like any other card.
 
 **Gallery.** Up to nine images. Select the card to reorder (drag, or the earlier and later
-buttons), and to give each image its own alt text and caption. A gallery has its own caption too.
-The host's `fileUploader` is called once per image, so a progress bar or a failure belongs to one
-picture. Files outside `fileUploader.fileTypes.image.mimeTypes`, and images past the ninth, are
-refused with a message (`strings.gallery`) before the uploader is called.
+buttons) and to give each image its own alt text. A gallery has its own caption too. The host's
+`fileUploader` is called once per image, so a progress bar or a failure belongs to one picture.
+Files outside `fileUploader.fileTypes.image.mimeTypes`, and images past the ninth, are refused
+with a message (`strings.gallery`) before the uploader is called.
+
+*Title and caption.* Selecting a photo shows its icons: remove, and an icon that opens a dialog
+for that photo's title and caption (focus stays in the dialog, Escape closes it without saving,
+Enter in the title saves). The text shows as an overlay along the bottom of the photo, on a solid
+dark band so it reads on any picture. Each photo's overlay has a control that collapses it, and
+the gallery has one control that collapses or expands them all. Collapsing hides the text from
+the eye only: it stays in the page for screen readers (`aria-expanded` on the controls). The
+choice is remembered in the viewer's own browser (`localStorage`, under `koenig-gallery-text`);
+a photo's own choice wins over the gallery-wide one, and the gallery-wide control sets every
+photo again. Where the browser's storage is blocked the choice lasts until the page closes. In
+the HTML output the text is written under the photo, inside the photo's `.kg-gallery-image`
+block (`.kg-gallery-image-text` with `.kg-gallery-image-title` and `.kg-gallery-image-caption`),
+as plain text, and a print rule puts the on-screen overlay under the photo too, collapsed or not.
+The wording is `strings.gallery`.
 
 **Header.** A section opener: title, subtitle, a background colour or image, and an optional
-button. Its sizes are multiples of `--kg-rem` and its type uses `--kg-font-sans` and
+button. Its settings are a colour, a background image, alignment (a left or centred choice, so
+there is no list to open) and the button; each label stays on one line. Its sizes are multiples of `--kg-rem` and its type uses `--kg-font-sans` and
 `--kg-font-size-h1`, so it follows the [theme tokens](#-styles-and-theme-tokens). The title is
 not a heading node: the H1 to H5 limit and any outline numbering a host builds from headings do
 not see it. The background image goes through the host's `fileUploader`.
@@ -665,6 +680,7 @@ editor.
 | `--kg-selection-color` | black (white in dark mode)     | The colour of selected and focused cards, active toolbar buttons, drop lines and focus outlines. There is no built-in green. |
 | `--kg-menu-width`      | `28rem` (in `--kg-rem` units)  | Width of the "+" and slash menus.                                                                                            |
 | `--kg-menu-max-height` | `32rem` (in `--kg-rem` units)  | Tallest the menus grow before they scroll; they also shrink to fit the room.                                                 |
+| `--kg-breakout-room`   | `1.8rem` (in `--kg-rem` units) | How far a wide or full card (the gallery, a wide image) may extend past the text column on each side. Set it large (`100vw`) when the editor spans the whole page, to get the viewport-wide cards upstream draws. |
 | `--kg-plus-size`       | `2.2rem` (in `--kg-rem` units) | Diameter of the "+" button beside an empty line.                                                                             |
 
 The `--kg-font-size-h2`, `--kg-font-size-h3`, `--kg-font-size-h4` and `--kg-font-size-h5`
@@ -703,7 +719,7 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   names (upstream swaps in `extended-*` replacements). Code blocks are stock `code` nodes.
 - Gallery and header: `src/kg-default-nodes` and `src/koenig-lexical` carry upstream's gallery
   node, parser and renderer and the header node, parser and renderers from the same commit. The
-  gallery card uploads one image at a time, has per-image alt text and caption, and reorders with
+  gallery card uploads one image at a time, has per-image alt text, title and caption, and reorders with
   buttons as well as drag. The header card is a smaller editor than upstream's (no image editor,
   no version 1 controls), and both take a host layout through `cardRenderers`.
 - File, video and audio: the file card is upstream's, without the email table. Video and audio are

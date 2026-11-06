@@ -15,7 +15,7 @@ export const MAX_IMAGES = 9;
 export const MAX_PER_ROW = 3;
 
 // ensure we don't save client-side only properties such as preview blob urls
-export const ALLOWED_IMAGE_PROPS = ['row', 'src', 'width', 'height', 'alt', 'caption', 'fileName'];
+export const ALLOWED_IMAGE_PROPS = ['row', 'src', 'width', 'height', 'alt', 'title', 'caption', 'fileName'];
 
 export function recalculateImageRows(images) {
     images.forEach((image, idx) => {

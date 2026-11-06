@@ -89,6 +89,9 @@ export const CardSpacePlugin = () => {
       (event) => {
         if (!editor.isEditable() || event?.shiftKey || event?.metaKey || event?.ctrlKey)
           return false;
+        // Enter typed in a field inside the card (alt text, a title) belongs to that field. Saying
+        // it is handled keeps the editor's own Enter from adding a paragraph behind the card.
+        if ((event?.target as HTMLElement | null)?.matches?.("input, textarea")) return true;
         const selection = $getSelection();
         if (!$isNodeSelection(selection)) return false;
         const nodes = selection.getNodes();

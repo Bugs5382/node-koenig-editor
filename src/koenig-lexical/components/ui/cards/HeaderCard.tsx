@@ -36,6 +36,7 @@ const choiceStyle = (checked) => ({
 
 function Settings({backgroundColor, backgroundImageSrc, buttonEnabled, buttonText, buttonUrl, alignment, strings, update, uploadBackgroundImage, uploadError}) {
     const fileInputRef = React.useRef(null);
+    const alignmentName = React.useId();
 
     return (
         <div
@@ -88,7 +89,7 @@ function Settings({backgroundColor, backgroundImageSrc, buttonEnabled, buttonTex
                         <label key={value} style={choiceStyle(alignment === value)}>
                             <input
                                 checked={alignment === value}
-                                name="kg-header-alignment"
+                                name={alignmentName}
                                 style={{margin: `0 ${rem(0.6)} 0 0`}}
                                 type="radio"
                                 value={value}

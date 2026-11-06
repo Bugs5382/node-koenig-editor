@@ -212,6 +212,7 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
                     unescapeHtml={unescapeHtml}
                     updateImageText={(index, changes) => updateImage(index, {
                         ...(changes.alt !== undefined ? {alt: changes.alt} : {}),
+                        ...(changes.title !== undefined ? {title: escapeHtml(changes.title)} : {}),
                         ...(changes.caption !== undefined ? {caption: escapeHtml(changes.caption)} : {})
                     })}
                     uploader={imageUploader}

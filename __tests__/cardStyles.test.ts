@@ -28,7 +28,11 @@ const root = path.resolve(__dirname, "..");
 const css = readFileSync(path.join(root, "src/generated/koenig.css"), "utf8");
 
 const sources: Record<string, string[]> = {
-  gallery: ["components/ui/cards/GalleryCard.tsx", "nodes/GalleryNodeComponent.tsx"],
+  gallery: [
+    "components/ui/cards/GalleryCard.tsx",
+    "nodes/GalleryNodeComponent.tsx",
+    "../additions/gallery/ImageTextDialog.tsx",
+  ],
   header: ["components/ui/cards/HeaderCard.tsx", "nodes/HeaderNodeComponent.tsx"],
   button: ["components/ui/cards/ButtonCard.tsx", "nodes/ButtonNodeComponent.tsx"],
   file: ["nodes/FileNodeComponent.tsx"],
@@ -71,5 +75,14 @@ describe("the stylesheet carries every utility the new cards use", () => {
     if (card !== "header") expect(classes.length).toBeGreaterThan(0);
     const missing = classes.filter((name) => !css.includes(`.${escape(name)}`));
     expect(missing, `${card}: not in koenig.css (run npm run build:css)`).toEqual([]);
+  });
+});
+
+describe("the stylesheet prints a gallery photo's text under the photo", () => {
+  it("has a print rule that puts the text in the flow and hides the controls", () => {
+    const print = css.slice(css.indexOf("@media print"));
+    expect(print).toContain("[data-gallery-image-text]");
+    expect(print).toContain("position: static");
+    expect(print).toContain("[data-gallery-image-text-toggle]");
   });
 });

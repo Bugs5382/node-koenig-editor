@@ -191,6 +191,17 @@ export interface KoenigStrings {
     moveLater: string;
     select: string;
     uploadError: string;
+    /** Names the icon that opens the title and caption dialog for one photo. */
+    editImageText: string;
+    hideAllImageText: string;
+    hideImageText: string;
+    imageCaptionLabel: string;
+    imageTextCancel: string;
+    imageTextDialogTitle: string;
+    imageTextSave: string;
+    imageTitleLabel: string;
+    showAllImageText: string;
+    showImageText: string;
   };
   header: {
     alignCenter: string;
