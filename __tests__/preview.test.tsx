@@ -21,11 +21,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
-import { $getRoot, $getSelection, $isRangeSelection, $isTextNode, UNDO_COMMAND } from "lexical";
+import {
+  $getRoot,
+  $getSelection,
+  $isNodeSelection,
+  $isRangeSelection,
+  $isTextNode,
+  KEY_ARROW_DOWN_COMMAND,
+  UNDO_COMMAND,
+} from "lexical";
 import { KoenigComposer, KoenigEditor, KoenigPreviewToggle } from "node-koenig-editor";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { documentOf, mount, uploader } from "./__utils__/mount";
+import { documentOf, mount, openSlashMenu, uploader } from "./__utils__/mount";
 
 afterEach(() => cleanup());
 
@@ -310,5 +318,189 @@ describe("one live document, nothing lost, back where it was", () => {
     dialog.addEventListener("cancel", cancel);
     await press();
     expect(cancel).toHaveBeenCalled();
+  });
+});
+
+const blank = () => ({
+  children: [],
+  direction: null,
+  format: "",
+  indent: 0,
+  type: "paragraph",
+  version: 1,
+});
+const line = (text: string) => ({
+  children: [{ detail: 0, format: 0, mode: "normal", style: "", text, type: "text", version: 1 }],
+  direction: null,
+  format: "",
+  indent: 0,
+  type: "paragraph",
+  version: 1,
+});
+const docWith = (...children: unknown[]) =>
+  JSON.stringify({
+    root: { children, direction: null, format: "", indent: 0, type: "root", version: 1 },
+  });
+const callout = (calloutText = "Note") => ({
+  backgroundColor: "blue",
+  calloutEmoji: "",
+  calloutText,
+  type: "callout",
+  version: 1,
+});
+
+// the editor's own wrapper, not the toolbar bar above it (which carries the class too)
+const root = () =>
+  document.querySelector("[data-lexical-editor]")?.closest(".koenig-lexical") as HTMLElement;
+
+describe("preview shows no editing chrome", () => {
+  it("marks the editor so styles can tell, and shows comment highlights only when asked", async () => {
+    await mount({ composer: { initialEditorState: documentOf("Hello") } });
+    expect(root().hasAttribute("data-kg-preview")).toBe(false);
+    await press();
+    expect(root().getAttribute("data-kg-preview")).toBe("true");
+    expect(root().hasAttribute("data-kg-preview-comments")).toBe(false);
+    await press();
+    expect(root().hasAttribute("data-kg-preview")).toBe(false);
+    cleanup();
+    await mount({
+      composer: {
+        defaultPreview: true,
+        initialEditorState: documentOf("Hello"),
+        previewComments: true,
+      },
+    });
+    expect(root().getAttribute("data-kg-preview-comments")).toBe("true");
+  });
+
+  it("hides comment highlights in the stylesheet unless the host asks", async () => {
+    const { readFileSync } = await import("node:fs");
+    const path = await import("node:path");
+    const css = readFileSync(
+      path.resolve(import.meta.dirname, "../src/generated/koenig.css"),
+      "utf8",
+    );
+    expect(css).toMatch(
+      /\[data-kg-preview\]:not\(\[data-kg-preview-comments\]\) mark\[data-kg-comment-ids\]/,
+    );
+  });
+
+  it("has no editor placeholder in an empty document", async () => {
+    await mount({ composer: { initialEditorState: docWith(blank()) } });
+    expect(document.body.textContent).toContain("Begin writing");
+    await press();
+    expect(document.body.textContent).not.toContain("Begin writing");
+  });
+
+  it("has no placeholder in an empty card field: a callout's text, a caption", async () => {
+    await mount({ composer: { initialEditorState: docWith(line("a"), callout("")) } });
+    expect(document.body.textContent).toContain("Callout text");
+    await press();
+    expect(document.body.textContent).not.toContain("Callout text");
+  });
+
+  it("has no plus button on an empty line", async () => {
+    const { api } = await mount({
+      composer: { initialEditorState: docWith(line("a"), blank(), line("b")) },
+    });
+    const place = async () => {
+      const empty = api.editorInstance.getRootElement()?.children[1] as HTMLElement;
+      api.editorInstance.getRootElement()?.focus();
+      const range = document.createRange();
+      range.setStart(empty, 0);
+      range.collapse(true);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      await act(async () => {
+        document.dispatchEvent(new Event("selectionchange"));
+        window.dispatchEvent(new MouseEvent("mousemove", { clientX: 5, clientY: 5 }));
+      });
+    };
+    await place();
+    await waitFor(() => expect(document.querySelector("[data-kg-plus-container]")).not.toBeNull());
+    await press();
+    await waitFor(() => expect(document.querySelector("[data-kg-plus-container]")).toBeNull());
+    await place();
+    expect(document.querySelector("[data-kg-plus-container]")).toBeNull();
+  });
+
+  it("has no slash menu", async () => {
+    const { api } = await mount({ composer: { initialEditorState: docWith(blank()) } });
+    await press();
+    await act(async () => {
+      api.editorInstance.getRootElement()?.focus();
+      window.dispatchEvent(new KeyboardEvent("keypress", { key: "/" }));
+    });
+    expect(document.querySelector("[data-kg-card-menu-item]")).toBeNull();
+    await press();
+    await openSlashMenu(api);
+    expect(document.querySelector("[data-kg-card-menu-item]")).not.toBeNull();
+  });
+
+  it("has no selection toolbar when a reader selects text", async () => {
+    const { api } = await mount({ composer: { initialEditorState: documentOf("Hello world") } });
+    await press();
+    await act(async () => {
+      api.editorInstance.getRootElement()?.focus();
+      api.editorInstance.update(() => {
+        const text = $getRoot().getFirstDescendant();
+        if ($isTextNode(text)) text.select(0, 5);
+      });
+    });
+    await act(async () => {
+      document.dispatchEvent(new Event("selectionchange"));
+    });
+    expect(document.querySelector("[data-kg-floating-toolbar]")).toBeNull();
+    expect(document.querySelector("[data-kg-toolbar-button]")).toBeNull();
+  });
+
+  it("does not select a card when a reader clicks it, so no card toolbar or outline appears", async () => {
+    await mount({ composer: { initialEditorState: docWith(line("a"), callout(), line("b")) } });
+    await press();
+    await act(async () => {
+      fireEvent.click(document.querySelector('[data-kg-card="callout"]') as Element);
+    });
+    expect(
+      document.querySelector('[data-kg-card="callout"]')?.getAttribute("data-kg-card-selected"),
+    ).not.toBe("true");
+  });
+
+  it("does not let the arrow keys select a card", async () => {
+    const { api } = await mount({
+      composer: { initialEditorState: docWith(line("a"), callout(), line("b")) },
+    });
+    await press();
+    await act(async () => {
+      api.editorInstance.getRootElement()?.focus();
+      api.editorInstance.update(() => {
+        $getRoot().getFirstChild()?.selectEnd();
+      });
+    });
+    await act(async () => {
+      api.editorInstance.dispatchCommand(
+        KEY_ARROW_DOWN_COMMAND,
+        new KeyboardEvent("keydown", { key: "ArrowDown" }),
+      );
+    });
+    const selection = api.editorInstance
+      .getEditorState()
+      .read(() => $isNodeSelection($getSelection()));
+    expect(selection).toBe(false);
+  });
+
+  it("does not let undo or redo change the document while previewing", async () => {
+    const { api } = await mount({ composer: { initialEditorState: documentOf("Hello") } });
+    await act(async () => {
+      api.editorInstance.update(() => {
+        const text = $getRoot().getFirstDescendant();
+        if ($isTextNode(text)) text.setTextContent("Edited");
+      });
+    });
+    await press();
+    await act(async () => {
+      api.editorInstance.dispatchCommand(UNDO_COMMAND, undefined);
+    });
+    expect(api.serialize()).toContain("Edited");
   });
 });

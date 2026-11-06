@@ -12,8 +12,10 @@ import {CalloutPlugin} from '../plugins/CalloutPlugin';
 import {CardMenuPlugin} from '../plugins/CardMenuPlugin';
 import {KoenigSnippetPlugin} from '../plugins/KoenigSnippetPlugin';
 import {ListPlugin} from '@lexical/react/LexicalListPlugin';
+import {ReadOnlyGuardPlugin} from '../../additions/preview/ReadOnlyGuardPlugin';
 import {TablePlugin} from '../../additions/table/TablePlugin';
 import {TogglePlugin} from '../plugins/TogglePlugin';
+import {useKoenigPreview} from '../../additions/preview/PreviewContext';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
 // A card's plugin runs only when the composer registered its node: a host that leaves a card
@@ -22,6 +24,7 @@ const hasNode = (editor, type) => editor._nodes.has(type);
 
 export const AllDefaultPlugins = () => {
     const [editor] = useLexicalComposerContext();
+    const {preview} = useKoenigPreview();
     return (
         <>
             {/* Lexical Plugins */}
@@ -29,8 +32,10 @@ export const AllDefaultPlugins = () => {
             {/* <TabIndentationPlugin /> tab/shift+tab triggers indent/outdent */}
 
             {/* Koenig Plugins */}
-            <CardMenuPlugin />
+            {/* the "+" and "/" menus are editing chrome: not in the reader's view */}
+            {!preview && <CardMenuPlugin />}
             <KoenigSnippetPlugin />
+            <ReadOnlyGuardPlugin />
 
             {/* Card Plugins */}
             {hasNode(editor, 'image') && <ImagePlugin />}
