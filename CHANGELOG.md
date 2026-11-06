@@ -12,6 +12,7 @@
 
 #### 🐛 Bug Fixes
 
+- fix(editor): headings take the white text token in dark mode @Bugs5382 (#47)
 - fix(editor): a new table shows its grid: visible dashed cell borders, a shaded header, and cursor and range highlights @Bugs5382 (#45)
 - fix(editor): the plus button opens the card list @Bugs5382 (#40)
 
