@@ -181,9 +181,9 @@ function GalleryImage({image, deleteImage, position, isDragging, isSelected, lis
             )}
 
             {hasText ? (
-                <div className={`pointer-events-none absolute inset-x-0 bottom-0 ${overlayClasses.join(' ')}`} data-gallery-image-text-wrap>
+                <div className={`pointer-events-none absolute inset-x-0 bottom-0 flex max-h-full flex-col justify-end ${overlayClasses.join(' ')}`} data-gallery-image-text-wrap>
                     <div
-                        className={collapsed ? 'sr-only' : 'pointer-events-auto bg-black/80 py-2 pl-3 pr-11 font-sans text-sm leading-snug text-white'}
+                        className={collapsed ? 'sr-only' : 'pointer-events-auto max-h-full min-w-0 overflow-y-auto break-words bg-black/80 py-2 pl-3 pr-[min(2.75rem,28%)] font-sans text-sm leading-snug text-white'}
                         data-collapsed={collapsed ? 'true' : 'false'}
                         data-gallery-image-text
                         id={panelId}

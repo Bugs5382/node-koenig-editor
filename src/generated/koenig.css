@@ -1308,6 +1308,10 @@
     max-width: 65%;
 }
 
+.koenig-lexical .max-w-\[calc\(100vw-16px\)\] {
+    max-width: calc(100vw - 16px);
+}
+
 .koenig-lexical .max-w-full {
     max-width: 100%;
 }
@@ -1547,6 +1551,10 @@
     white-space: nowrap;
 }
 
+.koenig-lexical .break-words {
+    overflow-wrap: break-word;
+}
+
 .koenig-lexical .rounded {
     border-radius: calc(0.4 * var(--kg-rem, 0.625rem));
 }
@@ -1688,8 +1696,12 @@
     border-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
-.koenig-lexical .border-white\/70 {
-    border-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.7 * 100%), transparent);
+.koenig-lexical .border-white\/10 {
+    border-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.1 * 100%), transparent);
+}
+
+.koenig-lexical .border-white\/80 {
+    border-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.8 * 100%), transparent);
 }
 
 .koenig-lexical .border-b-red {
@@ -1721,6 +1733,10 @@
 
 .koenig-lexical .bg-black\/80 {
     background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.8 * 100%), transparent);
+}
+
+.koenig-lexical .bg-black\/90 {
+    background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.9 * 100%), transparent);
 }
 
 .koenig-lexical .bg-blue\/10 {
@@ -1837,12 +1853,12 @@
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
-.koenig-lexical .bg-white\/15 {
-    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.15 * 100%), transparent);
+.koenig-lexical .bg-white\/10 {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.1 * 100%), transparent);
 }
 
-.koenig-lexical .bg-white\/20 {
-    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.2 * 100%), transparent);
+.koenig-lexical .bg-white\/15 {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.15 * 100%), transparent);
 }
 
 .koenig-lexical .bg-white\/30 {
@@ -1956,10 +1972,6 @@
     padding: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
-.koenig-lexical .p-20 {
-    padding: calc(8 * var(--kg-rem, 0.625rem));
-}
-
 .koenig-lexical .p-3 {
     padding: calc(1.2 * var(--kg-rem, 0.625rem));
 }
@@ -1988,6 +2000,10 @@
     padding: 4px;
 }
 
+.koenig-lexical .p-\[clamp\(1\.6rem\2c 8\%\2c 5rem\)\] {
+    padding: clamp(calc(1.6 * var(--kg-rem, 0.625rem)), 8%, calc(5 * var(--kg-rem, 0.625rem)));
+}
+
 .koenig-lexical .\!px-3 {
     padding-left: calc(1.2 * var(--kg-rem, 0.625rem)) !important;
     padding-right: calc(1.2 * var(--kg-rem, 0.625rem)) !important;
@@ -1996,6 +2012,11 @@
 .koenig-lexical .px-1 {
     padding-left: calc(0.4 * var(--kg-rem, 0.625rem));
     padding-right: calc(0.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .px-1\.5 {
+    padding-left: calc(0.6 * var(--kg-rem, 0.625rem));
+    padding-right: calc(0.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .px-2 {
@@ -2127,10 +2148,6 @@
     padding-right: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
-.koenig-lexical .pr-11 {
-    padding-right: calc(4.4 * var(--kg-rem, 0.625rem));
-}
-
 .koenig-lexical .pr-14 {
     padding-right: calc(5.6 * var(--kg-rem, 0.625rem));
 }
@@ -2149,6 +2166,10 @@
 
 .koenig-lexical .pr-\[max\(1rem\2c env\(safe-area-inset-right\)\)\] {
     padding-right: max(calc(1 * var(--kg-rem, 0.625rem)), env(safe-area-inset-right));
+}
+
+.koenig-lexical .pr-\[min\(2\.75rem\2c 28\%\)\] {
+    padding-right: min(calc(2.75 * var(--kg-rem, 0.625rem)), 28%);
 }
 
 .koenig-lexical .pt-3 {
@@ -2209,6 +2230,10 @@
 
 .koenig-lexical .text-2xs {
     font-size: calc(1.2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .text-\[0\.7rem\] {
+    font-size: calc(0.7 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .text-\[1\.1rem\] {
@@ -2307,6 +2332,10 @@
 
 .koenig-lexical .\!leading-\[1\.6em\] {
     line-height: 1.6em !important;
+}
+
+.koenig-lexical .leading-4 {
+    line-height: calc(1 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .leading-7 {
@@ -2542,12 +2571,22 @@
     outline-style: solid;
 }
 
+.koenig-lexical .outline-0 {
+    outline-width: 0px;
+}
+
 .koenig-lexical .outline-2 {
     outline-width: 2px;
 }
 
 .koenig-lexical .outline-selection {
     outline-color: color-mix(in srgb, var(--kg-selection) calc(1 * 100%), transparent);
+}
+
+.koenig-lexical .ring {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
 .koenig-lexical .blur {
@@ -2557,6 +2596,12 @@
 
 .koenig-lexical .filter {
     filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.koenig-lexical .backdrop-blur-sm {
+    --tw-backdrop-blur: blur(4px);
+    -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+    backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
 
 .koenig-lexical .transition {
@@ -2593,6 +2638,10 @@
     transition-duration: 100ms;
 }
 
+.koenig-lexical .duration-150 {
+    transition-duration: 150ms;
+}
+
 .koenig-lexical .duration-200 {
     transition-duration: 200ms;
 }
@@ -2603,6 +2652,10 @@
 
 .koenig-lexical .ease-linear {
     transition-timing-function: linear;
+}
+
+.koenig-lexical .ease-out {
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
 .koenig-lexical .will-change-transform {
@@ -4093,6 +4146,11 @@ em-emoji-picker {
     margin-right: calc(-1.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .hover\:-translate-y-px:hover {
+    --tw-translate-y: -1px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .koenig-lexical .hover\:scale-105:hover {
     --tw-scale-x: 1.05;
     --tw-scale-y: 1.05;
@@ -4142,12 +4200,8 @@ em-emoji-picker {
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
-.koenig-lexical .hover\:bg-white\/30:hover {
-    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.3 * 100%), transparent);
-}
-
-.koenig-lexical .hover\:bg-white\/35:hover {
-    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.35 * 100%), transparent);
+.koenig-lexical .hover\:bg-white\/20:hover {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.2 * 100%), transparent);
 }
 
 .koenig-lexical .hover\:px-3:hover {
@@ -4227,8 +4281,8 @@ em-emoji-picker {
     outline-color: color-mix(in srgb, var(--kg-selection) calc(1 * 100%), transparent);
 }
 
-.koenig-lexical .focus-visible\:outline-white:focus-visible {
-    outline-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(1 * 100%), transparent);
+.koenig-lexical .focus-visible\:outline-transparent:focus-visible {
+    outline-color: transparent;
 }
 
 .koenig-lexical .focus-visible\:ring-2:focus-visible {
@@ -4242,12 +4296,34 @@ em-emoji-picker {
     --tw-ring-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-ring-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .focus-visible\:ring-white\/40:focus-visible {
+    --tw-ring-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.4 * 100%), transparent);
+}
+
+.koenig-lexical .active\:translate-y-0:active {
+    --tw-translate-y: 0px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.koenig-lexical .disabled\:cursor-default:disabled {
+    cursor: default;
+}
+
 .koenig-lexical .disabled\:opacity-30:disabled {
     opacity: 0.3;
 }
 
 .koenig-lexical .disabled\:opacity-50:disabled {
     opacity: 0.5;
+}
+
+.koenig-lexical .disabled\:hover\:translate-y-0:hover:disabled {
+    --tw-translate-y: 0px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.koenig-lexical .disabled\:hover\:bg-white\/10:hover:disabled {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.1 * 100%), transparent);
 }
 
 .koenig-lexical :is(.group\/image:hover .group-hover\/image\:visible) {
@@ -4260,6 +4336,10 @@ em-emoji-picker {
 
 .koenig-lexical :is(.group:hover .group-hover\:block) {
     display: block;
+}
+
+.koenig-lexical :is(.group:hover .group-hover\:flex) {
+    display: flex;
 }
 
 .koenig-lexical :is(.group:hover .group-hover\:text-grey-800) {
@@ -4275,6 +4355,10 @@ em-emoji-picker {
     opacity: 1;
 }
 
+.koenig-lexical :is(.group:focus-visible .group-focus-visible\:flex) {
+    display: flex;
+}
+
 .koenig-lexical :is(.peer:checked ~ .peer-checked\:bg-black) {
     --tw-bg-opacity: 1;
     background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
@@ -4286,6 +4370,14 @@ em-emoji-picker {
     transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.koenig-lexical :is(.peer:hover ~ .peer-hover\:flex) {
+    display: flex;
+}
+
+.koenig-lexical :is(.peer:focus-visible ~ .peer-focus-visible\:flex) {
+    display: flex;
+}
+
 .koenig-lexical .aria-pressed\:bg-grey-100[aria-pressed="true"] {
     --tw-bg-opacity: 1;
     background-color: color-mix(in srgb, var(--kg-color-grey-100, #F4F5F6) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
@@ -4295,6 +4387,11 @@ em-emoji-picker {
 
     .koenig-lexical .motion-reduce\:transition-none {
         transition-property: none;
+    }
+
+    .koenig-lexical .motion-reduce\:hover\:translate-y-0:hover {
+        --tw-translate-y: 0px;
+        transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
     }
 }
 

@@ -98,3 +98,16 @@ describe("the header card's title and subtitle take the card's own text colour",
     }
   });
 });
+
+describe("hidden tooltips take no room", () => {
+  it("are display: none until hover or keyboard focus, so they cannot widen the page", () => {
+    const source = readFileSync(
+      path.join(root, "src/koenig-lexical/components/ui/Tooltip.tsx"),
+      "utf8",
+    );
+    expect(source).not.toMatch(/\binvisible\b/);
+    expect(source).toContain("hidden");
+    expect(source).toContain("group-hover:flex");
+    expect(source).toContain("group-focus-visible:flex");
+  });
+});

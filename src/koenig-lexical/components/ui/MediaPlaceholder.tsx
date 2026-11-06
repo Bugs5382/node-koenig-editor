@@ -89,9 +89,10 @@ export function MediaPlaceholder({
     );
 
     const buttonClasses = clsx(
-        'group flex cursor-pointer select-none items-center justify-center',
+        'group flex max-w-full cursor-pointer select-none items-center justify-center',
         type === 'button' && 'px-3 py-1',
-        type !== 'button' && (size === 'xsmall' ? 'p-4' : 'flex-col p-20')
+        // the padding follows the card's width, so a narrow card or a big text size does not push the button out of it
+        type !== 'button' && (size === 'xsmall' ? 'p-4' : 'flex-col p-[clamp(1.6rem,8%,5rem)]')
     );
 
     const errorClasses = clsx(
