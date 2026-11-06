@@ -484,15 +484,25 @@ describe("the viewer is drawn in the browser's top layer", () => {
     expect(document.activeElement).toBe(opener);
   });
 
-  it("labels the exit control: text on wide screens, a tooltip on phones, always visible", async () => {
+  it("labels the exit control: text on wide screens, a custom tooltip with the Esc hint, always visible", async () => {
     await open();
     await openFromGallery();
     const close = viewer()?.querySelector("[data-gallery-viewer-close]") as HTMLButtonElement;
-    expect(close.getAttribute("title")).toBe("Exit full screen");
+    // no default browser tooltip box: the tooltip is the editor's own
+    expect(close.hasAttribute("title")).toBe(false);
     const text = close.querySelector("[data-gallery-viewer-close-text]") as HTMLElement;
     expect(text.textContent).toBe("Exit full screen");
     expect(text.className).toContain("hidden");
     expect(text.className).toContain("sm:inline");
+    const tip = viewer()?.querySelector(
+      `#${close.getAttribute("aria-describedby")}`,
+    ) as HTMLElement;
+    expect(tip.getAttribute("role")).toBe("tooltip");
+    expect(tip.textContent).toContain("Exit full screen");
+    expect(tip.querySelector("kbd")?.textContent).toBe("Esc");
+    expect(tip.className).toMatch(/(^|\s)hidden(\s|$)/);
+    expect(tip.className).toContain("peer-hover:flex");
+    expect(tip.className).toContain("peer-focus-visible:flex");
     // never hidden until hover, and not inside anything that hides
     let node: HTMLElement | null = close;
     while (node && node !== viewer()) {
@@ -576,5 +586,91 @@ describe("the viewer is drawn in the browser's top layer", () => {
     expect(box.className).toContain("fixed");
     await press("Escape");
     await waitFor(() => expect(viewer()).toBeNull());
+  });
+});
+
+describe("the viewer's controls share one soft, quiet look", () => {
+  const controls = () => [
+    ...(viewer() as HTMLElement).querySelectorAll<HTMLElement>(
+      "[data-gallery-viewer-close], [data-gallery-viewer-prev], [data-gallery-viewer-next], [data-gallery-viewer-text-toggle]",
+    ),
+  ];
+
+  it("has no browser tooltip (title attribute) anywhere in the viewer", async () => {
+    await open();
+    await openFromGallery();
+    expect((viewer() as HTMLElement).querySelectorAll("[title]")).toHaveLength(0);
+  });
+
+  it("gives the exit and the arrows custom tooltips with their key hints", async () => {
+    await open();
+    await openFromGallery();
+    const hint = (selector: string) => {
+      const control = viewer()?.querySelector(selector) as HTMLElement;
+      const tip = viewer()?.querySelector(
+        `#${control.getAttribute("aria-describedby")}`,
+      ) as HTMLElement;
+      return {
+        role: tip?.getAttribute("role"),
+        text: tip?.textContent,
+        key: tip?.querySelector("kbd")?.textContent,
+      };
+    };
+    expect(hint("[data-gallery-viewer-prev]")).toEqual({
+      key: "\u2190",
+      role: "tooltip",
+      text: "Previous image\u2190",
+    });
+    expect(hint("[data-gallery-viewer-next]")).toEqual({
+      key: "\u2192",
+      role: "tooltip",
+      text: "Next image\u2192",
+    });
+    expect(hint("[data-gallery-viewer-close]").key).toBe("Esc");
+  });
+
+  it("softens the hover into a fade and a small lift, with a visible focus ring", async () => {
+    await open();
+    await openFromGallery();
+    for (const control of controls()) {
+      const classes = control.className;
+      expect(classes, "translucent, not a flat colour").toContain("bg-white/10");
+      expect(classes).toContain("hover:bg-white/20");
+      expect(classes).toContain("hover:-translate-y-px");
+      expect(classes).toContain("focus-visible:ring-2");
+      // a ring is a shadow, which high-contrast mode removes: the outline is what shows there
+      expect(classes).toContain("focus-visible:outline-transparent");
+      // no white border at rest or after a click; the one ring is soft, translucent and keyboard-only
+      expect(classes).toContain("border-transparent");
+      expect(classes).not.toMatch(/border-white|outline-white|ring-white(?!\/)|ring-offset/);
+      expect(classes).toContain("focus-visible:ring-white/40");
+      expect(classes).toContain("outline-0");
+      expect(classes).not.toMatch(/(^|\s)(focus:ring|focus:outline|border-2)/);
+    }
+  });
+
+  it("turns the motion off under reduced motion, on every control and thumbnail", async () => {
+    await open();
+    await openFromGallery();
+    for (const control of controls()) {
+      expect(control.className).toContain("motion-reduce:transition-none");
+      expect(control.className).toContain("motion-reduce:hover:translate-y-0");
+    }
+    for (const thumb of (viewer() as HTMLElement).querySelectorAll<HTMLElement>(
+      "[data-gallery-viewer-thumb]",
+    )) {
+      expect(thumb.className).toContain("motion-reduce:transition-none");
+      expect(thumb.className).toContain("focus-visible:ring-2");
+      expect(thumb.className).toContain("focus-visible:outline-transparent");
+    }
+  });
+
+  it("shows a disabled arrow quietly, and does not lift it", async () => {
+    await open();
+    await openFromGallery();
+    const prev = viewer()?.querySelector("[data-gallery-viewer-prev]") as HTMLButtonElement;
+    expect(prev.disabled).toBe(true);
+    expect(prev.className).toContain("disabled:opacity-30");
+    expect(prev.className).toContain("disabled:hover:translate-y-0");
   });
 });

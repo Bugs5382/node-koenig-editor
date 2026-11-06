@@ -221,6 +221,8 @@ export interface KoenigStrings {
     openImageFullScreen: string;
     /** The exit control: its label, its tooltip, and its text on wide screens. */
     viewerClose: string;
+    /** The key shown in the exit control's tooltip. */
+    viewerCloseHint: string;
     viewerLabel: string;
     viewerNext: string;
     viewerPrevious: string;

@@ -39,6 +39,7 @@ export interface ViewerStrings {
   hideImageText: string;
   showImageText: string;
   viewerClose: string;
+  viewerCloseHint: string;
   viewerLabel: string;
   viewerNext: string;
   viewerPrevious: string;
@@ -97,8 +98,35 @@ const Chevron = ({ left }: { left?: boolean }) => (
   </svg>
 );
 
-const button =
-  "flex size-11 cursor-pointer items-center justify-center rounded-full border-0 bg-white/15 text-white transition-opacity hover:bg-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white motion-reduce:transition-none";
+// One quiet look for every control in the viewer: a soft translucent fill, no visible border at
+// rest or after a click, a fade and a one-pixel lift on hover, and one translucent ring that shows
+// only for the keyboard (a transparent outline stands in for it in high-contrast mode, where shadows
+// are dropped). Under reduced motion nothing moves.
+const CONTROL =
+  "peer relative flex cursor-pointer items-center justify-center rounded-full border border-transparent bg-white/10 text-white outline-0 backdrop-blur-sm transition duration-150 ease-out hover:-translate-y-px hover:bg-white/20 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-transparent focus-visible:ring-2 focus-visible:ring-white/40 disabled:cursor-default disabled:opacity-30 disabled:hover:translate-y-0 disabled:hover:bg-white/10 motion-reduce:transition-none motion-reduce:hover:translate-y-0";
+
+// The editor's own tooltip: small, dark, rounded, with the key that does the same thing. It sits
+// after its control as a sibling and shows on hover or keyboard focus, not after a click.
+const Tip = ({
+  className,
+  hint,
+  id,
+  label,
+}: {
+  className: string;
+  hint: string;
+  id: string;
+  label: string;
+}) => (
+  <span
+    className={`pointer-events-none absolute z-20 hidden items-center gap-2 whitespace-nowrap rounded-md border border-white/10 bg-black/90 px-2 py-1 text-xs font-medium text-white shadow-lg peer-hover:flex peer-focus-visible:flex ${className}`}
+    id={id}
+    role="tooltip"
+  >
+    {label}
+    <kbd className="rounded bg-white/15 px-1.5 font-sans text-[0.7rem] leading-4">{hint}</kbd>
+  </span>
+);
 
 // The gallery full screen: one photo at a time on a dark page, a strip of thumbnails under it. It
 // mounts under the editor's own root, outside the card, and takes every key typed in it, so the
@@ -119,6 +147,9 @@ export const GalleryViewer = ({
   const currentThumb = useRef<HTMLButtonElement>(null);
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
   const textId = useId();
+  const closeTipId = useId();
+  const prevTipId = useId();
+  const nextTipId = useId();
   const target = opener?.closest(".koenig-lexical") ?? document.body;
   const photo = photos[index];
   const last = photos.length - 1;
@@ -240,47 +271,65 @@ export const GalleryViewer = ({
         <span aria-live="polite" className="text-sm tabular-nums" data-gallery-viewer-count>
           {fill(strings.countOf, { max: photos.length, n: index + 1 })}
         </span>
-        <button
-          ref={closeRef}
-          aria-label={strings.viewerClose}
-          className="flex h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/70 bg-white/20 px-3 text-sm font-medium text-white transition-opacity hover:bg-white/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none sm:px-4"
-          data-gallery-viewer-close
-          title={strings.viewerClose}
-          type="button"
-          onClick={close}
-        >
-          <svg
-            aria-hidden="true"
-            className="size-5 shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 16 16"
+        <span className="relative">
+          <button
+            ref={closeRef}
+            aria-describedby={closeTipId}
+            aria-label={strings.viewerClose}
+            className={`${CONTROL} h-11 min-w-11 gap-2 px-3 text-sm font-medium sm:px-4`}
+            data-gallery-viewer-close
+            type="button"
+            onClick={close}
           >
-            <path
-              d="M3.5 3.5 12.5 12.5M12.5 3.5 3.5 12.5"
-              strokeLinecap="round"
-              strokeWidth="1.6"
-            />
-          </svg>
-          <span className="hidden sm:inline" data-gallery-viewer-close-text>
-            {strings.viewerClose}
-          </span>
-        </button>
+            <svg
+              aria-hidden="true"
+              className="size-5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M3.5 3.5 12.5 12.5M12.5 3.5 3.5 12.5"
+                strokeLinecap="round"
+                strokeWidth="1.6"
+              />
+            </svg>
+            <span className="hidden sm:inline" data-gallery-viewer-close-text>
+              {strings.viewerClose}
+            </span>
+          </button>
+          <Tip
+            className="right-0 top-full mt-2"
+            hint={strings.viewerCloseHint}
+            id={closeTipId}
+            label={strings.viewerClose}
+          />
+        </span>
       </div>
 
       <div
         className="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-16"
         data-gallery-viewer-backdrop
       >
-        <button
-          aria-label={strings.viewerPrevious}
-          className={`${button} absolute left-2 z-10 disabled:opacity-30`}
-          disabled={index <= 0}
-          type="button"
-          onClick={() => go(index - 1)}
-        >
-          <Chevron left />
-        </button>
+        <div className="absolute left-2 z-10">
+          <button
+            aria-describedby={prevTipId}
+            aria-label={strings.viewerPrevious}
+            className={`${CONTROL} size-11`}
+            data-gallery-viewer-prev
+            disabled={index <= 0}
+            type="button"
+            onClick={() => go(index - 1)}
+          >
+            <Chevron left />
+          </button>
+          <Tip
+            className="left-0 top-full mt-2"
+            hint={"\u2190"}
+            id={prevTipId}
+            label={strings.viewerPrevious}
+          />
+        </div>
         <div
           className="flex size-full items-center justify-center"
           data-gallery-viewer-backdrop
@@ -296,15 +345,25 @@ export const GalleryViewer = ({
             src={photo.src || photo.previewSrc}
           />
         </div>
-        <button
-          aria-label={strings.viewerNext}
-          className={`${button} absolute right-2 z-10 disabled:opacity-30`}
-          disabled={index >= last}
-          type="button"
-          onClick={() => go(index + 1)}
-        >
-          <Chevron />
-        </button>
+        <div className="absolute right-2 z-10">
+          <button
+            aria-describedby={nextTipId}
+            aria-label={strings.viewerNext}
+            className={`${CONTROL} size-11`}
+            data-gallery-viewer-next
+            disabled={index >= last}
+            type="button"
+            onClick={() => go(index + 1)}
+          >
+            <Chevron />
+          </button>
+          <Tip
+            className="right-0 top-full mt-2"
+            hint={"\u2192"}
+            id={nextTipId}
+            label={strings.viewerNext}
+          />
+        </div>
 
         {hasText ? (
           <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-center px-2 sm:px-16">
@@ -326,7 +385,7 @@ export const GalleryViewer = ({
               aria-controls={textId}
               aria-expanded={!collapsed}
               aria-label={collapsed ? strings.showImageText : strings.hideImageText}
-              className={`${button} pointer-events-auto absolute bottom-2 right-3 size-9 bg-black/80`}
+              className={`${CONTROL} pointer-events-auto absolute bottom-2 right-3 size-9`}
               data-gallery-viewer-text-toggle
               type="button"
               onClick={() => toggleText(photo)}
@@ -364,9 +423,9 @@ export const GalleryViewer = ({
               ref={position === index ? currentThumb : undefined}
               aria-current={position === index ? "true" : undefined}
               aria-label={fill(strings.viewerThumbnail, { n: position + 1 })}
-              className={`h-14 w-20 shrink-0 cursor-pointer overflow-hidden rounded border-2 bg-transparent p-0 transition-opacity motion-reduce:transition-none ${
+              className={`h-14 w-20 shrink-0 cursor-pointer overflow-hidden rounded border-2 bg-transparent p-0 outline-0 transition duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-transparent focus-visible:ring-2 focus-visible:ring-white/40 motion-reduce:transition-none ${
                 position === index
-                  ? "border-white opacity-100"
+                  ? "border-white/80 opacity-100"
                   : "border-transparent opacity-60 hover:opacity-100"
               }`}
               data-gallery-viewer-thumb
