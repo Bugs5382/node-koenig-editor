@@ -1,4 +1,7 @@
+import AudioPlugin from '../plugins/AudioPlugin';
 import EmEnDashPlugin from '../plugins/EmEnDashPlugin';
+import FilePlugin from '../plugins/FilePlugin';
+import VideoPlugin from '../plugins/VideoPlugin';
 import GalleryPlugin from '../plugins/GalleryPlugin';
 import HeaderPlugin from '../plugins/HeaderPlugin';
 import HorizontalRulePlugin from '../plugins/HorizontalRulePlugin';
@@ -35,6 +38,9 @@ export const AllDefaultPlugins = () => {
             {hasNode(editor, 'toggle') && <TogglePlugin />}
             {hasNode(editor, 'gallery') && <GalleryPlugin />}
             {hasNode(editor, 'header') && <HeaderPlugin />}
+            {hasNode(editor, 'file') && <FilePlugin />}
+            {hasNode(editor, 'video') && <VideoPlugin />}
+            {hasNode(editor, 'audio') && <AudioPlugin />}
             <TablePlugin />
         </>
     );
