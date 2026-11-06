@@ -37,10 +37,19 @@ import {
   SIZES,
   type Settings,
 } from "./config";
+import {
+  appendCard,
+  dropCards,
+  galleryNode,
+  imageNode,
+  SAMPLES,
+  seedDocument,
+  type CardNode,
+} from "./seed";
 import { SettingsPanel } from "./SettingsPanel";
 import { ThreadList } from "./ThreadList";
 import { toolbarActions } from "./toolbarActions";
-import { fileUploader } from "./uploader";
+import { fileUploader, setSampleUploads } from "./uploader";
 
 // Everything but the text size changes what the composer is built with, so it rebuilds.
 const REBUILD: (keyof Settings)[] = [
@@ -51,6 +60,9 @@ const REBUILD: (keyof Settings)[] = [
   "readOnly",
   "dark",
 ];
+
+// The enabled cards, or null when the package does not list its cards (every card is on).
+const enabledCards = (settings: Settings) => (catalog.cards.length ? settings.cards : null);
 
 function WordCount() {
   // Only rendered when the package has the hook, which does not change while the page is open.
@@ -64,18 +76,25 @@ function WordCount() {
 
 export function App() {
   const [settings, setSettings] = useState(() => parseSettings(window.location.search, catalog));
+  const settingsRef = useRef(settings);
   const [state, setState] = useState<unknown>(null);
   const [events, setEvents] = useState<string[]>([]);
   const [rebuilds, setRebuilds] = useState(0);
-  const [initial, setInitial] = useState<string | undefined>(undefined);
+  const [initial, setInitial] = useState<string | undefined>(() =>
+    seedDocument(enabledCards(settings)),
+  );
   const [threadsInit, setThreadsInit] = useState<KoenigCommentThread[]>([]);
-  const stateRef = useRef<unknown>(null);
+  const docRef = useRef<string | undefined>(initial); // the document as it is now
   const threadsRef = useRef<KoenigCommentThread[]>([]); // the in-memory comment store
 
   useEffect(() => {
     document.documentElement.style.fontSize = `${settings.size}px`;
     document.documentElement.classList.toggle("dark", settings.dark);
   }, [settings.size, settings.dark]);
+
+  useEffect(() => {
+    setSampleUploads(settings.sampleUploads);
+  }, [settings.sampleUploads]);
 
   // The address always shows the current setup, so the page URL is the share link.
   useEffect(() => {
@@ -85,17 +104,31 @@ export function App() {
   }, [settings]);
 
   // A rebuild keeps the document and the comment threads.
-  const update = useCallback((patch: Partial<Settings>) => {
-    setSettings((current) => {
-      const next = { ...current, ...patch };
-      if (REBUILD.some((key) => current[key] !== next[key])) {
-        setInitial(stateRef.current ? JSON.stringify(stateRef.current) : undefined);
-        setThreadsInit([...threadsRef.current]);
-        setRebuilds((n) => n + 1);
-      }
-      return next;
-    });
+  const rebuild = useCallback((doc: string | undefined) => {
+    docRef.current = doc;
+    setInitial(doc);
+    setThreadsInit([...threadsRef.current]);
+    setRebuilds((n) => n + 1);
   }, []);
+
+  const update = useCallback(
+    (patch: Partial<Settings>) => {
+      const current = settingsRef.current;
+      const next = { ...current, ...patch };
+      settingsRef.current = next;
+      setSettings(next);
+      if (REBUILD.some((key) => current[key] !== next[key])) {
+        const doc = docRef.current;
+        rebuild(doc ? dropCards(doc, enabledCards(next)) : doc);
+      }
+    },
+    [rebuild],
+  );
+
+  const addCard = useCallback(
+    (node: CardNode) => rebuild(appendCard(docRef.current, node)),
+    [rebuild],
+  );
 
   const onEvent = useCallback((event: KoenigCommentEvent) => {
     const thread = event.thread;
@@ -110,7 +143,7 @@ export function App() {
   const comments = useMemo(() => ({ onEvent, threads: threadsInit }), [onEvent, threadsInit]);
 
   const onChange = useCallback((next: unknown) => {
-    stateRef.current = next;
+    docRef.current = JSON.stringify(next);
     setState(next);
   }, []);
   const json = useMemo(
@@ -122,6 +155,8 @@ export function App() {
     ? { tools: settings.tools }
     : {};
   const snippet = useMemo(() => buildSnippet(settings, catalog), [settings]);
+
+  const cardOn = (card: string) => !catalog.cards.length || settings.cards.includes(card);
 
   return (
     <>
@@ -145,6 +180,13 @@ export function App() {
             ))}
           </select>
         </label>
+        <button
+          disabled={!cardOn("gallery")}
+          title={cardOn("gallery") ? undefined : "The gallery card is switched off"}
+          onClick={() => addCard(galleryNode(SAMPLES))}
+        >
+          Load sample images
+        </button>
       </header>
       <KoenigComposer
         key={rebuilds}
@@ -181,6 +223,24 @@ export function App() {
                 <button onClick={() => void navigator.clipboard?.writeText(snippet)}>
                   Copy code
                 </button>
+              </div>
+            </section>
+            <section className="card">
+              <h2>Sample images</h2>
+              <p className="muted">
+                Ten pictures drawn by the demo. Click one to add it as an image card.
+              </p>
+              <div className="samples">
+                {SAMPLES.map((sample) => (
+                  <button
+                    key={sample.id}
+                    disabled={!cardOn("image")}
+                    title={`Add sample ${sample.id} (${sample.width} x ${sample.height})`}
+                    onClick={() => addCard(imageNode(sample))}
+                  >
+                    <img src={sample.url} alt={sample.alt} loading="lazy" />
+                  </button>
+                ))}
               </div>
             </section>
             <section className="card">

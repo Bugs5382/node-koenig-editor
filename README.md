@@ -812,6 +812,12 @@ A demo app in `playground/` runs the editor in your browser, with a checkbox for
 tool, the toolbar actions, comments, word count and read-only mode, and the matching code next to
 them. The setup lives in the page address, so copying the link shares it.
 
+The demo starts with a header and a gallery made of ten sample pictures (small PNGs it draws itself, no
+network: `npm --prefix playground run samples` rebuilds them). A "Load sample images" button adds a
+gallery, each thumbnail adds an image card, and by default an image upload is answered with the next
+sample so nobody needs a picture of their own. A gallery card holds nine, so the tenth is the header's
+background.
+
 ```bash
 npm run playground            # or: task playground, against the source in this repo
 npm run playground:published  # against the latest published node-koenig-editor

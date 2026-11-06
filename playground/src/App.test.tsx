@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "./App";
 
@@ -64,5 +64,39 @@ describe("playground", () => {
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
     expect(window.location.search).toBe("");
     expect(snippet()).toContain("comments={comments}");
+  });
+
+  it("starts with a header and a gallery made of the sample pictures", () => {
+    render(<App />);
+    const editor = document.querySelector('[contenteditable="true"]') as HTMLElement;
+    expect(editor.querySelectorAll('img[src*="/samples/"]').length).toBeGreaterThanOrEqual(9);
+  });
+
+  it("Load sample images adds another gallery at the end", async () => {
+    render(<App />);
+    const count = () => document.querySelectorAll('[data-kg-card="gallery"]').length;
+    const before = count();
+    fireEvent.click(screen.getByRole("button", { name: "Load sample images" }));
+    await waitFor(() => expect(count()).toBe(before + 1));
+  });
+
+  it("adds one sample as an image card when its thumbnail is clicked", async () => {
+    render(<App />);
+    const count = () => document.querySelectorAll('[data-kg-card="image"]').length;
+    const before = count();
+    fireEvent.click(screen.getByTitle(/Add sample 3 /));
+    await waitFor(() => expect(count()).toBe(before + 1));
+  });
+
+  it("drops the gallery and the header from the document when their cards go off", () => {
+    render(<App />);
+    fireEvent.click(screen.getByLabelText("gallery"));
+    fireEvent.click(screen.getByLabelText("header"));
+    expect(document.querySelectorAll('[data-kg-card="gallery"]')).toHaveLength(0);
+    expect(screen.getByRole("button", { name: "Load sample images" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByLabelText("sample images for uploads")).toBeDefined();
   });
 });

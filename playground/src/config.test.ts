@@ -40,7 +40,13 @@ describe("settings in the page address", () => {
     const s = defaultSettings(catalog);
     expect(s.cards).toEqual(catalog.cards);
     expect(s.tools).toEqual(catalog.tools);
-    expect(s).toMatchObject({ comments: true, toolbarActions: true, readOnly: false, size: 16 });
+    expect(s).toMatchObject({
+      comments: true,
+      toolbarActions: true,
+      readOnly: false,
+      sampleUploads: true,
+      size: 16,
+    });
   });
 
   it("writes nothing for the defaults", () => {
@@ -55,6 +61,7 @@ describe("settings in the page address", () => {
       comments: false,
       readOnly: true,
       dark: true,
+      sampleUploads: false,
       size: 20,
     };
     const query = serializeSettings(s, catalog);

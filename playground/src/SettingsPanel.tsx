@@ -110,6 +110,14 @@ export function SettingsPanel({ catalog, onChange, onReset, settings }: Props) {
           <label>
             <input
               type="checkbox"
+              checked={settings.sampleUploads}
+              onChange={(e) => onChange({ sampleUploads: e.target.checked })}
+            />{" "}
+            sample images for uploads
+          </label>
+          <label>
+            <input
+              type="checkbox"
               checked={settings.readOnly}
               onChange={(e) => onChange({ readOnly: e.target.checked })}
             />{" "}

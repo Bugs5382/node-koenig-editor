@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 // are checked the way a real host's uploader would check them.
 import type { FileUploader } from "node-koenig-editor";
 import { useCallback, useState } from "react";
+import { SAMPLES } from "./seed";
 
 const FILE_TYPES = {
   image: {
@@ -52,6 +53,22 @@ export function isAccepted(type: string, file: File): boolean {
   );
 }
 
+// With sample uploads on, an image upload is answered with the next sample picture instead of the
+// picked file, so nobody has to find a picture to try the cards.
+let sampleUploads = false;
+let nextSample = 0;
+
+export function setSampleUploads(on: boolean): void {
+  if (on && !sampleUploads) nextSample = 0; // switching on starts from the first picture
+  sampleUploads = on;
+}
+
+const takeSample = () => {
+  const sample = SAMPLES[nextSample % SAMPLES.length]!;
+  nextSample += 1;
+  return { fileName: sample.file, url: sample.url };
+};
+
 export const fileUploader: FileUploader = {
   fileTypes: FILE_TYPES,
   useFileUpload: (type) => {
@@ -75,6 +92,7 @@ export const fileUploader: FileUploader = {
         await new Promise((resolve) => setTimeout(resolve, 300));
         setProgress(100);
         setLoading(false);
+        if (type === "image" && sampleUploads) return accepted.map(takeSample);
         return accepted.map((f) => ({ fileName: f.name, url: URL.createObjectURL(f) }));
       },
       [type],

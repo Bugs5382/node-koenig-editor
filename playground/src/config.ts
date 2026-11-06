@@ -41,6 +41,7 @@ export interface Settings {
   wordCount: boolean;
   readOnly: boolean;
   dark: boolean;
+  sampleUploads: boolean;
   size: number;
 }
 
@@ -53,11 +54,19 @@ export function defaultSettings(catalog: Catalog): Settings {
     wordCount: true,
     readOnly: false,
     dark: false,
+    sampleUploads: true,
     size: DEFAULT_SIZE,
   };
 }
 
-const FLAGS = ["toolbarActions", "comments", "wordCount", "readOnly", "dark"] as const;
+const FLAGS = [
+  "toolbarActions",
+  "comments",
+  "wordCount",
+  "readOnly",
+  "dark",
+  "sampleUploads",
+] as const;
 
 const sameList = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((v, i) => v === b[i]);

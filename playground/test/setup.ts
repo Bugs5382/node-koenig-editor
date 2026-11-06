@@ -29,40 +29,43 @@ afterEach(() => {
   cleanup();
 });
 
-if (!globalThis.matchMedia) {
-  Object.defineProperty(globalThis, "matchMedia", {
-    value: (query: string) => ({
-      addEventListener: () => {},
-      addListener: () => {},
-      dispatchEvent: () => false,
-      matches: false,
-      media: query,
-      onchange: null,
-      removeEventListener: () => {},
-      removeListener: () => {},
-    }),
-    writable: true,
-  });
-}
-
-if (!("ResizeObserver" in globalThis)) {
-  class ResizeObserverStub {
-    disconnect() {}
-    observe() {}
-    unobserve() {}
+// The sample picture tests run in plain node, with no DOM to patch.
+if (typeof window !== "undefined") {
+  if (!globalThis.matchMedia) {
+    Object.defineProperty(globalThis, "matchMedia", {
+      value: (query: string) => ({
+        addEventListener: () => {},
+        addListener: () => {},
+        dispatchEvent: () => false,
+        matches: false,
+        media: query,
+        onchange: null,
+        removeEventListener: () => {},
+        removeListener: () => {},
+      }),
+      writable: true,
+    });
   }
-  Object.defineProperty(globalThis, "ResizeObserver", {
-    value: ResizeObserverStub,
-    writable: true,
-  });
-}
 
-if (!Element.prototype.scrollIntoView) {
-  Element.prototype.scrollIntoView = () => {};
-}
+  if (!("ResizeObserver" in globalThis)) {
+    class ResizeObserverStub {
+      disconnect() {}
+      observe() {}
+      unobserve() {}
+    }
+    Object.defineProperty(globalThis, "ResizeObserver", {
+      value: ResizeObserverStub,
+      writable: true,
+    });
+  }
 
-if (!Range.prototype.getBoundingClientRect) {
-  Range.prototype.getBoundingClientRect = () => new DOMRect();
-  Range.prototype.getClientRects = () =>
-    Object.assign([], { item: () => null }) as unknown as DOMRectList;
+  if (!Element.prototype.scrollIntoView) {
+    Element.prototype.scrollIntoView = () => {};
+  }
+
+  if (!Range.prototype.getBoundingClientRect) {
+    Range.prototype.getBoundingClientRect = () => new DOMRect();
+    Range.prototype.getClientRects = () =>
+      Object.assign([], { item: () => null }) as unknown as DOMRectList;
+  }
 }
