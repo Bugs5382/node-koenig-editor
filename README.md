@@ -22,6 +22,12 @@ editor works alone.
 - 📄 **Plain Lexical documents** — stock node names (`text`, `heading`, `table`), readable by any Lexical consumer.
 - 🪶 **Peers stay yours** — Lexical, `@lexical/*`, React and Yjs are peer dependencies, never bundled.
 
+## 📚 Guides
+
+- [The default cards on one page](https://github.com/Bugs5382/node-koenig-editor/blob/main/guides/cards.md):
+  what each card and tool is for, how to add it, its limits, keyboard use, accessibility notes and
+  how a host switches it off or replaces it. The playground shows the same page under its Guide tab, with a Try it link under each card.
+
 ## 📦 Install
 
 ```bash
@@ -805,6 +811,33 @@ one, apply the change by hand, and update the commit here. Upstream history is n
 - Images: an image an older document kept inside a paragraph loads as an image card placed after
   that paragraph, because cards sit at the top level. Its `src`, `alt`, `width` and `height` are
   kept.
+
+## 🧪 Playground
+
+A demo app in `playground/` runs the editor in your browser, with a checkbox for every card and
+tool, the toolbar actions, comments, word count and read-only mode, and the matching code next to
+them. The page splits 50/50 under a sticky top bar (the editor on the left, the options, code,
+sample images, comments and saved state stacked on the right, each side scrolling on its own; under
+1000px the right side drops below the editor). The bar holds the Editor and Guide tabs, the switches (dark, read only), a
+text-size control, a selection colour picker, a card preset list, and the Load sample images, Load
+the kitchen sink, Copy link, Clear and Reset buttons. Clear empties the document and keeps the
+settings; Reset empties it and restores the default settings; both ask first and leave an Undo.
+The Guide tab is the cards guide as a page: contents, an anchor per card, Print, and a Try it link
+that opens the editor with that card inserted. The setup lives in the page address, so copying the link shares it.
+
+The demo starts with a header and a gallery made of ten sample pictures (small PNGs it draws itself, no
+network: `npm --prefix playground run samples` rebuilds them). A "Load sample images" button adds a
+gallery, each thumbnail adds an image card, and by default an image upload is answered with the next
+sample so nobody needs a picture of their own. A "Load the kitchen sink" button replaces the document with one that shows every card the package has (cards that are switched off are left out), plus plain writing, a short sound and a text file kept in `playground/public/media/`. A gallery card holds nine, so the tenth is the header's
+background.
+
+```bash
+npm run playground            # or: task playground, against the source in this repo
+npm run playground:published  # against the latest published node-koenig-editor
+```
+
+It opens on http://127.0.0.1:5178. The demo has its own `package.json`, lint and tests
+(`npm run playground:check`), and it is not part of the published package.
 
 ## 🛠 Develop
 

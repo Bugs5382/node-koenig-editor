@@ -87,3 +87,27 @@ jobs:
         with:
           name: dist
           path: ${{ steps.pkg.outputs.paths }}
+
+  playground:
+    name: 🧪 Playground
+    # Only on PRs: the publish workflow calls this file and should not wait on the demo.
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+
+      - name: Install the package's dependencies
+        run: npm install --ignore-scripts --legacy-peer-deps
+
+      - name: Install the demo's dependencies
+        run: npm install --prefix playground --ignore-scripts --no-audit --no-fund
+
+      - name: Check the demo (lint, types, tests, build)
+        run: npm run playground:check

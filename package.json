@@ -58,7 +58,10 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "playground": "node playground/scripts/run.mjs",
+    "playground:published": "node playground/scripts/run.mjs --published",
+    "playground:check": "npm --prefix playground run lint && npm --prefix playground run typecheck && npm --prefix playground test && npm --prefix playground run build"
   },
   "peerDependencies": {
     "@lexical/clipboard": "^0.52.0",

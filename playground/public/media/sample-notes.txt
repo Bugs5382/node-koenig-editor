@@ -1,0 +1,5 @@
+Sample notes
+
+This small text file belongs to the Koenig playground. The file card in the kitchen sink
+points at it, so you can see a download without uploading anything. Nothing here is real
+content; it only needs to be a file.
