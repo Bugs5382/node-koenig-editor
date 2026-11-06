@@ -874,6 +874,10 @@
     margin-bottom: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .mb-4 {
+    margin-bottom: calc(1.6 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .mb-\[1px\] {
     margin-bottom: 1px;
 }
@@ -1178,6 +1182,10 @@
 
 .koenig-lexical .min-h-\[40px\] {
     min-height: 40px;
+}
+
+.koenig-lexical .min-h-\[4rem\] {
+    min-height: calc(4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .min-h-\[8rem\] {

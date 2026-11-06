@@ -59,9 +59,9 @@ describe("the preview toggle", () => {
     expect(button.getAttribute("aria-pressed")).toBe("false");
     expect(button.tabIndex).toBeGreaterThanOrEqual(0);
     await press();
-    expect(toggle()?.getAttribute("aria-pressed")).toBe("true");
+    expect(toggle()?.getAttribute("data-kg-preview-on")).toBe("true");
     await press();
-    expect(toggle()?.getAttribute("aria-pressed")).toBe("false");
+    expect(toggle()?.getAttribute("data-kg-preview-on")).toBe("false");
   });
 
   it("keeps focus on the toggle when it flips, so a keyboard user is not dropped", async () => {
@@ -88,7 +88,7 @@ describe("the preview toggle", () => {
 
   it("starts on with defaultPreview", async () => {
     await mount({ composer: { defaultPreview: true, initialEditorState: documentOf("Hello") } });
-    expect(toggle()?.getAttribute("aria-pressed")).toBe("true");
+    expect(toggle()?.getAttribute("data-kg-preview-on")).toBe("true");
   });
 
   it("is controlled by the preview prop when the host gives one", async () => {
@@ -103,7 +103,7 @@ describe("the preview toggle", () => {
     await press();
     expect(seen).toEqual([true]);
     // the host did not change the prop, so nothing changed
-    expect(toggle()?.getAttribute("aria-pressed")).toBe("false");
+    expect(toggle()?.getAttribute("data-kg-preview-on")).toBe("false");
   });
 
   it("follows the preview prop when the host changes it", async () => {
@@ -118,11 +118,11 @@ describe("the preview toggle", () => {
     );
     const view = render(host(false));
     await waitFor(() => expect(toggle()).not.toBeNull());
-    expect(toggle()?.getAttribute("aria-pressed")).toBe("false");
+    expect(toggle()?.getAttribute("data-kg-preview-on")).toBe("false");
     view.rerender(host(true));
-    await waitFor(() => expect(toggle()?.getAttribute("aria-pressed")).toBe("true"));
+    await waitFor(() => expect(toggle()?.getAttribute("data-kg-preview-on")).toBe("true"));
     view.rerender(host(false));
-    await waitFor(() => expect(toggle()?.getAttribute("aria-pressed")).toBe("false"));
+    await waitFor(() => expect(toggle()?.getAttribute("data-kg-preview-on")).toBe("false"));
   });
 });
 
@@ -140,7 +140,7 @@ describe("the preview API", () => {
       api.setPreview(true);
     });
     expect(api.isPreview()).toBe(true);
-    expect(toggle()?.getAttribute("aria-pressed")).toBe("true");
+    expect(toggle()?.getAttribute("data-kg-preview-on")).toBe("true");
     expect(seen).toEqual([true]);
     await act(async () => {
       api.setPreview(false);
@@ -163,7 +163,7 @@ describe("placing and switching off the toggle", () => {
     expect(document.querySelectorAll("[data-kg-preview-toggle]")).toHaveLength(1);
     expect((toggle() as HTMLElement).closest("[data-host-slot]")).not.toBeNull();
     await press();
-    expect(toggle()?.getAttribute("aria-pressed")).toBe("true");
+    expect(toggle()?.getAttribute("data-kg-preview-on")).toBe("true");
   });
 
   it("has no toggle when the preview tool is left out of tools", async () => {
@@ -887,5 +887,35 @@ describe("back where it was: scroll and focus", () => {
     await press();
     await press();
     expect(document.activeElement).toBe(api.editorInstance.getRootElement());
+  });
+});
+
+describe("where the preview button sits", () => {
+  it("is a strip of its own in the normal flow, with its height reserved, never floating over content", async () => {
+    await mount({ composer: { initialEditorState: documentOf("Hello") } });
+    const bar = document.querySelector("[data-kg-preview-bar]") as HTMLElement;
+    expect(bar).not.toBeNull();
+    const classes = bar.className.split(/\s+/);
+    for (const floating of ["fixed", "absolute", "sticky", "relative"])
+      expect(classes).not.toContain(floating);
+    expect(classes.some((name) => name.startsWith("z-"))).toBe(false);
+    expect(classes.some((name) => name.startsWith("min-h-"))).toBe(true);
+    // it comes before the writing area, not inside it
+    const root = document.querySelector("[contenteditable]") as HTMLElement;
+    expect(bar.contains(root)).toBe(false);
+    expect(bar.compareDocumentPosition(root) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("holds Back to editing in the same place while previewing, as a plain button", async () => {
+    await mount({ composer: { initialEditorState: documentOf("Hello") } });
+    expect(toggle()?.textContent).toContain("Preview");
+    await press();
+    const bar = document.querySelector("[data-kg-preview-bar]") as HTMLElement;
+    expect(bar.contains(toggle())).toBe(true);
+    expect(toggle()?.textContent).toContain("Back to editing");
+    expect(toggle()?.hasAttribute("aria-pressed")).toBe(false);
+    await press();
+    expect(toggle()?.textContent).toContain("Preview");
+    expect(toggle()?.getAttribute("aria-pressed")).toBe("false");
   });
 });

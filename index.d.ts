@@ -138,6 +138,8 @@ export interface KoenigStrings {
   cards: Record<KoenigCardName, KoenigCardText>;
   /** The Preview button, and the reader simulation's controls. */
   preview: {
+    /** The button that leaves the reader's view. */
+    back: string;
     dark: string;
     desktop: string;
     light: string;

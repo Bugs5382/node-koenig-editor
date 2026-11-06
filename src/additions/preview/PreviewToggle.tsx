@@ -54,12 +54,14 @@ export const KoenigPreviewToggle = ({ className }: { className?: string }) => {
     // the classes are scoped to the editor's own root, so the button carries one when it is placed outside it
     <span className="koenig-lexical inline-flex">
       <button
-        aria-pressed={preview}
+        // in the reader's view this is a plain "Back to editing" button, not a pressed toggle
+        aria-pressed={preview ? undefined : false}
         className={`flex cursor-pointer items-center gap-2 rounded-md border px-3 py-1 font-sans text-sm font-medium outline-0 transition duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-transparent focus-visible:ring-2 focus-visible:ring-grey-500 motion-reduce:transition-none ${
           preview
             ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
             : "border-grey-300 bg-white text-grey-900 hover:bg-grey-100 dark:border-grey-800 dark:bg-grey-950 dark:text-grey-200 dark:hover:bg-grey-900"
         } ${className ?? ""}`}
+        data-kg-preview-on={preview}
         data-kg-preview-toggle
         type="button"
         // a click does not take focus from the editor, so the cursor can go back where it was
@@ -67,7 +69,7 @@ export const KoenigPreviewToggle = ({ className }: { className?: string }) => {
         onClick={() => setPreview(!preview)}
       >
         <EyeIcon />
-        {strings.preview.toggle}
+        {preview ? strings.preview.back : strings.preview.toggle}
       </button>
     </span>
   );

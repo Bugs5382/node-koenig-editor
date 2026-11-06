@@ -24,17 +24,25 @@ import { useKoenigPreview } from "./PreviewContext";
 import { KoenigPreviewOptionsPanel } from "./PreviewOptionsPanel";
 import { KoenigPreviewToggle } from "./PreviewToggle";
 
-/** The default chrome above the editor: the Preview button, unless the host places its own. */
+/**
+ * The default chrome above the editor: the Preview button, and in the reader's view the "Back to
+ * editing" button in the same place, unless the host places its own. It is a strip of its own
+ * above the writing area, in the normal flow (no floating, no z-index), so its height is part of
+ * the layout and it can never cover text, the plus button, a menu or a toolbar.
+ */
 export const KoenigPreviewBar = () => {
   const { available, showToggle } = useKoenigPreview();
   if (!available || !showToggle) return null;
   return (
-    <div
-      className="koenig-lexical mb-2 flex flex-wrap items-center justify-end gap-x-4 gap-y-2"
-      data-kg-preview-bar
-    >
-      <KoenigPreviewOptionsPanel />
-      <KoenigPreviewToggle />
+    // the classes are scoped to the editor's root, so they sit on an element inside one
+    <div className="koenig-lexical">
+      <div
+        className="mb-4 flex min-h-[4rem] flex-wrap items-center justify-end gap-x-4 gap-y-2 border-b border-grey-200 pb-2 font-sans dark:border-grey-900"
+        data-kg-preview-bar
+      >
+        <KoenigPreviewOptionsPanel />
+        <KoenigPreviewToggle />
+      </div>
     </div>
   );
 };

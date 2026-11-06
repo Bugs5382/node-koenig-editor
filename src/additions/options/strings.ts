@@ -224,6 +224,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     tablet: "Tablet",
     textSize: "Text size",
     theme: "Theme",
+    back: "Back to editing",
     toggle: "Preview",
     width: "Width",
   },
