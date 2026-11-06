@@ -408,6 +408,8 @@ describe("preview shows no editing chrome", () => {
     const { api } = await mount({
       composer: { initialEditorState: docWith(line("a"), blank(), line("b")) },
     });
+    // jsdom has no hit testing; the plus button's mousemove handler asks for the element under the pointer
+    Object.defineProperty(document, "elementFromPoint", { configurable: true, value: () => null });
     const place = async () => {
       const empty = api.editorInstance.getRootElement()?.children[1] as HTMLElement;
       api.editorInstance.getRootElement()?.focus();
@@ -824,5 +826,66 @@ describe("the reader simulation: width, theme and text size", () => {
     });
     expect(document.querySelector("[data-host-options] [role='radiogroup']")).not.toBeNull();
     expect(document.querySelector("[data-kg-preview-bar]")).toBeNull();
+  });
+});
+
+describe("back where it was: scroll and focus", () => {
+  // jsdom has no layout: the scroller, the first block and the frame's extra height are stood in.
+  // Previewing adds 19px above the editor, so the scroll offset has to be noted before the flip.
+  it("puts the scroll back where it was, though preview shifts the layout", async () => {
+    const { api } = await mount({ composer: { initialEditorState: documentOf("One", "Two") } });
+    const editorRoot = api.editorInstance.getRootElement() as HTMLElement;
+    const scroller = editorRoot.closest(".koenig-lexical")?.parentElement as HTMLElement;
+    scroller.style.overflowY = "auto";
+    Object.defineProperty(scroller, "scrollHeight", { configurable: true, value: 5000 });
+    Object.defineProperty(scroller, "clientHeight", { configurable: true, value: 500 });
+    scroller.scrollTop = 300;
+    vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: Element,
+    ) {
+      const make = (top: number, height: number) =>
+        ({
+          bottom: top + height,
+          height,
+          left: 0,
+          right: 0,
+          top,
+          width: 0,
+          x: 0,
+          y: top,
+        }) as DOMRect;
+      if (this === scroller) return make(0, 500);
+      if (this.parentElement === editorRoot) {
+        const shift = document.querySelector('[data-kg-preview-stage][role="region"]') ? 19 : 0;
+        return make(100 - scroller.scrollTop + shift, 1000);
+      }
+      return make(0, 0);
+    });
+    await press();
+    await waitFor(() => expect(scroller.scrollTop).toBe(319));
+    await press();
+    await waitFor(() => expect(scroller.scrollTop).toBe(300));
+  });
+
+  it("gives the editor focus back after a mouse press on the toggle", async () => {
+    const { api } = await mount({ composer: { initialEditorState: documentOf("Hello world") } });
+    await act(async () => {
+      api.editorInstance.getRootElement()?.focus();
+      api.editorInstance.update(() => {
+        const text = $getRoot().getFirstDescendant();
+        if ($isTextNode(text)) text.select(3, 3);
+      });
+    });
+    // a click moves focus to the button first, and a mouse focus shows no focus ring
+    const button = toggle() as HTMLButtonElement;
+    vi.spyOn(button, "matches").mockImplementation((selector: string) =>
+      selector === ":focus-visible" ? false : Element.prototype.matches.call(button, selector),
+    );
+    await act(async () => {
+      button.focus();
+    });
+    await press();
+    await press();
+    expect(document.activeElement).toBe(api.editorInstance.getRootElement());
   });
 });

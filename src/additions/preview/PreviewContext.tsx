@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getSelection, $setSelection, type BaseSelection } from "lexical";
 import {
+  type MutableRefObject,
   type ReactNode,
   createContext,
   useCallback,
@@ -107,6 +108,16 @@ const scrollerOf = (root: HTMLElement): HTMLElement | null => {
   return null;
 };
 
+// Whether the browser shows a focus ring on the element (focus came from the keyboard). A browser
+// without :focus-visible counts as keyboard, so the focus stays on the toggle.
+const focusedByKeyboard = (element: Element): boolean => {
+  try {
+    return element.matches(":focus-visible");
+  } catch {
+    return true;
+  }
+};
+
 /** The top-level block at the top of the visible area, and how far below the top it sits. */
 const captureScroll = (editorRoot: HTMLElement): PreviewScroll | null => {
   const scroller = scrollerOf(editorRoot);
@@ -150,10 +161,13 @@ const PreviewController = ({
   hostEditable,
   onCardLet,
   preview,
+  snapshot,
 }: {
   hostEditable: boolean;
   onCardLet: () => void;
   preview: boolean;
+  /** Set to a function that notes the selection and scroll as they are right now. */
+  snapshot: MutableRefObject<(() => void) | null>;
 }) => {
   const [editor] = useLexicalComposerContext();
   const first = useRef(true);
@@ -167,6 +181,32 @@ const PreviewController = ({
     selection: null,
   });
 
+  // Noted before the mode flips, while the layout is still the editing one: preview adds a frame
+  // and a taller bar above the editor, so an offset measured after the flip is off by their size.
+  const noted = useRef(false);
+  const note = useCallback(() => {
+    const root = editor.getRootElement();
+    const selection = editor.getEditorState().read(() => $getSelection()?.clone() ?? null);
+    const active = document.activeElement;
+    // A click on the toggle moves focus to it; the person was still working in the editor, so it
+    // gets the focus back (a keyboard press on the toggle keeps it there).
+    const pressedByMouse = Boolean(
+      selection && active?.closest("[data-kg-preview-bar]") && !focusedByKeyboard(active),
+    );
+    saved.current = {
+      focused: Boolean(root && root.contains(active)) || pressedByMouse,
+      scroll: root ? captureScroll(root) : null,
+      selection,
+    };
+    noted.current = true;
+  }, [editor]);
+  useEffect(() => {
+    snapshot.current = note;
+    return () => {
+      snapshot.current = null;
+    };
+  }, [note, snapshot]);
+
   useEffect(() => {
     const root = editor.getRootElement();
     const getElement = (key: string) => editor.getElementByKey(key) as HTMLElement | null;
@@ -177,9 +217,11 @@ const PreviewController = ({
       window.requestAnimationFrame(() =>
         window.requestAnimationFrame(() => {
           action();
-          const at = window.scrollY;
+          const scroller = root ? scrollerOf(root) : null;
+          const position = () => (scroller ? scroller.scrollTop : window.scrollY);
+          const at = position();
           window.setTimeout(() => {
-            if (Math.abs(window.scrollY - at) < 1) action();
+            if (Math.abs(position() - at) < 1) action();
           }, 250);
         }),
       );
@@ -190,11 +232,9 @@ const PreviewController = ({
       return;
     }
     if (preview) {
-      saved.current = {
-        focused: Boolean(root && root.contains(document.activeElement)),
-        scroll: root ? captureScroll(root) : null,
-        selection: editor.getEditorState().read(() => $getSelection()?.clone() ?? null),
-      };
+      // A flip from the host's own `preview` prop has no earlier moment to note it in.
+      if (!noted.current) note();
+      noted.current = false;
       onCardLet();
       for (const dialog of document.querySelectorAll<HTMLDialogElement>(
         ".koenig-lexical dialog[open]",
@@ -265,6 +305,7 @@ export const KoenigPreviewProvider = ({
   const isControlled = controlled !== undefined;
   const preview = available && (isControlled ? controlled : own);
 
+  const snapshot = useRef<(() => void) | null>(null);
   const latest = useRef({
     isControlled,
     onPreviewChange,
@@ -277,6 +318,7 @@ export const KoenigPreviewProvider = ({
   const setPreview = useCallback((next: boolean) => {
     const current = latest.current;
     if (next === current.preview) return;
+    if (next) snapshot.current?.();
     if (!current.isControlled) setOwn(next);
     current.onPreviewChange?.(next);
   }, []);
@@ -310,7 +352,12 @@ export const KoenigPreviewProvider = ({
 
   return (
     <PreviewContext.Provider value={value}>
-      <PreviewController hostEditable={editable} preview={preview} onCardLet={onStart} />
+      <PreviewController
+        hostEditable={editable}
+        preview={preview}
+        snapshot={snapshot}
+        onCardLet={onStart}
+      />
       <KoenigComposerContext.Provider value={composerValue}>
         {children}
       </KoenigComposerContext.Provider>
