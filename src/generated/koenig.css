@@ -1555,6 +1555,10 @@
     white-space: nowrap;
 }
 
+.koenig-lexical .whitespace-pre-wrap {
+    white-space: pre-wrap;
+}
+
 .koenig-lexical .break-words {
     overflow-wrap: break-word;
 }
@@ -2463,6 +2467,10 @@
 
 .koenig-lexical .line-through {
     text-decoration-line: line-through;
+}
+
+.koenig-lexical .no-underline {
+    text-decoration-line: none;
 }
 
 .koenig-lexical .caret-black {
@@ -3972,6 +3980,11 @@ em-emoji-picker {
 /* When the header or the callout have a background color of accent, we need to show all links in white */
 .kg-header-accent, .kg-callout-accent {
     --kg-accent-color: var(--kg-color-white, #FFF);
+}
+/* The reader's view (preview): a card is not outlined when hovered or selected. */
+.koenig-lexical[data-kg-preview] [data-kg-card],
+.koenig-lexical[data-kg-preview] [data-kg-card]:hover {
+    box-shadow: none !important;
 }
 .koenig-lexical .react-colorful {
     width: 100%;

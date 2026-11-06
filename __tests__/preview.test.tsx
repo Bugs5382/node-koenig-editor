@@ -504,3 +504,112 @@ describe("preview shows no editing chrome", () => {
     expect(api.serialize()).toContain("Edited");
   });
 });
+
+const file = (extra: Record<string, unknown> = {}) => ({
+  fileCaption: "A short description",
+  fileName: "report.pdf",
+  fileSize: 2048,
+  fileTitle: "The report",
+  src: "https://example.com/report.pdf",
+  type: "file",
+  version: 1,
+  ...extra,
+});
+const media = (type: string, extra: Record<string, unknown> = {}) => ({
+  caption: "",
+  duration: 0,
+  fileName: "x",
+  mimeType: "",
+  src: "",
+  title: "",
+  trackLabel: "",
+  trackLang: "en",
+  trackSrc: "",
+  transcript: "",
+  type,
+  version: 1,
+  ...extra,
+});
+
+describe("each card shows its reader form in preview", () => {
+  it("the file card is a download link with text, not title and description inputs", async () => {
+    await mount({ composer: { initialEditorState: docWith(line("a"), file(), line("b")) } });
+    expect(document.querySelectorAll('[data-kg-card="file"] input').length).toBeGreaterThan(0);
+    await press();
+    const card = document.querySelector('[data-kg-card="file"]') as HTMLElement;
+    expect(card.querySelector("input, textarea")).toBeNull();
+    const link = card.querySelector("a") as HTMLAnchorElement;
+    expect(link.getAttribute("href")).toBe("https://example.com/report.pdf");
+    expect(link.hasAttribute("download")).toBe(true);
+    expect(card.textContent).toContain("The report");
+    expect(card.textContent).toContain("A short description");
+    expect(card.textContent).toContain("report.pdf");
+  });
+
+  it("the file card does not link an address a reader should not follow", async () => {
+    await mount({
+      composer: {
+        defaultPreview: true,
+        initialEditorState: docWith(line("a"), file({ src: "javascript:alert(1)" })),
+      },
+    });
+    expect(document.querySelector('[data-kg-card="file"] a')).toBeNull();
+  });
+
+  it("the callout's emoji is plain, not a button that opens a picker", async () => {
+    await mount({
+      composer: {
+        initialEditorState: docWith(line("a"), { ...callout(), calloutEmoji: "\u{1F4A1}" }),
+      },
+    });
+    expect(document.querySelector('[data-testid="emoji-picker-button"]')).not.toBeNull();
+    await press();
+    expect(document.querySelector('[data-testid="emoji-picker-button"]')).toBeNull();
+    expect(document.querySelector('[data-kg-card="callout"]')?.textContent).toContain("\u{1F4A1}");
+  });
+
+  it("an empty audio, video or image card shows nothing, as in the saved HTML", async () => {
+    await mount({
+      composer: {
+        initialEditorState: docWith(line("a"), media("audio"), media("video"), line("b")),
+      },
+    });
+    expect(document.body.textContent).toContain("Click to upload audio");
+    await press();
+    expect(document.body.textContent).not.toContain("Click to upload");
+    expect(document.body.textContent).not.toContain("Click to select");
+  });
+
+  it("an audio card with a file plays it, and shows no upload or caption controls", async () => {
+    await mount({
+      composer: {
+        defaultPreview: true,
+        initialEditorState: docWith(
+          line("a"),
+          media("audio", {
+            fileName: "a.mp3",
+            mimeType: "audio/mpeg",
+            src: "https://example.com/a.mp3",
+            title: "Episode",
+          }),
+        ),
+      },
+    });
+    const card = document.querySelector('[data-kg-card="audio"]') as HTMLElement;
+    expect(card.querySelector("audio")).not.toBeNull();
+    expect(card.querySelector("input, textarea")).toBeNull();
+    expect(card.textContent).toContain("Episode");
+  });
+
+  it("has no outline when a reader hovers a card", async () => {
+    const { readFileSync } = await import("node:fs");
+    const path = await import("node:path");
+    const css = readFileSync(
+      path.resolve(import.meta.dirname, "../src/generated/koenig.css"),
+      "utf8",
+    );
+    expect(css).toMatch(
+      /\[data-kg-preview\] \[data-kg-card\][^{]*\{[^}]*box-shadow: none !important/,
+    );
+  });
+});

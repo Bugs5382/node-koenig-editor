@@ -295,3 +295,18 @@ export const KoenigPreviewProvider = ({
     </PreviewContext.Provider>
   );
 };
+
+/**
+ * Whether the editor this component sits in can be edited right now: false in the reader's view
+ * and for a host that gave `editable={false}`. A card draws its reader form (text, not inputs; no
+ * upload placeholders; no controls) when this is false.
+ */
+export const useKoenigEditable = (): boolean => {
+  const [editor] = useLexicalComposerContext();
+  const [editable, setEditable] = useState(() => editor.isEditable());
+  useEffect(() => {
+    setEditable(editor.isEditable());
+    return editor.registerEditableListener(setEditable);
+  }, [editor]);
+  return editable;
+};

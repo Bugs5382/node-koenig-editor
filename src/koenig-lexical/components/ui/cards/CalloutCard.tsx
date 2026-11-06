@@ -4,6 +4,7 @@ import React from 'react';
 import {ColorOptionSetting, SettingsPanel, ToggleSetting} from '../SettingsPanel';
 import {ReadOnlyOverlay} from '../ReadOnlyOverlay';
 import {EmojiPicker} from '../../../../additions/emojiPicker/EmojiPicker';
+import {useKoenigEditable} from '../../../../additions/preview/PreviewContext';
 import {useKoenigStrings, useKoenigTool} from '../../../../additions/options';
 
 export const CALLOUT_COLORS = {
@@ -100,6 +101,7 @@ export function CalloutCard({
     const strings = useKoenigStrings();
     const emojiButtonRef = React.useRef(null);
     const emojiPickerOn = useKoenigTool('emojiPicker');
+    const editable = useKoenigEditable();
     const {darkMode} = React.useContext(KoenigComposerContext);
 
     React.useEffect(() => {
@@ -114,15 +116,20 @@ export function CalloutCard({
                 <div className="relative">
                     {hasEmoji &&
                     <>
-                        <button
-                            ref={emojiButtonRef}
-                            className={`mr-2 cursor-pointer rounded-md px-2 text-xl ${isEditing ? 'hover:bg-grey-500/20' : ''} ` }
-                            data-testid="emoji-picker-button"
-                            type="button"
-                            onClick={toggleEmojiPicker}
-                        >
-                            {calloutEmoji}
-                        </button>
+                        {editable ? (
+                            <button
+                                ref={emojiButtonRef}
+                                className={`mr-2 cursor-pointer rounded-md px-2 text-xl ${isEditing ? 'hover:bg-grey-500/20' : ''} ` }
+                                data-testid="emoji-picker-button"
+                                type="button"
+                                onClick={toggleEmojiPicker}
+                            >
+                                {calloutEmoji}
+                            </button>
+                        ) : (
+                            // a reader sees the emoji, not a button that opens a picker
+                            <span className="mr-2 px-2 text-xl" data-testid="callout-emoji">{calloutEmoji}</span>
+                        )}
                         {emojiPickerOn && showEmojiPicker && isEditing && (
                             <div className="absolute left-0 top-full z-50 mt-1">
                                 <EmojiPicker onClose={toggleEmojiPicker} onSelect={changeEmoji} />
