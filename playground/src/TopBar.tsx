@@ -40,6 +40,7 @@ interface Props {
   onChange: (patch: Partial<Settings>) => void;
   onCopyLink: () => void;
   onHelp: () => void;
+  onLoadKitchenSink: () => void;
   onLoadSamples: () => void;
   onReset: () => void;
   settings: Settings;
@@ -51,6 +52,7 @@ export function TopBar({
   onChange,
   onCopyLink,
   onHelp,
+  onLoadKitchenSink,
   onLoadSamples,
   onReset,
   settings,
@@ -115,6 +117,12 @@ export function TopBar({
           onClick={onLoadSamples}
         >
           Load sample images
+        </Button>
+        <Button
+          title="Replace the document with one that shows every card"
+          onClick={onLoadKitchenSink}
+        >
+          Load the kitchen sink
         </Button>
         <Button onClick={onCopyLink}>Copy link</Button>
         <Button onClick={onReset}>Reset</Button>

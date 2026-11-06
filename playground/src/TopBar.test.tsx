@@ -205,4 +205,32 @@ describe("buttons", () => {
       console.error = noise;
     }
   });
+
+  it("Load the kitchen sink replaces the document with one that shows the cards, and loads cleanly", () => {
+    render(<App />);
+    fireEvent.click(within(bar()).getByRole("button", { name: "Load the kitchen sink" }));
+    expect(screen.queryByRole("alert")).toBeNull();
+    const editor = document.querySelector('[contenteditable="true"]') as HTMLElement;
+    expect(editor.textContent).toContain("Kitchen sink");
+    expect(editor.textContent).not.toContain("Try the cards below");
+    for (const card of ["callout", "toggle", "table", "image", "gallery", "header"]) {
+      const found =
+        card === "table"
+          ? editor.querySelector("table")
+          : editor.querySelector(`[data-kg-card="${card}"]`);
+      expect(found, card).not.toBeNull();
+    }
+    expect(editor.querySelector('hr, [data-kg-card="horizontalrule"]')).not.toBeNull();
+  });
+
+  it("the kitchen sink keeps to the cards that are on", () => {
+    window.history.replaceState(null, "", "/?cards=image,divider");
+    render(<App />);
+    fireEvent.click(within(bar()).getByRole("button", { name: "Load the kitchen sink" }));
+    expect(screen.queryByRole("alert")).toBeNull();
+    const editor = document.querySelector('[contenteditable="true"]') as HTMLElement;
+    expect(editor.querySelector("table")).toBeNull();
+    expect(editor.querySelector('[data-kg-card="callout"]')).toBeNull();
+    expect(editor.querySelector('[data-kg-card="image"]')).not.toBeNull();
+  });
 });

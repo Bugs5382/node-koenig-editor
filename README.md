@@ -825,7 +825,7 @@ link and Reset buttons. The setup lives in the page address, so copying the link
 The demo starts with a header and a gallery made of ten sample pictures (small PNGs it draws itself, no
 network: `npm --prefix playground run samples` rebuilds them). A "Load sample images" button adds a
 gallery, each thumbnail adds an image card, and by default an image upload is answered with the next
-sample so nobody needs a picture of their own. A gallery card holds nine, so the tenth is the header's
+sample so nobody needs a picture of their own. A "Load the kitchen sink" button replaces the document with one that shows every card the package has (cards that are switched off are left out), plus plain writing, a short sound and a text file kept in `playground/public/media/`. A gallery card holds nine, so the tenth is the header's
 background.
 
 ```bash

@@ -31,6 +31,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { catalog, useWordCount } from "./catalog";
 import { EditorErrorBoundary } from "./EditorErrorBoundary";
 import { HelpSheet } from "./HelpSheet";
+import { kitchenSink } from "./kitchenSink";
 import {
   buildSnippet,
   defaultSettings,
@@ -133,6 +134,13 @@ export function App() {
     [rebuild],
   );
 
+  // Replaces the document with one that shows every card. Comment anchors go with the old text, so
+  // the threads are cleared too.
+  const loadKitchenSink = useCallback(() => {
+    threadsRef.current = [];
+    rebuild(kitchenSink(catalog.cards, enabledCards(settingsRef.current)));
+  }, [rebuild]);
+
   const onEvent = useCallback((event: KoenigCommentEvent) => {
     const thread = event.thread;
     if (thread) {
@@ -175,6 +183,7 @@ export function App() {
         onChange={update}
         onCopyLink={() => void navigator.clipboard?.writeText(window.location.href)}
         onHelp={() => setHelpOpen(true)}
+        onLoadKitchenSink={loadKitchenSink}
         onLoadSamples={() => addCard(galleryNode(SAMPLES))}
         onReset={() => update(defaultSettings(catalog))}
       />

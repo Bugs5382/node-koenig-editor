@@ -26,7 +26,8 @@ import { URL } from "node:url";
 import { inflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { SAMPLE_SPECS, sampleFileName } from "./sampleSpecs.mjs";
-import { renderSample, encodePng } from "../scripts/samples.mjs";
+import { renderSample, encodePng, renderTone } from "../scripts/samples.mjs";
+import { SAMPLE_FILE_BYTES } from "./kitchenSink";
 
 const dir = new URL("../public/samples/", import.meta.url);
 const SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
@@ -88,5 +89,15 @@ describe("sample pictures", () => {
       readFileSync(new URL(sampleFileName(s), dir)).toString("base64"),
     );
     expect(new Set(files).size).toBe(10);
+  });
+
+  it("come with a short sound and a text file for the audio and file cards", () => {
+    const media = new URL("../public/media/", import.meta.url);
+    const wav = readFileSync(new URL("sample-tone.wav", media));
+    expect(wav.toString("ascii", 0, 4)).toBe("RIFF");
+    expect(wav.toString("ascii", 8, 12)).toBe("WAVE");
+    expect(wav.equals(renderTone())).toBe(true);
+    expect(wav.length).toBeLessThan(20_000);
+    expect(readFileSync(new URL("sample-notes.txt", media)).length).toBe(SAMPLE_FILE_BYTES);
   });
 });

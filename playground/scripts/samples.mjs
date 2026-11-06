@@ -154,7 +154,37 @@ export function encodePng(width, height, pixels) {
   ]);
 }
 
+/** A short sine tone as an 8-bit mono WAV, for the audio card. Deterministic. */
+export function renderTone() {
+  const rate = 8000;
+  const seconds = 1.5;
+  const count = Math.round(rate * seconds);
+  const data = Buffer.alloc(count);
+  for (let i = 0; i < count; i++) {
+    const fade = Math.min(1, i / 400, (count - i) / 400); // no click at either end
+    data[i] = Math.round(128 + Math.sin((2 * Math.PI * 440 * i) / rate) * 60 * fade);
+  }
+  const header = Buffer.alloc(44);
+  header.write("RIFF", 0, "ascii");
+  header.writeUInt32LE(36 + count, 4);
+  header.write("WAVEfmt ", 8, "ascii");
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20); // PCM
+  header.writeUInt16LE(1, 22); // mono
+  header.writeUInt32LE(rate, 24);
+  header.writeUInt32LE(rate, 28); // bytes per second
+  header.writeUInt16LE(1, 32); // block align
+  header.writeUInt16LE(8, 34); // bits per sample
+  header.write("data", 36, "ascii");
+  header.writeUInt32LE(count, 40);
+  return Buffer.concat([header, data]);
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const media = new URL("../public/media/", import.meta.url);
+  mkdirSync(media, { recursive: true });
+  writeFileSync(new URL("sample-tone.wav", media), renderTone());
+  console.log("sample-tone.wav");
   const out = new URL("../public/samples/", import.meta.url);
   mkdirSync(out, { recursive: true });
   for (const spec of SAMPLE_SPECS) {
