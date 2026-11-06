@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 
-import { FloatingPortal } from "../placement/FloatingPortal";
+import { TopLayerDialog } from "./TopLayerDialog";
 
 export interface ImageTextDialogStrings {
   imageAltLabel: string;
@@ -61,7 +61,6 @@ export const ImageTextDialog = ({
 }: ImageTextDialogProps) => {
   const headingId = useId();
   const helpId = useId();
-  const boxRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const [titleValue, setTitleValue] = useState(title);
   const [captionValue, setCaptionValue] = useState(caption);
@@ -82,7 +81,7 @@ export const ImageTextDialog = ({
     opener?.focus();
   };
 
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
     // Nothing typed here is for the document behind it.
     event.stopPropagation();
     if (event.key === "Escape") {
@@ -95,8 +94,8 @@ export const ImageTextDialog = ({
       save();
       return;
     }
-    if (event.key !== "Tab" || !boxRef.current) return;
-    const stops = [...boxRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)];
+    if (event.key !== "Tab") return;
+    const stops = [...event.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE)];
     const first = stops[0];
     const last = stops[stops.length - 1];
     if (!first || !last) return;
@@ -113,84 +112,81 @@ export const ImageTextDialog = ({
     "w-full rounded-md border border-grey-300 bg-white px-3 py-2 font-sans text-base text-grey-900 focus:border-selection focus:outline-none dark:border-grey-800 dark:bg-grey-950 dark:text-grey-200";
 
   return (
-    <FloatingPortal to={target}>
-      <div
-        className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4"
-        data-gallery-text-backdrop
-        onClick={(event) => {
-          event.stopPropagation();
-          if (event.target === event.currentTarget) close();
-        }}
-        onKeyUp={(event) => event.stopPropagation()}
-      >
-        <div
-          ref={boxRef}
-          aria-describedby={helpId}
-          aria-labelledby={headingId}
-          aria-modal="true"
-          className="flex w-[min(92vw,44rem)] flex-col gap-4 rounded-lg bg-white p-6 font-sans shadow-xl dark:bg-grey-950"
-          role="dialog"
-          onKeyDown={onKeyDown}
+    <TopLayerDialog
+      aria-describedby={helpId}
+      aria-labelledby={headingId}
+      aria-modal="true"
+      className="fixed inset-0 z-[2147483647] m-0 flex size-full max-h-none max-w-none items-center justify-center border-0 bg-black/50 p-4"
+      data-gallery-text-backdrop
+      role="dialog"
+      to={target}
+      onClick={(event) => {
+        event.stopPropagation();
+        if (event.target === event.currentTarget) close();
+      }}
+      onKeyDown={onKeyDown}
+      onKeyUp={(event) => event.stopPropagation()}
+      onRequestClose={close}
+    >
+      <div className="flex w-[min(92vw,44rem)] flex-col gap-4 rounded-lg bg-white p-6 font-sans shadow-xl dark:bg-grey-950">
+        <h2 className="m-0 text-lg font-semibold text-grey-900 dark:text-grey-200" id={headingId}>
+          {strings.imageTextDialogTitle}
+        </h2>
+        <p
+          className="m-0 text-sm text-grey-700 dark:text-grey-500"
+          data-gallery-text-help
+          id={helpId}
         >
-          <h2 className="m-0 text-lg font-semibold text-grey-900 dark:text-grey-200" id={headingId}>
-            {strings.imageTextDialogTitle}
-          </h2>
-          <p
-            className="m-0 text-sm text-grey-700 dark:text-grey-500"
-            data-gallery-text-help
-            id={helpId}
+          {strings.imageTextHelp}
+        </p>
+        <label className="flex flex-col gap-1 text-sm font-medium text-grey-800 dark:text-grey-400">
+          {strings.imageTitleLabel}
+          <input
+            ref={titleRef}
+            className={field}
+            data-gallery-text-title
+            type="text"
+            value={titleValue}
+            onChange={(event) => setTitleValue(event.target.value)}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm font-medium text-grey-800 dark:text-grey-400">
+          {strings.imageCaptionLabel}
+          <textarea
+            className={`${field} min-h-[8rem] resize-y`}
+            value={captionValue}
+            onChange={(event) => setCaptionValue(event.target.value)}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm font-medium text-grey-800 dark:text-grey-400">
+          {strings.imageAltLabel}
+          <input
+            className={field}
+            data-gallery-text-alt
+            type="text"
+            value={altValue}
+            onChange={(event) => setAltValue(event.target.value)}
+          />
+        </label>
+        <div className="flex justify-end gap-2">
+          <button
+            className="cursor-pointer rounded-md border border-grey-300 bg-transparent px-4 py-2 text-sm text-grey-900 dark:border-grey-800 dark:text-grey-200"
+            type="button"
+            onClick={close}
           >
-            {strings.imageTextHelp}
-          </p>
-          <label className="flex flex-col gap-1 text-sm font-medium text-grey-800 dark:text-grey-400">
-            {strings.imageTitleLabel}
-            <input
-              ref={titleRef}
-              className={field}
-              data-gallery-text-title
-              type="text"
-              value={titleValue}
-              onChange={(event) => setTitleValue(event.target.value)}
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm font-medium text-grey-800 dark:text-grey-400">
-            {strings.imageCaptionLabel}
-            <textarea
-              className={`${field} min-h-[8rem] resize-y`}
-              value={captionValue}
-              onChange={(event) => setCaptionValue(event.target.value)}
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm font-medium text-grey-800 dark:text-grey-400">
-            {strings.imageAltLabel}
-            <input
-              className={field}
-              data-gallery-text-alt
-              type="text"
-              value={altValue}
-              onChange={(event) => setAltValue(event.target.value)}
-            />
-          </label>
-          <div className="flex justify-end gap-2">
-            <button
-              className="cursor-pointer rounded-md border border-grey-300 bg-transparent px-4 py-2 text-sm text-grey-900 dark:border-grey-800 dark:text-grey-200"
-              type="button"
-              onClick={close}
-            >
-              {strings.imageTextCancel}
-            </button>
-            <button
-              className="cursor-pointer rounded-md border-0 bg-selection px-4 py-2 text-sm font-semibold text-white"
-              data-gallery-text-save
-              type="button"
-              onClick={save}
-            >
-              {strings.imageTextSave}
-            </button>
-          </div>
+            {strings.imageTextCancel}
+          </button>
+          <button
+            className="cursor-pointer rounded-md border-0 bg-selection px-4 py-2 text-sm font-semibold text-white"
+            data-gallery-text-save
+            type="button"
+            onClick={save}
+          >
+            {strings.imageTextSave}
+          </button>
         </div>
       </div>
-    </FloatingPortal>
+    </TopLayerDialog>
   );
 };
 

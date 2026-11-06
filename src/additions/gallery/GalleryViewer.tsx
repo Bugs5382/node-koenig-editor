@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { type KeyboardEvent, type TouchEvent, useEffect, useId, useRef } from "react";
 
-import { FloatingPortal } from "../placement/FloatingPortal";
+import { TopLayerDialog } from "./TopLayerDialog";
 import { photoKey } from "./galleryText";
 
 export interface ViewerPhoto {
@@ -58,6 +58,25 @@ interface GalleryViewerProps {
   toggleText: (photo: ViewerPhoto) => void;
   unescape: (value: string) => string;
 }
+
+/**
+ * Where to scroll a strip so that one of its thumbnails sits in the middle of it, never past
+ * either end, and not at all when the strip already fits.
+ */
+export const centerOffset = ({
+  scrollWidth,
+  stripWidth,
+  thumbLeft,
+  thumbWidth,
+}: {
+  scrollWidth: number;
+  stripWidth: number;
+  thumbLeft: number;
+  thumbWidth: number;
+}): number => {
+  const furthest = Math.max(scrollWidth - stripWidth, 0);
+  return Math.min(Math.max(thumbLeft + thumbWidth / 2 - stripWidth / 2, 0), furthest);
+};
 
 const FOCUSABLE = "button, input, textarea, select, [href], [tabindex]:not([tabindex='-1'])";
 const SWIPE_DISTANCE = 40;
@@ -95,7 +114,7 @@ export const GalleryViewer = ({
   toggleText,
   unescape,
 }: GalleryViewerProps) => {
-  const boxRef = useRef<HTMLDivElement>(null);
+  const stripRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const currentThumb = useRef<HTMLButtonElement>(null);
   const swipeStart = useRef<{ x: number; y: number } | null>(null);
@@ -113,8 +132,18 @@ export const GalleryViewer = ({
     };
   }, []);
 
+  // Keep the current thumbnail in the middle of the strip as the photo changes. The strip is
+  // scrolled itself, not the page, so nothing else on screen moves.
   useEffect(() => {
-    currentThumb.current?.scrollIntoView?.({ block: "nearest", inline: "center" });
+    const strip = stripRef.current;
+    const thumb = currentThumb.current;
+    if (!strip || !thumb) return;
+    strip.scrollLeft = centerOffset({
+      scrollWidth: strip.scrollWidth,
+      stripWidth: strip.clientWidth,
+      thumbLeft: thumb.offsetLeft,
+      thumbWidth: thumb.offsetWidth,
+    });
   }, [index]);
 
   if (!photo) return null;
@@ -125,7 +154,7 @@ export const GalleryViewer = ({
     opener?.focus();
   };
 
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
     // Nothing typed here is for the document behind it.
     event.stopPropagation();
     switch (event.key) {
@@ -150,7 +179,7 @@ export const GalleryViewer = ({
         go(last);
         return;
       case "Tab": {
-        const stops = [...(boxRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [])];
+        const stops = [...event.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE)];
         const first = stops[0];
         const end = stops[stops.length - 1];
         if (!first || !end) return;
@@ -187,130 +216,148 @@ export const GalleryViewer = ({
   const collapsed = hasText && isCollapsed(photo);
 
   return (
-    <FloatingPortal to={target}>
+    <TopLayerDialog
+      aria-label={strings.viewerLabel}
+      aria-modal="true"
+      className="fixed inset-0 z-[2147483647] m-0 flex size-full max-h-none max-w-none flex-col overflow-hidden border-0 bg-black p-0 font-sans text-white transition-opacity motion-reduce:transition-none"
+      data-gallery-viewer
+      role="dialog"
+      to={target}
+      onClick={(event) => {
+        event.stopPropagation();
+        // a click on the dark page around the photo closes it; a click on the photo or a control does not
+        if ((event.target as HTMLElement).hasAttribute("data-gallery-viewer-backdrop")) close();
+      }}
+      onKeyDown={onKeyDown}
+      onKeyUp={(event) => event.stopPropagation()}
+      onRequestClose={close}
+    >
       <div
-        ref={boxRef}
-        aria-label={strings.viewerLabel}
-        aria-modal="true"
-        className="fixed inset-0 z-[10000] flex flex-col bg-black font-sans text-white transition-opacity motion-reduce:transition-none"
-        data-gallery-viewer
-        role="dialog"
-        onClick={(event) => event.stopPropagation()}
-        onKeyDown={onKeyDown}
-        onKeyUp={(event) => event.stopPropagation()}
+        className="flex items-center justify-between gap-4 pb-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(0.75rem,env(safe-area-inset-top))]"
+        data-gallery-viewer-backdrop
+        data-gallery-viewer-bar
       >
-        <div className="flex items-center justify-between gap-4 px-4 py-3">
-          <span aria-live="polite" className="text-sm tabular-nums" data-gallery-viewer-count>
-            {fill(strings.countOf, { max: photos.length, n: index + 1 })}
-          </span>
-          <button
-            ref={closeRef}
-            aria-label={strings.viewerClose}
-            className={button}
-            data-gallery-viewer-close
-            type="button"
-            onClick={close}
-          >
-            <svg
-              aria-hidden="true"
-              className="size-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M3.5 3.5 12.5 12.5M12.5 3.5 3.5 12.5"
-                strokeLinecap="round"
-                strokeWidth="1.6"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <div className="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-16">
-          <button
-            aria-label={strings.viewerPrevious}
-            className={`${button} absolute left-2 z-10 disabled:opacity-30`}
-            disabled={index <= 0}
-            type="button"
-            onClick={() => go(index - 1)}
-          >
-            <Chevron left />
-          </button>
-          <div
-            className="flex size-full items-center justify-center"
-            data-gallery-viewer-stage
-            onTouchEnd={onTouchEnd}
-            onTouchStart={onTouchStart}
-          >
-            <img
-              key={photoKey(photo)}
-              alt={photo.alt ?? ""}
-              className="max-h-full max-w-full object-contain transition-opacity motion-reduce:transition-none"
-              data-gallery-viewer-image
-              src={photo.src || photo.previewSrc}
-            />
-          </div>
-          <button
-            aria-label={strings.viewerNext}
-            className={`${button} absolute right-2 z-10 disabled:opacity-30`}
-            disabled={index >= last}
-            type="button"
-            onClick={() => go(index + 1)}
-          >
-            <Chevron />
-          </button>
-
-          {hasText ? (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-center px-2 sm:px-16">
-              <div
-                className={
-                  collapsed
-                    ? "sr-only"
-                    : "pointer-events-auto max-w-3xl flex-1 bg-black/80 py-2 pl-4 pr-14 text-sm leading-snug"
-                }
-                data-gallery-viewer-text
-                id={textId}
-              >
-                {photo.title ? (
-                  <strong className="block font-semibold">{unescape(photo.title)}</strong>
-                ) : null}
-                {photo.caption ? <span className="block">{unescape(photo.caption)}</span> : null}
-              </div>
-              <button
-                aria-controls={textId}
-                aria-expanded={!collapsed}
-                aria-label={collapsed ? strings.showImageText : strings.hideImageText}
-                className={`${button} pointer-events-auto absolute bottom-2 right-3 size-9 bg-black/80`}
-                data-gallery-viewer-text-toggle
-                type="button"
-                onClick={() => toggleText(photo)}
-              >
-                <svg
-                  aria-hidden="true"
-                  className="size-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 16 16"
-                >
-                  <path
-                    d={collapsed ? "M3.5 10.5 8 6l4.5 4.5" : "M3.5 5.5 8 10l4.5-4.5"}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.6"
-                  />
-                </svg>
-              </button>
-            </div>
-          ) : null}
-        </div>
-
-        <div
-          aria-label={strings.viewerThumbnails}
-          className="flex gap-2 overflow-x-auto px-4 py-3"
-          data-gallery-viewer-thumbs
-          role="group"
+        <span aria-live="polite" className="text-sm tabular-nums" data-gallery-viewer-count>
+          {fill(strings.countOf, { max: photos.length, n: index + 1 })}
+        </span>
+        <button
+          ref={closeRef}
+          aria-label={strings.viewerClose}
+          className="flex h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/70 bg-white/20 px-3 text-sm font-medium text-white transition-opacity hover:bg-white/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none sm:px-4"
+          data-gallery-viewer-close
+          title={strings.viewerClose}
+          type="button"
+          onClick={close}
         >
+          <svg
+            aria-hidden="true"
+            className="size-5 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M3.5 3.5 12.5 12.5M12.5 3.5 3.5 12.5"
+              strokeLinecap="round"
+              strokeWidth="1.6"
+            />
+          </svg>
+          <span className="hidden sm:inline" data-gallery-viewer-close-text>
+            {strings.viewerClose}
+          </span>
+        </button>
+      </div>
+
+      <div
+        className="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-16"
+        data-gallery-viewer-backdrop
+      >
+        <button
+          aria-label={strings.viewerPrevious}
+          className={`${button} absolute left-2 z-10 disabled:opacity-30`}
+          disabled={index <= 0}
+          type="button"
+          onClick={() => go(index - 1)}
+        >
+          <Chevron left />
+        </button>
+        <div
+          className="flex size-full items-center justify-center"
+          data-gallery-viewer-backdrop
+          data-gallery-viewer-stage
+          onTouchEnd={onTouchEnd}
+          onTouchStart={onTouchStart}
+        >
+          <img
+            key={photoKey(photo)}
+            alt={photo.alt ?? ""}
+            className="max-h-full max-w-full object-contain transition-opacity motion-reduce:transition-none"
+            data-gallery-viewer-image
+            src={photo.src || photo.previewSrc}
+          />
+        </div>
+        <button
+          aria-label={strings.viewerNext}
+          className={`${button} absolute right-2 z-10 disabled:opacity-30`}
+          disabled={index >= last}
+          type="button"
+          onClick={() => go(index + 1)}
+        >
+          <Chevron />
+        </button>
+
+        {hasText ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-center px-2 sm:px-16">
+            <div
+              className={
+                collapsed
+                  ? "sr-only"
+                  : "pointer-events-auto max-w-3xl flex-1 bg-black/80 py-2 pl-4 pr-14 text-sm leading-snug"
+              }
+              data-gallery-viewer-text
+              id={textId}
+            >
+              {photo.title ? (
+                <strong className="block font-semibold">{unescape(photo.title)}</strong>
+              ) : null}
+              {photo.caption ? <span className="block">{unescape(photo.caption)}</span> : null}
+            </div>
+            <button
+              aria-controls={textId}
+              aria-expanded={!collapsed}
+              aria-label={collapsed ? strings.showImageText : strings.hideImageText}
+              className={`${button} pointer-events-auto absolute bottom-2 right-3 size-9 bg-black/80`}
+              data-gallery-viewer-text-toggle
+              type="button"
+              onClick={() => toggleText(photo)}
+            >
+              <svg
+                aria-hidden="true"
+                className="size-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d={collapsed ? "M3.5 10.5 8 6l4.5 4.5" : "M3.5 5.5 8 10l4.5-4.5"}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.6"
+                />
+              </svg>
+            </button>
+          </div>
+        ) : null}
+      </div>
+
+      <div
+        ref={stripRef}
+        aria-label={strings.viewerThumbnails}
+        className="relative flex shrink-0 overflow-x-auto pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-3"
+        data-gallery-viewer-thumbs
+        role="group"
+      >
+        <div className="mx-auto flex gap-2">
           {photos.map((item, position) => (
             <button
               key={photoKey(item) + position}
@@ -337,7 +384,7 @@ export const GalleryViewer = ({
           ))}
         </div>
       </div>
-    </FloatingPortal>
+    </TopLayerDialog>
   );
 };
 

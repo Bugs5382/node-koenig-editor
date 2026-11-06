@@ -219,6 +219,7 @@ export interface KoenigStrings {
     /** The button that opens the full-screen viewer, on the gallery and on each photo. */
     openGalleryFullScreen: string;
     openImageFullScreen: string;
+    /** The exit control: its label, its tooltip, and its text on wide screens. */
     viewerClose: string;
     viewerLabel: string;
     viewerNext: string;

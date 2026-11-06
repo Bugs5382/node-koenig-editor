@@ -737,6 +737,10 @@
     z-index: 1000;
 }
 
+.koenig-lexical .z-\[2147483647\] {
+    z-index: 2147483647;
+}
+
 .koenig-lexical .z-\[9999999\] {
     z-index: 9999999;
 }
@@ -1084,6 +1088,10 @@
     height: 0px;
 }
 
+.koenig-lexical .h-11 {
+    height: calc(4.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .h-14 {
     height: calc(5.6 * var(--kg-rem, 0.625rem));
 }
@@ -1150,6 +1158,10 @@
 
 .koenig-lexical .max-h-full {
     max-height: 100%;
+}
+
+.koenig-lexical .max-h-none {
+    max-height: none;
 }
 
 .koenig-lexical .min-h-0 {
@@ -1252,6 +1264,10 @@
     min-width: 0px;
 }
 
+.koenig-lexical .min-w-11 {
+    min-width: calc(4.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .min-w-\[296px\] {
     min-width: 296px;
 }
@@ -1294,6 +1310,10 @@
 
 .koenig-lexical .max-w-full {
     max-width: 100%;
+}
+
+.koenig-lexical .max-w-none {
+    max-width: none;
 }
 
 .koenig-lexical .flex-1 {
@@ -1668,6 +1688,10 @@
     border-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .border-white\/70 {
+    border-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.7 * 100%), transparent);
+}
+
 .koenig-lexical .border-b-red {
     --tw-border-opacity: 1;
     border-bottom-color: color-mix(in srgb, var(--kg-color-red, #F50B23) calc(var(--tw-border-opacity, 1) * 100%), transparent);
@@ -1815,6 +1839,10 @@
 
 .koenig-lexical .bg-white\/15 {
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.15 * 100%), transparent);
+}
+
+.koenig-lexical .bg-white\/20 {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.2 * 100%), transparent);
 }
 
 .koenig-lexical .bg-white\/30 {
@@ -2071,6 +2099,10 @@
     padding-bottom: calc(.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .pb-\[max\(0\.75rem\2c env\(safe-area-inset-bottom\)\)\] {
+    padding-bottom: max(calc(0.75 * var(--kg-rem, 0.625rem)), env(safe-area-inset-bottom));
+}
+
 .koenig-lexical .pl-2 {
     padding-left: calc(0.8 * var(--kg-rem, 0.625rem));
 }
@@ -2085,6 +2117,10 @@
 
 .koenig-lexical .pl-\[1rem\] {
     padding-left: calc(1 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .pl-\[max\(1rem\2c env\(safe-area-inset-left\)\)\] {
+    padding-left: max(calc(1 * var(--kg-rem, 0.625rem)), env(safe-area-inset-left));
 }
 
 .koenig-lexical .pr-1 {
@@ -2111,6 +2147,10 @@
     padding-right: calc(3.6 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .pr-\[max\(1rem\2c env\(safe-area-inset-right\)\)\] {
+    padding-right: max(calc(1 * var(--kg-rem, 0.625rem)), env(safe-area-inset-right));
+}
+
 .koenig-lexical .pt-3 {
     padding-top: calc(1.2 * var(--kg-rem, 0.625rem));
 }
@@ -2121,6 +2161,10 @@
 
 .koenig-lexical .pt-\[\.6rem\] {
     padding-top: calc(.6 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .pt-\[max\(0\.75rem\2c env\(safe-area-inset-top\)\)\] {
+    padding-top: max(calc(0.75 * var(--kg-rem, 0.625rem)), env(safe-area-inset-top));
 }
 
 .koenig-lexical .text-left {
@@ -4091,6 +4135,10 @@ em-emoji-picker {
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.3 * 100%), transparent);
 }
 
+.koenig-lexical .hover\:bg-white\/35:hover {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.35 * 100%), transparent);
+}
+
 .koenig-lexical .hover\:px-3:hover {
     padding-left: calc(1.2 * var(--kg-rem, 0.625rem));
     padding-right: calc(1.2 * var(--kg-rem, 0.625rem));
@@ -4519,9 +4567,18 @@ em-emoji-picker {
 
 @media (min-width: 640px) {
 
+    .koenig-lexical .sm\:inline {
+        display: inline;
+    }
+
     .koenig-lexical .sm\:px-16 {
         padding-left: calc(6.4 * var(--kg-rem, 0.625rem));
         padding-right: calc(6.4 * var(--kg-rem, 0.625rem));
+    }
+
+    .koenig-lexical .sm\:px-4 {
+        padding-left: calc(1.6 * var(--kg-rem, 0.625rem));
+        padding-right: calc(1.6 * var(--kg-rem, 0.625rem));
     }
 }
 

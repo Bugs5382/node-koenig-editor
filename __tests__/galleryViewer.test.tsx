@@ -21,8 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { act, cleanup, fireEvent, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { centerOffset } from "../src/additions/gallery/GalleryViewer";
 import { mount } from "./__utils__/mount";
 
 beforeEach(() => {
@@ -328,5 +329,244 @@ describe("a gallery for someone who can only read it", () => {
     await open(0, { editable: false });
     expect(document.querySelector("input[name='image-input']")).toBeNull();
     expect(document.body.textContent).not.toContain("Click to select");
+  });
+});
+
+describe("the thumbnail strip sits centered along the bottom", () => {
+  it("centers the group when it fits, and scrolls from the start when it does not", async () => {
+    await open(3);
+    await openFromGallery();
+    const strip = viewer()?.querySelector("[data-gallery-viewer-thumbs]") as HTMLElement;
+    // the strip scrolls sideways, and what is inside it centers itself with auto margins: unlike
+    // justify-content: center, that never cuts off the first thumbnails when the strip overflows
+    expect(strip.className).toContain("overflow-x-auto");
+    expect(strip.className).not.toContain("justify-center");
+    const group = strip.firstElementChild as HTMLElement;
+    expect(group.className).toContain("mx-auto");
+    expect(group.querySelectorAll("[data-gallery-viewer-thumb]")).toHaveLength(3);
+  });
+
+  it("stays inside the phone's safe area", async () => {
+    await open(3);
+    await openFromGallery();
+    const strip = viewer()?.querySelector("[data-gallery-viewer-thumbs]") as HTMLElement;
+    expect(strip.className).toContain("env(safe-area-inset-bottom)");
+    expect(strip.className).toContain("env(safe-area-inset-left)");
+    expect(strip.className).toContain("env(safe-area-inset-right)");
+  });
+
+  it("sits below the photo and its title and caption, not over them", async () => {
+    await open(9);
+    await openFromGallery();
+    const box = viewer() as HTMLElement;
+    const strip = box.querySelector("[data-gallery-viewer-thumbs]") as HTMLElement;
+    const text = box.querySelector("[data-gallery-viewer-text]") as HTMLElement;
+    expect(text).not.toBeNull();
+    expect(strip.contains(text)).toBe(false);
+    expect(strip.className).not.toMatch(/(^|\s)(absolute|fixed)(\s|$)/);
+    // the strip comes after the stage that holds the photo and its text, in the page's flow
+    const stage = text.closest("div.relative") as HTMLElement;
+    expect(stage.compareDocumentPosition(strip) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(stage.contains(strip)).toBe(false);
+  });
+
+  it("scrolls the current thumbnail to the middle as the photo changes", async () => {
+    await open(30);
+    await openFromGallery();
+    const strip = viewer()?.querySelector("[data-gallery-viewer-thumbs]") as HTMLElement;
+    const thumbs = [...strip.querySelectorAll<HTMLElement>("[data-gallery-viewer-thumb]")];
+    // jsdom has no layout: give the strip 400 wide and each thumbnail 80 wide with 8 gaps
+    Object.defineProperty(strip, "clientWidth", { configurable: true, value: 400 });
+    Object.defineProperty(strip, "scrollWidth", { configurable: true, value: 30 * 88 });
+    thumbs.forEach((thumb, index) => {
+      Object.defineProperty(thumb, "offsetLeft", { configurable: true, value: index * 88 });
+      Object.defineProperty(thumb, "offsetWidth", { configurable: true, value: 80 });
+    });
+    await press("End");
+    await waitFor(() => expect(strip.scrollLeft).toBe(30 * 88 - 400));
+    await press("Home");
+    await waitFor(() => expect(strip.scrollLeft).toBe(0));
+    await act(async () => {
+      fireEvent.click(thumbs[15] as Element);
+    });
+    await waitFor(() => expect(strip.scrollLeft).toBe(15 * 88 + 40 - 200));
+  });
+});
+
+describe("centerOffset", () => {
+  it("puts the thumbnail in the middle of the strip", () => {
+    expect(
+      centerOffset({ scrollWidth: 2640, stripWidth: 400, thumbLeft: 1320, thumbWidth: 80 }),
+    ).toBe(1160);
+  });
+
+  it("never scrolls past either end", () => {
+    expect(centerOffset({ scrollWidth: 2640, stripWidth: 400, thumbLeft: 0, thumbWidth: 80 })).toBe(
+      0,
+    );
+    expect(
+      centerOffset({ scrollWidth: 2640, stripWidth: 400, thumbLeft: 2560, thumbWidth: 80 }),
+    ).toBe(2240);
+  });
+
+  it("does not scroll a strip that fits", () => {
+    expect(
+      centerOffset({ scrollWidth: 300, stripWidth: 400, thumbLeft: 100, thumbWidth: 80 }),
+    ).toBe(0);
+  });
+});
+
+// jsdom has no top layer; stand in for the browser's native <dialog> so the tests can see that the
+// viewer asks for it, which is what keeps it above any z-index a host's page uses.
+const withNativeDialog = () => {
+  const calls = { close: 0, showModal: 0 };
+  const proto = HTMLDialogElement.prototype as unknown as Record<string, unknown>;
+  const saved = { close: proto.close, showModal: proto.showModal };
+  proto.showModal = function (this: HTMLDialogElement) {
+    calls.showModal += 1;
+    this.setAttribute("open", "");
+  };
+  proto.close = function (this: HTMLDialogElement) {
+    calls.close += 1;
+    this.removeAttribute("open");
+  };
+  return {
+    calls,
+    restore: () => {
+      proto.close = saved.close;
+      proto.showModal = saved.showModal;
+    },
+  };
+};
+
+describe("the viewer is drawn in the browser's top layer", () => {
+  let native: ReturnType<typeof withNativeDialog>;
+  beforeEach(() => {
+    native = withNativeDialog();
+  });
+  afterEach(() => native.restore());
+
+  it("is a native dialog opened as a modal, so no z-index on the page can cover it", async () => {
+    await open();
+    await openFromGallery();
+    const box = viewer() as HTMLElement;
+    expect(box.tagName).toBe("DIALOG");
+    expect(native.calls.showModal).toBe(1);
+    expect(box.hasAttribute("open")).toBe(true);
+    expect(box.getAttribute("role")).toBe("dialog");
+    expect(box.getAttribute("aria-modal")).toBe("true");
+  });
+
+  it("closes from the X, with a visible, labelled, keyboard-reachable button", async () => {
+    await open();
+    const opener = await openFromGallery();
+    const close = viewer()?.querySelector("[data-gallery-viewer-close]") as HTMLButtonElement;
+    expect(close.getAttribute("aria-label")).toBe("Exit full screen");
+    expect(close.tabIndex).toBeGreaterThanOrEqual(0);
+    expect(close.closest("[data-gallery-viewer-bar]")?.className).toContain(
+      "env(safe-area-inset-top)",
+    );
+    expect(close.closest("[data-gallery-viewer-bar]")?.className).toContain(
+      "env(safe-area-inset-right)",
+    );
+    await act(async () => {
+      fireEvent.click(close);
+    });
+    await waitFor(() => expect(viewer()).toBeNull());
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it("labels the exit control: text on wide screens, a tooltip on phones, always visible", async () => {
+    await open();
+    await openFromGallery();
+    const close = viewer()?.querySelector("[data-gallery-viewer-close]") as HTMLButtonElement;
+    expect(close.getAttribute("title")).toBe("Exit full screen");
+    const text = close.querySelector("[data-gallery-viewer-close-text]") as HTMLElement;
+    expect(text.textContent).toBe("Exit full screen");
+    expect(text.className).toContain("hidden");
+    expect(text.className).toContain("sm:inline");
+    // never hidden until hover, and not inside anything that hides
+    let node: HTMLElement | null = close;
+    while (node && node !== viewer()) {
+      expect(node.className).not.toMatch(/(^|\s)(invisible|opacity-0|hidden)(\s|$)/);
+      node = node.parentElement;
+    }
+  });
+
+  it("is the first Tab stop inside the viewer", async () => {
+    await open();
+    await openFromGallery();
+    const stops = [
+      ...(viewer() as HTMLElement).querySelectorAll<HTMLElement>(
+        "button, input, textarea, select, [href], [tabindex]:not([tabindex='-1'])",
+      ),
+    ].filter((element) => !(element as HTMLButtonElement).disabled);
+    expect(stops[0]?.hasAttribute("data-gallery-viewer-close")).toBe(true);
+  });
+
+  it("does not use the browser's own Fullscreen API, so there is nothing else to leave", async () => {
+    await open();
+    const request = vi.fn();
+    (Element.prototype as unknown as Record<string, unknown>).requestFullscreen = request;
+    await openFromGallery();
+    delete (Element.prototype as unknown as Record<string, unknown>).requestFullscreen;
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  it("closes from a click on the dark backdrop, but not from a click on the photo", async () => {
+    await open();
+    const opener = await openFromGallery();
+    await act(async () => {
+      fireEvent.click(viewer()?.querySelector("[data-gallery-viewer-image]") as Element);
+    });
+    expect(viewer()).not.toBeNull();
+    await act(async () => {
+      fireEvent.click(viewer()?.querySelector("[data-gallery-viewer-stage]") as Element);
+    });
+    await waitFor(() => expect(viewer()).toBeNull());
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it("closes on Escape, including the browser's own cancel event", async () => {
+    await open();
+    const opener = await openFromGallery();
+    const cancel = new Event("cancel", { cancelable: true });
+    await act(async () => {
+      viewer()?.dispatchEvent(cancel);
+    });
+    expect(cancel.defaultPrevented).toBe(true);
+    await waitFor(() => expect(viewer()).toBeNull());
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it("puts the title and caption dialog in the top layer too", async () => {
+    await open();
+    await act(async () => {
+      fireEvent.click(document.querySelector("[data-gallery] [data-image] img") as Element);
+    });
+    await act(async () => {
+      fireEvent.click(document.querySelector("[data-gallery-image-text-edit]") as Element);
+    });
+    const box = document.querySelector('[role="dialog"]') as HTMLElement;
+    expect(box.tagName).toBe("DIALOG");
+    expect(native.calls.showModal).toBe(1);
+    const cancel = new Event("cancel", { cancelable: true });
+    await act(async () => {
+      box.dispatchEvent(cancel);
+    });
+    await waitFor(() => expect(document.querySelector('[role="dialog"]')).toBeNull());
+  });
+
+  it("still works where the browser has no native dialog", async () => {
+    native.restore();
+    const proto = HTMLDialogElement.prototype as unknown as Record<string, unknown>;
+    expect(proto.showModal).toBeUndefined();
+    await open();
+    await openFromGallery();
+    const box = viewer() as HTMLElement;
+    expect(box.hasAttribute("open")).toBe(true);
+    expect(box.className).toContain("fixed");
+    await press("Escape");
+    await waitFor(() => expect(viewer()).toBeNull());
   });
 });

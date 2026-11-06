@@ -134,7 +134,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     showAllImageText: "Show all titles and captions",
     showImageText: "Show title and caption",
     uploadError: "An image could not be uploaded. Try it again",
-    viewerClose: "Close",
+    viewerClose: "Exit full screen",
     viewerLabel: "Gallery viewer",
     viewerNext: "Next image",
     viewerPrevious: "Previous image",
