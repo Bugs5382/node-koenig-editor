@@ -11,7 +11,7 @@ editor works alone.
 
 ## ✨ Highlights
 
-- 🧱 **Pick your cards** — image, gallery, header, divider, callout, toggle and table, on by default, off one by one.
+- 🧱 **Pick your cards** — image, gallery, header, button, markdown, divider, callout, toggle and table, on by default, off one by one.
 - 🧩 **Bring your own nodes** — register custom nodes and cards, and add your own "+" and slash menu entries.
 - 🗣️ **Your wording** — every label, placeholder and menu text comes from a `strings` option with English defaults.
 - 🎛️ **Your toolbar** — show only the format buttons you want.
@@ -65,7 +65,7 @@ the sources.
 
 | Prop                 | Type                              | Default         | What it does                                                                                                                                                                     |
 | -------------------- | --------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `divider`, `callout`, `toggle`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
+| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `button`, `markdown`, `divider`, `callout`, `toggle`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
 | `cardRenderers`      | `KoenigCardRenderers`             | none            | Your own layout for the `gallery` and `header` cards; see [Gallery and header cards](#-gallery-and-header-cards). |
 | `customNodes`        | `EditorNodes`                     | none            | Your own node classes, registered after the shipped ones. A node with a static `kgMenu` (a `CardMenuItem` or a list) is listed in the menus.                                     |
 | `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
@@ -99,7 +99,7 @@ the sources.
 
 `DEFAULT_STRINGS` holds every piece of text the editor shows, grouped as `placeholder`,
 `nestedPlaceholder`, `errorFallback` (the message a failed card shows; `{card}` is replaced with the card's name), `cards` (each card's menu `label` and `desc`), `menu`, `toolbar`, `table` (the table card's controls), `card`
-(card toolbar buttons), `link`, `image`, `callout`, `toggle` and `snippet`. Plug your i18n in by
+(card toolbar buttons), `link`, `image`, `button`, `markdown`, `wordCount`, `callout`, `toggle` and `snippet`. Plug your i18n in by
 building the `strings` object from your translations. Your own cards read the wording in effect
 with `useKoenigStrings()`.
 
@@ -107,8 +107,10 @@ with `useKoenigStrings()`.
 
 `KoenigComposer`, `KoenigEditor`, `KoenigComposableEditor`, `AllDefaultPlugins`, `TablePlugin`,
 `TABLE_MENU_ITEM`, `DEFAULT_NODES`, `BASIC_NODES`, `MINIMAL_NODES`, `KOENIG_CARD_NAMES`,
-`KOENIG_TOOLBAR_ITEMS`, `DEFAULT_STRINGS`, `KoenigStringsContext` and `useKoenigStrings`, plus the
-types in `index.d.ts`.
+`KOENIG_TOOLBAR_ITEMS`, `DEFAULT_STRINGS`, `KoenigStringsContext`, `useKoenigStrings`,
+`isSafeUrl`, `toSafeUrl`, `renderMarkdown` and the word count functions
+(`useKoenigWordCount`, `getWordCount`, `countWords`, `getReadingTime`), plus the types in
+`index.d.ts`.
 
 ## 🧱 A complete host component
 
@@ -353,6 +355,56 @@ Not included: the parts of upstream's header and gallery that need a Ghost site 
 A version 1 header in a saved document still loads and exports; the card edits it with the
 current controls.
 
+## 🔘 Button and Markdown cards
+
+Both are in the default card set (`/button`, `/md`) and `cards` leaves either out.
+
+**Links.** Wherever a card writes a link, only an absolute `http`, `https` or `mailto` URL is
+kept. One rule, `isSafeUrl(url)` / `toSafeUrl(url)`, runs when you type in the editor, when a
+document loads (JSON or HTML), and again when the HTML is written out. It reads a URL the way a
+browser does (leading spaces and control characters, tabs and line breaks inside the URL are
+ignored), so `JaVaScRiPt:`, `data:`, `vbscript:`, relative and protocol-relative links are all
+refused. The button's link field shows `strings.button.invalidUrl` and does not store the value.
+
+**Button.** A label, a link and left or centre alignment. A button with no valid link exports
+nothing. Upstream's email-specific markup is not included: every target gets the same link.
+
+**Markdown.** Write or paste Markdown into a text area; the card shows the rendered result.
+`renderMarkdown(source)` does the rendering for both the preview and the exported HTML, so they
+cannot differ. Raw HTML in the source is escaped, never passed through. Links and image sources
+follow the URL rule above (a link that fails stays plain text), and `######` becomes an H5 to
+match the [heading limit](#-headings). Rendering uses [`markdown-it`](https://github.com/markdown-it/markdown-it)
+(MIT), a regular dependency that stays external in the build. Upstream's CodeMirror editor and
+its Ghost image uploads are not included.
+
+## 🔢 Word count and reading time
+
+`useKoenigWordCount()` returns `{ words, minutes, wordsLabel, readingTimeLabel }` for the editor it
+sits under and updates as the text changes. Place it in any component rendered inside
+`KoenigComposer`:
+
+```tsx
+const WordCount = () => {
+  const { wordsLabel, readingTimeLabel } = useKoenigWordCount({ wordsPerMinute: 200 });
+  return <p>{wordsLabel} · {readingTimeLabel}</p>;
+};
+
+<KoenigComposer>
+  <KoenigEditor />
+  <WordCount />
+</KoenigComposer>;
+```
+
+`wordsPerMinute` defaults to `DEFAULT_WORDS_PER_MINUTE` (238); minutes are rounded up. Outside a
+component, `getWordCount(editorState)`, `countWords(text)` and `getReadingTime(words, wpm)` give the
+same numbers. The labels come from `strings.wordCount` (`{count}` and `{minutes}` are filled in).
+
+What counts: the document's own text (paragraphs, headings, lists, quotes, code and table
+cells). Cards are not counted at all, so a gallery's alt text, an image caption, a button's label
+and link, callout and toggle text, and the source of a Markdown card add nothing. A word is a run
+between spaces ("well-known" is one); Chinese, Japanese and Thai text is split with the browser's
+word segmenter.
+
 ## 🔠 Headings
 
 Headings run from H1 to H5 and no deeper. The toolbar has a button for each level (hide any with
@@ -578,9 +630,9 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   card selection, drag to reorder, remote carets, and the image, callout, toggle, divider and
   aside cards.
 - Removed: cards that need a Ghost site or service (membership, signup, product, paywall, email
-  and email CTA, call to action, button, bookmark, embed, audio, video, file,
-  HTML, Markdown, Transistor, Ghost's code block card), the GIF and Unsplash pickers, the Pintura
-  image editor, the emoji picker, the TK and at-link nodes, word counts, replacement strings, the
+  and email CTA, call to action, bookmark, embed, audio, video, file,
+  HTML, Transistor, Ghost's code block card), the GIF and Unsplash pickers, the Pintura
+  image editor, the emoji picker, the TK and at-link nodes, replacement strings, the
   demo, stories and upstream's tests.
 - Images: an image an older document kept inside a paragraph loads as an image card placed after
   that paragraph, because cards sit at the top level. Its `src`, `alt`, `width` and `height` are

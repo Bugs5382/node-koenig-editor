@@ -31,3 +31,11 @@ export {
   useKoenigStrings,
 } from "./additions/options";
 export { useKoenigComments } from "./additions/comments";
+export { isSafeUrl, renderMarkdown, toSafeUrl } from "#kg-default-nodes";
+export {
+  DEFAULT_WORDS_PER_MINUTE,
+  countWords,
+  getReadingTime,
+  getWordCount,
+  useKoenigWordCount,
+} from "./additions/wordCount";

@@ -1,6 +1,8 @@
 import EmEnDashPlugin from '../plugins/EmEnDashPlugin';
 import GalleryPlugin from '../plugins/GalleryPlugin';
 import HeaderPlugin from '../plugins/HeaderPlugin';
+import ButtonPlugin from '../plugins/ButtonPlugin';
+import MarkdownCardPlugin from '../plugins/MarkdownCardPlugin';
 import HorizontalRulePlugin from '../plugins/HorizontalRulePlugin';
 import ImagePlugin from '../plugins/ImagePlugin';
 import {CalloutPlugin} from '../plugins/CalloutPlugin';
@@ -35,6 +37,8 @@ export const AllDefaultPlugins = () => {
             {hasNode(editor, 'toggle') && <TogglePlugin />}
             {hasNode(editor, 'gallery') && <GalleryPlugin />}
             {hasNode(editor, 'header') && <HeaderPlugin />}
+            {hasNode(editor, 'button') && <ButtonPlugin />}
+            {hasNode(editor, 'markdown') && <MarkdownCardPlugin />}
             <TablePlugin />
         </>
     );

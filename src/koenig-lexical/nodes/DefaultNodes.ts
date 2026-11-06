@@ -2,8 +2,10 @@ import {AsideNode} from './AsideNode';
 import {CalloutNode} from './CalloutNode';
 import {CodeHighlightNode, CodeNode} from '@lexical/code';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
+import {ButtonNode} from './ButtonNode';
 import {GalleryNode} from './GalleryNode';
 import {HeaderNode} from './HeaderNode';
+import {MarkdownNode} from './MarkdownNode';
 import {HorizontalRuleNode} from './HorizontalRuleNode';
 import {ImageNode} from './ImageNode';
 import {LinkNode} from '@lexical/link';
@@ -30,7 +32,9 @@ const DEFAULT_NODES = [
     CalloutNode,
     ToggleNode,
     GalleryNode,
-    HeaderNode
+    HeaderNode,
+    ButtonNode,
+    MarkdownNode
 ];
 
 export default DEFAULT_NODES;

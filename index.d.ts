@@ -38,7 +38,15 @@ import type { Doc, XmlText } from "yjs";
 
 /** The cards the package ships. Pass a list as the composer's `cards` to register only those. */
 export type KoenigCardName =
-  "callout" | "divider" | "gallery" | "header" | "image" | "table" | "toggle";
+  | "button"
+  | "callout"
+  | "divider"
+  | "gallery"
+  | "header"
+  | "image"
+  | "markdown"
+  | "table"
+  | "toggle";
 
 /** The format toolbar's buttons. Pass a list as the composer's `toolbar` to show only those. */
 export type KoenigToolbarItem =
@@ -165,6 +173,19 @@ export interface KoenigStrings {
     titlePlaceholder: string;
     uploadError: string;
   };
+  /** The button card; its link must be http, https or mailto. */
+  button: {
+    alignCenter: string;
+    alignLeft: string;
+    alignment: string;
+    invalidUrl: string;
+    text: string;
+    textPlaceholder: string;
+    url: string;
+  };
+  markdown: { editorLabel: string; empty: string; placeholder: string; previewLabel: string };
+  /** Wording for `useKoenigWordCount`; `{count}` and `{minutes}` are filled in. */
+  wordCount: { readLessThanMinute: string; readMinutes: string; word: string; words: string };
   callout: { background: string; emoji: string; placeholder: string };
   toggle: { contentPlaceholder: string; headingPlaceholder: string };
   snippet: { namePlaceholder: string; replaceExisting: string };
@@ -450,6 +471,37 @@ export declare const useKoenigStrings: () => KoenigStrings;
 
 /** The comment controller, the threads and the active thread, re-rendering the caller on change.
  *  Null outside a composer that was given `comments`. */
+/** True for an absolute http, https or mailto URL: the only links the button and Markdown cards keep. */
+export declare const isSafeUrl: (value: unknown) => boolean;
+/** The URL cleaned the way a browser reads it, or an empty string when it is not allowed. */
+export declare const toSafeUrl: (value: unknown) => string;
+/** Markdown to HTML as the Markdown card shows and exports it: raw HTML escaped, links checked, headings to H5. */
+export declare const renderMarkdown: (source: null | string | undefined) => string;
+
+export interface KoenigWordCountOptions {
+  /** Reading speed. Default: `DEFAULT_WORDS_PER_MINUTE`. */
+  wordsPerMinute?: number;
+}
+export interface KoenigWordCount {
+  /** Whole minutes to read, rounded up; 0 for an empty document. */
+  minutes: number;
+  /** "3 min read", or "Less than a minute", in the host's `strings.wordCount`. */
+  readingTimeLabel: string;
+  words: number;
+  /** "1 word" or "5 words", in the host's `strings.wordCount`. */
+  wordsLabel: string;
+}
+/** 238 words per minute. */
+export declare const DEFAULT_WORDS_PER_MINUTE: number;
+/** Words in a piece of text. */
+export declare const countWords: (text: string) => number;
+/** Whole minutes to read `words`, rounded up; 0 for none. */
+export declare const getReadingTime: (words: number, wordsPerMinute?: number) => number;
+/** Words in the document's own text; cards and what they hold are not counted. */
+export declare const getWordCount: (editorState: LexicalEditorState) => number;
+/** Word count and reading time for the editor it is placed under, live. Place it inside `KoenigComposer`. */
+export declare const useKoenigWordCount: (options?: KoenigWordCountOptions) => KoenigWordCount;
+
 export declare const useKoenigComments: () => {
   activeThreadId: null | string;
   controller: KoenigCommentsController;

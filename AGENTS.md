@@ -38,6 +38,7 @@ or off, adds its own nodes, wording and theme. Two things to know before changin
 - `src/additions/toolbarActions/` - saving and restoring the selection for host toolbar actions
 - `src/koenig-lexical/nodes/GalleryNode*.tsx`, `HeaderNode*.tsx` - the gallery and header cards (ported from upstream); the composer's `cardRenderers` option swaps their layout
 - `src/additions/headings/` - the H1 to H5 limit
+- `src/additions/wordCount/` - `getWordCount`, `countWords`, `getReadingTime` and the `useKoenigWordCount` hook
 - `src/additions/comments/` - inline comment threads on mark nodes: store, plugin, hook (opt-in through the composer's `comments`)
 - `src/koenig-lexical/`, `src/kg-default-nodes/`, `src/kg-default-transforms/` - upstream Koenig
 - `src/generated/koenig.css` - the stylesheet, built by `npm run build:css` and committed

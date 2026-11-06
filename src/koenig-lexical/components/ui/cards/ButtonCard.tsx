@@ -1,6 +1,5 @@
 import CenterAlignIcon from '../../../assets/icons/kg-align-center.svg?react';
 import LeftAlignIcon from '../../../assets/icons/kg-align-left.svg?react';
-import PropTypes from 'prop-types';
 import React from 'react';
 import {Button} from '../Button';
 import {ButtonGroupSetting, InputSetting, SettingsPanel} from '../SettingsPanel';
@@ -87,14 +86,3 @@ export function ButtonCard({
         </>
     );
 }
-
-ButtonCard.propTypes = {
-    alignment: PropTypes.string,
-    buttonText: PropTypes.string,
-    buttonPlaceholder: PropTypes.string,
-    buttonUrl: PropTypes.string,
-    handleAlignmentChange: PropTypes.func,
-    handleButtonTextChange: PropTypes.func,
-    handleButtonUrlChange: PropTypes.func,
-    isEditing: PropTypes.bool
-};

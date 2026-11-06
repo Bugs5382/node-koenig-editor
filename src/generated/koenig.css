@@ -784,6 +784,11 @@
     margin-bottom: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .my-3 {
+    margin-top: calc(1.2 * var(--kg-rem, 0.625rem));
+    margin-bottom: calc(1.2 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .my-\[\.2rem\] {
     margin-top: calc(.2 * var(--kg-rem, 0.625rem));
     margin-bottom: calc(.2 * var(--kg-rem, 0.625rem));
@@ -872,6 +877,10 @@
 
 .koenig-lexical .mr-3 {
     margin-right: calc(1.2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .mt-0 {
+    margin-top: 0px;
 }
 
 .koenig-lexical .mt-0\.5 {
@@ -1078,6 +1087,10 @@
     max-height: min(var(--kg-menu-max-height,calc(32 * var(--kg-rem, 0.625rem))), var(--kg-menu-fit,100vh));
 }
 
+.koenig-lexical .min-h-\[16rem\] {
+    min-height: calc(16 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .min-h-\[40px\] {
     min-height: 40px;
 }
@@ -1259,6 +1272,10 @@
     user-select: none;
 }
 
+.koenig-lexical .resize-y {
+    resize: vertical;
+}
+
 .koenig-lexical .resize {
     resize: both;
 }
@@ -1293,6 +1310,10 @@
 
 .koenig-lexical .items-center {
     align-items: center;
+}
+
+.koenig-lexical .justify-start {
+    justify-content: flex-start;
 }
 
 .koenig-lexical .justify-end {
@@ -1939,6 +1960,10 @@
 
 .koenig-lexical .\!font-sans {
     font-family: var(--kg-font-sans, Inter, -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif) !important;
+}
+
+.koenig-lexical .font-mono {
+    font-family: var(--kg-font-mono, Consolas, Liberation Mono, Menlo, Courier, monospace);
 }
 
 .koenig-lexical .font-sans {
@@ -4293,6 +4318,10 @@ em-emoji-picker {
 
     .koenig-lexical .md\:min-w-\[calc\(100\%\+10rem\)\] {
         min-width: calc(100% + calc(10 * var(--kg-rem, 0.625rem)));
+    }
+
+    .koenig-lexical .md\:grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .koenig-lexical .md\:gap-y-\[\.2rem\] {
