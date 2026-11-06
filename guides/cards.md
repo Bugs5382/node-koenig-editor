@@ -213,6 +213,24 @@ Shift with the arrows resizes it.
 **Developer:** `tools` leaves it out (`tools={["imageEditor"]}` keeps only the image editor,
 `tools={[]}` turns both off).
 
+## Preview
+
+**For:** seeing the document the way a reader will see it, while you write.
+**It opens:** from the Preview button above the editor. Press it again to go back to writing.
+**What it shows:** the same document with no editing tools: no plus button or slash menu, no
+toolbars, no placeholders, no drag handles. Every card shows its reader form: a file is a link,
+a toggle opens and closes, a video or audio card shows its title and captions, empty upload slots
+are gone.
+**What it can do:** pick the width the reader has (desktop, tablet or phone, shown in a frame),
+light or dark, and the text size (12 to 20). Nothing you change here changes the document.
+**Coming back:** your cursor, selection and scroll position are where you left them, and no change
+is lost. It is one document, not a copy.
+**Keyboard:** the button is a toggle you reach with Tab and press with Space or Enter; the width,
+theme and size choices are radio groups you move through with the arrow keys.
+**Developer:** `tools` leaves it out (`tools={["imageEditor", "emojiPicker"]}`). `showPreviewToggle={false}`
+hides the default button so you can place `<KoenigPreviewToggle />` yourself, and `preview`,
+`defaultPreview` and `onPreviewChange` (or `api.setPreview(true)`) let your own code drive it.
+
 ## Word count
 
 **For:** showing "120 words, 1 min read" next to the writing.
@@ -228,7 +246,7 @@ developer changes it.
 | You want to | Use | Example |
 | --- | --- | --- |
 | Keep only some cards | `cards` on `KoenigComposer` | `cards={["image", "divider"]}` |
-| Remove the image editor or the emoji picker | `tools` | `tools={[]}` |
+| Remove the image editor, the emoji picker or the preview | `tools` | `tools={[]}` |
 | Change how the gallery or header looks | `cardRenderers` | `cardRenderers={{ gallery: MyGallery }}` |
 | Change the gallery's picture limit | `gallery` | `gallery={{ maxImages: 12 }}` |
 | Add your own card | `customNodes` and `menuItems` | a node with a `kgMenu` entry |
