@@ -633,6 +633,10 @@
     bottom: calc(0.4 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .bottom-2 {
+    bottom: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .bottom-full {
     bottom: 100%;
 }
@@ -643,6 +647,10 @@
 
 .koenig-lexical .left-1\/2 {
     left: 50%;
+}
+
+.koenig-lexical .left-2 {
+    left: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .left-3 {
@@ -663,6 +671,10 @@
 
 .koenig-lexical .right-1 {
     right: calc(0.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .right-2 {
+    right: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .right-3 {
@@ -973,6 +985,11 @@
     display: none;
 }
 
+.koenig-lexical .size-11 {
+    width: calc(4.4 * var(--kg-rem, 0.625rem));
+    height: calc(4.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .size-14 {
     width: calc(5.6 * var(--kg-rem, 0.625rem));
     height: calc(5.6 * var(--kg-rem, 0.625rem));
@@ -1023,6 +1040,11 @@
     height: calc(3.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .size-9 {
+    width: calc(3.6 * var(--kg-rem, 0.625rem));
+    height: calc(3.6 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .size-\[1\.4rem\] {
     width: calc(1.4 * var(--kg-rem, 0.625rem));
     height: calc(1.4 * var(--kg-rem, 0.625rem));
@@ -1060,6 +1082,10 @@
 
 .koenig-lexical .h-0 {
     height: 0px;
+}
+
+.koenig-lexical .h-14 {
+    height: calc(5.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .h-3 {
@@ -1120,6 +1146,14 @@
 
 .koenig-lexical .max-h-\[min\(var\(--kg-menu-max-height\2c 32rem\)\2c var\(--kg-menu-fit\2c 100vh\)\)\] {
     max-height: min(var(--kg-menu-max-height,calc(32 * var(--kg-rem, 0.625rem))), var(--kg-menu-fit,100vh));
+}
+
+.koenig-lexical .max-h-full {
+    max-height: 100%;
+}
+
+.koenig-lexical .min-h-0 {
+    min-height: 0px;
 }
 
 .koenig-lexical .min-h-\[16rem\] {
@@ -1242,6 +1276,10 @@
     max-width: calc(67.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .max-w-3xl {
+    max-width: calc(76.8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .max-w-\[240px\] {
     max-width: 240px;
 }
@@ -1252,6 +1290,10 @@
 
 .koenig-lexical .max-w-\[65\%\] {
     max-width: 65%;
+}
+
+.koenig-lexical .max-w-full {
+    max-width: 100%;
 }
 
 .koenig-lexical .flex-1 {
@@ -1391,6 +1433,10 @@
     align-items: flex-start;
 }
 
+.koenig-lexical .items-end {
+    align-items: flex-end;
+}
+
 .koenig-lexical .items-center {
     align-items: center;
 }
@@ -1453,6 +1499,10 @@
 
 .koenig-lexical .overflow-visible {
     overflow: visible;
+}
+
+.koenig-lexical .overflow-x-auto {
+    overflow-x: auto;
 }
 
 .koenig-lexical .overflow-y-auto {
@@ -1763,6 +1813,10 @@
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .bg-white\/15 {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.15 * 100%), transparent);
+}
+
 .koenig-lexical .bg-white\/30 {
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.3 * 100%), transparent);
 }
@@ -1852,6 +1906,14 @@
 
 .koenig-lexical .stroke-\[3px\] {
     stroke-width: 3px;
+}
+
+.koenig-lexical .object-contain {
+    object-fit: contain;
+}
+
+.koenig-lexical .object-cover {
+    object-fit: cover;
 }
 
 .koenig-lexical .p-0 {
@@ -2017,6 +2079,10 @@
     padding-left: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .pl-4 {
+    padding-left: calc(1.6 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .pl-\[1rem\] {
     padding-left: calc(1 * var(--kg-rem, 0.625rem));
 }
@@ -2027,6 +2093,10 @@
 
 .koenig-lexical .pr-11 {
     padding-right: calc(4.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .pr-14 {
+    padding-right: calc(5.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pr-2 {
@@ -2180,6 +2250,11 @@
 
 .koenig-lexical .italic {
     font-style: italic;
+}
+
+.koenig-lexical .tabular-nums {
+    --tw-numeric-spacing: tabular-nums;
+    font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction);
 }
 
 .koenig-lexical .\!leading-\[1\.1\] {
@@ -2349,6 +2424,10 @@
     opacity: 0.5;
 }
 
+.koenig-lexical .opacity-60 {
+    opacity: 0.6;
+}
+
 .koenig-lexical .opacity-70 {
     opacity: 0.7;
 }
@@ -2456,6 +2535,12 @@
 
 .koenig-lexical .transition-colors {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.koenig-lexical .transition-opacity {
+    transition-property: opacity;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
 }
@@ -3923,10 +4008,6 @@ em-emoji-picker {
     border-top-width: 0px;
 }
 
-.koenig-lexical .focus-within\:visible:focus-within {
-    visibility: visible;
-}
-
 .koenig-lexical .focus-within\:border-selection:focus-within {
     --tw-border-opacity: 1;
     border-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-border-opacity, 1) * 100%), transparent);
@@ -4006,6 +4087,10 @@ em-emoji-picker {
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .hover\:bg-white\/30:hover {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.3 * 100%), transparent);
+}
+
 .koenig-lexical .hover\:px-3:hover {
     padding-left: calc(1.2 * var(--kg-rem, 0.625rem));
     padding-right: calc(1.2 * var(--kg-rem, 0.625rem));
@@ -4019,6 +4104,10 @@ em-emoji-picker {
 .koenig-lexical .hover\:text-selection:hover {
     --tw-text-opacity: 1;
     color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-text-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .hover\:opacity-100:hover {
+    opacity: 1;
 }
 
 .koenig-lexical .hover\:shadow-\[0_0_0_1px\]:hover {
@@ -4079,6 +4168,10 @@ em-emoji-picker {
     outline-color: color-mix(in srgb, var(--kg-selection) calc(1 * 100%), transparent);
 }
 
+.koenig-lexical .focus-visible\:outline-white:focus-visible {
+    outline-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(1 * 100%), transparent);
+}
+
 .koenig-lexical .focus-visible\:ring-2:focus-visible {
     --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
     --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
@@ -4088,6 +4181,10 @@ em-emoji-picker {
 .koenig-lexical .focus-visible\:ring-selection:focus-visible {
     --tw-ring-opacity: 1;
     --tw-ring-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-ring-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .disabled\:opacity-30:disabled {
+    opacity: 0.3;
 }
 
 .koenig-lexical .disabled\:opacity-50:disabled {
@@ -4133,6 +4230,13 @@ em-emoji-picker {
 .koenig-lexical .aria-pressed\:bg-grey-100[aria-pressed="true"] {
     --tw-bg-opacity: 1;
     background-color: color-mix(in srgb, var(--kg-color-grey-100, #F4F5F6) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .koenig-lexical .motion-reduce\:transition-none {
+        transition-property: none;
+    }
 }
 
 .koenig-lexical .dark\:border-grey-800:is(.dark *) {
@@ -4410,6 +4514,14 @@ em-emoji-picker {
 
     .koenig-lexical .xs\:overflow-visible {
         overflow: visible;
+    }
+}
+
+@media (min-width: 640px) {
+
+    .koenig-lexical .sm\:px-16 {
+        padding-left: calc(6.4 * var(--kg-rem, 0.625rem));
+        padding-right: calc(6.4 * var(--kg-rem, 0.625rem));
     }
 }
 

@@ -32,6 +32,7 @@ const sources: Record<string, string[]> = {
     "components/ui/cards/GalleryCard.tsx",
     "nodes/GalleryNodeComponent.tsx",
     "../additions/gallery/ImageTextDialog.tsx",
+    "../additions/gallery/GalleryViewer.tsx",
   ],
   header: ["components/ui/cards/HeaderCard.tsx", "nodes/HeaderNodeComponent.tsx"],
   button: ["components/ui/cards/ButtonCard.tsx", "nodes/ButtonNodeComponent.tsx"],
@@ -43,7 +44,7 @@ const sources: Record<string, string[]> = {
 
 // Classes that are markers or hooks, not utilities, so the stylesheet has no rule for them.
 const MARKERS =
-  /^(group|peer|kg-|not-kg|bg-black-60$|markdown-editor$|sans-serif$|fw7$|f7$|center$|buttonUrl$)/;
+  /^(group|peer|kg-|not-kg|bg-black-60$|markdown-editor$|sans-serif$|fw7$|f7$|center$|buttonUrl$|position$|index$)/;
 
 const escape = (name: string) => name.replace(/([^a-zA-Z0-9_-])/g, "\\$1");
 

@@ -216,6 +216,16 @@ export interface KoenigStrings {
     /** `{host}` is the host's ceiling and `{n}` the number of photos already in the gallery. */
     maxImagesHint: string;
     maxImagesLabel: string;
+    /** The button that opens the full-screen viewer, on the gallery and on each photo. */
+    openGalleryFullScreen: string;
+    openImageFullScreen: string;
+    viewerClose: string;
+    viewerLabel: string;
+    viewerNext: string;
+    viewerPrevious: string;
+    /** `{n}` is the photo's place in the gallery. */
+    viewerThumbnail: string;
+    viewerThumbnails: string;
   };
   header: {
     alignCenter: string;

@@ -3,6 +3,7 @@ import React from 'react';
 import {CardCaptionEditor} from '../CardCaptionEditor';
 import {IconButton} from '../IconButton';
 import {MediaPlaceholder} from '../MediaPlaceholder';
+import {GalleryViewer} from '../../../../additions/gallery/GalleryViewer';
 import {ImageTextDialog} from '../../../../additions/gallery/ImageTextDialog';
 import {ProgressBar} from '../ProgressBar';
 import {Tooltip} from '../Tooltip';
@@ -16,6 +17,14 @@ function TextIcon({className}) {
     );
 }
 
+function ExpandIcon({className}) {
+    return (
+        <svg aria-hidden="true" className={className} fill="none" stroke="currentColor" viewBox="0 0 16 16">
+            <path d="M6 2.5H2.5V6M10 2.5h3.5V6M6 13.5H2.5V10M10 13.5h3.5V10" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    );
+}
+
 function ChevronIcon({className, up}) {
     return (
         <svg aria-hidden="true" className={className} fill="none" stroke="currentColor" viewBox="0 0 16 16">
@@ -24,7 +33,7 @@ function ChevronIcon({className, up}) {
     );
 }
 
-function GalleryRow({index, images, deleteImage, isDragging, isSelected, listIndexOf, total, moveImage, text, announce, updateImageText, strings, unescapeHtml}) {
+function GalleryRow({index, images, deleteImage, isDragging, isSelected, listIndexOf, total, moveImage, text, announce, openViewer, readOnly, updateImageText, strings, unescapeHtml}) {
     const GalleryImages = images.map((image, idx) => {
         const position =
             images.length === 1 ? 'single' :
@@ -32,7 +41,7 @@ function GalleryRow({index, images, deleteImage, isDragging, isSelected, listInd
                     idx === images.length - 1 ? 'last' :
                         'middle';
 
-        return <GalleryImage key={image.fileName + (image.src || image.previewSrc)} deleteImage={deleteImage} image={image} isDragging={isDragging} isSelected={isSelected} listIndex={listIndexOf(image)} moveImage={moveImage} announce={announce} position={position} strings={strings} text={text} total={total} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
+        return <GalleryImage key={image.fileName + (image.src || image.previewSrc)} deleteImage={deleteImage} image={image} isDragging={isDragging} isSelected={isSelected} listIndex={listIndexOf(image)} moveImage={moveImage} announce={announce} openViewer={openViewer} position={position} readOnly={readOnly} strings={strings} text={text} total={total} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
     });
 
 
@@ -48,7 +57,7 @@ function GalleryRow({index, images, deleteImage, isDragging, isSelected, listInd
 // Fills {n}, {total} and {other} in one of the gallery's wordings.
 const fill = (template, values) => template.replace(/\{(\w+)\}/g, (match, name) => (values[name] === undefined ? match : String(values[name])));
 
-function GalleryImage({image, deleteImage, position, isDragging, isSelected, listIndex, total, moveImage, text, announce, updateImageText, strings, unescapeHtml}) {
+function GalleryImage({image, deleteImage, position, isDragging, isSelected, listIndex, total, moveImage, text, announce, openViewer, readOnly, updateImageText, strings, unescapeHtml}) {
     const itemRef = React.useRef(null);
     const keyRef = photoKey(image);
 
@@ -142,19 +151,31 @@ function GalleryImage({image, deleteImage, position, isDragging, isSelected, lis
             />
 
             {isDragging ? null : (
-                <div className={`${isSelected ? 'visible opacity-100' : 'invisible opacity-0'} pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-3 transition-all focus-within:visible focus-within:opacity-100 group-hover/image:visible group-hover/image:opacity-100 ${overlayClasses.join(' ')}`}>
+                <div className={`${isSelected ? 'opacity-100' : 'opacity-0'} pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-t from-black/0 via-black/5 to-black/30 p-3 transition-all focus-within:opacity-100 group-hover/image:opacity-100 ${overlayClasses.join(' ')}`}>
                     <div className="pointer-events-auto flex flex-row-reverse gap-1">
-                        <IconButton Icon={DeleteIcon} label="Delete" onClick={() => deleteImage(image)} />
+                        {readOnly ? null : <IconButton Icon={DeleteIcon} label="Delete" onClick={() => deleteImage(image)} />}
+                        {readOnly ? null : (
+                            <button
+                                ref={editButtonRef}
+                                aria-label={strings.editImageText}
+                                className="group pointer-events-auto relative flex h-8 w-9 cursor-pointer items-center justify-center rounded-md bg-white/90 text-grey-900 transition-all hover:bg-white hover:text-black"
+                                data-gallery-image-text-edit
+                                type="button"
+                                onClick={() => setEditingText(true)}
+                            >
+                                <TextIcon className="size-4 stroke-2" />
+                                <Tooltip label={strings.editImageText} />
+                            </button>
+                        )}
                         <button
-                            ref={editButtonRef}
-                            aria-label={strings.editImageText}
+                            aria-label={strings.openImageFullScreen}
                             className="group pointer-events-auto relative flex h-8 w-9 cursor-pointer items-center justify-center rounded-md bg-white/90 text-grey-900 transition-all hover:bg-white hover:text-black"
-                            data-gallery-image-text-edit
+                            data-gallery-image-fullscreen
                             type="button"
-                            onClick={() => setEditingText(true)}
+                            onClick={event => openViewer(listIndex, event.currentTarget)}
                         >
-                            <TextIcon className="size-4 stroke-2" />
-                            <Tooltip label={strings.editImageText} />
+                            <ExpandIcon className="size-4 stroke-2" />
+                            <Tooltip label={strings.openImageFullScreen} />
                         </button>
                     </div>
                 </div>
@@ -201,11 +222,13 @@ function GalleryImage({image, deleteImage, position, isDragging, isSelected, lis
     );
 }
 
-function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, isSelected, moveImage, updateImageText, strings, unescapeHtml}) {
+function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, isSelected, moveImage, readOnly, updateImageText, strings, unescapeHtml}) {
     const rows = [];
     const withText = images.filter(image => image.title || image.caption);
     const text = useGalleryText(images, withText);
     const [announcement, announce] = React.useState('');
+    const [viewing, setViewing] = React.useState(null);
+    const openViewer = (index, opener) => setViewing({index, opener});
     const noOfImages = images.length;
 
     // 3 images per row unless last row would have a single image in which
@@ -231,23 +254,47 @@ function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, 
 
     const GalleryRows = rows.map((rowImages, idx) => {
         // eslint-disable-next-line react/no-array-index-key
-        return <GalleryRow key={idx} deleteImage={deleteImage} images={rowImages} index={idx} isDragging={isDragging} isSelected={isSelected} listIndexOf={image => images.indexOf(image)} announce={announce} moveImage={moveImage} strings={strings} text={text} total={noOfImages} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
+        return <GalleryRow key={idx} deleteImage={deleteImage} images={rowImages} index={idx} isDragging={isDragging} isSelected={isSelected} listIndexOf={image => images.indexOf(image)} announce={announce} moveImage={moveImage} openViewer={openViewer} readOnly={readOnly} strings={strings} text={text} total={noOfImages} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />;
     });
 
     return (
         <div ref={reorderHandler.setContainerRef} className="not-kg-prose relative flex flex-col" data-gallery>
             {GalleryRows}
             <div aria-live="polite" className="sr-only" data-gallery-announce role="status">{announcement}</div>
-            {withText.length ? (
+            <div className="absolute left-3 top-3 z-10 flex gap-1" data-kg-allow-clickthrough="false">
                 <button
-                    aria-label={text.allCollapsed ? strings.showAllImageText : strings.hideAllImageText}
-                    className="absolute left-3 top-3 z-10 flex size-8 cursor-pointer items-center justify-center rounded-md bg-black/80 text-white hover:bg-black"
-                    data-gallery-text-toggle-all
+                    aria-label={strings.openGalleryFullScreen}
+                    className="flex size-8 cursor-pointer items-center justify-center rounded-md bg-black/80 text-white hover:bg-black"
+                    data-gallery-fullscreen
                     type="button"
-                    onClick={text.toggleAll}
+                    onClick={event => openViewer(0, event.currentTarget)}
                 >
-                    <TextIcon className="size-4 stroke-2" />
+                    <ExpandIcon className="size-4 stroke-2" />
                 </button>
+                {withText.length ? (
+                    <button
+                        aria-label={text.allCollapsed ? strings.showAllImageText : strings.hideAllImageText}
+                        className="flex size-8 cursor-pointer items-center justify-center rounded-md bg-black/80 text-white hover:bg-black"
+                        data-gallery-text-toggle-all
+                        type="button"
+                        onClick={text.toggleAll}
+                    >
+                        <TextIcon className="size-4 stroke-2" />
+                    </button>
+                ) : null}
+            </div>
+            {viewing ? (
+                <GalleryViewer
+                    index={viewing.index}
+                    isCollapsed={text.isCollapsed}
+                    opener={viewing.opener}
+                    photos={images}
+                    strings={strings}
+                    toggleText={text.toggleImage}
+                    unescape={unescapeHtml}
+                    onClose={() => setViewing(null)}
+                    onIndexChange={index => setViewing(current => ({...current, index}))}
+                />
             ) : null}
         </div>
     );
@@ -363,8 +410,8 @@ export function GalleryCard({
         <figure>
             <div ref={filesDropper.setRef} className="not-kg-prose relative" data-testid="gallery-container">
                 {images.length
-                    ? <PopulatedGalleryCard deleteImage={deleteImage} images={images} isDragging={isDragging} isSelected={isSelected} moveImage={moveImage} reorderHandler={reorderHandler} strings={strings} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />
-                    : <EmptyGalleryCard isDraggedOver={isDragging} maxImages={maxImages} openFilePicker={openFilePicker} reorderHandler={reorderHandler} strings={strings} />
+                    ? <PopulatedGalleryCard deleteImage={deleteImage} images={images} isDragging={isDragging} isSelected={isSelected} moveImage={moveImage} readOnly={readOnly} reorderHandler={reorderHandler} strings={strings} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />
+                    : readOnly ? null : <EmptyGalleryCard isDraggedOver={isDragging} maxImages={maxImages} openFilePicker={openFilePicker} reorderHandler={reorderHandler} strings={strings} />
                 }
 
                 {isLoading ? <UploadOverlay progress={progress} /> : null}
@@ -381,16 +428,18 @@ export function GalleryCard({
                     </div>
                 ) : null}
 
-                <form onChange={onFileChange}>
-                    <input
-                        ref={fileInputRef}
-                        accept={imageMimeTypes.join(',')}
-                        hidden={true}
-                        multiple={true}
-                        name="image-input"
-                        type='file'
-                    />
-                </form>
+                {readOnly ? null : (
+                    <form onChange={onFileChange}>
+                        <input
+                            ref={fileInputRef}
+                            accept={imageMimeTypes.join(',')}
+                            hidden={true}
+                            multiple={true}
+                            name="image-input"
+                            type='file'
+                        />
+                    </form>
+                )}
             </div>
 
             {!readOnly && images.length ? (
