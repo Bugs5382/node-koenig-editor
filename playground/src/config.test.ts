@@ -276,6 +276,18 @@ describe("the toolbar, fonts and spell check settings", () => {
     expect(snippet).toContain("spellCheck={false}");
   });
 
+  it("start with collaboration off, and it travels in the address and shows in the snippet", () => {
+    const base = defaultSettings(withToolbar);
+    expect(base.collaboration).toBe(false);
+    expect(buildSnippet(base, withToolbar)).not.toContain("collaboration");
+    const on = { ...base, collaboration: true };
+    expect(serializeSettings(on, withToolbar)).toContain("collaboration=1");
+    expect(parseSettings(`?${serializeSettings(on, withToolbar)}`, withToolbar).collaboration).toBe(
+      true,
+    );
+    expect(buildSnippet(on, withToolbar)).toContain("collaboration={collaboration}");
+  });
+
   it("start with the two-row selection toolbar, and one row travels in the address and the snippet", () => {
     const base = defaultSettings(withToolbar);
     expect(base.toolbarRows).toBe(2);

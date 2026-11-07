@@ -78,6 +78,8 @@ export interface Settings {
   fonts: boolean;
   /** The browser's spell check in the editing area. */
   spellCheck: boolean;
+  /** Live collaboration: windows of this browser at this address share one document. */
+  collaboration: boolean;
   /** How many rows the selection toolbar's built-in buttons use. */
   toolbarRows: 1 | 2;
   /** The colour wheel (any colour) in every colour setting. */
@@ -113,6 +115,7 @@ export function defaultSettings(catalog: Catalog): Settings {
     toolbar: [...(catalog.toolbar ?? [])],
     fonts: false,
     spellCheck: true,
+    collaboration: false,
     toolbarRows: 2,
     colorPicker: true,
     brandColors: false,
@@ -138,6 +141,7 @@ const FLAGS = [
   "preview",
   "fonts",
   "spellCheck",
+  "collaboration",
   "colorPicker",
   "brandColors",
 ] as const;
@@ -224,6 +228,7 @@ export function buildSnippet(settings: Settings, catalog: Catalog): string {
   }
   if (settings.fonts) props.push("fonts={fonts}");
   if (!settings.spellCheck) props.push("spellCheck={false}");
+  if (settings.collaboration) props.push("collaboration={collaboration}");
   if (settings.toolbarRows !== 2) props.push(`toolbarRows={${settings.toolbarRows}}`);
   if (settings.brandColors || !settings.colorPicker) props.push("colors={colors}");
   if (settings.comments) props.push("comments={comments}");
