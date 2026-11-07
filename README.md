@@ -1063,12 +1063,14 @@ class PollNode extends DecoratorNode<ReactNode> {
 ```
 
 The package's own cards use the same list. `collaboration.excludedProperties` adds to it from the
-host side, for a node class you cannot edit. If the card holds nested editors, give each one a
-stable id of your own (the same in every window) and mount it with `skipCollabChecks`, as the
-toggle group does for its items: a window cannot learn an id that only exists in another window.
+host side, for a node class you cannot edit.
 
-- `cursorsContainerRef`, `cursorColor`, `username` and `excludedProperties` go straight to
-  Lexical's `CollaborationPlugin`.
+If the card holds a nested editor, keep it as a property of its own on the node (`__captionEditor`),
+never inside an array or an object. Lexical gives each such editor a shared document, with the same
+id in every window, and calls your `providerFactory` for it. List the editor's saved `EditorState`
+in `collabLocalProperties` too. An editor that sits inside an array or an object cannot be found by
+the other windows, and its editors reach the shared document as an object that cannot be encoded,
+which stops sync for the whole document.
 
 ## 🎨 Styles and theme tokens
 

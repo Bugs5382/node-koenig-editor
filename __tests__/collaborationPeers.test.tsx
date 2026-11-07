@@ -32,12 +32,13 @@ import {
   $createTextNode,
   $getRoot,
   $isDecoratorNode,
-  type ElementNode,
+  $isTextNode,
   isLexicalEditor,
   type LexicalEditor,
-  type TextNode,
 } from "lexical";
+import { $dfs } from "@lexical/utils";
 import { afterEach, describe, expect, it } from "vitest";
+import { kitchenSink } from "../playground/src/kitchenSink";
 import {
   broadcastProviderFactory,
   type Channel,
@@ -50,7 +51,7 @@ afterEach(() => cleanup());
 // Two editors in one room: every document id has one Y.Doc per peer, and an update to one is
 // applied to the others, as a websocket server would.
 export let PEERS: Array<Map<string, Doc>> = [];
-const room = () => {
+const room = (syncDelay = 0) => {
   const peers: Array<Map<string, Doc>> = (PEERS = []);
   const join = (): KoenigCollaboration => {
     const docs = new Map<string, Doc>();
@@ -82,7 +83,11 @@ const room = () => {
               const twin = other.get(id);
               if (twin && twin !== doc) applyUpdate(doc, encodeStateAsUpdate(twin), "remote");
             }
-            for (const l of listeners.sync ?? []) (l as (s: boolean) => void)(true);
+            const report = () => {
+              for (const l of listeners.sync ?? []) (l as (s: boolean) => void)(true);
+            };
+            if (syncDelay) setTimeout(report, syncDelay);
+            else report();
           },
           disconnect: () => {},
           off: () => {},
@@ -99,11 +104,15 @@ const state = (card: object) =>
     root: { children: [card], direction: null, format: "", indent: 0, type: "root", version: 1 },
   });
 
-const mountPeer = async (collaboration: KoenigCollaboration, initial?: string) => {
+const mountPeer = async (
+  collaboration: KoenigCollaboration,
+  initial?: string,
+  changes?: unknown[],
+) => {
   let api: KoenigEditorAPI | undefined;
   const view = render(
     <KoenigComposer collaboration={collaboration} initialEditorState={initial}>
-      <KoenigEditor registerAPI={(a) => (api = a)} />
+      <KoenigEditor onChange={(next) => changes?.push(next)} registerAPI={(a) => (api = a)} />
     </KoenigComposer>,
   );
   await waitFor(() => expect(api).toBeDefined());
@@ -527,15 +536,14 @@ describe.each([
             .getChildren()
             .find((child) => child.getType() === name) as unknown as Record<string, unknown>;
           edit?.(node);
-          if (name === "paragraph" || name === "heading" || name === "quote" || name === "aside") {
-            (
-              $getRoot()
-                .getChildren()
-                .find((child) => child.getType() === name) as unknown as ElementNode
-            )
-              .getFirstChild<TextNode>()!
-              .setTextContent("edited");
-          }
+          // and the text of the first text node anywhere under the card
+          const card = $getRoot()
+            .getChildren()
+            .find((child) => child.getType() === name)!;
+          $dfs(card)
+            .map(({ node: found }) => found)
+            .find($isTextNode)
+            ?.setTextContent("edited");
         });
       });
       for (const [path, editor] of nestedOf(a.api)) await typeInto(editor, `edited ${path}`);
@@ -551,3 +559,42 @@ describe.each([
     });
   }),
 );
+
+// A provider that reports synced late: the nested editors wait for it, and what the host is told
+// about the document in the meantime must still carry their text.
+describe("a provider that syncs late", () => {
+  const withText = ["callout", "image", "toggle", "toggle-group", "header", "gallery"];
+  it.each(withText)("%s: no change event carries its text blank", async (name) => {
+    const changes: unknown[] = [];
+    const r = room(300);
+    const a = await mountPeer(r.join(), state(cases[name]!.seed), changes);
+    await act(async () => void (await new Promise((resolve) => setTimeout(resolve, 900))));
+    const blank = changes.filter((change) => {
+      const card = (
+        change as { root: { children: Array<Record<string, unknown>> } }
+      ).root.children.find((child) => child.type === name);
+      return card !== undefined && !JSON.stringify(card).includes("<");
+    });
+    expect(blank.length).toBe(0);
+    expect(a.api).toBeDefined();
+  });
+});
+
+// The demo's own kitchen sink: every card in one document, through the demo's transport.
+describe("the demo's kitchen sink between two windows", () => {
+  it("matches on join and after a reload", async () => {
+    const r = demoRoom();
+    const a = await mountPeer(r.join(), kitchenSink([], null));
+    await settle();
+    const b = await mountPeer(r.join());
+    await settle();
+    expect(snapshot(b.api)).toEqual(snapshot(a.api));
+    for (const [, editor] of nestedOf(a.api)) await typeInto(editor, "everywhere");
+    await settle();
+    expect(snapshot(b.api)).toEqual(snapshot(a.api));
+    b.view.unmount();
+    const c = await mountPeer(r.join());
+    await settle();
+    expect(snapshot(c.api)).toEqual(snapshot(a.api));
+  });
+});
