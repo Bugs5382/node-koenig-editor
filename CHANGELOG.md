@@ -6,6 +6,7 @@
 
 #### 🚀 Features
 
+- feat(playground): hide the side panel so the editor has the whole width (#81) @Bugs5382 (#82)
 - feat(playground): a collaboration option so two windows edit the same document live (#77) @Bugs5382 (#78)
 - feat(editor): gallery slideshow options: auto-advance, random order and a screen mode @Bugs5382 (#64)
 - feat(editor): shared colour control, code and toggle group cards, table banding, emoji, file icons and the rest of the owner's review @Bugs5382 (#60)
