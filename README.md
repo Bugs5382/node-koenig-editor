@@ -81,6 +81,7 @@ the sources.
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
 | `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `textDirection`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
+| `fileIcons`          | `false \| { overrides? }`         | on              | The file card's type icons; `false` switches them off, `overrides` maps an extension to your own icon component; see [File, video and audio cards](#-file-video-and-audio-cards). |
 | `codeLanguages`      | `KoenigCodeLanguage[]`            | highlighter's  | The languages the code block's list offers, each a `label` and a Prism language `value`; see [Code blocks](#-code-blocks). |
 | `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
@@ -601,7 +602,12 @@ plays from the url your uploader returned.
   chosen file against its `extensions`, `mimeTypes` and an optional `maxSize` in bytes *before*
   uploading, and names the file in the message (`strings.file.typeError`, `strings.file.sizeError`).
   A host with no `fileTypes` gets no pre-check; the uploader has the last word.
-- **File.** A title, a description, and the file name and size. It saves as a download link.
+- **File.** A title, a description, and the file name and size. It saves as a download link. The
+  card shows a picture for the file's type (react-file-icon, MIT: a PDF, a spreadsheet, an archive and
+  several hundred more; a type it does not know gets a plain page with the extension on it). The icon
+  is optional: `fileIcons={false}` switches it off for the whole editor, a card has its own "Show the
+  file type icon" box, and `fileIcons={{ overrides: { pdf: PdfIcon } }}` draws your own for a type
+  (the component gets `extension`). The icon is in the editor and Preview; the saved HTML is unchanged.
 - **Video and audio** play in the browser's own player, so play, seek, volume and mute work from the
   keyboard and show the browser's focus ring. Captions are required for accessibility: a card has a
   **transcript** field and a **WebVTT (`.vtt`) track upload**, saved as a

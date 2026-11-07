@@ -57,6 +57,7 @@ const KoenigComposer = ({
     fonts,
     colors,
     codeLanguages,
+    fileIcons,
     spellCheck,
     lang,
     toolbarActions,
@@ -146,6 +147,7 @@ const KoenigComposer = ({
                     fonts,
                     colors,
                     codeLanguages,
+                    fileIcons,
                     spellCheck,
                     lang,
                     toolbarActions

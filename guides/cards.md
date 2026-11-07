@@ -185,10 +185,13 @@ are tokens (`--kg-table-edit-border-style` for the dashed editing line, `--kg-ta
 **For:** a document people can download, such as a PDF.
 **Add it:** the plus button, `/file`, or dragging a file in.
 **What it can do:** a title, a description, and the file's name and size. It is saved as a
-download link.
+download link. A picture for the file's type sits beside the text (a PDF, a spreadsheet, an archive
+and many more; an unknown type gets a plain page with its extension). Select the card and untick
+"Show the file type icon" to hide it on that card.
 **Limits:** if the developer sets `fileTypes.file`, the card checks the type and size (`maxSize`)
 before uploading and names the file in its message.
-**Developer:** `cards` leaves it out.
+**Developer:** `cards` leaves it out; `fileIcons={false}` removes the icons everywhere and
+`fileIcons={{ overrides: { pdf: MyIcon } }}` draws your own for a type.
 
 ## Video
 

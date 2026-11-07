@@ -138,6 +138,18 @@ export interface KoenigColorSetting {
   picker?: boolean;
 }
 
+/** A file-type icon a host draws itself: the extension (lower case, no dot) is passed in. */
+export type KoenigFileIconOverrides = Record<string, FC<{ extension: string }>>;
+
+/** The file card's type icons. `false` switches them off. Without a setting they are on. */
+export type KoenigFileIcons =
+  | false
+  | {
+      /** Your own icon per extension, for example `{ pdf: PdfIcon }`; any other type keeps the
+       *  default picture. */
+      overrides?: KoenigFileIconOverrides;
+    };
+
 /** A language the code card offers. */
 export interface KoenigCodeLanguage {
   /** What the list shows. */
@@ -503,6 +515,7 @@ export interface KoenigStrings {
   file: {
     descriptionPlaceholder: string;
     select: string;
+    showIcon: string;
     /** `{name}` is replaced with the file name and `{limit}` with the size limit. */
     sizeError: string;
     titlePlaceholder: string;
@@ -857,6 +870,8 @@ export interface KoenigComposerProps {
    *  whether the editor's own colour is a choice. With `picker: false` and `none: false` the host
    *  forces the person to a colour from its list. */
   colors?: Partial<Record<KoenigColorSlot, KoenigColorSetting>>;
+  /** The icons the file card shows for a file's type; `false` switches them off. */
+  fileIcons?: KoenigFileIcons;
   /** The languages the code card's list offers. Default: the ones the highlighter ships with
    *  (JavaScript, TypeScript, CSS, HTML, Python, Java, Go, Rust, SQL and a few more). "Plain text"
    *  is always offered. */

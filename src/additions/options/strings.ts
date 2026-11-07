@@ -399,6 +399,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
   file: {
     descriptionPlaceholder: "Enter a description",
     select: "Click to upload a file",
+    showIcon: "Show the file type icon",
     sizeError: "The file {name} is larger than the {limit} limit",
     titlePlaceholder: "Enter a title",
     typeError: "The file {name} is not an allowed type",

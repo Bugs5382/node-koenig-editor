@@ -4,6 +4,7 @@ import KoenigComposerContext from '../context/KoenigComposerContext';
 import React from 'react';
 import useFileDragAndDrop from '../hooks/useFileDragAndDrop';
 import {$getNodeByKey} from 'lexical';
+import {FileTypeIcon, useFileIconsEnabled} from '../../additions/fileIcons/FileTypeIcon';
 import {ActionToolbar} from '../components/ui/ActionToolbar';
 import {MediaPlaceholder} from '../components/ui/MediaPlaceholder';
 import {ProgressBar} from '../components/ui/ProgressBar';
@@ -19,9 +20,10 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
 // A file as a reader sees it: the same card, with the text in place of inputs, and (for a safe
 // address) the whole card a download link.
-function ReaderFile({href, fileName, title, description, dataset}) {
+function ReaderFile({href, fileName, title, description, dataset, showIcon}) {
     const body = (
         <div className="flex justify-between rounded-md border border-grey/30 p-2 font-sans">
+            {showIcon ? <FileTypeIcon fileName={fileName} /> : null}
             <div className="flex w-full flex-col justify-between px-2">
                 {title ? <div className="py-1 text-lg font-bold leading-tight tracking-tight text-black dark:text-grey-200" data-kg-file-card="fileTitle">{title}</div> : null}
                 {description ? <div className="pb-1 text-[1.6rem] font-normal leading-snug text-grey-700 dark:text-grey-300" data-kg-file-card="fileDescription">{description}</div> : null}
@@ -40,8 +42,10 @@ function FileNodeComponent({
     fileSrc,
     nodeKey,
     triggerFileDialog,
-    initialFile
+    initialFile,
+    showIcon = true
 }) {
+    const iconsAvailable = useFileIconsEnabled();
     const strings = useKoenigStrings();
     const editable = useKoenigEditable();
     const [editor] = useLexicalComposerContext();
@@ -127,10 +131,12 @@ function FileNodeComponent({
                     description={fileDesc}
                     fileName={fileName}
                     href={safeMediaUrl(fileSrc)}
+                    showIcon={showIcon}
                     title={fileTitle}
                 />
             ) : isPopulated ? (
                 <div className="flex justify-between rounded-md border border-grey/30 p-2 font-sans">
+                    {showIcon ? <FileTypeIcon fileName={fileName} /> : null}
                     <div className="flex w-full flex-col justify-between px-2">
                         {(isSelected || fileTitle) && (
                             <input
@@ -160,6 +166,17 @@ function FileNodeComponent({
                             {fileName}
                             <span className="text-grey-700"> {'•'} {fileSize}</span>
                         </div>
+                        {iconsAvailable && isSelected ? (
+                            <label className="flex cursor-pointer items-center gap-2 pb-1 text-sm text-grey-700 dark:text-grey-300">
+                                <input
+                                    checked={showIcon}
+                                    data-kg-file-show-icon
+                                    type="checkbox"
+                                    onChange={event => setField('showIcon')({target: {value: event.target.checked}})}
+                                />
+                                {strings.file.showIcon}
+                            </label>
+                        ) : null}
                     </div>
                 </div>
             ) : (

@@ -1281,6 +1281,10 @@
     width: calc(28 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .w-\[3\.2rem\] {
+    width: calc(3.2 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .w-\[320px\] {
     width: 320px;
 }
@@ -1617,6 +1621,10 @@
 
 .koenig-lexical .gap-y-2 {
     row-gap: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .self-center {
+    align-self: center;
 }
 
 .koenig-lexical .self-stretch {
