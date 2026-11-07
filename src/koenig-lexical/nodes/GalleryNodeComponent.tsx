@@ -48,6 +48,45 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
     // This gallery's own limit is saved in the card; the host's is the ceiling it cannot exceed.
     const [ownMax, setOwnMaxState] = React.useState(() => editor.getEditorState().read(() => $getNodeByKey(nodeKey)?.maxImages || 0));
     const maxImages = Math.min(ownMax > 0 ? ownMax : hostMaxImages, hostMaxImages);
+    // The slideshow settings of the full-screen viewer, saved in the card. The host can switch any of
+    // the three off; a switched-off one is neither shown nor played.
+    const slideshowOptions = {
+        autoAdvance: gallery?.autoAdvance !== false,
+        screenMode: gallery?.screenMode !== false,
+        shuffle: gallery?.shuffle !== false
+    };
+    const [ownSlideshow, setOwnSlideshow] = React.useState(() => editor.getEditorState().read(() => {
+        const node = $getNodeByKey(nodeKey);
+        return {autoplaySeconds: node?.autoplaySeconds || 0, screenMode: !!node?.screenMode, shuffle: !!node?.shuffle};
+    }));
+    const slideshow = {
+        autoplaySeconds: slideshowOptions.autoAdvance ? ownSlideshow.autoplaySeconds : 0,
+        screenMode: slideshowOptions.screenMode && ownSlideshow.screenMode,
+        shuffle: slideshowOptions.shuffle && ownSlideshow.shuffle
+    };
+    const setSlideshow = (changes) => {
+        const next = {...ownSlideshow};
+        if ('autoplaySeconds' in changes) {
+            const seconds = Number(changes.autoplaySeconds);
+            // 0 is off; anything else is a whole number of seconds from 1 to 3600
+            next.autoplaySeconds = Number.isFinite(seconds) && seconds > 0 ? Math.min(Math.max(Math.round(seconds), 1), 3600) : 0;
+        }
+        if ('shuffle' in changes) {
+            next.shuffle = !!changes.shuffle;
+        }
+        if ('screenMode' in changes) {
+            next.screenMode = !!changes.screenMode;
+        }
+        setOwnSlideshow(next);
+        editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if (node) {
+                node.autoplaySeconds = next.autoplaySeconds;
+                node.shuffle = next.shuffle;
+                node.screenMode = next.screenMode;
+            }
+        });
+    };
     const [readOnly, setReadOnly] = React.useState(() => !editor.isEditable());
     React.useEffect(() => editor.registerEditableListener(editable => setReadOnly(!editable)), [editor]);
 
@@ -229,6 +268,9 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
             removeImage={removeImage}
             replaceImages={replaceImages}
             setMaxImages={setMaxImages}
+            setSlideshow={setSlideshow}
+            slideshow={slideshow}
+            slideshowOptions={slideshowOptions}
             updateImage={(index, changes) => updateImage(index, stored(changes))}
         />
     );

@@ -142,3 +142,63 @@ describe("reading the output back", () => {
     expect(payload.caption ?? "").toBe("");
   });
 });
+
+describe("a gallery's slideshow settings in the output", () => {
+  const withSettings = (extra: Record<string, unknown>) =>
+    JSON.stringify({
+      root: {
+        children: [{ caption: "", images: [image("one")], type: "gallery", version: 1, ...extra }],
+        direction: null,
+        format: "",
+        indent: 0,
+        type: "root",
+        version: 1,
+      },
+    });
+
+  const output = async (extra: Record<string, unknown>) => {
+    const { api } = await mount({ composer: { initialEditorState: withSettings(extra) } });
+    const editor = api.editorInstance;
+    const html = editor.getEditorState().read(() => $generateHtmlFromNodes(editor, null));
+    const holder = document.createElement("div");
+    holder.innerHTML = html;
+    return { editor, figure: holder.querySelector("figure.kg-gallery-card") as HTMLElement, html };
+  };
+
+  it("writes the seconds, the random order and the screen mode as data attributes", async () => {
+    const { figure } = await output({ autoplaySeconds: 7, screenMode: true, shuffle: true });
+    expect(figure.getAttribute("data-kg-autoplay")).toBe("7");
+    expect(figure.getAttribute("data-kg-shuffle")).toBe("true");
+    expect(figure.getAttribute("data-kg-screen-mode")).toBe("true");
+  });
+
+  it("writes nothing for settings that are off", async () => {
+    const { figure } = await output({});
+    expect(figure.hasAttribute("data-kg-autoplay")).toBe(false);
+    expect(figure.hasAttribute("data-kg-shuffle")).toBe(false);
+    expect(figure.hasAttribute("data-kg-screen-mode")).toBe(false);
+  });
+
+  it("reads them back from saved HTML", async () => {
+    const { editor, html } = await output({ autoplaySeconds: 4, screenMode: true, shuffle: true });
+    const read = editor.update
+      ? await new Promise<Record<string, unknown>>((resolve) => {
+          editor.update(() => {
+            const dom = new DOMParser().parseFromString(html, "text/html");
+            const nodes = $generateNodesFromDOM(editor, dom);
+            const gallery = nodes.find((node) => node.getType() === "gallery") as unknown as Record<
+              string,
+              unknown
+            >;
+            resolve({
+              autoplaySeconds: gallery.autoplaySeconds,
+              screenMode: gallery.screenMode,
+              shuffle: gallery.shuffle,
+            });
+            $getRoot();
+          });
+        })
+      : {};
+    expect(read).toEqual({ autoplaySeconds: 4, screenMode: true, shuffle: true });
+  });
+});

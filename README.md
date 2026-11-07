@@ -435,6 +435,19 @@ photo, and the photo's title and caption show over the bottom with the same coll
 fades only when the person has not asked for reduced motion. The photo's alt text is on the
 image, not printed over it.
 
+*Slideshow.* A selected gallery's settings panel also has **Auto-advance** with a seconds box (the
+viewer goes to the next photo after that many seconds and starts over after the last; a Pause and
+Play button and the Space key stop and start it, and a move by hand starts the wait again),
+**Random order** (each time the viewer opens, the photos play shuffled, starting with the one
+opened) and **Screen mode** (no thumbnail strip; the controls hide after three seconds without
+input, and a key, a tap or a mouse move brings them back; Escape shows them first and a second
+Escape exits). The exit control of the normal viewer never hides. The settings are saved in the
+card and written to the saved HTML as `data-kg-autoplay` (seconds), `data-kg-shuffle` and
+`data-kg-screen-mode`, for a page that plays the gallery itself. A host switches any of them off
+with `gallery={{ autoAdvance: false, shuffle: false, screenMode: false }}`; a switched-off setting
+is not shown and a stored one does not play. A custom `cardRenderers.gallery` gets `slideshow`,
+`setSlideshow` and `slideshowOptions`. The wording is `strings.gallery`.
+
 *How many photos.* `gallery.maxImages` (default 50) is the host's ceiling. Select a gallery and its
 settings panel has a "Maximum number of images" box for that gallery: at most the host's ceiling,
 at least the number of photos already in it, and saved in the card, so the reader's view and the

@@ -39,6 +39,16 @@ export function parseGalleryNode(GalleryNode: new (data: Record<string, unknown>
                         if (limit > 0) {
                             payload.maxImages = limit;
                         }
+                        const seconds = parseFloat(domNode.getAttribute('data-kg-autoplay') || '');
+                        if (seconds > 0) {
+                            payload.autoplaySeconds = seconds;
+                        }
+                        if (domNode.getAttribute('data-kg-shuffle') === 'true') {
+                            payload.shuffle = true;
+                        }
+                        if (domNode.getAttribute('data-kg-screen-mode') === 'true') {
+                            payload.screenMode = true;
+                        }
 
                         const node = new GalleryNode(payload);
                         return {node};
