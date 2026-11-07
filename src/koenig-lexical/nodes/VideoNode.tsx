@@ -7,6 +7,9 @@ import {createCommand} from 'lexical';
 export const INSERT_VIDEO_COMMAND = createCommand();
 
 export class VideoNode extends BaseVideoNode {
+    // per-window upload state, not part of the card (see KoenigCollaboration)
+    static collabLocalProperties = ['__initialFile', '__triggerFileDialog'];
+
     // Lexical expects every registered class to declare these itself; the base class's
     // versions already build `this`, so they only need passing through.
     static getType() {

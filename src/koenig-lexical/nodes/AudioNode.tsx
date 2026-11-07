@@ -7,6 +7,9 @@ import {createCommand} from 'lexical';
 export const INSERT_AUDIO_COMMAND = createCommand();
 
 export class AudioNode extends BaseAudioNode {
+    // per-window upload state, not part of the card (see KoenigCollaboration)
+    static collabLocalProperties = ['__initialFile', '__triggerFileDialog'];
+
     // Lexical expects every registered class to declare these itself; the base class's
     // versions already build `this`, so they only need passing through.
     static getType() {

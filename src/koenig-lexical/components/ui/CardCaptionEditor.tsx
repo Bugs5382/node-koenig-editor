@@ -1,4 +1,5 @@
 import KoenigCaptionEditor from '../KoenigCaptionEditor';
+import KoenigComposerContext from '../../context/KoenigComposerContext';
 import React from 'react';
 import {TextInput} from './TextInput';
 import {isEditorEmpty} from '../../utils/isEditorEmpty';
@@ -77,12 +78,32 @@ export function CardCaptionEditor({
         }
     }, [isSelected, setIsEditingAlt]);
 
+    const {collaboration} = React.useContext(KoenigComposerContext);
     const isCaptionEmpty = isEditorEmpty(captionEditor);
     const showAltToggle = setAltText && isSelected;
+    const isShown = isSelected || !isCaptionEmpty;
+
+    // In a shared session the caption editor stays mounted while it is hidden, so it is bound to
+    // the shared document and receives what the other windows type; the card shows it as soon
+    // as the caption has text.
+    const [, refresh] = React.useReducer(count => count + 1, 0);
+    const wasEmpty = React.useRef(isCaptionEmpty);
+    React.useEffect(() => {
+        if (!collaboration) {
+            return undefined;
+        }
+        return captionEditor.registerUpdateListener(() => {
+            const empty = isEditorEmpty(captionEditor);
+            if (empty !== wasEmpty.current) {
+                wasEmpty.current = empty;
+                refresh();
+            }
+        });
+    }, [captionEditor, collaboration]);
 
     return (
-        ((isSelected || !isCaptionEmpty) &&
-            <figcaption className="flex min-h-[40px] w-full p-2">
+        ((isShown || collaboration) &&
+            <figcaption className={isShown ? "flex min-h-[40px] w-full p-2" : "hidden"}>
                 {isEditingAlt
                     ? <AltTextInput dataTestId={dataTestId} placeholder={altTextPlaceholder} readOnly={readOnly} value={altText} onChange={setAltText} />
                     : <CaptionInput captionEditor={captionEditor} captionEditorInitialState={captionEditorInitialState} dataTestId={dataTestId} placeholder={captionPlaceholder} /> }

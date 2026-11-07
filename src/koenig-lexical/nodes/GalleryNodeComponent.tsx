@@ -87,6 +87,27 @@ export function GalleryNodeComponent({nodeKey, captionEditor, captionEditorIniti
             }
         });
     };
+    // The pictures, the limit and the slideshow settings are copied into this component's state
+    // when it mounts. Another window of a shared session changes the card, not this state, so
+    // read the card again after each update and take what differs. A picture that is still
+    // uploading is only here, not in the card, and stays.
+    React.useEffect(() => editor.registerUpdateListener(({editorState}) => {
+        editorState.read(() => {
+            const node = $getNodeByKey(nodeKey);
+            if (!node) {
+                return;
+            }
+            const saved = node.images.map(image => ({...image}));
+            const mine = imagesRef.current.filter(image => image.src);
+            if (JSON.stringify(saved) !== JSON.stringify(mine)) {
+                setImages([...saved, ...imagesRef.current.filter(image => !image.src)]);
+            }
+            setOwnMaxState(node.maxImages || 0);
+            const next = {autoplaySeconds: node.autoplaySeconds || 0, screenMode: !!node.screenMode, shuffle: !!node.shuffle};
+            setOwnSlideshow(previous => (JSON.stringify(previous) === JSON.stringify(next) ? previous : next));
+        });
+    }), [editor, nodeKey]);
+
     const [readOnly, setReadOnly] = React.useState(() => !editor.isEditable());
     React.useEffect(() => editor.registerEditableListener(editable => setReadOnly(!editable)), [editor]);
 

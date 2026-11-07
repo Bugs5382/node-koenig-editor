@@ -15,6 +15,9 @@ export const INSERT_HEADER_COMMAND = createCommand();
 // outline numbering never see it. Version 1 documents still load and export; the card edits
 // them with the version 2 controls.
 export class HeaderNode extends BaseHeaderNode {
+    // properties a shared session keeps in this window (see KoenigCollaboration)
+    static collabLocalProperties = ['__headerTextEditorInitialState', '__subheaderTextEditorInitialState'];
+
     // Lexical expects every registered class to declare these itself; the base class's
     // versions already build `this`, so they only need passing through.
     static getType() {
