@@ -44,7 +44,9 @@ function KoenigNestedEditorPlugin({
 
         if (shouldFocus) {
             editor.focus(() => {
-                editor.getRootElement().focus({preventScroll: true});
+                // Lexical runs this on the editor's next commit, which can be the one inside
+                // `setRootElement(null)` when the card closes or React remounts the editor
+                editor.getRootElement()?.focus({preventScroll: true});
             });
         }
     }, [shouldFocus, editor, isParentCardEditing]);

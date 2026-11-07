@@ -43,7 +43,7 @@ export default function FloatingToolbar({
                 return;
             }
 
-            setFloatingElemPosition(rangeRect, toolbarElement, anchorElem, {controlOpacity});
+            setFloatingElemPosition(rangeRect, toolbarElement, anchorElem, {boundsElem: editor.getRootElement(), controlOpacity});
         });
     }, [anchorElem, controlOpacity, editor, targetElem, toolbarRef]);
 
