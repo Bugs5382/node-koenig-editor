@@ -155,4 +155,19 @@ describe("the colour control in the toolbar", () => {
     expect(style(api)).toContain("background-color: #101820");
     expect(style(api).toLowerCase()).toContain("color: #ffffff");
   });
+
+  it("draws the list in the toolbar's own layer, so a host's stacking context cannot put it under the toolbar", async () => {
+    const api = await load();
+    await selectAll(api);
+    for (const item of ["textColor", "highlight", "fontSize"]) {
+      await open(item);
+      await waitFor(() =>
+        expect(
+          document.querySelector("[data-kg-floating-toolbar] [data-kg-style-menu]"),
+        ).not.toBeNull(),
+      );
+      await open(item);
+      await waitFor(() => expect(document.querySelector("[data-kg-style-menu]")).toBeNull());
+    }
+  });
 });

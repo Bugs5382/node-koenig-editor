@@ -85,7 +85,12 @@ export const StyleMenu: FC<StyleMenuProps> = ({ anchor, label, onClose, onPick, 
   };
 
   return (
-    <AnchoredMenu anchor={anchor} containerRef={container} measure="whole">
+    <AnchoredMenu
+      anchor={anchor}
+      containerRef={container}
+      layer={anchor?.closest("[data-kg-floating-toolbar]")}
+      measure="whole"
+    >
       <div
         ref={menu}
         aria-label={label}

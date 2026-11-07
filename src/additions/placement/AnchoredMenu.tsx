@@ -44,6 +44,13 @@ interface AnchoredMenuProps {
    * whenever its size changes.
    */
   measure?: "list" | "whole";
+  /**
+   * Where to draw the menu instead of the editor's root: the layer of the thing that opened it. A
+   * menu opened from the selection toolbar goes in the toolbar's own layer, because the toolbar is
+   * in the page's top layer and a menu in the editor's root (inside a host's stacking context)
+   * would sit under it, however high its z-index.
+   */
+  layer?: Element | null;
 }
 
 // A menu drawn in a portal at the editor's own root, positioned fixed against the viewport:
@@ -55,11 +62,15 @@ export const AnchoredMenu = ({
   children,
   containerRef,
   measure = "list",
+  layer,
 }: AnchoredMenuProps) => {
   const [editor] = useLexicalComposerContext();
   const [style, setStyle] = useState<CSSProperties>({ opacity: 0 });
   const root = editor.getRootElement();
-  const target = (root?.closest(".koenig-lexical") as HTMLElement | null) ?? document.body;
+  const target =
+    (layer as HTMLElement | null | undefined) ??
+    (root?.closest(".koenig-lexical") as HTMLElement | null) ??
+    document.body;
 
   useLayoutEffect(() => {
     if (!anchor) return undefined;

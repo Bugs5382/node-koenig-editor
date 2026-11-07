@@ -66,7 +66,12 @@ export const ColorMenu: FC<ColorMenuProps> = ({
   };
 
   return (
-    <AnchoredMenu anchor={anchor} containerRef={container} measure="whole">
+    <AnchoredMenu
+      anchor={anchor}
+      containerRef={container}
+      layer={anchor?.closest("[data-kg-floating-toolbar]")}
+      measure="whole"
+    >
       <div
         ref={box}
         className="not-kg-prose max-w-[26rem] rounded-lg bg-white p-3 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white forced-colors:border forced-colors:border-[ButtonText]"
