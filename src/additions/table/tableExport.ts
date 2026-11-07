@@ -30,6 +30,7 @@ import type {
 } from "lexical";
 
 import { $getTableCaption, TABLE_CELL_INK } from "./tableActions";
+import { $getCellBorders, BORDER_SIDES, borderCss } from "./tableBorders";
 import { $getTableWidthMode } from "./tableResize";
 
 // What a reader's page gets in the saved HTML. Stock table export already carries merged cells
@@ -89,6 +90,11 @@ export const TABLE_HTML_EXPORT: DOMExportOutputMap = new Map<
       const cell = target as TableCellNode;
       const output = cell.exportDOM(editor);
       if (output.element instanceof HTMLElement) {
+        const borders = $getCellBorders(cell);
+        for (const side of BORDER_SIDES) {
+          const edge = borders[side];
+          if (edge) output.element.style.setProperty(`border-${side}`, borderCss(edge));
+        }
         if (cell.getBackgroundColor()) output.element.style.color = TABLE_CELL_INK;
         // the stock export always writes text-align: start; the cell's own alignment wins
         const format = cell.getFormatType();

@@ -394,7 +394,7 @@ export type TableScope = "cell" | "column" | "row" | "table";
 
 export const TABLE_SCOPES: readonly TableScope[] = ["cell", "row", "column", "table"];
 
-const $cellsInScope = (state: TableState, scope: TableScope): TableCellNode[] => {
+export const $cellsInScope = (state: TableState, scope: TableScope): TableCellNode[] => {
   if (scope === "cell") return state.cells;
   const map = $computeTableMapSkipCellCheck(state.table, null, null)[0];
   const picked =

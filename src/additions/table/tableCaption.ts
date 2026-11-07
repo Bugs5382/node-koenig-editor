@@ -26,6 +26,7 @@ import { $nodesOfType } from "lexical";
 import { useEffect } from "react";
 
 import { $getTableCaption } from "./tableActions";
+import { $syncCellBorders } from "./tableBorders";
 import { $getTableWidthMode } from "./tableResize";
 
 // A table's caption is node state (see tableActions). In the editor it is drawn from attributes on
@@ -62,6 +63,7 @@ export const useTableCaptions = (): void => {
           const element = found?.tagName === "TABLE" ? found : found?.querySelector("table");
           if (!element) continue;
           syncSize(table, element);
+          $syncCellBorders(editor, table);
           const text = $getTableCaption(table);
           if (!text) {
             element.removeAttribute("data-kg-caption");
