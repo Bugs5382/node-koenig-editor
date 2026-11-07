@@ -20,35 +20,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import js from "@eslint/js";
-import tseslint from "typescript-eslint";
-import prettier from "eslint-plugin-prettier";
-import prettierConfig from "eslint-config-prettier";
+import shared from "@bugs5382/node-oxlint-config/oxfmt";
 
-export default tseslint.config(
-  {
-    ignores: [
-      "dist",
-      "coverage",
-      "docs",
-      "node_modules",
-      // The demo app has its own package.json, lint and tests.
-      "playground",
-      // Upstream Koenig code keeps upstream's style; it is carried over, not linted.
-      "src/koenig-lexical",
-      "src/kg-default-nodes",
-      "src/kg-default-transforms",
-      "src/generated",
-      "tailwind.config.cjs",
-    ],
-  },
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
-  prettierConfig,
-  {
-    plugins: { prettier },
-    rules: {
-      "prettier/prettier": "error",
-    },
-  },
-);
+export default {
+  ...shared,
+  ignorePatterns: [
+    ...shared.ignorePatterns,
+    "dist/**",
+    "docs/**",
+    "coverage/**",
+    "package-lock.json",
+    "playground/**",
+  ],
+  printWidth: 100,
+};
