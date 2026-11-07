@@ -121,7 +121,7 @@ describe("the table toolbar's menus", () => {
     fireEvent.keyDown(menu, { key: "ArrowDown" });
     expect(document.activeElement).toBe(item("rowBelow"));
     fireEvent.keyDown(menu, { key: "End" });
-    expect(document.activeElement).toBe(item("headerRow"));
+    expect(document.activeElement).toBe(item("selectRow"));
     fireEvent.keyDown(menu, { key: "Escape" });
     expect(screen.queryByRole("menu")).toBeNull();
   });

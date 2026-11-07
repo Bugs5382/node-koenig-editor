@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import {
   $computeTableMapSkipCellCheck,
+  $createTableSelectionFrom,
   $deleteTableColumnAtSelection,
   $deleteTableRowAtSelection,
   $getTableColumnIndexFromTableCellNode,
@@ -45,6 +46,7 @@ import { $findMatchingParent } from "@lexical/utils";
 import {
   $createParagraphNode,
   $getSelection,
+  $setSelection,
   $isRangeSelection,
   $getState,
   $setState,
@@ -75,6 +77,9 @@ export type TableActionId =
   | "moveRowUp"
   | "rowAbove"
   | "rowBelow"
+  | "selectColumn"
+  | "selectRow"
+  | "selectTable"
   | "split"
   | "valignBottom"
   | "valignMiddle"
@@ -89,7 +94,15 @@ export type TableGroupId = "align" | "cell" | "column" | "row" | "table" | "widt
 /** The groups, in the order a toolbar and a menu list them, with the actions in each. */
 export const TABLE_GROUPS: readonly { actions: readonly TableActionId[]; id: TableGroupId }[] = [
   {
-    actions: ["rowAbove", "rowBelow", "moveRowUp", "moveRowDown", "deleteRow", "headerRow"],
+    actions: [
+      "rowAbove",
+      "rowBelow",
+      "moveRowUp",
+      "moveRowDown",
+      "deleteRow",
+      "headerRow",
+      "selectRow",
+    ],
     id: "row",
   },
   {
@@ -100,10 +113,11 @@ export const TABLE_GROUPS: readonly { actions: readonly TableActionId[]; id: Tab
       "moveColumnRight",
       "deleteColumn",
       "headerColumn",
+      "selectColumn",
     ],
     id: "column",
   },
-  { actions: ["merge", "split"], id: "cell" },
+  { actions: ["merge", "split", "selectTable"], id: "cell" },
   {
     actions: [
       "alignLeft",
@@ -320,6 +334,21 @@ export const $runTableAction = (id: TableActionId): void => {
     case "headerColumn":
       $setTableColumnIsHeader(state.table, 0, !state.headerColumn);
       return;
+    case "selectRow":
+    case "selectColumn":
+    case "selectTable": {
+      const map = $computeTableMapSkipCellCheck(state.table, null, null)[0];
+      const lastRow = map.length - 1;
+      const lastColumn = (map[0]?.length ?? 1) - 1;
+      const [from, to] =
+        id === "selectRow"
+          ? [map[state.row]?.[0], map[state.row]?.[lastColumn]]
+          : id === "selectColumn"
+            ? [map[0]?.[state.column], map[lastRow]?.[state.column]]
+            : [map[0]?.[0], map[lastRow]?.[lastColumn]];
+      if (from && to) $setSelection($createTableSelectionFrom(state.table, from.cell, to.cell));
+      return;
+    }
     case "merge": {
       const merged = $mergeCells(state.cells);
       merged?.selectStart();

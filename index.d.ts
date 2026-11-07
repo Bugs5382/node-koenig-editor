@@ -194,6 +194,9 @@ export interface KoenigStrings {
     noColour: string;
     positionAnnouncement: string;
     rowMenu: string;
+    selectColumn: string;
+    selectRow: string;
+    selectTable: string;
     spanAnnouncement: string;
     splitCell: string;
     toolbar: string;

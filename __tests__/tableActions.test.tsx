@@ -197,6 +197,49 @@ describe("rows and columns", () => {
   });
 });
 
+describe("selecting a row, a column or the table, to act on all of it", () => {
+  const count = (api: KoenigEditorAPI) =>
+    api.editorInstance.getEditorState().read(() => $readTableState()?.cells.length);
+
+  it("selects the whole row, column or table around the cursor", async () => {
+    const api = await load();
+    await caret(api, 1, 1);
+    await run(api, "selectRow");
+    expect(count(api)).toBe(3);
+    await caret(api, 1, 1);
+    await run(api, "selectColumn");
+    expect(count(api)).toBe(3);
+    await caret(api, 1, 1);
+    await run(api, "selectTable");
+    expect(count(api)).toBe(9);
+  });
+
+  it("shades every cell of the selected row, and nothing else", async () => {
+    const api = await load();
+    await caret(api, 2, 0);
+    await run(api, "selectRow");
+    const green = TABLE_COLORS.find((c) => c.name === "green")!;
+    await update(api, () => $setCellColor(green.value));
+    const colours = api.editorInstance
+      .getEditorState()
+      .read(() => [0, 1, 2].map((r) => [0, 1, 2].map((c) => $cellAt(r, c).getBackgroundColor())));
+    expect(colours[2]).toEqual([green.value, green.value, green.value]);
+    expect(colours[0]).toEqual([null, null, null]);
+    expect(colours[1]).toEqual([null, null, null]);
+  });
+
+  it("aligns every cell of the selected column", async () => {
+    const api = await load();
+    await caret(api, 1, 2);
+    await run(api, "selectColumn");
+    await run(api, "alignRight");
+    const formats = api.editorInstance
+      .getEditorState()
+      .read(() => [0, 1, 2].map((r) => $cellAt(r, 2).getFormatType()));
+    expect(formats).toEqual(["right", "right", "right"]);
+  });
+});
+
 describe("merging and splitting cells", () => {
   it("merges a selected range into one cell and splits it again", async () => {
     const api = await load();

@@ -191,16 +191,31 @@ em-emoji-picker {
     border-style: var(--kg-table-edit-border-style, dashed);
 }
 
+/* The header row reads as a header by its bold text. It has no shade of its own: a host can set
+   --kg-table-header-bg, and an author shades cells (or the whole row) from the palette. */
 .koenig-lexical table tr th {
-    background: var(--kg-table-header-bg, var(--grey-200));
+    background: var(--kg-table-header-bg, transparent);
     font-weight: 700;
-    text-align: left;
+    text-align: start;
 }
 
-.koenig-lexical > .dark table tr th,
-.koenig-lexical.dark table tr th,
-.dark .koenig-lexical table tr th {
-    background: var(--kg-table-header-bg, var(--grey-900));
+/* A cell the author shaded keeps dark ink, so its text reads on the shade in light and dark. */
+.koenig-lexical table tr td[style*="background-color"],
+.koenig-lexical table tr th[style*="background-color"] {
+    color: #15171A;
+}
+
+/* The caption is the table's own text, drawn under it from an attribute (the editor cannot add a
+   child element to the table; the exported HTML has a real caption element). */
+.koenig-lexical table[data-kg-caption]::after {
+    content: attr(data-kg-caption);
+    display: table-caption;
+    caption-side: bottom;
+    padding: 0.8rem 1.2rem;
+    font-family: var(--kg-font-sans, Inter, sans-serif);
+    font-size: 1.4rem;
+    text-align: center;
+    color: var(--grey-700);
 }
 
 /* The cell the cursor is in, and the cells of a selected range. */
@@ -210,8 +225,8 @@ em-emoji-picker {
     outline-offset: -2px;
 }
 
-.koenig-lexical .kg-table-cell-selected {
-    background: var(--kg-table-selected-bg, color-mix(in srgb, var(--kg-selection) 14%, transparent));
+.koenig-lexical table .kg-table-cell-selected {
+    box-shadow: inset 0 0 0 9999px var(--kg-table-selected-bg, color-mix(in srgb, var(--kg-selection) 14%, transparent));
 }
 
 /* On paper the grid is solid, the header keeps its shade and nothing is lost to the editing look. */
