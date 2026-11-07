@@ -80,7 +80,7 @@ the sources.
 | `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
-| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
+| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
 | `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
 | `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker` and `preview`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
@@ -711,6 +711,21 @@ The styling is the text's own style, so it is saved in the document, survives a 
 inline CSS in the saved HTML. The lists open under their button; the arrow keys move, Enter picks,
 Escape closes and returns to the text. Each button is marked while the selection has that style.
 The wording is `strings.textStyle` and `strings.toolbar`.
+
+## 📃 Lists and spacing
+
+The selection toolbar has **Bulleted list** (`bulletList`), **Numbered list** (`numberList`) and
+**Checklist** (`checkList`), each marked when the selection is in that kind of list and pressed
+again to go back to paragraphs, and **Decrease indent** and **Increase indent** (`outdent`,
+`indent`; Tab and Shift+Tab already do this inside a list). A checklist item has a box before its
+text that a click, or Space with the cursor in the item, ticks; the item is a `role="checkbox"`
+with `aria-checked`, the state is saved with it, and the box and tick follow `--kg-selection` and
+the system colours in forced-colours mode.
+
+**Line spacing** (`lineSpacing`: single, 1.15, 1.5, double) and **Paragraph spacing**
+(`paragraphSpacing`: none, small, medium, large; the space after the block) apply to the selected
+blocks. They are saved on the block, drawn as inline CSS, and written as inline `line-height` and
+`margin-bottom` into the saved HTML. "Default" takes them off.
 
 ## ↔️ Text alignment
 

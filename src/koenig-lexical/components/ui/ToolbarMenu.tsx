@@ -18,6 +18,13 @@ import ImgFullIcon from '../../assets/icons/kg-img-full.svg?react';
 import ImgRegularIcon from '../../assets/icons/kg-img-regular.svg?react';
 import ImgReplaceIcon from '../../assets/icons/kg-replace.svg?react';
 import ImgWideIcon from '../../assets/icons/kg-img-wide.svg?react';
+import IndentIcon from '../../assets/icons/kg-indent.svg?react';
+import LineSpacingIcon from '../../assets/icons/kg-line-spacing.svg?react';
+import ParagraphSpacingIcon from '../../assets/icons/kg-paragraph-spacing.svg?react';
+import ListBulletIcon from '../../assets/icons/kg-list-bullet.svg?react';
+import ListCheckIcon from '../../assets/icons/kg-list-check.svg?react';
+import ListNumberIcon from '../../assets/icons/kg-list-number.svg?react';
+import OutdentIcon from '../../assets/icons/kg-outdent.svg?react';
 import ClearFormatIcon from '../../assets/icons/kg-clear-format.svg?react';
 import CodeIcon from '../../assets/icons/kg-code.svg?react';
 import FontFamilyIcon from '../../assets/icons/kg-font-family.svg?react';
@@ -51,6 +58,13 @@ export const TOOLBAR_ICONS = {
     highlight: HighlightIcon,
     fontFamily: FontFamilyIcon,
     clearFormatting: ClearFormatIcon,
+    bulletList: ListBulletIcon,
+    numberList: ListNumberIcon,
+    checkList: ListCheckIcon,
+    indent: IndentIcon,
+    lineSpacing: LineSpacingIcon,
+    paragraphSpacing: ParagraphSpacingIcon,
+    outdent: OutdentIcon,
     headingOne: HeadingOneIcon,
     headingTwo: HeadingTwoIcon,
     headingThree: HeadingThreeIcon,

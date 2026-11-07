@@ -7,6 +7,7 @@ import {DEFAULT_CONFIG} from '#kg-default-nodes';
 import {KoenigSelectedCardContext} from '../context/KoenigSelectedCardContext';
 import {LexicalCollaboration} from '@lexical/react/LexicalCollaborationContext';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
+import {SPACING_HTML_EXPORT} from '../../additions/spacing/spacingExport';
 import {TABLE_HTML_EXPORT} from '../../additions/table/tableExport';
 import {CommentsPlugin, KoenigCommentsContext, useCommentsStoreFor} from '../../additions/comments';
 import {KoenigStringsContext, KoenigToolsContext, resolveStrings, resolveTools, selectEditorNodes} from '../../additions/options';
@@ -106,7 +107,7 @@ const KoenigComposer = ({
             editable,
             editorState: collaboration ? null : editorState,
             // the saved HTML of a table: its caption, and dark ink on shaded cells
-            html: {export: TABLE_HTML_EXPORT},
+            html: {export: new Map([...TABLE_HTML_EXPORT, ...SPACING_HTML_EXPORT])},
             onError
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps

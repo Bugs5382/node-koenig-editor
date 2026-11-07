@@ -11,12 +11,14 @@ import {
     $getSelection,
     $isRangeSelection,
     FORMAT_ELEMENT_COMMAND,
-    FORMAT_TEXT_COMMAND
+    FORMAT_TEXT_COMMAND,
+    INDENT_CONTENT_COMMAND,
+    OUTDENT_CONTENT_COMMAND
 } from 'lexical';
 import {$getNearestNodeOfType} from '@lexical/utils';
 import {$alignInScope, $readTableState, TABLE_SCOPES} from '../../../additions/table/tableActions';
 import {$alignmentOfSelection, ALIGN_OF_ITEM, isAlignActive} from '../../../additions/alignment/alignment';
-import {$isListNode, ListNode} from '@lexical/list';
+import {$isListNode, INSERT_CHECK_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, ListNode, REMOVE_LIST_COMMAND} from '@lexical/list';
 import {$setBlocksType} from '@lexical/selection';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 import {
@@ -50,6 +52,7 @@ const scopeIcon = text => function ScopeIcon({className}) {
 const SCOPE_ICONS = {cell: scopeIcon('Cell'), row: scopeIcon('Row'), column: scopeIcon('Col'), table: scopeIcon('All')};
 const SCOPE_STRING = {cell: 'scopeCell', row: 'scopeRow', column: 'scopeColumn', table: 'scopeTable'};
 import {getSelectedNode} from '../../utils/getSelectedNode';
+import {$getSelectionSpacing, $setSpacing, LINE_SPACINGS, PARAGRAPH_SPACINGS} from '../../../additions/spacing/spacing';
 import {StyleMenu} from '../../../additions/textStyle/StyleMenu';
 import {$clearFormatting, $getTextStyle, $setHighlight, $setTextStyle, FONT_SIZES, HIGHLIGHTS, TEXT_COLORS} from '../../../additions/textStyle/textStyle';
 import {ALIGNMENT_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
@@ -110,6 +113,7 @@ export default function FormatToolbar({
     // the style button whose list is open, and the button it hangs from
     const [styleMenu, setStyleMenu] = React.useState(null);
     const [styleNow, setStyleNow] = React.useState({});
+    const [spacingNow, setSpacingNow] = React.useState({});
     // the host's `toolbar` option names the buttons to show; leaving it out shows them all
     const isHidden = item => isToolbarItemHidden(toolbar, item);
 
@@ -168,6 +172,8 @@ export default function FormatToolbar({
                 'background-color': $getTextStyle(selection, 'background-color'),
                 'font-family': $getTextStyle(selection, 'font-family')
             };
+            const nextSpacing = $getSelectionSpacing(selection) || {};
+            setSpacingNow(current => (JSON.stringify(current) === JSON.stringify(nextSpacing) ? current : nextSpacing));
             setStyleNow(current => (JSON.stringify(current) === JSON.stringify(nextStyle) ? current : nextStyle));
             setInlineOn(current => (JSON.stringify(current) === JSON.stringify(nextInline) ? current : nextInline));
 
@@ -229,6 +235,14 @@ export default function FormatToolbar({
             });
         }
     };
+
+    // a list button turns the selected blocks into that list, or back into paragraphs when they
+    // already are one
+    const LIST_COMMANDS = {bullet: INSERT_UNORDERED_LIST_COMMAND, number: INSERT_ORDERED_LIST_COMMAND, check: INSERT_CHECK_LIST_COMMAND};
+    const toggleList = (type) => {
+        editor.dispatchCommand(blockType === type ? REMOVE_LIST_COMMAND : LIST_COMMANDS[type], undefined);
+    };
+    const hideLists = !editor.hasNodes([ListNode]) || !!editor._parentEditor;
 
     const formatQuote = () => {
         editor.update(() => {
@@ -297,6 +311,22 @@ export default function FormatToolbar({
                 ...HIGHLIGHTS.map(color => ({id: color.id, label: strings_.highlights[color.id], swatch: color.value, checked: (styleNow['background-color'] || '').toLowerCase() === color.value.toLowerCase()}))
             ],
             apply: id => $setHighlight($getSelection(), HIGHLIGHTS.find(color => color.id === id)?.value || null)
+        },
+        lineSpacing: {
+            label: strings.toolbar.lineSpacing,
+            options: [
+                {id: 'default', label: strings_.defaultSpacing, checked: spacingNow.line === undefined},
+                ...LINE_SPACINGS.map(entry => ({id: entry.id, label: strings_.lineSpacings[entry.id], checked: spacingNow.line === entry.value}))
+            ],
+            apply: id => $setSpacing($getSelection(), {line: LINE_SPACINGS.find(entry => entry.id === id)?.value ?? null})
+        },
+        paragraphSpacing: {
+            label: strings.toolbar.paragraphSpacing,
+            options: [
+                {id: 'default', label: strings_.defaultSpacing, checked: spacingNow.after === undefined},
+                ...PARAGRAPH_SPACINGS.map(entry => ({id: entry.id, label: strings_.paragraphSpacings[entry.id], checked: spacingNow.after === entry.id}))
+            ],
+            apply: id => $setSpacing($getSelection(), {after: PARAGRAPH_SPACINGS.find(entry => entry.id === id)?.id ?? null})
         },
         fontFamily: {
             label: strings.toolbar.fontFamily,
@@ -404,6 +434,47 @@ export default function FormatToolbar({
                 label={strings.toolbar.quote}
                 shortcutKeys={[ctrlOrSymbol(), 'Q']}
                 onClick={formatQuote}
+            />
+
+            <ToolbarMenuSeparator hide={hideLists} />
+            {[['bulletList', 'bullet', 'U'], ['numberList', 'number', 'O'], ['checkList', 'check', 'X']].map(([item, type, key]) => (
+                <ToolbarMenuItem
+                    key={item}
+                    data-kg-toolbar-button={item}
+                    hide={hideLists || isHidden(item)}
+                    icon={item}
+                    isActive={blockType === type}
+                    label={strings.toolbar[item]}
+                    shortcutKeys={undefined}
+                    onClick={() => toggleList(type)}
+                />
+            ))}
+            <ToolbarMenuItem
+                data-kg-toolbar-button="outdent"
+                hide={hideLists || isHidden('outdent')}
+                icon="outdent"
+                isActive={false}
+                label={strings.toolbar.outdent}
+                onClick={() => editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)}
+            />
+            <ToolbarMenuItem
+                data-kg-toolbar-button="indent"
+                hide={hideLists || isHidden('indent')}
+                icon="indent"
+                isActive={false}
+                label={strings.toolbar.indent}
+                onClick={() => editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)}
+            />
+
+            <ToolbarMenuItem
+                {...styleButton('lineSpacing')}
+                hide={hideAlignment || isHidden('lineSpacing')}
+                isActive={spacingNow.line !== undefined}
+            />
+            <ToolbarMenuItem
+                {...styleButton('paragraphSpacing')}
+                hide={hideAlignment || isHidden('paragraphSpacing')}
+                isActive={spacingNow.after !== undefined}
             />
 
             <ToolbarMenuSeparator hide={hideAlignment} />

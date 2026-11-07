@@ -16,7 +16,10 @@ const defaultTheme = {
         },
         ol: undefined,
         ul: undefined,
-        listitem: undefined
+        listitem: undefined,
+        checklist: 'kg-checklist',
+        listitemChecked: 'kg-check-item kg-check-item-checked',
+        listitemUnchecked: 'kg-check-item'
     },
     link: undefined,
     text: {

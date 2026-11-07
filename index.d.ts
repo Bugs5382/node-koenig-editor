@@ -73,6 +73,8 @@ export type KoenigToolbarItem =
   | "alignLeft"
   | "alignRight"
   | "bold"
+  | "bulletList"
+  | "checkList"
   | "clearFormatting"
   | "code"
   | "fontFamily"
@@ -83,8 +85,13 @@ export type KoenigToolbarItem =
   | "heading4"
   | "heading5"
   | "highlight"
+  | "indent"
   | "italic"
+  | "lineSpacing"
   | "link"
+  | "numberList"
+  | "outdent"
+  | "paragraphSpacing"
   | "quote"
   | "snippet"
   | "strikethrough"
@@ -185,6 +192,9 @@ export interface KoenigStrings {
     colours: Record<"blue" | "green" | "grey" | "orange" | "purple" | "red", string>;
     defaultColour: string;
     defaultFont: string;
+    defaultSpacing: string;
+    lineSpacings: Record<"1" | "1.15" | "1.5" | "2", string>;
+    paragraphSpacings: Record<"large" | "medium" | "none" | "small", string>;
     highlights: Record<"blue" | "green" | "orange" | "pink" | "purple" | "yellow", string>;
     noHighlight: string;
     sizes: Record<"large" | "larger" | "normal" | "small" | "smaller", string>;
