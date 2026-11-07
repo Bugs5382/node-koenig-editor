@@ -125,7 +125,29 @@ function WordCount() {
   ) : null;
 }
 
+// The side panel (settings, code, samples, saved state) can be hidden so the editor has the whole
+// width; the choice is kept in the browser.
+const PANEL_KEY = "koenig-demo-panel";
+const readPanelHidden = () => {
+  try {
+    return window.localStorage.getItem(PANEL_KEY) === "hidden";
+  } catch {
+    return false;
+  }
+};
+
 export function App() {
+  const [panelHidden, setPanelHidden] = useState(readPanelHidden);
+  const togglePanel = useCallback(() => {
+    setPanelHidden((hidden) => {
+      try {
+        window.localStorage.setItem(PANEL_KEY, hidden ? "shown" : "hidden");
+      } catch {
+        /* the choice just is not kept */
+      }
+      return !hidden;
+    });
+  }, []);
   const [settings, setSettings] = useState(() => parseSettings(window.location.search, catalog));
   const settingsRef = useRef(settings);
   const [route, setRoute] = useState<Route>(() => parseRoute(window.location.hash));
@@ -382,14 +404,28 @@ export function App() {
           {...optionalProps}
         >
           {previewAvailable && usePreview && <PreviewWidthBridge width={settings.previewWidth} />}
-          <div className="page" hidden={route.page === "guide"}>
+          <div
+            className={`page${panelHidden ? " panel-hidden" : ""}`}
+            hidden={route.page === "guide"}
+          >
             <main>
+              <button
+                type="button"
+                className="panel-toggle"
+                aria-expanded={!panelHidden}
+                title={
+                  panelHidden ? "Bring the settings panel back" : "Give the editor the whole width"
+                }
+                onClick={togglePanel}
+              >
+                {panelHidden ? "Show side panel" : "Hide side panel"}
+              </button>
               <div ref={cursorsRef} className="editor-box" style={editorStyle}>
                 <KoenigEditor readOnly={settings.readOnly} onChange={onChange} />
               </div>
               {catalog.wordCount && settings.wordCount && <WordCount />}
             </main>
-            <aside>
+            <aside hidden={panelHidden}>
               <section className="card">
                 <h2>Options</h2>
                 <SettingsPanel catalog={catalog} settings={settings} onChange={update} />

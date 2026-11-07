@@ -13,3 +13,6 @@ plan/
 
 # local environment - copy .env.example to .env
 .env
+
+# base commit checked out by the package growth job
+.pack-base/
