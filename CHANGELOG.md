@@ -1,5 +1,17 @@
 # node-koenig-editor
 
+## v1.2.1 - 2026-11-07
+
+### What Changed 👀
+
+#### 🐛 Bug Fixes
+
+- fix(toolbar): single-swatch toggle, nested-editor focus guard, narrow toolbar @Bugs5382 (#95)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.2.0...v1.2.1
+
 ## v1.2.0 - 2026-11-07
 
 ### What Changed 👀
