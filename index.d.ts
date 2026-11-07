@@ -500,6 +500,7 @@ export interface KoenigStrings {
     autoAdvanceSeconds: string;
     screenModeLabel: string;
     shuffleLabel: string;
+    shuffleNeedsAutoAdvance: string;
     slideshowLabel: string;
     viewerPause: string;
     viewerPlay: string;

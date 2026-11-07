@@ -385,16 +385,23 @@ function GallerySettings({count, hostMaxImages, maxImages, setMaxImages, setSlid
                     </>
                 ) : null}
                 {slideshowOptions.shuffle ? (
-                    <button
-                        aria-pressed={slideshow.shuffle}
-                        className={optionButton(slideshow.shuffle)}
-                        data-gallery-shuffle-toggle
-                        type="button"
-                        onClick={() => setSlideshow({shuffle: !slideshow.shuffle})}
-                        onMouseDown={e => e.preventDefault()}
-                    >
-                        {strings.shuffleLabel}
-                    </button>
+                    <>
+                        <button
+                            aria-pressed={slideshow.shuffle}
+                            className={`${optionButton(slideshow.shuffle)} disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent`}
+                            data-gallery-shuffle-toggle
+                            disabled={!slideshow.autoplaySeconds}
+                            title={slideshow.autoplaySeconds ? undefined : strings.shuffleNeedsAutoAdvance}
+                            type="button"
+                            onClick={() => setSlideshow({shuffle: !slideshow.shuffle})}
+                            onMouseDown={e => e.preventDefault()}
+                        >
+                            {strings.shuffleLabel}
+                        </button>
+                        {slideshow.autoplaySeconds ? null : (
+                            <span className="pr-1 text-grey-600" data-gallery-shuffle-reason>{strings.shuffleNeedsAutoAdvance}</span>
+                        )}
+                    </>
                 ) : null}
                 {slideshowOptions.screenMode ? (
                     <button

@@ -366,6 +366,52 @@ describe("the normal viewer", () => {
   });
 });
 
+describe("which settings depend on which", () => {
+  const select = async (extra: Record<string, unknown> = {}) => {
+    await mount({ composer: { initialEditorState: galleryDocument(extra, 3) } });
+    await act(async () => {
+      fireEvent.click(document.querySelector("[data-kg-card='gallery']") as HTMLElement);
+    });
+    await waitFor(() =>
+      expect(document.querySelector("[data-gallery-autoplay-toggle]")).not.toBeNull(),
+    );
+  };
+  const el = (name: string) => document.querySelector(`[data-gallery-${name}]`) as HTMLElement;
+
+  it("disables Random order, with the reason, while auto-advance is off, and turns it on with auto-advance", async () => {
+    await select();
+    const shuffle = el("shuffle-toggle") as HTMLButtonElement;
+    expect(shuffle.disabled).toBe(true);
+    expect(shuffle.title).toBe("Needs auto-advance");
+    expect(el("shuffle-reason")?.textContent).toBe("Needs auto-advance");
+    await act(async () => {
+      fireEvent.click(el("autoplay-toggle"));
+    });
+    expect((el("shuffle-toggle") as HTMLButtonElement).disabled).toBe(false);
+    expect(el("shuffle-reason")).toBeNull();
+    await act(async () => {
+      fireEvent.click(el("shuffle-toggle"));
+    });
+    expect(el("shuffle-toggle").getAttribute("aria-pressed")).toBe("true");
+    await act(async () => {
+      fireEvent.click(el("autoplay-toggle"));
+    });
+    // switched off again: disabled once more, and the choice is kept for next time
+    expect((el("shuffle-toggle") as HTMLButtonElement).disabled).toBe(true);
+    expect(el("shuffle-toggle").getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("keeps the seconds box tied to auto-advance and Screen mode independent of it", async () => {
+    await select();
+    expect((el("autoplay-seconds") as HTMLInputElement).disabled).toBe(true);
+    expect((el("screen-mode-toggle") as HTMLButtonElement).disabled).toBe(false);
+    await act(async () => {
+      fireEvent.click(el("autoplay-toggle"));
+    });
+    expect((el("autoplay-seconds") as HTMLInputElement).disabled).toBe(false);
+  });
+});
+
 describe("the settings and the saved HTML", () => {
   it("shows the three settings under a selected gallery and saves them in the card", async () => {
     const { api } = await mount({ composer: { initialEditorState: galleryDocument({}, 3) } });
