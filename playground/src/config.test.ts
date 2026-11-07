@@ -276,6 +276,17 @@ describe("the toolbar, fonts and spell check settings", () => {
     expect(snippet).toContain("spellCheck={false}");
   });
 
+  it("start with the two-row selection toolbar, and one row travels in the address and the snippet", () => {
+    const base = defaultSettings(withToolbar);
+    expect(base.toolbarRows).toBe(2);
+    expect(buildSnippet(base, withToolbar)).not.toContain("toolbarRows");
+    const one = { ...base, toolbarRows: 1 as const };
+    expect(serializeSettings(one, withToolbar)).toContain("toolbarRows=1");
+    expect(parseSettings("?toolbarRows=1", withToolbar).toolbarRows).toBe(1);
+    expect(parseSettings("?toolbarRows=7", withToolbar).toolbarRows).toBe(2);
+    expect(buildSnippet(one, withToolbar)).toContain("toolbarRows={1}");
+  });
+
   it("are not offered by a build that lacks the toolbar list", () => {
     const old = defaultSettings(catalog);
     expect(old.toolbar).toEqual([]);
