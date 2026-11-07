@@ -177,6 +177,14 @@ export function SettingsPanel({ catalog, onChange, settings }: Props) {
           <label>
             <input
               type="checkbox"
+              checked={settings.toolbarRows === 1}
+              onChange={(e) => onChange({ toolbarRows: e.target.checked ? 1 : 2 })}
+            />{" "}
+            one-row selection toolbar
+          </label>
+          <label>
+            <input
+              type="checkbox"
               checked={settings.readOnly}
               onChange={(e) => onChange({ readOnly: e.target.checked })}
             />{" "}

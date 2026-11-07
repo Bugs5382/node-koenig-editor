@@ -125,10 +125,23 @@ const KoenigComposer = ({
 
     const editorContainerRef = React.useRef(null);
 
+    // `fileUploader` and its `fileTypes` are optional (Bugs5382/node-koenig-editor#10): without
+    // them the cards still render and edit, and only an upload attempt fails, with the reason
+    // logged.
+    if (!fileUploader.fileTypes) {
+        fileUploader.fileTypes = {};
+    }
     if (!fileUploader.useFileUpload) {
         fileUploader.useFileUpload = function () {
-            console.error('<KoenigComposer> requires a `fileUploader` prop object to be passed containing a `useFileUpload` custom hook');
-            return;
+            return {
+                errors: [],
+                isLoading: false,
+                progress: 0,
+                upload: async () => {
+                    console.error('<KoenigComposer> requires a `fileUploader` prop object to be passed containing a `useFileUpload` custom hook');
+                    return null;
+                }
+            };
         };
     }
 

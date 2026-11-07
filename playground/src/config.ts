@@ -80,6 +80,8 @@ export interface Settings {
   spellCheck: boolean;
   /** Live collaboration: windows of this browser at this address share one document. */
   collaboration: boolean;
+  /** How many rows the selection toolbar's built-in buttons use. */
+  toolbarRows: 1 | 2;
   /** The colour wheel (any colour) in every colour setting. */
   colorPicker: boolean;
   /** A sample brand palette in every colour setting, with the editor's own colour not offered. */
@@ -114,6 +116,7 @@ export function defaultSettings(catalog: Catalog): Settings {
     fonts: false,
     spellCheck: true,
     collaboration: false,
+    toolbarRows: 2,
     colorPicker: true,
     brandColors: false,
     comments: true,
@@ -177,6 +180,8 @@ export function parseSettings(search: string, catalog: Catalog): Settings {
   const size = Number(params.get("size"));
   if ((SIZES as readonly number[]).includes(size)) settings.size = size;
 
+  const rows = params.get("toolbarRows");
+  if (rows === "1") settings.toolbarRows = 1;
   const border = TABLE_BORDERS.find((b) => b === params.get("tableBorder"));
   if (border) settings.tableBorder = border;
   const width = params.get("previewWidth");
@@ -199,6 +204,8 @@ export function serializeSettings(settings: Settings, catalog: Catalog): string 
   if (settings.selection !== defaults.selection)
     params.set("selection", settings.selection.slice(1));
   if (settings.size !== defaults.size) params.set("size", String(settings.size));
+  if (settings.toolbarRows !== defaults.toolbarRows)
+    params.set("toolbarRows", String(settings.toolbarRows));
   if (settings.tableBorder !== defaults.tableBorder)
     params.set("tableBorder", settings.tableBorder);
   if (settings.previewWidth !== defaults.previewWidth)
@@ -222,6 +229,7 @@ export function buildSnippet(settings: Settings, catalog: Catalog): string {
   if (settings.fonts) props.push("fonts={fonts}");
   if (!settings.spellCheck) props.push("spellCheck={false}");
   if (settings.collaboration) props.push("collaboration={collaboration}");
+  if (settings.toolbarRows !== 2) props.push(`toolbarRows={${settings.toolbarRows}}`);
   if (settings.brandColors || !settings.colorPicker) props.push("colors={colors}");
   if (settings.comments) props.push("comments={comments}");
   if (settings.readOnly) props.push("editable={false}");

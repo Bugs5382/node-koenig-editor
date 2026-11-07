@@ -308,6 +308,7 @@ export function App() {
   if (settings.fonts) optionalProps.fonts = SAMPLE_FONTS;
   if (!settings.spellCheck) optionalProps.spellCheck = false;
   if (settings.collaboration) optionalProps.collaboration = collaboration;
+  if (settings.toolbarRows !== 2) optionalProps.toolbarRows = settings.toolbarRows;
   if (settings.brandColors || !settings.colorPicker) optionalProps.colors = colorOptions(settings);
   if (previewAvailable) {
     // The bar's switch and width presets drive the editor, and the editor's own Preview button
