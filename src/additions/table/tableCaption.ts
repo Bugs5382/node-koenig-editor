@@ -25,7 +25,7 @@ import { TableNode } from "@lexical/table";
 import { $nodesOfType } from "lexical";
 import { useEffect } from "react";
 
-import { $getTableCaption } from "./tableActions";
+import { $getTableCaption, $getTableFigure } from "./tableActions";
 import { $syncCellBorders } from "./tableBorders";
 import { $getTableWidthMode } from "./tableResize";
 
@@ -67,6 +67,7 @@ export const useTableCaptions = (): void => {
           const text = $getTableCaption(table);
           if (!text) {
             element.removeAttribute("data-kg-caption");
+            element.removeAttribute("data-kg-caption-above");
             if (element.hasAttribute("data-kg-captioned")) {
               element.removeAttribute("aria-label");
               element.removeAttribute("data-kg-captioned");
@@ -77,6 +78,8 @@ export const useTableCaptions = (): void => {
             element.setAttribute("data-kg-caption", text);
           if (element.getAttribute("aria-label") !== text) element.setAttribute("aria-label", text);
           element.setAttribute("data-kg-captioned", "");
+          if ($getTableFigure(table)?.above) element.setAttribute("data-kg-caption-above", "");
+          else element.removeAttribute("data-kg-caption-above");
         }
       });
     };

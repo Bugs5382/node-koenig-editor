@@ -20,6 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
+import { $figureText, $getFigure, $setFigure, type Figure } from "../figure/figure";
 import {
   $computeTableMapSkipCellCheck,
   $createTableSelectionFrom,
@@ -182,10 +183,38 @@ const captionState = createState("kgCaption", {
 
 /** The table's caption, "" when it has none. Stored on the table as node state, so it saves with
  *  the document and moves with the table. */
-export const $getTableCaption = (table: TableNode): string => $getState(table, captionState);
+/** The table's figure entry. A caption saved before the entry existed reads as a title with no label. */
+export const $getTableFigure = (table: TableNode): Figure | null => {
+  const figure = $getFigure(table);
+  if (figure) return figure;
+  const legacy = $getState(table, captionState);
+  return legacy ? { above: false, label: "", numbered: false, title: legacy } : null;
+};
 
+/** The caption text as the reader sees it ("Table 1: Quarterly totals"); empty without an entry. */
+export const $getTableCaption = (table: TableNode): string =>
+  $getFigure(table) ? $figureText(table) : $getState(table, captionState);
+
+/** Sets the figure entry of a table, or removes it with null. Inside an editor update. */
+export const $setTableFigure = (table: TableNode, figure: Figure | null): void => {
+  $setState(table, captionState, "");
+  $setFigure(table, figure);
+};
+
+/** Sets just the caption text, keeping any label, position and numbering already chosen. */
 export const $setTableCaption = (table: TableNode, caption: string): void => {
-  $setState(table, captionState, caption.trim());
+  const text = caption.trim();
+  const current = $getTableFigure(table);
+  if (!text && !current?.label) {
+    $setTableFigure(table, null);
+    return;
+  }
+  $setTableFigure(table, {
+    above: current?.above ?? false,
+    label: current?.label ?? "",
+    numbered: current?.numbered ?? false,
+    title: text,
+  });
 };
 
 const same = <T>(values: T[]): T | "mixed" =>

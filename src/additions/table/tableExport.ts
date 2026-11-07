@@ -29,7 +29,7 @@ import type {
   LexicalNode,
 } from "lexical";
 
-import { $getTableCaption, TABLE_CELL_INK } from "./tableActions";
+import { $getTableCaption, $getTableFigure, TABLE_CELL_INK } from "./tableActions";
 import { $getCellBorders, BORDER_SIDES, borderCss } from "./tableBorders";
 import { $getTableWidthMode } from "./tableResize";
 
@@ -52,6 +52,7 @@ export const TABLE_HTML_EXPORT: DOMExportOutputMap = new Map<
       if (caption) {
         const element = output.element.ownerDocument.createElement("caption");
         element.textContent = caption;
+        if (!$getTableFigure(table)?.above) element.style.captionSide = "bottom";
         output.element.insertBefore(element, output.element.firstChild);
       }
       // column widths as shares of the whole, so the table reads the same in any column width

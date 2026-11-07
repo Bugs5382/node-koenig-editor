@@ -240,12 +240,12 @@ describe("the caption", () => {
     const api = await load();
     await caret(api, 1, 1);
     await openGroup("caption");
-    const input = screen.getByLabelText("Caption text") as HTMLInputElement;
     await act(async () => {
-      fireEvent.change(input, { target: { value: "Quarterly totals" } });
+      fireEvent.change(screen.getByLabelText("Label"), { target: { value: "" } });
+      fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Quarterly totals" } });
     });
     await act(async () => {
-      fireEvent.click(document.querySelector("[data-kg-table-caption-done]") as Element);
+      fireEvent.click(document.querySelector("[data-kg-figure-done]") as Element);
     });
     const table = document.querySelector("table") as HTMLElement;
     expect(table.getAttribute("data-kg-caption")).toBe("Quarterly totals");
@@ -256,12 +256,29 @@ describe("the caption", () => {
     await caret(api, 1, 1);
     await openGroup("caption");
     await act(async () => {
-      fireEvent.click(document.querySelector("[data-kg-table-caption-remove]") as Element);
+      fireEvent.click(document.querySelector("[data-kg-figure-remove]") as Element);
     });
     expect((document.querySelector("table") as HTMLElement).hasAttribute("data-kg-caption")).toBe(
       false,
     );
     expect((document.querySelector("table") as HTMLElement).hasAttribute("aria-label")).toBe(false);
+  });
+
+  it("can carry a label with an automatic number, above the table", async () => {
+    const api = await load();
+    await caret(api, 1, 1);
+    await openGroup("caption");
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText("Label"), { target: { value: "Table" } });
+      fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Quarterly totals" } });
+      fireEvent.change(screen.getByLabelText("Position"), { target: { value: "above" } });
+    });
+    await act(async () => {
+      fireEvent.click(document.querySelector("[data-kg-figure-done]") as Element);
+    });
+    const table = document.querySelector("table") as HTMLElement;
+    expect(table.getAttribute("data-kg-caption")).toBe("Table 1: Quarterly totals");
+    expect(table.hasAttribute("data-kg-caption-above")).toBe(true);
   });
 });
 

@@ -7,6 +7,7 @@ import {$generateHtmlFromNodes} from '@lexical/html';
 import {GalleryNode as BaseGalleryNode} from '#kg-default-nodes';
 import {GalleryNodeComponent} from './GalleryNodeComponent';
 import {cleanBasicHtml} from '@tryghost/kg-clean-basic-html';
+import {$getFigure, $setFigure} from '../../additions/figure/figure';
 import {createCommand} from 'lexical';
 import {populateNestedEditor, setupNestedEditor} from '../utils/nested-editors';
 
@@ -37,7 +38,12 @@ export class GalleryNode extends BaseGalleryNode {
     }
 
     static importJSON(serializedNode) {
-        return super.importJSON(serializedNode);
+        const node = super.importJSON(serializedNode);
+        // the optional figure entry (label, number, title) is node state; see additions/figure
+        if (serializedNode.figure) {
+            $setFigure(node, serializedNode.figure);
+        }
+        return node;
     }
 
     __captionEditor;
@@ -94,6 +100,11 @@ export class GalleryNode extends BaseGalleryNode {
                 const cleanedHtml = cleanBasicHtml(html);
                 json.caption = cleanedHtml;
             });
+        }
+
+        const figure = $getFigure(this);
+        if (figure) {
+            json.figure = figure;
         }
 
         return json;

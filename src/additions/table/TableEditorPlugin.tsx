@@ -39,6 +39,8 @@ import {
   useState,
 } from "react";
 
+import { FigureEntry } from "../figure/FigureEntry";
+import type { Figure } from "../figure/figure";
 import { useKoenigStrings } from "../options";
 import { AnchoredMenu } from "../placement/AnchoredMenu";
 import { FloatingPortal } from "../placement/FloatingPortal";
@@ -49,7 +51,8 @@ import {
   $runTableAction,
   $setCellColor,
   $cellsInScope,
-  $setTableCaption,
+  $getTableFigure,
+  $setTableFigure,
   TABLE_CELL_INK,
   TABLE_COLORS,
   TABLE_GROUPS,
@@ -87,7 +90,7 @@ import {
 
 interface Snapshot {
   align: string;
-  caption: string;
+  figure: Figure | null;
   cellKey: string;
   color: string | null;
   colSpan: number;
@@ -117,7 +120,7 @@ const $snapshot = (): Snapshot | null => {
   for (const id of ALL_ACTIONS) enabled[id] = $isTableActionEnabled(id, state);
   return {
     align: state.align,
-    caption: state.caption,
+    figure: $getTableFigure(state.table),
     cellKey: cell.getKey(),
     color: state.color === "mixed" ? null : state.color,
     colSpan: cell.getColSpan(),
@@ -717,16 +720,18 @@ export const TableEditorPlugin = () => {
       ) : null}
       {open?.group === "caption" ? (
         <PointMenu at={open}>
-          <CaptionField
-            caption={snapshot.caption}
+          <FigureEntry
+            figure={snapshot.figure}
+            initialAbove
+            initialLabel="Table"
             onClose={() => {
               closeAll();
               focusEditor();
             }}
-            onCommit={(text) =>
+            onCommit={(figure) =>
               run(() => {
                 const state = $readTableState();
-                if (state) $setTableCaption(state.table, text);
+                if (state) $setTableFigure(state.table, figure);
               })
             }
           />
@@ -1031,67 +1036,6 @@ const SizeField = ({ onClose, onCommit, onEqual, snapshot }: SizeFieldProps) => 
           onClick={commit}
         >
           {t.sizeDone}
-        </button>
-      </div>
-    </div>
-  );
-};
-
-interface CaptionFieldProps {
-  caption: string;
-  onClose: () => void;
-  onCommit: (text: string) => void;
-}
-
-const CaptionField = ({ caption, onClose, onCommit }: CaptionFieldProps) => {
-  const t = useKoenigStrings().table;
-  const [text, setText] = useState(caption);
-  const input = useRef<HTMLInputElement>(null);
-  useEffect(() => input.current?.focus(), []);
-  return (
-    <div
-      aria-label={t.caption}
-      className="not-kg-prose flex w-[28rem] max-w-[92vw] flex-col gap-2 rounded-lg bg-white p-3 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white forced-colors:border forced-colors:border-[ButtonText]"
-      data-kg-table-popover
-      role="dialog"
-      onKeyDown={(event) => {
-        event.stopPropagation();
-        if (event.key === "Escape") {
-          event.preventDefault();
-          onClose();
-        } else if (event.key === "Enter") {
-          event.preventDefault();
-          onCommit(text);
-        }
-      }}
-    >
-      <input
-        ref={input}
-        aria-label={t.captionLabel}
-        className="w-full rounded-md border border-grey-300 bg-white px-2 py-1 dark:bg-grey-900"
-        placeholder={t.captionPlaceholder}
-        type="text"
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-      />
-      <div className="flex justify-end gap-2">
-        {caption ? (
-          <button
-            className="cursor-pointer rounded-md px-2 py-1 hover:bg-grey-200/80 dark:hover:bg-grey-900"
-            data-kg-table-caption-remove
-            type="button"
-            onClick={() => onCommit("")}
-          >
-            {t.captionRemove}
-          </button>
-        ) : null}
-        <button
-          className="cursor-pointer rounded-md px-2 py-1 font-medium hover:bg-grey-200/80 dark:hover:bg-grey-900"
-          data-kg-table-caption-done
-          type="button"
-          onClick={() => onCommit(text)}
-        >
-          {t.captionDone}
         </button>
       </div>
     </div>

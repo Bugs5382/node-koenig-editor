@@ -225,6 +225,10 @@ em-emoji-picker {
 
 /* The caption is the table's own text, drawn under it from an attribute (the editor cannot add a
    child element to the table; the exported HTML has a real caption element). */
+.koenig-lexical table[data-kg-caption][data-kg-caption-above]::after {
+    caption-side: top;
+}
+
 .koenig-lexical table[data-kg-caption]::after {
     content: attr(data-kg-caption);
     display: table-caption;

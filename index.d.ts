@@ -160,6 +160,19 @@ export interface KoenigStrings {
   toolbar: Record<KoenigToolbarItem, string>;
   /** The table card's controls; `toolbar` names the group for screen readers. The two announcements
    *  take `{row}`, `{rows}`, `{column}`, `{columns}`, `{rowSpan}` and `{colSpan}`. */
+  figure: {
+    above: string;
+    below: string;
+    button: string;
+    done: string;
+    label: string;
+    labelPlaceholder: string;
+    numbered: string;
+    position: string;
+    remove: string;
+    title: string;
+    titlePlaceholder: string;
+  };
   table: {
     addColumnLeft: string;
     addColumnRight: string;
