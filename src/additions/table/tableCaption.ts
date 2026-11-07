@@ -27,10 +27,11 @@ import { useEffect } from "react";
 
 import { $getTableCaption } from "./tableActions";
 
-// A table's caption is node state (see tableActions), drawn as a real `caption` element inside
-// the table, so the editor, the reader's view and a screen reader all get the same thing. The
-// element is kept outside Lexical's own children: it sits before the table's column group, which
-// the table node already skips when it lays out its rows.
+// A table's caption is node state (see tableActions). In the editor it is drawn from attributes on
+// the table element, not from a child element: Lexical removes DOM nodes it did not put there, and
+// re-adding one would never settle. `data-kg-caption` carries the text for a CSS caption box
+// (`table::after`), and `aria-label` gives the table its accessible name. The exported HTML has a
+// real `caption` element.
 export const useTableCaptions = (): void => {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
@@ -42,18 +43,18 @@ export const useTableCaptions = (): void => {
           const element = found?.tagName === "TABLE" ? found : found?.querySelector("table");
           if (!element) continue;
           const text = $getTableCaption(table);
-          let caption = element.querySelector(":scope > caption[data-kg-table-caption]");
           if (!text) {
-            caption?.remove();
+            element.removeAttribute("data-kg-caption");
+            if (element.hasAttribute("data-kg-captioned")) {
+              element.removeAttribute("aria-label");
+              element.removeAttribute("data-kg-captioned");
+            }
             continue;
           }
-          if (!caption) {
-            caption = document.createElement("caption");
-            caption.setAttribute("data-kg-table-caption", "");
-            caption.setAttribute("contenteditable", "false");
-            element.insertBefore(caption, element.firstChild);
-          }
-          if (caption.textContent !== text) caption.textContent = text;
+          if (element.getAttribute("data-kg-caption") !== text)
+            element.setAttribute("data-kg-caption", text);
+          if (element.getAttribute("aria-label") !== text) element.setAttribute("aria-label", text);
+          element.setAttribute("data-kg-captioned", "");
         }
       });
     };

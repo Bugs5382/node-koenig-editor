@@ -23,7 +23,12 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $findMatchingParent } from "@lexical/utils";
 import { $isTableCellNode, $isTableSelection } from "@lexical/table";
-import { $getNearestNodeFromDOMNode, $getSelection } from "lexical";
+import {
+  $getNearestNodeFromDOMNode,
+  $getSelection,
+  $setSelection,
+  type BaseSelection,
+} from "lexical";
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useKoenigStrings } from "../options";
@@ -151,12 +156,19 @@ export const TableEditorPlugin = () => {
   const [context, setContext] = useState<{ left: number; top: number } | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const last = useRef<string>("");
+  // While a menu is open focus is in the menu, which can change the editor's selection (a range
+  // of cells would collapse). The toolbar then keeps what it saw when the menu opened, and an
+  // action puts that selection back before it runs.
+  const frozen = useRef(false);
+  const savedSelection = useRef<BaseSelection | null>(null);
   useTableCaptions();
 
   // Follow the cursor: what cell and table it is in, and what can be done there.
   useEffect(
     () =>
       editor.registerUpdateListener(({ editorState }) => {
+        if (frozen.current) return;
+        savedSelection.current = editorState.read(() => $getSelection()?.clone() ?? null);
         const next = editorState.read(() => (editor.isEditable() ? $snapshot() : null));
         const key = JSON.stringify(next);
         if (key === last.current) return;
@@ -211,18 +223,31 @@ export const TableEditorPlugin = () => {
     };
   }, [place]);
 
+  const focusEditor = useCallback(() => {
+    editor.focus();
+  }, [editor]);
+
   const closeAll = useCallback(() => {
+    frozen.current = false;
     setOpen(null);
     setContext(null);
   }, []);
 
   const run = useCallback(
     (change: () => void) => {
-      editor.update(change, { discrete: true });
+      const saved = savedSelection.current;
+      frozen.current = false;
+      editor.update(
+        () => {
+          if (saved) $setSelection(saved.clone());
+          change();
+        },
+        { discrete: true },
+      );
       closeAll();
-      editor.focus();
+      focusEditor();
     },
-    [closeAll, editor],
+    [closeAll, editor, focusEditor],
   );
 
   // Alt+F10 moves focus into the toolbar from the cell; Escape closes a menu, then returns to the cell.
@@ -237,13 +262,13 @@ export const TableEditorPlugin = () => {
         if (target?.closest?.("[data-kg-table-toolbar], [data-kg-table-popover]")) {
           event.preventDefault();
           closeAll();
-          editor.focus();
+          focusEditor();
         }
       }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [closeAll, editor, snapshot]);
+  }, [closeAll, editor, focusEditor, snapshot]);
 
   // A press outside the controls closes an open menu.
   useEffect(() => {
@@ -286,6 +311,7 @@ export const TableEditorPlugin = () => {
         },
         { discrete: true },
       );
+      frozen.current = true;
       setOpen(null);
       setContext(at);
     };
@@ -328,6 +354,7 @@ export const TableEditorPlugin = () => {
                 id: "caption",
                 label: t.caption,
                 onSelect: () => {
+                  frozen.current = true;
                   setContext(null);
                   setOpen((current) => ({
                     group: "caption",
@@ -451,6 +478,7 @@ export const TableEditorPlugin = () => {
                   return;
                 }
                 const rect = event.currentTarget.getBoundingClientRect();
+                frozen.current = open?.group !== group;
                 setContext(null);
                 setOpen((current) =>
                   current?.group === group
@@ -479,7 +507,7 @@ export const TableEditorPlugin = () => {
             sections={sectionsFor([open.group])}
             onClose={() => {
               closeAll();
-              editor.focus();
+              focusEditor();
             }}
           />
         </div>
@@ -490,7 +518,7 @@ export const TableEditorPlugin = () => {
             caption={snapshot.caption}
             onClose={() => {
               closeAll();
-              editor.focus();
+              focusEditor();
             }}
             onCommit={(text) =>
               run(() => {
@@ -526,7 +554,7 @@ export const TableEditorPlugin = () => {
             })}
             onClose={() => {
               closeAll();
-              editor.focus();
+              focusEditor();
             }}
           />
         </div>

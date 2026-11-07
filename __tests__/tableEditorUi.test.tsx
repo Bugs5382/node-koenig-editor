@@ -151,6 +151,7 @@ describe("the table toolbar's menus", () => {
     expect(item("split").getAttribute("aria-disabled")).toBe("true");
     await pick("merge");
     expect(api.serialize()).toContain('"colSpan":2');
+    await caret(api, 1, 0);
     await openGroup("cell");
     expect(item("split").getAttribute("aria-disabled")).toBeNull();
   });
@@ -162,6 +163,7 @@ describe("the table toolbar's menus", () => {
     expect(item("colour-none").getAttribute("aria-checked")).toBe("true");
     await pick("colour-green");
     expect(api.serialize()).toContain('"backgroundColor":"#D4EFDF"');
+    await caret(api, 1, 1);
     await openGroup("colour");
     await waitFor(() => expect(item("colour-green").getAttribute("aria-checked")).toBe("true"));
   });
@@ -172,6 +174,7 @@ describe("the table toolbar's menus", () => {
     await openGroup("align");
     expect(item("alignLeft").getAttribute("aria-checked")).toBe("true");
     await pick("alignRight");
+    await caret(api, 1, 1);
     await openGroup("align");
     await waitFor(() => expect(item("alignRight").getAttribute("aria-checked")).toBe("true"));
   });
@@ -217,7 +220,7 @@ describe("the right-click menu", () => {
 });
 
 describe("the caption", () => {
-  it("is set from the toolbar and drawn as a caption element in the table", async () => {
+  it("is set from the toolbar, drawn from the table's own attributes and named for assistive technology", async () => {
     const api = await load();
     await caret(api, 1, 1);
     await openGroup("caption");
@@ -228,15 +231,21 @@ describe("the caption", () => {
     await act(async () => {
       fireEvent.click(document.querySelector("[data-kg-table-caption-done]") as Element);
     });
-    const caption = document.querySelector("table > caption[data-kg-table-caption]");
-    expect(caption?.textContent).toBe("Quarterly totals");
+    const table = document.querySelector("table") as HTMLElement;
+    expect(table.getAttribute("data-kg-caption")).toBe("Quarterly totals");
+    // the table gets its accessible name from the caption, and no foreign child is added to it
+    expect(table.getAttribute("aria-label")).toBe("Quarterly totals");
+    expect(table.querySelector(":scope > caption")).toBeNull();
     expect(api.serialize()).toContain("Quarterly totals");
     await caret(api, 1, 1);
     await openGroup("caption");
     await act(async () => {
       fireEvent.click(document.querySelector("[data-kg-table-caption-remove]") as Element);
     });
-    expect(document.querySelector("table > caption")).toBeNull();
+    expect((document.querySelector("table") as HTMLElement).hasAttribute("data-kg-caption")).toBe(
+      false,
+    );
+    expect((document.querySelector("table") as HTMLElement).hasAttribute("aria-label")).toBe(false);
   });
 });
 
@@ -256,6 +265,7 @@ describe("what a screen reader hears", () => {
     await range(api, [1, 0], [2, 1]);
     await openGroup("cell");
     await pick("merge");
+    await caret(api, 1, 0);
     await waitFor(() => expect(said()).toContain("spans 2 rows and 2 columns"));
   });
 
