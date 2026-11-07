@@ -212,7 +212,10 @@ export interface KoenigStrings {
     widthNarrow: string;
     widthWide: string;
     /** Names of the cell colours, by their key. */
-    colours: Record<"blue" | "green" | "grey" | "orange" | "pink" | "purple" | "red" | "yellow", string>;
+    colours: Record<
+      "blue" | "green" | "grey" | "orange" | "pink" | "purple" | "red" | "yellow",
+      string
+    >;
   };
   card: {
     edit: string;
