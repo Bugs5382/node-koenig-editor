@@ -811,6 +811,21 @@ describe("the reader simulation: width, theme and text size", () => {
     expect(region.getAttribute("aria-label")).toBe("Reader preview");
   });
 
+  it("draws no grey box around the document: no backdrop, and a hairline only on a device width", async () => {
+    await mount({ composer: { defaultPreview: true, initialEditorState: documentOf("Hello") } });
+    const stage = frame().closest("[data-kg-preview-stage]") as HTMLElement;
+    expect(stage.style.background).toBe("");
+    expect(stage.style.padding).toBe("");
+    expect(frame().style.boxShadow).toBe("");
+    expect(frame().style.border).not.toContain("1px solid");
+    await press();
+    await choose("Width", "Phone");
+    await press();
+    await press();
+    expect(frame().style.border).toContain("1px solid");
+    expect((frame().closest("[data-kg-preview-stage]") as HTMLElement).style.background).toBe("");
+  });
+
   it("lets a host place the options panel with its own toggle", async () => {
     await mount({
       composer: {
