@@ -1341,6 +1341,14 @@
     max-width: 65%;
 }
 
+.koenig-lexical .max-w-\[92vw\] {
+    max-width: 92vw;
+}
+
+.koenig-lexical .max-w-\[96vw\] {
+    max-width: 96vw;
+}
+
 .koenig-lexical .max-w-\[calc\(100vw-16px\)\] {
     max-width: calc(100vw - 16px);
 }
@@ -4979,5 +4987,21 @@ em-emoji-picker {
 
     .koenig-lexical .forced-colors\:text-\[HighlightText\] {
         color: HighlightText;
+    }
+
+    .koenig-lexical .forced-colors\:focus\:outline:focus {
+        outline-style: solid;
+    }
+
+    .koenig-lexical .forced-colors\:focus\:outline-2:focus {
+        outline-width: 2px;
+    }
+
+    .koenig-lexical .forced-colors\:focus-visible\:outline:focus-visible {
+        outline-style: solid;
+    }
+
+    .koenig-lexical .forced-colors\:focus-visible\:outline-2:focus-visible {
+        outline-width: 2px;
     }
 }

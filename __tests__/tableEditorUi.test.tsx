@@ -180,6 +180,22 @@ describe("the table toolbar's menus", () => {
   });
 });
 
+describe("the table controls in forced-colours mode", () => {
+  it("have a system-colour edge and a focus outline, since shadows and rings are lost", async () => {
+    const api = await load();
+    await caret(api, 1, 1);
+    expect((document.querySelector("[data-kg-table-toolbar]") as HTMLElement).className).toContain(
+      "forced-colors:border-[ButtonText]",
+    );
+    expect(group("row").className).toContain("forced-colors:focus-visible:outline");
+    await openGroup("row");
+    expect((document.querySelector("[data-kg-table-menu]") as HTMLElement).className).toContain(
+      "forced-colors:border-[ButtonText]",
+    );
+    expect(item("rowAbove").className).toContain("forced-colors:focus:outline");
+  });
+});
+
 describe("the right-click menu", () => {
   it("opens on a cell, lists the actions, and puts the cursor in that cell", async () => {
     const api = await load();

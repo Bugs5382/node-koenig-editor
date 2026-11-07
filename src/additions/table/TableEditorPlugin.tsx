@@ -29,9 +29,18 @@ import {
   $setSelection,
   type BaseSelection,
 } from "lexical";
-import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { useKoenigStrings } from "../options";
+import { AnchoredMenu } from "../placement/AnchoredMenu";
 import { FloatingPortal } from "../placement/FloatingPortal";
 import { TableActionMenu, type TableMenuSection } from "./TableActionMenu";
 import {
@@ -149,6 +158,41 @@ const TOOLBAR: readonly MenuGroup[] = [
   "table",
 ];
 
+// A menu or popover that hangs from a point (the button it opened from, or where the pointer was):
+// the editor's floating-layer placement keeps it inside the window and flips it above when there is
+// no room below.
+const PointMenu = ({
+  at,
+  children,
+}: {
+  at: { left: number; top: number };
+  children: ReactNode;
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const anchor = useMemo(
+    () =>
+      ({
+        getBoundingClientRect: () => ({
+          bottom: at.top,
+          height: 0,
+          left: at.left,
+          right: at.left,
+          top: at.top,
+          width: 0,
+          x: at.left,
+          y: at.top,
+          toJSON: () => ({}),
+        }),
+      }) as unknown as Element,
+    [at.left, at.top],
+  );
+  return (
+    <AnchoredMenu anchor={anchor} containerRef={ref} measure="whole">
+      {children}
+    </AnchoredMenu>
+  );
+};
+
 export const TableEditorPlugin = () => {
   const [editor] = useLexicalComposerContext();
   const strings = useKoenigStrings();
@@ -159,6 +203,7 @@ export const TableEditorPlugin = () => {
   const [context, setContext] = useState<{ left: number; top: number } | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const last = useRef<string>("");
+  const barRef = useRef<HTMLDivElement>(null);
   // While a menu is open focus is in the menu, which can change the editor's selection (a range
   // of cells would collapse). The toolbar then keeps what it saw when the menu opened, and an
   // action puts that selection back before it runs.
@@ -213,14 +258,20 @@ export const TableEditorPlugin = () => {
     const element = editor.getElementByKey(snapshot.tableKey);
     if (!element) return;
     const rect = element.getBoundingClientRect();
-    setStyle({ left: Math.max(rect.left, 8), opacity: 1, top: Math.max(rect.top - 44, 8) });
+    // inside the window, whatever the toolbar's width (it wraps on a narrow window)
+    const width = barRef.current?.offsetWidth ?? 0;
+    const left = Math.min(Math.max(rect.left, 8), Math.max(window.innerWidth - width - 8, 8));
+    setStyle({ left, opacity: 1, top: Math.max(rect.top - 44, 8) });
   }, [snapshot?.tableKey]);
 
   useEffect(() => {
     place();
+    // once more after the toolbar has been drawn, when its width is known
+    const frame = window.requestAnimationFrame(place);
     window.addEventListener("resize", place);
     window.addEventListener("scroll", place, true);
     return () => {
+      window.cancelAnimationFrame(frame);
       window.removeEventListener("resize", place);
       window.removeEventListener("scroll", place, true);
     };
@@ -455,7 +506,8 @@ export const TableEditorPlugin = () => {
     <FloatingPortal to={target}>
       <div
         aria-label={t.toolbar}
-        className="not-kg-prose fixed z-[9999] flex items-center gap-1 rounded-lg bg-white px-1 py-1 font-sans text-sm text-black shadow-md dark:bg-grey-950 dark:text-white"
+        className="not-kg-prose fixed z-[9999] flex max-w-[96vw] flex-wrap items-center gap-1 rounded-lg bg-white px-1 py-1 font-sans text-sm text-black shadow-md dark:bg-grey-950 dark:text-white forced-colors:border forced-colors:border-[ButtonText]"
+        ref={barRef}
         data-kg-table-toolbar
         role="toolbar"
         style={style}
@@ -469,7 +521,7 @@ export const TableEditorPlugin = () => {
               aria-expanded={direct ? undefined : open?.group === group}
               aria-haspopup={direct ? undefined : group === "caption" ? "dialog" : "menu"}
               aria-label={groupLabel(group)}
-              className="flex h-8 cursor-pointer items-center justify-center rounded-md px-2 text-[1.2rem] font-medium hover:bg-grey-200/80 focus-visible:ring-2 focus-visible:ring-selection dark:hover:bg-grey-900"
+              className="flex h-8 cursor-pointer items-center justify-center rounded-md px-2 text-[1.2rem] font-medium hover:bg-grey-200/80 focus-visible:ring-2 focus-visible:ring-selection dark:hover:bg-grey-900 forced-colors:focus-visible:outline forced-colors:focus-visible:outline-2"
               data-kg-table-action={direct ? "delete-table" : undefined}
               data-kg-table-group={group}
               tabIndex={index === 0 ? 0 : -1}
@@ -481,12 +533,12 @@ export const TableEditorPlugin = () => {
                   return;
                 }
                 const rect = event.currentTarget.getBoundingClientRect();
+                // under the whole toolbar, which has wrapped to several rows on a narrow window
+                const bottom = barRef.current?.getBoundingClientRect().bottom ?? rect.bottom;
                 frozen.current = open?.group !== group;
                 setContext(null);
                 setOpen((current) =>
-                  current?.group === group
-                    ? null
-                    : { group, left: rect.left, top: rect.bottom + 4 },
+                  current?.group === group ? null : { group, left: rect.left, top: bottom + 4 },
                 );
               }}
               onMouseDown={(event) => event.preventDefault()}
@@ -504,7 +556,7 @@ export const TableEditorPlugin = () => {
         })}
       </div>
       {open && open.group !== "caption" && open.group !== "table" ? (
-        <div className="fixed z-[10000]" style={{ left: open.left, top: open.top }}>
+        <PointMenu at={open}>
           <TableActionMenu
             label={groupLabel(open.group)}
             sections={sectionsFor([open.group])}
@@ -513,10 +565,10 @@ export const TableEditorPlugin = () => {
               focusEditor();
             }}
           />
-        </div>
+        </PointMenu>
       ) : null}
       {open?.group === "caption" ? (
-        <div className="fixed z-[10000]" style={{ left: open.left, top: open.top }}>
+        <PointMenu at={open}>
           <CaptionField
             caption={snapshot.caption}
             onClose={() => {
@@ -530,16 +582,10 @@ export const TableEditorPlugin = () => {
               })
             }
           />
-        </div>
+        </PointMenu>
       ) : null}
       {context ? (
-        <div
-          className="fixed z-[10000]"
-          style={{
-            left: Math.min(context.left, window.innerWidth - 220),
-            top: Math.min(context.top, window.innerHeight - 340),
-          }}
-        >
+        <PointMenu at={context}>
           <TableActionMenu
             label={t.contextMenu}
             sections={sectionsFor(
@@ -560,7 +606,7 @@ export const TableEditorPlugin = () => {
               focusEditor();
             }}
           />
-        </div>
+        </PointMenu>
       ) : null}
       <div aria-live="polite" className="sr-only" data-kg-table-announcer role="status">
         {announcement}
@@ -583,7 +629,7 @@ const CaptionField = ({ caption, onClose, onCommit }: CaptionFieldProps) => {
   return (
     <div
       aria-label={t.caption}
-      className="not-kg-prose flex w-[28rem] flex-col gap-2 rounded-lg bg-white p-3 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white"
+      className="not-kg-prose flex w-[28rem] max-w-[92vw] flex-col gap-2 rounded-lg bg-white p-3 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white forced-colors:border forced-colors:border-[ButtonText]"
       data-kg-table-popover
       role="dialog"
       onKeyDown={(event) => {

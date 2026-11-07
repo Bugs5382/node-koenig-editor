@@ -93,7 +93,7 @@ export const TableActionMenu: FC<TableMenuProps> = ({ footer, label, onClose, se
     <div
       ref={ref}
       aria-label={label}
-      className="not-kg-prose max-h-[min(40rem,70vh)] min-w-[18rem] overflow-y-auto rounded-lg bg-white py-1 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white"
+      className="not-kg-prose max-h-[min(40rem,70vh)] min-w-[18rem] overflow-y-auto rounded-lg bg-white py-1 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white forced-colors:border forced-colors:border-[ButtonText]"
       data-kg-table-menu
       role="menu"
       onKeyDown={onKeyDown}
@@ -114,7 +114,7 @@ export const TableActionMenu: FC<TableMenuProps> = ({ footer, label, onClose, se
               key={item.id}
               aria-checked={item.kind && item.kind !== "item" ? Boolean(item.checked) : undefined}
               aria-disabled={item.disabled || undefined}
-              className="flex w-full cursor-pointer items-center gap-2 px-3 py-[0.7rem] text-left hover:bg-grey-100 focus:bg-grey-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-selection aria-disabled:cursor-default aria-disabled:opacity-40 dark:hover:bg-grey-900 dark:focus:bg-grey-900"
+              className="flex w-full cursor-pointer items-center gap-2 px-3 py-[0.7rem] text-left hover:bg-grey-100 focus:bg-grey-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-selection aria-disabled:cursor-default aria-disabled:opacity-40 dark:hover:bg-grey-900 dark:focus:bg-grey-900 forced-colors:focus:outline forced-colors:focus:outline-2"
               data-kg-table-menu-item={item.id}
               role={
                 item.kind === "checkbox"
