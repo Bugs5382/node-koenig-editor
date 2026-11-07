@@ -80,7 +80,7 @@ the sources.
 | `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
-| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `heading1` to `heading5` (headings stop at H5), `quote`, `link`, `snippet`.                                                        |
+| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
 | `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker` and `preview`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
 | `collaboration`      | `KoenigCollaboration \| null`     | `null`          | The Yjs provider factory. Without it the editor works alone and asks for no provider.                                                                                            |
@@ -641,6 +641,22 @@ padding leaves room, at the box's left edge otherwise, and never outside it.
 Headings run from H1 to H5 and no deeper. The toolbar has a button for each level (hide any with
 `toolbar`), and a Heading 6 that arrives from a stored document, a paste, a markdown shortcut or
 a collaborator is set to Heading 5.
+
+## ↔️ Text alignment
+
+The selection toolbar has Align left, Align center, Align right and Justify, for paragraphs,
+headings, quotes and list items. They set the alignment of the block the selection is in, mark the
+one that is active, and work from the keyboard with Ctrl or Cmd plus Shift and **L**, **E**, **R**
+or **J**. The alignment is the block's own format, so it is saved in the document, shows in the
+reader's view and in the saved HTML as `text-align`, and survives a reload.
+
+Right-to-left text is handled: a block with no stored alignment counts as start-aligned, so in a
+Hebrew or Arabic paragraph the Align right button is the marked one. Nested card text (a callout,
+a caption) has no alignment.
+
+Leave the buttons out with `toolbar` (`toolbar={["bold", "italic"]}` shows none of them). That also
+turns the shortcuts off, and, as before, alignment in a document is then removed from paragraphs,
+headings and quotes. Table cells have their own alignment controls in the table editor.
 
 ## 💬 Inline comments
 

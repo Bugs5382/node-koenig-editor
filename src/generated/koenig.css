@@ -957,6 +957,10 @@
     -webkit-line-clamp: 1;
 }
 
+.koenig-lexical .\!block {
+    display: block !important;
+}
+
 .koenig-lexical .block {
     display: block;
 }

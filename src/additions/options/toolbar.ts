@@ -32,8 +32,20 @@ export const KOENIG_TOOLBAR_ITEMS: readonly KoenigToolbarItem[] = [
   "heading4",
   "heading5",
   "quote",
+  "alignLeft",
+  "alignCenter",
+  "alignRight",
+  "alignJustify",
   "link",
   "snippet",
+];
+
+/** The four alignment buttons. */
+export const ALIGNMENT_ITEMS: readonly KoenigToolbarItem[] = [
+  "alignLeft",
+  "alignCenter",
+  "alignRight",
+  "alignJustify",
 ];
 
 /** True when the host's toolbar choice leaves this button out. No choice shows them all. */

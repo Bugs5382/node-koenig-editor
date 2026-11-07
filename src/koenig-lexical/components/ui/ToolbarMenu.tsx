@@ -1,4 +1,8 @@
 import AddIcon from '../../assets/icons/kg-add.svg?react';
+import AlignCenterIcon from '../../assets/icons/kg-align-center.svg?react';
+import AlignJustifyIcon from '../../assets/icons/kg-align-justify.svg?react';
+import AlignLeftIcon from '../../assets/icons/kg-align-left.svg?react';
+import AlignRightIcon from '../../assets/icons/kg-align-right.svg?react';
 import BoldIcon from '../../assets/icons/kg-bold.svg?react';
 import EditIcon from '../../assets/icons/kg-edit.svg?react';
 import EyeIcon from '../../assets/icons/kg-eye.svg?react';
@@ -33,6 +37,10 @@ export const TOOLBAR_ICONS = {
     quoteOne: QuoteOneIcon,
     quoteTwo: QuoteTwoIcon,
     link: LinkIcon,
+    alignLeft: AlignLeftIcon,
+    alignCenter: AlignCenterIcon,
+    alignRight: AlignRightIcon,
+    alignJustify: AlignJustifyIcon,
     imgRegular: ImgRegularIcon,
     imgWide: ImgWideIcon,
     imgFull: ImgFullIcon,
@@ -73,7 +81,7 @@ export function ToolbarMenuItem({label, isActive, onClick, icon, CustomIcon, sho
         <li className="group relative m-0 flex p-0 first:m-0" {...props}>
             <button
                 aria-label={label}
-                className={`my-1 flex h-8 w-9 cursor-pointer items-center justify-center rounded-md transition hover:bg-grey-200/80 dark:bg-grey-950 dark:hover:bg-grey-900 ${isActive ? 'bg-grey-200/80' : 'bg-white'}`}
+                className={`my-1 flex h-8 w-9 cursor-pointer items-center justify-center rounded-md transition hover:bg-grey-200/80 dark:hover:bg-grey-900 ${isActive ? 'bg-grey-200/80 dark:bg-grey-800' : 'bg-white dark:bg-grey-950'}`}
                 data-kg-active={isActive}
                 data-testid={dataTestId}
                 type="button"

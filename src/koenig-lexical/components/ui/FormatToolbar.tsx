@@ -10,9 +10,11 @@ import {
     $createParagraphNode,
     $getSelection,
     $isRangeSelection,
+    FORMAT_ELEMENT_COMMAND,
     FORMAT_TEXT_COMMAND
 } from 'lexical';
 import {$getNearestNodeOfType} from '@lexical/utils';
+import {$alignmentOfSelection, ALIGN_OF_ITEM, isAlignActive} from '../../../additions/alignment/alignment';
 import {$isListNode, ListNode} from '@lexical/list';
 import {$setBlocksType} from '@lexical/selection';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
@@ -21,7 +23,9 @@ import {
     ToolbarMenuItem,
     ToolbarMenuSeparator
 } from './ToolbarMenu';
-import {altOrOption, ctrlOrCmdSymbol, ctrlOrSymbol} from '../../utils/shortcutSymbols';
+import {altOrOption, ctrlOrCmdSymbol, ctrlOrSymbol, shiftOrSymbol} from '../../utils/shortcutSymbols';
+
+const ALIGN_KEY = {left: 'L', center: 'E', right: 'R', justify: 'J'};
 import {getSelectedNode} from '../../utils/getSelectedNode';
 import {isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
 
@@ -73,6 +77,7 @@ export default function FormatToolbar({
     const [isBold, setIsBold] = React.useState(false);
     const [isItalic, setIsItalic] = React.useState(false);
     const [blockType, setBlockType] = React.useState('paragraph');
+    const [alignment, setAlignment] = React.useState({direction: null, format: ''});
     const {cardConfig: {createSnippet}, toolbar, toolbarActions} = React.useContext(KoenigComposerContext);
     // the host's `toolbar` option names the buttons to show; leaving it out shows them all
     const isHidden = item => isToolbarItemHidden(toolbar, item);
@@ -92,6 +97,9 @@ export default function FormatToolbar({
         hideSnippets = true;
     }
 
+    // alignment is for the main editor's blocks; nested card text has none
+    const hideAlignment = !!editor._parentEditor;
+
     let hideBold = isHidden('bold');
     if (hiddenFormats.includes('bold')) {
         hideBold = true;
@@ -110,6 +118,10 @@ export default function FormatToolbar({
             }
             // update text format
             setIsBold(selection.hasFormat('bold'));
+            const blockAlignment = $alignmentOfSelection();
+            if (blockAlignment) {
+                setAlignment(current => (current.format === blockAlignment.format && current.direction === blockAlignment.direction ? current : blockAlignment));
+            }
             setIsItalic(selection.hasFormat('italic'));
 
             const anchorNode = getSelectedNode(selection);
@@ -229,6 +241,20 @@ export default function FormatToolbar({
                 shortcutKeys={[ctrlOrSymbol(), 'Q']}
                 onClick={formatQuote}
             />
+
+            <ToolbarMenuSeparator hide={hideAlignment} />
+            {Object.entries(ALIGN_OF_ITEM).map(([item, align]) => (
+                <ToolbarMenuItem
+                    key={item}
+                    data-kg-toolbar-button={item}
+                    hide={hideAlignment || isHidden(item)}
+                    icon={item}
+                    isActive={isAlignActive(align, alignment)}
+                    label={strings.toolbar[item]}
+                    shortcutKeys={[ctrlOrCmdSymbol(), shiftOrSymbol(), ALIGN_KEY[align]]}
+                    onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, align)}
+                />
+            ))}
 
             <ToolbarMenuItem
                 data-kg-toolbar-button="link"

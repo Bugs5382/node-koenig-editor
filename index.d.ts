@@ -68,6 +68,10 @@ export type KoenigEmojiCategory =
 
 /** The format toolbar's buttons. Pass a list as the composer's `toolbar` to show only those. */
 export type KoenigToolbarItem =
+  | "alignCenter"
+  | "alignJustify"
+  | "alignLeft"
+  | "alignRight"
   | "bold"
   | "heading1"
   | "heading2"

@@ -53,6 +53,8 @@ import {$isListItemNode, $isListNode, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDE
 import {$setBlocksType} from '@lexical/selection';
 import {MIME_TEXT_HTML, MIME_TEXT_PLAIN, PASTE_MARKDOWN_COMMAND} from './MarkdownPastePlugin.jsx';
 import {mergeRegister} from '@lexical/utils';
+import KoenigComposerContext from '../context/KoenigComposerContext';
+import {ALIGNMENT_ITEMS, isToolbarItemHidden} from '../../additions/options';
 import {registerDefaultTransforms} from '#kg-default-transforms';
 import {shouldIgnoreEvent} from '../utils/shouldIgnoreEvent';
 import {useKoenigSelectedCardContext} from '../context/KoenigSelectedCardContext';
@@ -1489,9 +1491,12 @@ function useKoenigBehaviour({editor, containerElem, cursorDidExitAtTop, isNested
     // remove alignment formats,
     // denest invalid node nesting,
     // merge list nodes of same type
+    // (alignment stays when the toolbar offers it; the main editor only, nested card text has none)
+    const {toolbar} = React.useContext(KoenigComposerContext);
+    const keepAlignment = !isNested && ALIGNMENT_ITEMS.some(item => !isToolbarItemHidden(toolbar, item));
     React.useEffect(() => {
-        return registerDefaultTransforms(editor);
-    }, [editor]);
+        return registerDefaultTransforms(editor, {keepAlignment});
+    }, [editor, keepAlignment]);
 
     return null;
 }

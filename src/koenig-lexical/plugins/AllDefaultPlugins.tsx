@@ -13,6 +13,7 @@ import {CardMenuPlugin} from '../plugins/CardMenuPlugin';
 import {KoenigSnippetPlugin} from '../plugins/KoenigSnippetPlugin';
 import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {ReadOnlyGuardPlugin} from '../../additions/preview/ReadOnlyGuardPlugin';
+import {AlignmentShortcutsPlugin} from '../../additions/alignment/AlignmentShortcutsPlugin';
 import {TablePlugin} from '../../additions/table/TablePlugin';
 import {TogglePlugin} from '../plugins/TogglePlugin';
 import {useKoenigPreview} from '../../additions/preview/PreviewContext';
@@ -51,6 +52,7 @@ export const AllDefaultPlugins = () => {
             {hasNode(editor, 'video') && <VideoPlugin />}
             {hasNode(editor, 'audio') && <AudioPlugin />}
             <TablePlugin />
+            <AlignmentShortcutsPlugin />
         </>
     );
 };
