@@ -49,7 +49,7 @@ const KoenigComposableEditor = ({
     const {historyState} = useSharedHistoryContext();
     const [editor] = useLexicalComposerContext();
     const {isCollabActive} = useCollaborationContext();
-    const {editorContainerRef, darkMode} = React.useContext(KoenigComposerContext);
+    const {editorContainerRef, darkMode, spellCheck, lang} = React.useContext(KoenigComposerContext);
 
     const isNested = !!editor._parentEditor;
     // the reader's view has no editing chrome: no placeholder, toolbar or drag handles
@@ -102,7 +102,7 @@ const KoenigComposableEditor = ({
             <RichTextPlugin
                 contentEditable={
                     <div ref={onContentEditableRef} data-kg="editor">
-                        <ContentEditable className={useDefaultClasses ? 'kg-prose' : ''} readOnly={readOnly} />
+                        <ContentEditable className={useDefaultClasses ? 'kg-prose' : ''} lang={lang} readOnly={readOnly} spellCheck={spellCheck} />
                     </div>
                 }
                 ErrorBoundary={KoenigErrorBoundary}

@@ -51,6 +51,8 @@ const KoenigComposer = ({
     strings: hostStrings,
     toolbar,
     fonts,
+    spellCheck,
+    lang,
     toolbarActions,
     tools,
     onError = defaultOnError,
@@ -136,6 +138,8 @@ const KoenigComposer = ({
                     gallery,
                     toolbar,
                     fonts,
+                    spellCheck,
+                    lang,
                     toolbarActions
                 }}>
                     <KoenigStringsContext.Provider value={strings}>

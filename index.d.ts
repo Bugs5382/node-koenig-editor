@@ -52,7 +52,8 @@ export type KoenigCardName =
   | "video";
 
 /** Features that are not cards. Pass a list as the composer's `tools` to keep only those. */
-export type KoenigTool = "emojiPicker" | "imageEditor" | "preview";
+export type KoenigTool =
+  "cleanPaste" | "emojiPicker" | "findReplace" | "imageEditor" | "preview" | "shortcuts";
 
 /** The emoji picker's groups, in tab order. */
 export type KoenigEmojiCategory =
@@ -188,6 +189,12 @@ export interface KoenigStrings {
   };
   /** The table card's controls; `toolbar` names the group for screen readers. The two announcements
    *  take `{row}`, `{rows}`, `{column}`, `{columns}`, `{rowSpan}` and `{colSpan}`. */
+  shortcuts: {
+    actions: Record<"find" | "redo" | "shortcuts" | "toolbar" | "undo", string>;
+    close: string;
+    groups: Record<"align" | "blocks" | "general" | "text", string>;
+    title: string;
+  };
   textStyle: {
     colours: Record<"blue" | "green" | "grey" | "orange" | "purple" | "red", string>;
     defaultColour: string;
@@ -706,6 +713,10 @@ export interface KoenigComposerProps {
   onError?: (error: Error) => void;
   /** The host's wording, laid over the English defaults. */
   strings?: KoenigStringsInput;
+  /** The browser's spell check in the editing area. Default: on (not set). `false` switches it off. */
+  spellCheck?: boolean;
+  /** The language of the text (a BCP 47 tag such as `de`), so the browser checks spelling in it. */
+  lang?: string;
   /** The fonts the font button offers: a label and a CSS `font-family` value each. With none, the
    *  button is not shown. */
   fonts?: readonly KoenigFont[];

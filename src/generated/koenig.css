@@ -1161,6 +1161,10 @@
     max-height: 30vh;
 }
 
+.koenig-lexical .max-h-\[85vh\] {
+    max-height: 85vh;
+}
+
 .koenig-lexical .max-h-\[95vh\] {
     max-height: 95vh;
 }
@@ -1257,6 +1261,10 @@
     width: 320px;
 }
 
+.koenig-lexical .w-\[46rem\] {
+    width: calc(46 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .w-\[min\(34rem\2c 95vw\)\] {
     width: min(calc(34 * var(--kg-rem, 0.625rem)), 95vw);
 }
@@ -1347,6 +1355,10 @@
 
 .koenig-lexical .max-w-\[92vw\] {
     max-width: 92vw;
+}
+
+.koenig-lexical .max-w-\[94vw\] {
+    max-width: 94vw;
 }
 
 .koenig-lexical .max-w-\[96vw\] {
@@ -1716,6 +1728,11 @@
 .koenig-lexical .border-grey-300 {
     --tw-border-opacity: 1;
     border-color: color-mix(in srgb, var(--kg-color-grey-300, #DDE1E5) calc(var(--tw-border-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .border-grey-400 {
+    --tw-border-opacity: 1;
+    border-color: color-mix(in srgb, var(--kg-color-grey-400, #CED4D9) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .border-grey-500 {
@@ -2130,6 +2147,11 @@
     padding-right: calc(.4 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .px-\[0\.6rem\] {
+    padding-left: calc(0.6 * var(--kg-rem, 0.625rem));
+    padding-right: calc(0.6 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .px-\[1rem\] {
     padding-left: calc(1 * var(--kg-rem, 0.625rem));
     padding-right: calc(1 * var(--kg-rem, 0.625rem));
@@ -2175,6 +2197,11 @@
     padding-bottom: calc(.3 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .py-\[0\.1rem\] {
+    padding-top: calc(0.1 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(0.1 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .py-\[0\.7rem\] {
     padding-top: calc(0.7 * var(--kg-rem, 0.625rem));
     padding-bottom: calc(0.7 * var(--kg-rem, 0.625rem));
@@ -2200,6 +2227,10 @@
 
 .koenig-lexical .pb-3 {
     padding-bottom: calc(1.2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .pb-4 {
+    padding-bottom: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pb-\[\.2rem\] {
@@ -4798,6 +4829,11 @@ em-emoji-picker {
         --tw-translate-y: 0px;
         transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
     }
+}
+
+.koenig-lexical .dark\:border-grey-700:is(.dark *) {
+    --tw-border-opacity: 1;
+    border-color: color-mix(in srgb, var(--kg-color-grey-700, #7C8B9A) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .dark\:border-grey-800:is(.dark *) {

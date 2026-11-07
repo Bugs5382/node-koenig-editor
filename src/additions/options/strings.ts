@@ -85,6 +85,23 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     textColor: "Text colour",
     underline: "Underline",
   },
+  shortcuts: {
+    actions: {
+      find: "Find and replace",
+      redo: "Redo",
+      shortcuts: "Show this list",
+      toolbar: "Move focus to the selection toolbar",
+      undo: "Undo",
+    },
+    close: "Close",
+    groups: {
+      align: "Alignment",
+      blocks: "Blocks",
+      general: "General",
+      text: "Text",
+    },
+    title: "Keyboard shortcuts",
+  },
   textStyle: {
     colours: {
       blue: "Blue",
