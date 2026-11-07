@@ -19,6 +19,7 @@
 
 #### 🐛 Bug Fixes
 
+- fix(editor): the gallery viewer goes round at the ends and the slideshow options use button toggles (#67) @Bugs5382 (#68)
 - fix(editor): a composer whose cards leave out the divider mounts instead of throwing @Bugs5382 (#66)
 - fix(editor): the selection toolbar's lists open in the toolbar's own layer, on top of its rows @Bugs5382 (#62)
 - fix(editor): the preview's scroll restore is cancelled when the editor goes away @Bugs5382 (#51)
