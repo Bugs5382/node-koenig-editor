@@ -289,7 +289,7 @@ function PopulatedGalleryCard({slideshow, images, deleteImage, reorderHandler, i
                     isCollapsed={text.isCollapsed}
                     opener={viewing.opener}
                     photos={images}
-                    shuffle={slideshow.shuffle}
+                    shuffle={slideshow.shuffle && slideshow.autoplaySeconds > 0}
                     screenMode={slideshow.screenMode}
                     strings={strings}
                     toggleText={text.toggleImage}
