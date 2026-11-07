@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { cleanup } from "@testing-library/react";
+import type { KoenigCardName } from "node-koenig-editor";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { documentOf, mount } from "./__utils__/mount";
@@ -28,7 +29,8 @@ import { documentOf, mount } from "./__utils__/mount";
 afterEach(() => cleanup());
 
 describe("a composer built without the divider card", () => {
-  for (const cards of [[], ["image"], ["callout", "table"]]) {
+  const lists: KoenigCardName[][] = [[], ["image"], ["callout", "table"]];
+  for (const cards of lists) {
     it(`mounts with cards ${JSON.stringify(cards)}`, async () => {
       const { api } = await mount({
         composer: { cards, initialEditorState: documentOf("Hello") },
