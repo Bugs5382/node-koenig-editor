@@ -37,6 +37,7 @@ const CARDS = [
   "Header",
   "Callout",
   "Toggle",
+  "Code",
   "Divider",
   "Table",
   "File",
@@ -47,7 +48,7 @@ const CARDS = [
 ];
 
 describe("cards guide", () => {
-  it("opens with a quick-reference table of the twelve cards", () => {
+  it("opens with a quick-reference table of the cards", () => {
     const quick = guide.slice(
       guide.indexOf("## Quick reference"),
       guide.indexOf("## Adding a card"),

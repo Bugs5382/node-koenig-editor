@@ -81,6 +81,7 @@ the sources.
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
 | `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `textDirection`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
+| `codeLanguages`      | `KoenigCodeLanguage[]`            | highlighter's  | The languages the code block's list offers, each a `label` and a Prism language `value`; see [Code blocks](#-code-blocks). |
 | `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
 | `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker`, `preview`, `shortcuts`, `findReplace` and `cleanPaste`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
@@ -538,6 +539,27 @@ follow the URL rule above (a link that fails stays plain text), and `######` bec
 match the [heading limit](#-headings). Rendering uses [`markdown-it`](https://github.com/markdown-it/markdown-it)
 (MIT), a regular dependency that stays external in the build. Upstream's CodeMirror editor and
 its Ghost image uploads are not included.
+
+## 💻 Code blocks
+
+A code block is Lexical's own (`@lexical/code`), highlighted with Prism through `@lexical/code-prism`
+(add it next to the other `@lexical/*` peers). Type three backticks and a language (` ```ts `) on an
+empty line, or pick **Code** from the "+" or slash menu (`/code`). Every block has line numbers (drawn
+by the stylesheet, so they are never selected or copied) and, on hover or with the cursor in it, a
+small bar with a language list and a **Copy** button. A reader (read-only or Preview) gets the copy
+button alone.
+
+- **Languages.** `codeLanguages={[{ label: 'TypeScript', value: 'typescript' }, ...]}` lists the
+  languages the bar offers; "Plain text" is always there. Without a list you get what the highlighter
+  ships with (C, C++, CSS, Go, HTML, Java, JavaScript, Markdown, Objective-C, PowerShell, Python, Rust,
+  SQL, Swift, TypeScript and XML). The value must be a language name Prism knows.
+- **Saved HTML.** `<pre class="language-ts" data-language="ts">` with the code as plain text: no token
+  spans and no line numbers, so your site can colour it again.
+- **Colours.** The token colours come from `--kg-code-*` custom properties on `.kg-code-block`
+  (`--kg-code-bg`, `--kg-code-fg`, `--kg-code-gutter`, `--kg-code-comment`, `--kg-code-keyword`,
+  `--kg-code-string`, `--kg-code-number`, `--kg-code-function`, `--kg-code-attr`, `--kg-code-builtin`);
+  set them to match your page. In forced-colours mode the block uses the system colours.
+- **Wording.** `strings.code` (copy, copied, copy failed, language list name, plain text).
 
 ## 🔢 Word count and reading time
 

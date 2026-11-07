@@ -117,6 +117,13 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     },
     title: "Keyboard shortcuts",
   },
+  code: {
+    copied: "Copied",
+    copy: "Copy",
+    copyFailed: "Copy failed",
+    language: "Code language",
+    plainText: "Plain text",
+  },
   colors: {
     custom: "Custom colour",
     group: "{label}",

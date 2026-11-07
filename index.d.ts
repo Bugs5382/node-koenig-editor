@@ -137,6 +137,14 @@ export interface KoenigColorSetting {
   picker?: boolean;
 }
 
+/** A language the code card offers. */
+export interface KoenigCodeLanguage {
+  /** What the list shows. */
+  label: string;
+  /** The language name the highlighter knows, for example `typescript`. */
+  value: string;
+}
+
 /** A font the host offers in the selection toolbar. */
 export interface KoenigFont {
   /** What the menu shows. */
@@ -244,6 +252,13 @@ export interface KoenigStrings {
     close: string;
     groups: Record<"align" | "blocks" | "general" | "text", string>;
     title: string;
+  };
+  code: {
+    copied: string;
+    copy: string;
+    copyFailed: string;
+    language: string;
+    plainText: string;
   };
   colors: {
     custom: string;
@@ -835,6 +850,10 @@ export interface KoenigComposerProps {
    *  whether the editor's own colour is a choice. With `picker: false` and `none: false` the host
    *  forces the person to a colour from its list. */
   colors?: Partial<Record<KoenigColorSlot, KoenigColorSetting>>;
+  /** The languages the code card's list offers. Default: the ones the highlighter ships with
+   *  (JavaScript, TypeScript, CSS, HTML, Python, Java, Go, Rust, SQL and a few more). "Plain text"
+   *  is always offered. */
+  codeLanguages?: readonly KoenigCodeLanguage[];
   /** The fonts the font button offers: a label and a CSS `font-family` value each. With none, the
    *  button is not shown. */
   fonts?: readonly KoenigFont[];

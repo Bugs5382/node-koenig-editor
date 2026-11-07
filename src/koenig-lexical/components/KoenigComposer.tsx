@@ -7,6 +7,7 @@ import {DEFAULT_CONFIG} from '#kg-default-nodes';
 import {KoenigSelectedCardContext} from '../context/KoenigSelectedCardContext';
 import {LexicalCollaboration} from '@lexical/react/LexicalCollaborationContext';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
+import {CODE_HTML_EXPORT} from '../../additions/code/codeExport';
 import {SPACING_HTML_EXPORT} from '../../additions/spacing/spacingExport';
 import {TABLE_HTML_EXPORT} from '../../additions/table/tableExport';
 import {GalleryNode} from '../nodes/GalleryNode';
@@ -55,6 +56,7 @@ const KoenigComposer = ({
     toolbar,
     fonts,
     colors,
+    codeLanguages,
     spellCheck,
     lang,
     toolbarActions,
@@ -113,7 +115,7 @@ const KoenigComposer = ({
             editable,
             editorState: collaboration ? null : editorState,
             // the saved HTML of a table, of block spacing, and of the figure entry on pictures
-            html: {export: new Map([...TABLE_HTML_EXPORT, ...SPACING_HTML_EXPORT, [ImageNode, withFigureEntry], [GalleryNode, withFigureEntry]])},
+            html: {export: new Map([...CODE_HTML_EXPORT, ...TABLE_HTML_EXPORT, ...SPACING_HTML_EXPORT, [ImageNode, withFigureEntry], [GalleryNode, withFigureEntry]])},
             onError
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -143,6 +145,7 @@ const KoenigComposer = ({
                     toolbar,
                     fonts,
                     colors,
+                    codeLanguages,
                     spellCheck,
                     lang,
                     toolbarActions

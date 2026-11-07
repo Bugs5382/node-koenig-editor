@@ -14,6 +14,7 @@ cards.
 | Header | A big title at the top of a section | `/header` | Colour or picture background, optional button |
 | Callout | A box that stands out | `/callout` | Nine colours, optional emoji |
 | Toggle | Text that opens and closes | `/toggle` | A header and hidden content |
+| Code | Code with line numbers | `/code` or three backticks | Language list, Copy button, highlighting |
 | Divider | A line between sections | `/hr` or type `---` | No settings |
 | Table | Rows and columns | `/table` | Merge cells, shading, alignment, caption; dashed grid while editing |
 | File | A download | `/file` | Title, description, name and size |
@@ -120,6 +121,18 @@ Enter picks; Escape closes.
 you press the header's arrow.
 **Accessibility:** keep the header a clear question or label, because it is what people see before they open it.
 **Developer:** `cards` leaves it out.
+
+## Code
+
+**For:** snippets, commands and configuration that should keep their spacing.
+**Add it:** the plus button, `/code`, or three backticks and a language on an empty line.
+**What it can do:** line numbers, syntax highlighting for the chosen language, a language list and a
+Copy button on the block (hover it, or put the cursor in it). The copied text has no line numbers.
+A reader gets the Copy button only.
+**Accessibility:** the language list and the Copy button are real controls with labels; the copy
+result is announced.
+**Developer:** `codeLanguages` lists the languages; `strings.code` is the wording. The block is part of
+the base node set and cannot be left out with `cards`.
 
 ## Divider
 
