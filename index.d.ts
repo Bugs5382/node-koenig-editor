@@ -203,6 +203,12 @@ export interface KoenigStrings {
     bordersColourGrey: string;
     bordersApply: string;
     bordersReset: string;
+    dragRow: string;
+    dragRowHint: string;
+    dragColumn: string;
+    dragColumnHint: string;
+    rowMovedStatus: string;
+    columnMovedStatus: string;
     sizeMenu: string;
     sizeDone: string;
     columnWidthLabel: string;

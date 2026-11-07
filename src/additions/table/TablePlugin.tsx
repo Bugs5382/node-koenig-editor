@@ -25,6 +25,7 @@ import { TablePlugin as LexicalTablePlugin } from "@lexical/react/LexicalTablePl
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 
 import { TableActionsPlugin } from "./TableActionsPlugin";
+import { TableDragPlugin } from "./TableDragPlugin";
 import { TableEditorPlugin } from "./TableEditorPlugin";
 import { TableResizePlugin } from "./TableResizePlugin";
 import { TablePastePlugin } from "./pasteTable";
@@ -42,6 +43,7 @@ export const TablePlugin = () => {
       <TableActionsPlugin />
       <TableEditorPlugin />
       <TableResizePlugin />
+      <TableDragPlugin />
       <TablePastePlugin />
     </>
   );
