@@ -731,10 +731,13 @@ export interface KoenigGalleryRenderProps {
 
 /** What the composer's `cardRenderers.header` component receives. */
 export interface KoenigHeaderRenderProps {
+  /** `left`, `center` or `right`. */
   alignment: string;
   backgroundColor: string;
   backgroundImageSrc: string;
   buttonColor: string;
+  /** An emoji shown before the button's text, or empty. */
+  buttonEmoji?: string;
   buttonEnabled: boolean;
   buttonText: string;
   buttonTextColor: string;
@@ -762,6 +765,7 @@ export interface KoenigHeaderRenderProps {
         | "backgroundColor"
         | "backgroundImageSrc"
         | "buttonColor"
+        | "buttonEmoji"
         | "buttonEnabled"
         | "buttonText"
         | "buttonTextColor"

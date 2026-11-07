@@ -145,6 +145,22 @@ export function SettingsPanel({ catalog, onChange, settings }: Props) {
           <label>
             <input
               type="checkbox"
+              checked={settings.colorPicker}
+              onChange={(e) => onChange({ colorPicker: e.target.checked })}
+            />{" "}
+            colour wheel
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={settings.brandColors}
+              onChange={(e) => onChange({ brandColors: e.target.checked })}
+            />{" "}
+            brand colours only
+          </label>
+          <label>
+            <input
+              type="checkbox"
               checked={settings.spellCheck}
               onChange={(e) => onChange({ spellCheck: e.target.checked })}
             />{" "}

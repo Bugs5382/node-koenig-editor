@@ -67,6 +67,38 @@ const SAMPLE_FONTS = [
   { label: "Mono", value: "ui-monospace, Menlo, monospace" },
 ];
 
+// the colour settings the demo passes: a brand palette in every slot (the editor's own colour is not
+// offered), and the colour wheel off, as the switches say
+const BRAND = [
+  { label: "Brand blue", value: "#1D4ED8" },
+  { label: "Brand teal", value: "#0F766E" },
+  { label: "Brand amber", value: "#B45309" },
+  { label: "Brand ink", value: "#111827" },
+  { label: "Brand paper", value: "#FEF3C7" },
+];
+const COLOR_SLOTS = [
+  "textColor",
+  "highlight",
+  "calloutBackground",
+  "calloutText",
+  "buttonBackground",
+  "buttonText",
+  "headerBackground",
+  "headerText",
+  "headerButton",
+  "headerButtonText",
+];
+const colorOptions = (settings: Settings) =>
+  Object.fromEntries(
+    COLOR_SLOTS.map((slot) => [
+      slot,
+      {
+        ...(settings.brandColors ? { none: false, palette: BRAND } : {}),
+        ...(settings.colorPicker ? {} : { picker: false }),
+      },
+    ]),
+  );
+
 const REBUILD: (keyof Settings)[] = ["cards", "tools", "comments", "readOnly", "dark"];
 
 // The enabled cards, or null when the package does not list its cards (every card is on).
@@ -259,6 +291,7 @@ export function App() {
   if (catalog.toolbar?.length) optionalProps.toolbar = settings.toolbar;
   if (settings.fonts) optionalProps.fonts = SAMPLE_FONTS;
   if (!settings.spellCheck) optionalProps.spellCheck = false;
+  if (settings.brandColors || !settings.colorPicker) optionalProps.colors = colorOptions(settings);
   if (previewAvailable) {
     // The bar's switch and width presets drive the editor, and the editor's own Preview button
     // and bar report back, so the two stay one state.
