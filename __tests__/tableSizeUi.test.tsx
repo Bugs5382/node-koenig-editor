@@ -126,4 +126,10 @@ describe("the size popover", () => {
     });
     expect(read(api, () => $table().getColWidths())).toBeUndefined();
   });
+
+  it("scrolls sideways inside its own box when it is wider than the column", async () => {
+    await load();
+    const table = document.querySelector("table") as HTMLElement;
+    expect(table.parentElement?.style.overflowX).toBe("auto");
+  });
 });
