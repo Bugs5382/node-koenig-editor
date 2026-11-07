@@ -22,9 +22,10 @@ function useFloatingFormatToolbar(editor, anchorElem, isSnippetsEnabled, hiddenF
                 return;
             }
 
-            // focus is on one of the toolbar's own buttons (Alt+F10, then the arrow keys): the person
+            // focus is on one of the toolbar's own buttons or in a list opened from it (Alt+F10, then the
+            // arrow keys, or a style list): the person
             // is using the toolbar, so it stays, whatever the page's selection did when focus moved
-            if (document.activeElement?.closest?.('[data-kg-selection-toolbar]')) {
+            if (document.activeElement?.closest?.('[data-kg-selection-toolbar], [data-kg-style-menu]')) {
                 return;
             }
 

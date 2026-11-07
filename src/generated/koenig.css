@@ -1297,6 +1297,10 @@
     min-width: calc(4.4 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .min-w-\[16rem\] {
+    min-width: calc(16 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .min-w-\[18rem\] {
     min-width: calc(18 * var(--kg-rem, 0.625rem));
 }

@@ -80,7 +80,8 @@ the sources.
 | `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
-| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
+| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
+| `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
 | `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker` and `preview`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
 | `collaboration`      | `KoenigCollaboration \| null`     | `null`          | The Yjs provider factory. Without it the editor works alone and asks for no provider.                                                                                            |
@@ -680,6 +681,36 @@ drawn with a light background and a monospace face; style it with the `.koenig-l
 arrow keys, Home and End move between its buttons, Enter or Space applies one, and Escape goes
 back to the text with the selection kept. The toolbar is a labelled `role="toolbar"`
 (`strings.toolbar.group`).
+
+## 🎨 Text styling
+
+Four buttons in the selection toolbar style the selected text, and a fifth takes styling off:
+
+- **Text size** (`fontSize`): smaller, small, normal, large, larger, set in `em` so the text follows
+  the host's type scale.
+- **Text colour** (`textColor`): six colours that read on both a light and a dark page, or the
+  default colour.
+- **Highlight** (`highlight`): six light colours, saved together with dark ink so the text reads on
+  any page.
+- **Font** (`fontFamily`): the fonts the host gives, shown in their own face. With no `fonts` the
+  button is not shown.
+- **Clear formatting** (`clearFormatting`, Ctrl or Cmd+**backslash**): takes every inline format and style off
+  the selected text.
+
+```tsx
+<KoenigComposer
+  fonts={[
+    { label: "Serif", value: "Georgia, serif" },
+    { label: "Mono", value: "Menlo, monospace" },
+  ]}
+  toolbar={["bold", "italic", "fontSize", "textColor", "fontFamily"]}
+/>
+```
+
+The styling is the text's own style, so it is saved in the document, survives a reload, and is
+inline CSS in the saved HTML. The lists open under their button; the arrow keys move, Enter picks,
+Escape closes and returns to the text. Each button is marked while the selection has that style.
+The wording is `strings.textStyle` and `strings.toolbar`.
 
 ## ↔️ Text alignment
 

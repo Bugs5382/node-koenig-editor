@@ -49,6 +49,7 @@ const KoenigComposer = ({
     gallery,
     strings: hostStrings,
     toolbar,
+    fonts,
     toolbarActions,
     tools,
     onError = defaultOnError,
@@ -133,6 +134,7 @@ const KoenigComposer = ({
                     cardRenderers,
                     gallery,
                     toolbar,
+                    fonts,
                     toolbarActions
                 }}>
                     <KoenigStringsContext.Provider value={strings}>

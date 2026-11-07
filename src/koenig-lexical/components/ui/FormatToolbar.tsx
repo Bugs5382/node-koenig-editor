@@ -50,6 +50,8 @@ const scopeIcon = text => function ScopeIcon({className}) {
 const SCOPE_ICONS = {cell: scopeIcon('Cell'), row: scopeIcon('Row'), column: scopeIcon('Col'), table: scopeIcon('All')};
 const SCOPE_STRING = {cell: 'scopeCell', row: 'scopeRow', column: 'scopeColumn', table: 'scopeTable'};
 import {getSelectedNode} from '../../utils/getSelectedNode';
+import {StyleMenu} from '../../../additions/textStyle/StyleMenu';
+import {$clearFormatting, $getTextStyle, $setHighlight, $setTextStyle, FONT_SIZES, HIGHLIGHTS, TEXT_COLORS} from '../../../additions/textStyle/textStyle';
 import {ALIGNMENT_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
 
 const blockTypeToBlockName = {
@@ -104,7 +106,10 @@ export default function FormatToolbar({
     const [alignment, setAlignment] = React.useState({direction: null, format: ''});
     const [cell, setCell] = React.useState(null);
     const [scope, setScope] = React.useState('cell');
-    const {cardConfig: {createSnippet}, toolbar, toolbarActions} = React.useContext(KoenigComposerContext);
+    const {cardConfig: {createSnippet}, toolbar, toolbarActions, fonts} = React.useContext(KoenigComposerContext);
+    // the style button whose list is open, and the button it hangs from
+    const [styleMenu, setStyleMenu] = React.useState(null);
+    const [styleNow, setStyleNow] = React.useState({});
     // the host's `toolbar` option names the buttons to show; leaving it out shows them all
     const isHidden = item => isToolbarItemHidden(toolbar, item);
 
@@ -157,6 +162,13 @@ export default function FormatToolbar({
             for (const {item} of INLINE_FORMATS) {
                 nextInline[item] = selection.hasFormat(item);
             }
+            const nextStyle = {
+                'font-size': $getTextStyle(selection, 'font-size'),
+                color: $getTextStyle(selection, 'color'),
+                'background-color': $getTextStyle(selection, 'background-color'),
+                'font-family': $getTextStyle(selection, 'font-family')
+            };
+            setStyleNow(current => (JSON.stringify(current) === JSON.stringify(nextStyle) ? current : nextStyle));
             setInlineOn(current => (JSON.stringify(current) === JSON.stringify(nextInline) ? current : nextInline));
 
             const anchorNode = getSelectedNode(selection);
@@ -255,7 +267,62 @@ export default function FormatToolbar({
         buttons[(to + buttons.length) % buttons.length]?.focus();
     };
 
+    // the lists under the style buttons: what each offers, what the selection has now, and what
+    // choosing one does
+    const strings_ = strings.textStyle;
+    const closeStyleMenu = () => {
+        setStyleMenu(null);
+        editor.focus();
+        editor.getRootElement()?.focus({preventScroll: true});
+    };
+    const sizeNow = FONT_SIZES.find(size => size.value === (styleNow['font-size'] || null))?.id || 'normal';
+    const STYLE_MENUS = {
+        fontSize: {
+            label: strings.toolbar.fontSize,
+            options: FONT_SIZES.map(size => ({id: size.id, label: strings_.sizes[size.id], checked: sizeNow === size.id, sample: size.value ? {fontSize: size.value} : undefined})),
+            apply: id => $setTextStyle($getSelection(), 'font-size', FONT_SIZES.find(size => size.id === id)?.value || null)
+        },
+        textColor: {
+            label: strings.toolbar.textColor,
+            options: [
+                {id: 'default', label: strings_.defaultColour, checked: !styleNow.color || styleNow.color === 'inherit'},
+                ...TEXT_COLORS.map(color => ({id: color.id, label: strings_.colours[color.id], swatch: color.value, checked: (styleNow.color || '').toLowerCase() === color.value.toLowerCase()}))
+            ],
+            apply: id => $setTextStyle($getSelection(), 'color', TEXT_COLORS.find(color => color.id === id)?.value || null)
+        },
+        highlight: {
+            label: strings.toolbar.highlight,
+            options: [
+                {id: 'none', label: strings_.noHighlight, checked: !styleNow['background-color']},
+                ...HIGHLIGHTS.map(color => ({id: color.id, label: strings_.highlights[color.id], swatch: color.value, checked: (styleNow['background-color'] || '').toLowerCase() === color.value.toLowerCase()}))
+            ],
+            apply: id => $setHighlight($getSelection(), HIGHLIGHTS.find(color => color.id === id)?.value || null)
+        },
+        fontFamily: {
+            label: strings.toolbar.fontFamily,
+            options: [
+                {id: 'default', label: strings_.defaultFont, checked: !styleNow['font-family']},
+                ...(fonts || []).map((font, index) => ({id: `font-${index}`, label: font.label, checked: styleNow['font-family'] === font.value, sample: {fontFamily: font.value}}))
+            ],
+            apply: id => $setTextStyle($getSelection(), 'font-family', id === 'default' ? null : (fonts || [])[Number(id.slice(5))]?.value || null)
+        }
+    };
+    const styleButton = (item) => ({
+        ariaExpanded: styleMenu?.item === item,
+        ariaHasPopup: 'menu',
+        'data-kg-toolbar-button': item,
+        icon: item,
+        label: strings.toolbar[item],
+        onClick: (event) => {
+            const anchor = event.currentTarget;
+            setStyleMenu(current => (current?.item === item ? null : {item, anchor}));
+        }
+    });
+
+    const openMenu = styleMenu ? STYLE_MENUS[styleMenu.item] : null;
+
     return (
+        <>
         <ToolbarMenu aria-label={strings.toolbar.group} data-kg-selection-toolbar role="toolbar" onKeyDown={onToolbarKeyDown}>
             <ToolbarMenuItem
                 data-kg-toolbar-button="bold"
@@ -287,6 +354,35 @@ export default function FormatToolbar({
                     onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, item)}
                 />
             ))}
+            <ToolbarMenuItem
+                {...styleButton('fontSize')}
+                hide={isHidden('fontSize')}
+                isActive={sizeNow !== 'normal'}
+            />
+            <ToolbarMenuItem
+                {...styleButton('textColor')}
+                hide={isHidden('textColor')}
+                isActive={!!styleNow.color}
+            />
+            <ToolbarMenuItem
+                {...styleButton('highlight')}
+                hide={isHidden('highlight')}
+                isActive={!!styleNow['background-color']}
+            />
+            <ToolbarMenuItem
+                {...styleButton('fontFamily')}
+                hide={isHidden('fontFamily') || !fonts?.length}
+                isActive={!!styleNow['font-family']}
+            />
+            <ToolbarMenuItem
+                data-kg-toolbar-button="clearFormatting"
+                hide={isHidden('clearFormatting')}
+                icon="clearFormatting"
+                isActive={false}
+                label={strings.toolbar.clearFormatting}
+                shortcutKeys={[ctrlOrCmdSymbol(), '\\']}
+                onClick={() => editor.update(() => $clearFormatting(), {discrete: true})}
+            />
             {HEADING_LEVELS.map(({tag, item, icon, key}) => (
                 <ToolbarMenuItem
                     key={tag}
@@ -377,5 +473,18 @@ export default function FormatToolbar({
                 onClick={onSnippetClick}
             />
         </ToolbarMenu>
+        {openMenu ? (
+            <StyleMenu
+                anchor={styleMenu.anchor}
+                label={openMenu.label}
+                options={openMenu.options}
+                onClose={closeStyleMenu}
+                onPick={(id) => {
+                    editor.update(() => openMenu.apply(id), {discrete: true});
+                    closeStyleMenu();
+                }}
+            />
+        ) : null}
+        </>
     );
 }

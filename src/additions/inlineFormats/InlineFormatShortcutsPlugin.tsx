@@ -26,6 +26,7 @@ import { useContext, useEffect } from "react";
 
 import KoenigComposerContext from "../../koenig-lexical/context/KoenigComposerContext";
 import { isToolbarItemHidden } from "../options";
+import { $clearFormatting } from "../textStyle/textStyle";
 
 // Shortcuts for the inline formats the selection toolbar offers. Underline (Ctrl or Cmd+U) and
 // the others Lexical already handles are left to it. Added here: strikethrough with Ctrl or
@@ -46,6 +47,16 @@ export const InlineFormatShortcutsPlugin = () => {
       (event: KeyboardEvent) => {
         if (!editor.isEditable()) return false;
         if (!(event.ctrlKey || event.metaKey) || event.altKey) return false;
+        // Ctrl or Cmd+backslash clears the formatting of the selected text
+        if (
+          !event.shiftKey &&
+          (event.code === "Backslash" || (!event.code && event.key === "\\"))
+        ) {
+          if (isToolbarItemHidden(toolbar as never, "clearFormatting")) return false;
+          event.preventDefault();
+          $clearFormatting();
+          return true;
+        }
         const found = INLINE_SHORTCUTS.find(
           (entry) =>
             entry.shift === event.shiftKey &&

@@ -73,12 +73,16 @@ export type KoenigToolbarItem =
   | "alignLeft"
   | "alignRight"
   | "bold"
+  | "clearFormatting"
   | "code"
+  | "fontFamily"
+  | "fontSize"
   | "heading1"
   | "heading2"
   | "heading3"
   | "heading4"
   | "heading5"
+  | "highlight"
   | "italic"
   | "link"
   | "quote"
@@ -86,7 +90,16 @@ export type KoenigToolbarItem =
   | "strikethrough"
   | "subscript"
   | "superscript"
+  | "textColor"
   | "underline";
+
+/** A font the host offers in the selection toolbar. */
+export interface KoenigFont {
+  /** What the menu shows. */
+  label: string;
+  /** A CSS `font-family` value, for example `Georgia, serif`. */
+  value: string;
+}
 
 /** What a host's toolbar button or card gets when the person uses it on a text selection. */
 export interface KoenigToolbarSelection {
@@ -168,6 +181,14 @@ export interface KoenigStrings {
   };
   /** The table card's controls; `toolbar` names the group for screen readers. The two announcements
    *  take `{row}`, `{rows}`, `{column}`, `{columns}`, `{rowSpan}` and `{colSpan}`. */
+  textStyle: {
+    colours: Record<"blue" | "green" | "grey" | "orange" | "purple" | "red", string>;
+    defaultColour: string;
+    defaultFont: string;
+    highlights: Record<"blue" | "green" | "orange" | "pink" | "purple" | "yellow", string>;
+    noHighlight: string;
+    sizes: Record<"large" | "larger" | "normal" | "small" | "smaller", string>;
+  };
   table: {
     addColumnLeft: string;
     addColumnRight: string;
@@ -675,6 +696,9 @@ export interface KoenigComposerProps {
   onError?: (error: Error) => void;
   /** The host's wording, laid over the English defaults. */
   strings?: KoenigStringsInput;
+  /** The fonts the font button offers: a label and a CSS `font-family` value each. With none, the
+   *  button is not shown. */
+  fonts?: readonly KoenigFont[];
   /** The format toolbar buttons to show. Default: all of them. */
   toolbar?: readonly KoenigToolbarItem[];
   /** The host's own buttons and cards on the selection toolbar. */
