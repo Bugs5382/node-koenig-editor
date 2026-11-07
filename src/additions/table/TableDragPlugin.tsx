@@ -211,6 +211,8 @@ export const TableDragPlugin = () => {
   const target = editor.getRootElement()?.closest(".koenig-lexical") as HTMLElement | null;
   const grip =
     "fixed z-[9998] flex cursor-grab items-center justify-center rounded bg-white text-grey-700 shadow-sm hover:bg-grey-200/80 active:cursor-grabbing dark:bg-grey-950 dark:text-grey-300 forced-colors:border forced-colors:border-[ButtonText]";
+  // nothing to draw until a table is being edited: no portal, no extra node in the editor's tree
+  if (!(active && boxes) && !drop && !status) return null;
   return (
     <FloatingPortal to={target ?? document.body}>
       {active && boxes?.rowRect ? (
