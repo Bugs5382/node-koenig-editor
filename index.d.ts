@@ -178,6 +178,15 @@ export interface KoenigStrings {
     alignMiddle: string;
     alignRight: string;
     alignTop: string;
+    sizeMenu: string;
+    sizeDone: string;
+    columnWidthLabel: string;
+    rowHeightLabel: string;
+    tableWidthLabel: string;
+    tableWidthFull: string;
+    tableWidthFit: string;
+    tableWidthFixed: string;
+    equalColumns: string;
     caption: string;
     captionDone: string;
     captionLabel: string;

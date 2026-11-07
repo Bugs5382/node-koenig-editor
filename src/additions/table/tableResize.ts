@@ -28,6 +28,8 @@ import { $getState, $setState, createState } from "lexical";
 // keeps its size in the document and in the reader's view. Only the table's overall width mode
 // is new, stored on the table as node state.
 
+/** What a column measures when nothing is stored or laid out (the editor draws it at 75 pixels). */
+export const DEFAULT_COLUMN_WIDTH = 75;
 /** The narrowest a column can be dragged, in pixels. */
 export const MIN_COLUMN_WIDTH = 40;
 /** The shortest a row can be dragged, in pixels. */
@@ -68,4 +70,25 @@ export const $getTableWidthMode = (table: TableNode): TableWidthMode =>
 
 export const $setTableWidthMode = (table: TableNode, mode: TableWidthMode): void => {
   $setState(table, widthState, mode);
+};
+
+/** The table's column widths as drawn, one per column; the stored width where nothing is laid out. */
+export const measureWidths = (
+  element: HTMLElement | null,
+  stored: readonly number[] | undefined,
+  count: number,
+) => {
+  const widths: number[] = [];
+  let column = 0;
+  const first = element?.querySelector("tr");
+  for (const cell of first?.children ?? []) {
+    const span = Math.max((cell as HTMLTableCellElement).colSpan || 1, 1);
+    const width = (cell as HTMLElement).getBoundingClientRect().width;
+    for (let i = 0; i < span; i += 1) widths[column + i] = width / span;
+    column += span;
+  }
+  return Array.from({ length: count }, (_, index) => {
+    const measured = widths[index] ?? 0;
+    return Math.round(measured > 0 ? measured : (stored?.[index] ?? DEFAULT_COLUMN_WIDTH));
+  });
 };

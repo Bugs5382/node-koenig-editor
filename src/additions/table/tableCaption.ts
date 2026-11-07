@@ -26,12 +26,31 @@ import { $nodesOfType } from "lexical";
 import { useEffect } from "react";
 
 import { $getTableCaption } from "./tableActions";
+import { $getTableWidthMode } from "./tableResize";
 
 // A table's caption is node state (see tableActions). In the editor it is drawn from attributes on
 // the table element, not from a child element: Lexical removes DOM nodes it did not put there, and
 // re-adding one would never settle. `data-kg-caption` carries the text for a CSS caption box
 // (`table::after`), and `aria-label` gives the table its accessible name. The exported HTML has a
 // real `caption` element.
+// The table's width mode and sizing, as attributes the stylesheet reads and a width where one is
+// needed (a fixed table is as wide as its columns).
+const syncSize = (table: TableNode, element: Element) => {
+  const mode = $getTableWidthMode(table);
+  const widths = table.getColWidths();
+  const total = widths?.reduce((sum, width) => sum + width, 0) ?? 0;
+  const html = element as HTMLElement;
+  if (element.getAttribute("data-kg-table-width") !== mode)
+    element.setAttribute("data-kg-table-width", mode);
+  if (widths?.length) {
+    if (!element.hasAttribute("data-kg-sized")) element.setAttribute("data-kg-sized", "");
+  } else if (element.hasAttribute("data-kg-sized")) {
+    element.removeAttribute("data-kg-sized");
+  }
+  const width = mode === "fit" ? "auto" : mode === "fixed" && total > 0 ? `${total}px` : "";
+  if (html.style.width !== width) html.style.width = width;
+};
+
 export const useTableCaptions = (): void => {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
@@ -42,6 +61,7 @@ export const useTableCaptions = (): void => {
           const found = editor.getElementByKey(table.getKey());
           const element = found?.tagName === "TABLE" ? found : found?.querySelector("table");
           if (!element) continue;
+          syncSize(table, element);
           const text = $getTableCaption(table);
           if (!text) {
             element.removeAttribute("data-kg-caption");

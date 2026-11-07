@@ -46,6 +46,7 @@ import {
   $setColumnWidths,
   $setRowHeight,
   MIN_COLUMN_WIDTH,
+  measureWidths,
   MIN_ROW_HEIGHT,
   resizedWidths,
 } from "./tableResize";
@@ -57,7 +58,6 @@ import {
 // is left alone when the cursor is just in a cell, where it moves by word.
 
 const EDGE = 6;
-const DEFAULT_COLUMN_WIDTH = 75;
 const DEFAULT_ROW_HEIGHT = 32;
 const STEP = 10;
 const BIG_STEP = 40;
@@ -79,27 +79,6 @@ const handleAt = (event: MouseEvent): Handle | null => {
   if (toRight >= -2 && toRight <= EDGE) return { cell, kind: "column" };
   if (toBottom >= -2 && toBottom <= EDGE) return { cell, kind: "row" };
   return null;
-};
-
-/** The table's column widths as drawn, one per column; the stored width where nothing is laid out. */
-const measureWidths = (
-  element: HTMLElement | null,
-  stored: readonly number[] | undefined,
-  count: number,
-) => {
-  const widths: number[] = [];
-  let column = 0;
-  const first = element?.querySelector("tr");
-  for (const cell of first?.children ?? []) {
-    const span = Math.max((cell as HTMLTableCellElement).colSpan || 1, 1);
-    const width = (cell as HTMLElement).getBoundingClientRect().width;
-    for (let i = 0; i < span; i += 1) widths[column + i] = width / span;
-    column += span;
-  }
-  return Array.from({ length: count }, (_, index) => {
-    const measured = widths[index] ?? 0;
-    return Math.round(measured > 0 ? measured : (stored?.[index] ?? DEFAULT_COLUMN_WIDTH));
-  });
 };
 
 const textWidth = (cell: HTMLElement): number => {
