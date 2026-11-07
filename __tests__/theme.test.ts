@@ -27,7 +27,10 @@ import { describe, expect, it } from "vitest";
 
 const root = path.resolve(import.meta.dirname, "..");
 const css = readFileSync(path.join(root, "src/generated/koenig.css"), "utf8");
-const readme = readFileSync(path.join(root, "README.md"), "utf8");
+// the theme tokens are documented in the styles guide; the README links to it
+const readme =
+  readFileSync(path.join(root, "README.md"), "utf8") +
+  readFileSync(path.join(root, "guides/styles.md"), "utf8");
 const require = createRequire(import.meta.url);
 const tailwind = require(path.join(root, "tailwind.config.cjs")) as {
   theme: { colors: Record<string, string | Record<string, string>> };

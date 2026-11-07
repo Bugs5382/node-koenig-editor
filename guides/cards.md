@@ -185,7 +185,7 @@ are announced, and so is what a merged cell spans; the caption names the table.
 **Developer:** `cards` leaves it out; the wording is `strings.table`. The band and brand colours are
 the `tableBand` and `tableBrand` slots of the composer's `colors` option. The borders and header colour
 are tokens (`--kg-table-edit-border-style` for the dashed editing line, `--kg-table-border-color`,
-`--kg-table-header-bg`); see the README.
+`--kg-table-header-bg`); see [Styles and theme tokens](./styles.md).
 
 ## File
 
@@ -315,7 +315,7 @@ says so; the lists work with the arrow keys; buttons are marked while the select
 **Developer:** `toolbar` picks the buttons (`toolbar={["bold", "italic", "textColor"]}`), a button left
 out also turns its shortcut off; `fonts` gives the font list; `tools` switches clean paste
 (`cleanPaste`), find and replace (`findReplace`) and the shortcuts list (`shortcuts`) on or off. See
-the README for each.
+[Writing and text styling](./writing-and-text.md) for each.
 
 ## For developers: switching things off or replacing them
 
