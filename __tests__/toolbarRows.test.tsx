@@ -52,15 +52,12 @@ const action = (id: string, extra: Partial<KoenigToolbarAction> = {}): KoenigToo
 
 /** The toolbar's buttons in order, with a "|" where a new row starts. */
 const layout = () =>
-  [
-    ...document.querySelectorAll(
-      "[data-kg-selection-toolbar] > [data-kg-toolbar-button], [data-kg-selection-toolbar] > [data-kg-toolbar-row-break]",
+  [...document.querySelectorAll("[data-kg-toolbar-row]")].flatMap((row, index) => [
+    ...(index ? ["|"] : []),
+    ...[...row.querySelectorAll("[data-kg-toolbar-button]")].map((node) =>
+      node.getAttribute("data-kg-toolbar-button"),
     ),
-  ].map((node) =>
-    node.hasAttribute("data-kg-toolbar-row-break")
-      ? "|"
-      : node.getAttribute("data-kg-toolbar-button"),
-  );
+  ]);
 
 const load = async (composer: Record<string, unknown>) => {
   const { api } = await mount({

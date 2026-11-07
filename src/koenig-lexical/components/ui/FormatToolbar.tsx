@@ -24,6 +24,7 @@ import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 import {
     ToolbarMenu,
     ToolbarMenuItem,
+    ToolbarMenuRow,
     ToolbarMenuSeparator
 } from './ToolbarMenu';
 import {altOrOption, ctrlOrCmdSymbol, ctrlOrSymbol, shiftOrSymbol} from '../../utils/shortcutSymbols';
@@ -385,7 +386,6 @@ export default function FormatToolbar({
     );
     const actionsAfter = id => visibleActions.filter(action => anchored(action) && buttonId(action.after) === id).map(actionButton);
     const actionsAtEndOf = row => visibleActions.filter(action => !anchored(action) && (action.row || rowCount) === row).map(actionButton);
-    const rowBreak = row => <li key={`row-${row}`} aria-hidden="true" className="m-0 h-0 basis-full p-0" data-kg-toolbar-row-break={row} role="presentation" />;
     const defaultButtons = React.Children.toArray((
         <>
             <ToolbarMenuItem
@@ -574,28 +574,28 @@ export default function FormatToolbar({
             />
         </>
     ).props.children);
-    const placed = [];
-    let row = 1;
+    const rows = [[]];
     for (const element of defaultButtons) {
         const id = element?.props?.['data-kg-toolbar-button'];
-        if (rowCount > 1 && row === 1 && ROW_TWO_START.includes(id)) {
-            placed.push(...actionsAtEndOf(1), rowBreak(1));
-            row = 2;
+        if (rowCount > 1 && rows.length === 1 && ROW_TWO_START.includes(id)) {
+            rows[0].push(...actionsAtEndOf(1));
+            rows.push([]);
         }
-        placed.push(element);
+        const current = rows[rows.length - 1];
+        current.push(element);
         if (id) {
-            placed.push(...actionsAfter(id));
+            current.push(...actionsAfter(id));
         }
     }
-    placed.push(...actionsAtEndOf(row));
-    for (let extra = row + 1; extra <= lastRow; extra++) {
-        placed.push(rowBreak(extra - 1), ...actionsAtEndOf(extra));
+    rows[rows.length - 1].push(...actionsAtEndOf(rows.length));
+    for (let extra = rows.length + 1; extra <= lastRow; extra++) {
+        rows.push(actionsAtEndOf(extra));
     }
 
     return (
         <>
-        <ToolbarMenu aria-label={strings.toolbar.group} data-kg-selection-toolbar role="toolbar" onKeyDown={onToolbarKeyDown}>
-            {placed}
+        <ToolbarMenu aria-label={strings.toolbar.group} data-kg-selection-toolbar role="toolbar" rows onKeyDown={onToolbarKeyDown}>
+            {rows.map((items, index) => <ToolbarMenuRow key={index} row={index + 1}>{items}</ToolbarMenuRow>)}
         </ToolbarMenu>
         {openMenu?.colour ? (
             <ColorMenu

@@ -1429,10 +1429,6 @@
     flex-shrink: 0;
 }
 
-.koenig-lexical .basis-full {
-    flex-basis: 100%;
-}
-
 .koenig-lexical .origin-left {
     transform-origin: left;
 }
@@ -1530,6 +1526,10 @@
     list-style-type: none !important;
 }
 
+.koenig-lexical .list-none {
+    list-style-type: none;
+}
+
 .koenig-lexical .appearance-none {
     appearance: none;
 }
@@ -1564,6 +1564,10 @@
 
 .koenig-lexical .items-center {
     align-items: center;
+}
+
+.koenig-lexical .items-stretch {
+    align-items: stretch;
 }
 
 .koenig-lexical .justify-start {
