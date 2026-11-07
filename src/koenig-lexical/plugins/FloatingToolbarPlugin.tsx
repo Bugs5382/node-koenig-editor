@@ -22,6 +22,12 @@ function useFloatingFormatToolbar(editor, anchorElem, isSnippetsEnabled, hiddenF
                 return;
             }
 
+            // a read-only editor (and the reader's view) has no formatting to offer
+            if (!editor.isEditable()) {
+                setToolbarItemType(null);
+                return;
+            }
+
             const selection = $getSelection();
             const nativeSelection = window.getSelection();
             const rootElement = editor.getRootElement();

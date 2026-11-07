@@ -4904,3 +4904,26 @@ em-emoji-picker {
         --kg-card-w: min(calc(100vw - var(--kg-breakout-adjustment-with-fallback) + 2px), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
     }
 }
+
+@media (forced-colors: active) {
+
+    .koenig-lexical .forced-colors\:border {
+        border-width: 1px;
+    }
+
+    .koenig-lexical .forced-colors\:border-\[ButtonText\] {
+        border-color: ButtonText;
+    }
+
+    .koenig-lexical .forced-colors\:bg-\[Highlight\] {
+        background-color: Highlight;
+    }
+
+    .koenig-lexical .forced-colors\:text-\[ButtonText\] {
+        color: ButtonText;
+    }
+
+    .koenig-lexical .forced-colors\:text-\[HighlightText\] {
+        color: HighlightText;
+    }
+}

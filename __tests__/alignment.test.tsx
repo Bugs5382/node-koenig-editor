@@ -199,6 +199,53 @@ describe("the marked alignment is visible in dark mode too", () => {
   });
 });
 
+describe("the toolbar buttons in forced-colours mode", () => {
+  it("use system colours for the icon, the marked button and the toolbar's edge", async () => {
+    const api = (
+      await mount({ composer: { initialEditorState: documentOf(block("paragraph", "Hello")) } })
+    ).api;
+    await selectFirstText(api);
+    const active = button("alignLeft") as HTMLElement;
+    const inactive = button("alignCenter") as HTMLElement;
+    expect(active.className).toContain("forced-colors:bg-[Highlight]");
+    expect(active.querySelector("svg")?.getAttribute("class")).toContain(
+      "forced-colors:text-[HighlightText]",
+    );
+    expect(inactive.querySelector("svg")?.getAttribute("class")).toContain(
+      "forced-colors:text-[ButtonText]",
+    );
+    expect(active.closest("ul")?.className).toContain("forced-colors:border-[ButtonText]");
+  });
+});
+
+describe("a read-only editor", () => {
+  it("shows no selection toolbar, so nothing can change the document", async () => {
+    const api = (
+      await mount({
+        composer: { editable: false, initialEditorState: documentOf(block("paragraph", "Hello")) },
+      })
+    ).api;
+    await selectFirstText(api, false);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(document.querySelector("[data-kg-toolbar-button]")).toBeNull();
+    expect(formats(api)).toEqual([""]);
+  });
+
+  it("hides the toolbar when the editor becomes read-only while it is open", async () => {
+    const api = (
+      await mount({ composer: { initialEditorState: documentOf(block("paragraph", "Hello")) } })
+    ).api;
+    await selectFirstText(api);
+    await act(async () => {
+      api.editorInstance.setEditable(false);
+    });
+    await act(async () => {
+      document.dispatchEvent(new Event("selectionchange"));
+    });
+    await waitFor(() => expect(document.querySelector("[data-kg-toolbar-button]")).toBeNull());
+  });
+});
+
 describe("the shortcuts", () => {
   const press = async (api: KoenigEditorAPI, key: string, extra: Record<string, boolean> = {}) => {
     await act(async () => {

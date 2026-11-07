@@ -45,6 +45,7 @@ export const AlignmentShortcutsPlugin = () => {
     return editor.registerCommand(
       KEY_DOWN_COMMAND,
       (event: KeyboardEvent) => {
+        if (!editor.isEditable()) return false;
         if (!(event.ctrlKey || event.metaKey) || !event.shiftKey || event.altKey) return false;
         const letter = event.code?.startsWith("Key")
           ? event.code.slice(3)

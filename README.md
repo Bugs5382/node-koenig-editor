@@ -656,7 +656,10 @@ a caption) has no alignment.
 
 Leave the buttons out with `toolbar` (`toolbar={["bold", "italic"]}` shows none of them). That also
 turns the shortcuts off, and, as before, alignment in a document is then removed from paragraphs,
-headings and quotes. Table cells have their own alignment controls in the table editor.
+headings and quotes.
+
+In a read-only editor (and the reader's view) the selection toolbar does not show, so nothing in
+it can change the document.
 
 ## 💬 Inline comments
 
