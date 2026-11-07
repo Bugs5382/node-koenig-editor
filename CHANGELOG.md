@@ -6,6 +6,7 @@
 
 #### 🐛 Bug Fixes
 
+- fix(nested-editor): configure nested editors at creation, with the parent's namespace @Bugs5382 (#96)
 - fix(toolbar): single-swatch toggle, nested-editor focus guard, narrow toolbar @Bugs5382 (#95)
 
 #### 📄 Documentation
