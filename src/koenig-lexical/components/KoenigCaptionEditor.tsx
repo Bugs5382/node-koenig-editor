@@ -1,7 +1,7 @@
 import CardContext from '../context/CardContext.jsx';
 import React, {useCallback, useContext} from 'react';
 import {BLUR_COMMAND, COMMAND_PRIORITY_HIGH, COMMAND_PRIORITY_LOW, FOCUS_COMMAND, KEY_ARROW_DOWN_COMMAND, KEY_ARROW_UP_COMMAND, KEY_ENTER_COMMAND} from 'lexical';
-import {KoenigComposableEditor, KoenigNestedComposer, MINIMAL_NODES, MINIMAL_TRANSFORMERS} from '../index.js';
+import {KoenigComposableEditor, KoenigNestedComposer, MINIMAL_TRANSFORMERS} from '../index.js';
 import {RestrictContentPlugin} from '../plugins/RestrictContentPlugin';
 import {mergeRegister} from '@lexical/utils';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -132,7 +132,6 @@ const KoenigCaptionEditor = ({paragraphs = 1, captionEditor, captionEditorInitia
         <KoenigNestedComposer
             initialEditor={captionEditor}
             initialEditorState={captionEditorInitialState}
-            initialNodes={MINIMAL_NODES}
         >
             <KoenigComposableEditor
                 className={className}

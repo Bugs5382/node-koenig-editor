@@ -31,7 +31,7 @@ const seedWhenEmpty = (editor, id, docMap, getXmlText) => {
     }, {tag: 'history-merge'});
 };
 
-const KoenigNestedComposer = ({initialEditor, initialEditorState, initialNodes, initialTheme, skipCollabChecks, children} = {}) => {
+const KoenigNestedComposer = ({initialEditor, initialEditorState, initialTheme, skipCollabChecks, children} = {}) => {
     const {collaboration} = React.useContext(KoenigComposerContext);
     const id = initialEditor.getKey();
     // `isCollabActive` is flipped by an effect of the main plugin, after the cards have first
@@ -61,7 +61,6 @@ const KoenigNestedComposer = ({initialEditor, initialEditorState, initialNodes, 
     return (
         <LexicalNestedComposer
             initialEditor={initialEditor}
-            initialNodes={initialNodes}
             initialTheme={initialTheme}
             skipCollabChecks={skipCollabChecks}
         >
