@@ -99,6 +99,7 @@ export type KoenigToolbarItem =
   | "subscript"
   | "superscript"
   | "textColor"
+  | "textDirection"
   | "underline";
 
 /** A font the host offers in the selection toolbar. */
@@ -215,6 +216,7 @@ export interface KoenigStrings {
     colours: Record<"blue" | "green" | "grey" | "orange" | "purple" | "red", string>;
     defaultColour: string;
     defaultFont: string;
+    directions: Record<"auto" | "ltr" | "rtl", string>;
     defaultSpacing: string;
     lineSpacings: Record<"1" | "1.15" | "1.5" | "2", string>;
     paragraphSpacings: Record<"large" | "medium" | "none" | "small", string>;

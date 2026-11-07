@@ -49,6 +49,7 @@ export const KOENIG_TOOLBAR_ITEMS: readonly KoenigToolbarItem[] = [
   "outdent",
   "lineSpacing",
   "paragraphSpacing",
+  "textDirection",
   "alignLeft",
   "alignCenter",
   "alignRight",

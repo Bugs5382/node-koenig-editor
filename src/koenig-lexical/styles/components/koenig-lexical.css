@@ -382,3 +382,25 @@ em-emoji-picker {
         color: ButtonFace;
     }
 }
+
+/* Right to left. A block set to (or reading as) right to left turns its list indent and quote
+   bar around, since the prose styles pad lists and quotes on the physical left. */
+.koenig-lexical ul[dir="rtl"] {
+    padding: 0 0.6rem 0 0;
+}
+
+.koenig-lexical ol[dir="rtl"] {
+    padding: 0 0.8rem 0 0;
+}
+
+.koenig-lexical blockquote[dir="rtl"] {
+    border-left: 0;
+    border-right: 0.25rem solid var(--kg-accent-color, #ff0095);
+    padding-left: 0;
+    padding-right: 2rem;
+}
+
+.koenig-lexical .kg-check-item[dir="rtl"],
+.koenig-lexical [dir="rtl"] .kg-check-item {
+    padding-inline-start: 2.8rem;
+}

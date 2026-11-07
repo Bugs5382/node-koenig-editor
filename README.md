@@ -80,7 +80,7 @@ the sources.
 | `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
-| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
+| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `textDirection`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
 | `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
 | `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker`, `preview`, `shortcuts`, `findReplace` and `cleanPaste`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
@@ -767,6 +767,13 @@ headings, quotes and list items. They set the alignment of the block the selecti
 one that is active, and work from the keyboard with Ctrl or Cmd plus Shift and **L**, **E**, **R**
 or **J**. The alignment is the block's own format, so it is saved in the document, shows in the
 reader's view and in the saved HTML as `text-align`, and survives a reload.
+
+**Text direction** (`textDirection`) sets the selected blocks to automatic, left to right or right
+to left. Automatic is the default: a block follows its own text (`dir="auto"`), so a Hebrew or Arabic
+paragraph already reads right to left, and mixed text follows its first strong character. A choice
+is saved on the block (`direction`), drawn as `dir`, and kept in the saved HTML. A list or a table is
+one block, so it turns around whole: bullets and numbers move to the right, table columns run right to
+left, and a quote's bar moves to the right edge.
 
 Right-to-left text is handled: a block with no stored alignment counts as start-aligned, so in a
 Hebrew or Arabic paragraph the Align right button is the marked one. Nested card text (a callout,

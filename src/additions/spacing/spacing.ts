@@ -69,7 +69,7 @@ const spacingState = createState("kgSpacing", {
 export const $getSpacing = (node: ElementNode): Spacing | null => $getState(node, spacingState);
 
 /** The top-level blocks the selection touches. */
-const $blocksOf = (selection: BaseSelection | null): ElementNode[] => {
+export const $blocksOf = (selection: BaseSelection | null): ElementNode[] => {
   if (!$isRangeSelection(selection)) return [];
   const blocks = new Map<string, ElementNode>();
   for (const node of selection.getNodes()) {

@@ -3181,6 +3181,28 @@ em-emoji-picker {
     }
 }
 
+/* Right to left. A block set to (or reading as) right to left turns its list indent and quote
+   bar around, since the prose styles pad lists and quotes on the physical left. */
+.koenig-lexical ul[dir="rtl"] {
+    padding: 0 calc(0.6 * var(--kg-rem, 0.625rem)) 0 0;
+}
+
+.koenig-lexical ol[dir="rtl"] {
+    padding: 0 calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
+}
+
+.koenig-lexical blockquote[dir="rtl"] {
+    border-left: 0;
+    border-right: calc(0.25 * var(--kg-rem, 0.625rem)) solid var(--kg-accent-color, #ff0095);
+    padding-left: 0;
+    padding-right: calc(2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .kg-check-item[dir="rtl"],
+.koenig-lexical [dir="rtl"] .kg-check-item {
+    padding-inline-start: calc(2.8 * var(--kg-rem, 0.625rem));
+}
+
 /* Content Styles
     /*
     /* We use only margin-top to set the vertical spacings. The styles below

@@ -53,6 +53,7 @@ const SCOPE_ICONS = {cell: scopeIcon('Cell'), row: scopeIcon('Row'), column: sco
 const SCOPE_STRING = {cell: 'scopeCell', row: 'scopeRow', column: 'scopeColumn', table: 'scopeTable'};
 import {getSelectedNode} from '../../utils/getSelectedNode';
 import {$getSelectionSpacing, $setSpacing, LINE_SPACINGS, PARAGRAPH_SPACINGS} from '../../../additions/spacing/spacing';
+import {$getSelectionDirection, $setDirection} from '../../../additions/direction/direction';
 import {StyleMenu} from '../../../additions/textStyle/StyleMenu';
 import {$clearFormatting, $getTextStyle, $setHighlight, $setTextStyle, FONT_SIZES, HIGHLIGHTS, TEXT_COLORS} from '../../../additions/textStyle/textStyle';
 import {ALIGNMENT_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
@@ -114,6 +115,7 @@ export default function FormatToolbar({
     const [styleMenu, setStyleMenu] = React.useState(null);
     const [styleNow, setStyleNow] = React.useState({});
     const [spacingNow, setSpacingNow] = React.useState({});
+    const [directionNow, setDirectionNow] = React.useState(null);
     // the host's `toolbar` option names the buttons to show; leaving it out shows them all
     const isHidden = item => isToolbarItemHidden(toolbar, item);
 
@@ -173,6 +175,7 @@ export default function FormatToolbar({
                 'font-family': $getTextStyle(selection, 'font-family')
             };
             const nextSpacing = $getSelectionSpacing(selection) || {};
+            setDirectionNow($getSelectionDirection(selection));
             setSpacingNow(current => (JSON.stringify(current) === JSON.stringify(nextSpacing) ? current : nextSpacing));
             setStyleNow(current => (JSON.stringify(current) === JSON.stringify(nextStyle) ? current : nextStyle));
             setInlineOn(current => (JSON.stringify(current) === JSON.stringify(nextInline) ? current : nextInline));
@@ -328,6 +331,11 @@ export default function FormatToolbar({
             ],
             apply: id => $setSpacing($getSelection(), {after: PARAGRAPH_SPACINGS.find(entry => entry.id === id)?.id ?? null})
         },
+        textDirection: {
+            label: strings.toolbar.textDirection,
+            options: ['auto', 'ltr', 'rtl'].map(id => ({id, label: strings_.directions[id], checked: (directionNow || 'auto') === id})),
+            apply: id => $setDirection($getSelection(), id === 'auto' ? null : id)
+        },
         fontFamily: {
             label: strings.toolbar.fontFamily,
             options: [
@@ -475,6 +483,12 @@ export default function FormatToolbar({
                 {...styleButton('paragraphSpacing')}
                 hide={hideAlignment || isHidden('paragraphSpacing')}
                 isActive={spacingNow.after !== undefined}
+            />
+
+            <ToolbarMenuItem
+                {...styleButton('textDirection')}
+                hide={hideAlignment || isHidden('textDirection')}
+                isActive={!!directionNow}
             />
 
             <ToolbarMenuSeparator hide={hideAlignment} />

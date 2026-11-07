@@ -19,6 +19,7 @@ import ImgRegularIcon from '../../assets/icons/kg-img-regular.svg?react';
 import ImgReplaceIcon from '../../assets/icons/kg-replace.svg?react';
 import ImgWideIcon from '../../assets/icons/kg-img-wide.svg?react';
 import IndentIcon from '../../assets/icons/kg-indent.svg?react';
+import TextDirectionIcon from '../../assets/icons/kg-text-direction.svg?react';
 import LineSpacingIcon from '../../assets/icons/kg-line-spacing.svg?react';
 import ParagraphSpacingIcon from '../../assets/icons/kg-paragraph-spacing.svg?react';
 import ListBulletIcon from '../../assets/icons/kg-list-bullet.svg?react';
@@ -63,6 +64,7 @@ export const TOOLBAR_ICONS = {
     checkList: ListCheckIcon,
     indent: IndentIcon,
     lineSpacing: LineSpacingIcon,
+    textDirection: TextDirectionIcon,
     paragraphSpacing: ParagraphSpacingIcon,
     outdent: OutdentIcon,
     headingOne: HeadingOneIcon,

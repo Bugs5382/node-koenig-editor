@@ -83,6 +83,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     subscript: "Subscript",
     superscript: "Superscript",
     textColor: "Text colour",
+    textDirection: "Text direction",
     underline: "Underline",
   },
   find: {
@@ -127,6 +128,11 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     },
     defaultColour: "Default colour",
     defaultFont: "Default font",
+    directions: {
+      auto: "Automatic",
+      ltr: "Left to right",
+      rtl: "Right to left",
+    },
     defaultSpacing: "Default",
     lineSpacings: {
       "1": "Single",
