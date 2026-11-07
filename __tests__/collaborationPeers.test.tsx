@@ -38,7 +38,6 @@ import {
 } from "lexical";
 import { $dfs } from "@lexical/utils";
 import { afterEach, describe, expect, it } from "vitest";
-import { kitchenSink } from "../playground/src/kitchenSink";
 import {
   broadcastProviderFactory,
   type Channel,
@@ -583,6 +582,11 @@ describe("a provider that syncs late", () => {
 // The demo's own kitchen sink: every card in one document, through the demo's transport.
 describe("the demo's kitchen sink between two windows", () => {
   it("matches on join and after a reload", async () => {
+    // loaded by a variable path: the playground's sources are not part of the package type check
+    const sinkPath: string = "../playground/src/kitchenSink";
+    const { kitchenSink } = (await import(/* @vite-ignore */ sinkPath)) as {
+      kitchenSink: (available: readonly string[], enabled: readonly string[] | null) => string;
+    };
     const r = demoRoom();
     const a = await mountPeer(r.join(), kitchenSink([], null));
     await settle();
