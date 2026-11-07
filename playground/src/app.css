@@ -493,3 +493,17 @@ ul.threads li.resolved {
     break-inside: avoid;
   }
 }
+
+.panel-toggle {
+  float: right;
+  margin: 0 0 8px 8px;
+  font-size: 0.8125rem;
+}
+.page.panel-hidden {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 1000px) {
+  .page.panel-hidden main {
+    border-right: 0;
+  }
+}
