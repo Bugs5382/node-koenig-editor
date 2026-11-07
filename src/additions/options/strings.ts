@@ -85,6 +85,20 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     textColor: "Text colour",
     underline: "Underline",
   },
+  find: {
+    close: "Close",
+    find: "Find",
+    matchCase: "Match case",
+    next: "Next match",
+    none: "No matches",
+    previous: "Previous match",
+    replace: "Replace with",
+    replaceAll: "Replace all",
+    replaceOne: "Replace",
+    replaced: "{count} replaced",
+    status: "{current} of {total}",
+    title: "Find and replace",
+  },
   shortcuts: {
     actions: {
       find: "Find and replace",

@@ -747,6 +747,19 @@ that are on in this editor, in groups, with the keys for this platform; a shortc
 host's `toolbar` option leaves out is not listed. Escape or Close returns to the text. Its wording is
 `strings.shortcuts`. `tools={["preview"]}` (any list without them) turns clean paste and the list off.
 
+## 🔎 Find and replace
+
+Ctrl or Cmd with **F** (the `findReplace` tool) opens a bar over the editor with a find field
+(filled from a one-line selection), Previous and Next (Enter and Shift+Enter in the field step
+through too), **Match case**, a replace field with **Replace** and **Replace all**, a live count
+("2 of 5", "No matches", "5 replaced") and Close. Escape closes it and puts focus back in the text. The query is plain text,
+never a pattern; a match can run across bold, italic and other formatting inside a block, and
+the matches follow the text while it is edited. Where the browser has the CSS Custom Highlight API
+the matches are highlighted in the text, the current one stronger (`::highlight(kg-find)` and
+`::highlight(kg-find-current)`, from `--kg-selection`; system colours in forced-colours mode).
+While the editor is read-only (Preview) the replace controls are not shown. Replace all is one
+step in the undo history. Its wording is `strings.find`.
+
 ## ↔️ Text alignment
 
 The selection toolbar has Align left, Align center, Align right and Justify, for paragraphs,

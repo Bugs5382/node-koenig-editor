@@ -16,6 +16,7 @@ import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {ReadOnlyGuardPlugin} from '../../additions/preview/ReadOnlyGuardPlugin';
 import {AlignmentShortcutsPlugin} from '../../additions/alignment/AlignmentShortcutsPlugin';
 import {InlineFormatShortcutsPlugin} from '../../additions/inlineFormats/InlineFormatShortcutsPlugin';
+import {FindReplacePlugin} from '../../additions/find/FindReplacePlugin';
 import {CleanPastePlugin} from '../../additions/paste/CleanPastePlugin';
 import {ShortcutsPlugin} from '../../additions/shortcuts/ShortcutsPlugin';
 import {SpacingPlugin} from '../../additions/spacing/SpacingPlugin';
@@ -63,6 +64,7 @@ export const AllDefaultPlugins = () => {
             <SpacingPlugin />
             <ShortcutsPlugin />
             <CleanPastePlugin />
+            <FindReplacePlugin />
         </>
     );
 };

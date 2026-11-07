@@ -189,6 +189,22 @@ export interface KoenigStrings {
   };
   /** The table card's controls; `toolbar` names the group for screen readers. The two announcements
    *  take `{row}`, `{rows}`, `{column}`, `{columns}`, `{rowSpan}` and `{colSpan}`. */
+  find: {
+    close: string;
+    find: string;
+    matchCase: string;
+    next: string;
+    none: string;
+    previous: string;
+    replace: string;
+    replaceAll: string;
+    replaceOne: string;
+    /** `{count}` is the number replaced. */
+    replaced: string;
+    /** `{current}` and `{total}` are the position and the number of matches. */
+    status: string;
+    title: string;
+  };
   shortcuts: {
     actions: Record<"find" | "redo" | "shortcuts" | "toolbar" | "undo", string>;
     close: string;

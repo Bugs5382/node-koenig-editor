@@ -685,6 +685,10 @@
     top: 0px;
 }
 
+.koenig-lexical .top-2 {
+    top: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .top-3 {
     top: calc(1.2 * var(--kg-rem, 0.625rem));
 }
@@ -1259,6 +1263,10 @@
 
 .koenig-lexical .w-\[320px\] {
     width: 320px;
+}
+
+.koenig-lexical .w-\[34rem\] {
+    width: calc(34 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .w-\[46rem\] {
@@ -3147,6 +3155,29 @@ em-emoji-picker {
 
     .koenig-lexical .kg-check-item-checked::after {
         border-color: HighlightText;
+    }
+}
+
+/* Find and replace: every match, and the current one, drawn with the CSS Custom Highlight API where
+   the browser has it. They follow the selection colour token. */
+.koenig-lexical ::highlight(kg-find) {
+    background-color: color-mix(in srgb, var(--kg-selection) 35%, transparent);
+}
+
+.koenig-lexical ::highlight(kg-find-current) {
+    background-color: var(--kg-selection);
+    color: var(--white);
+}
+
+@media (forced-colors: active) {
+    .koenig-lexical ::highlight(kg-find) {
+        background-color: Highlight;
+        color: HighlightText;
+    }
+
+    .koenig-lexical ::highlight(kg-find-current) {
+        background-color: ButtonText;
+        color: ButtonFace;
     }
 }
 
