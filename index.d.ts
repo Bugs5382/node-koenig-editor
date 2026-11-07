@@ -857,7 +857,7 @@ export interface KoenigGallerySlideshow {
    *  themselves after a few seconds without input. Any key, a tap or a mouse move brings them
    *  back, and Escape shows them before a second Escape closes the viewer. */
   screenMode: boolean;
-  /** Shows the photos in a random order each time the viewer opens, starting with the one opened. */
+  /** The automatic advance jumps to a random photo, every photo once before any repeats. The viewer keeps the set order. */
   shuffle: boolean;
 }
 
