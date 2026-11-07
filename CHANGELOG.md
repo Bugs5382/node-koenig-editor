@@ -6,6 +6,7 @@
 
 #### 🚀 Features
 
+- feat(editor): shared colour control, code and toggle group cards, table banding, emoji, file icons and the rest of the owner's review @Bugs5382 (#60)
 - feat(editor): text styling and the word-processor gap list @Bugs5382 (#57)
 - feat(editor): table resize, borders, drag and drop, and a figure entry for tables, images and galleries @Bugs5382 (#55)
 - feat(editor): a table editor: merge and split, shading, alignment, caption, row and column tools, ranges and paste @Bugs5382 (#53)
