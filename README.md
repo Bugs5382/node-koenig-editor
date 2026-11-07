@@ -71,32 +71,32 @@ the sources.
 
 `KoenigComposer` takes the options; every editor under it, nested ones included, follows them.
 
-| Prop                 | Type                              | Default         | What it does                                                                                                                                                                     |
-| -------------------- | --------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `file`, `video`, `audio`, `button`, `markdown`, `divider`, `callout`, `toggle`, `toggleGroup`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
-| `cardRenderers`      | `KoenigCardRenderers`             | none            | Your own layout for the `gallery` and `header` cards; see [Gallery and header cards](#-gallery-and-header-cards). |
-| `gallery`            | `{ maxImages?: number }`          | `{ maxImages: 50 }` | Options for the gallery card. `maxImages` is the most photos a gallery takes, and the ceiling for each gallery's own setting. It limits adding photos, never cuts off photos a document already has. |
-| `customNodes`        | `EditorNodes`                     | none            | Your own node classes, registered after the shipped ones. A node with a static `kgMenu` (a `CardMenuItem` or a list) is listed in the menus.                                     |
-| `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
-| `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
-| `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
-| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `textDirection`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
-| `colors`             | `Partial<Record<KoenigColorSlot, KoenigColorSetting>>` | the editor's palettes | Per colour slot: a `palette` of swatches, `picker: false` to switch the colour wheel off, `none: false` to take away the editor's own colour. See [Colours](#-colours). |
-| `fileIcons`          | `false \| { overrides? }`         | on              | The file card's type icons; `false` switches them off, `overrides` maps an extension to your own icon component; see [File, video and audio cards](#-file-video-and-audio-cards). |
-| `codeLanguages`      | `KoenigCodeLanguage[]`            | highlighter's  | The languages the code block's list offers, each a `label` and a Prism language `value`; see [Code blocks](#-code-blocks). |
-| `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
-| `toolbarRows`        | `1 \| 2`                          | `2`             | The rows the selection toolbar uses; see [Toolbar actions](#-toolbar-actions). |
-| `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
-| `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker`, `preview`, `shortcuts`, `findReplace` and `cleanPaste`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
-| `spellCheck`, `lang` | `boolean`, `string`               | on, none        | `spellCheck={false}` switches the browser's spell check off in the editing area; `lang` names the language of the text for it. |
-| `collaboration`      | `KoenigCollaboration \| null`     | `null`          | The Yjs provider factory. Without it the editor works alone and asks for no provider.                                                                                            |
-| `nodes`              | `EditorNodes`                     | `DEFAULT_NODES` | The base node set the `cards` choice filters. `BASIC_NODES` and `MINIMAL_NODES` are smaller sets.                                                                                |
-| `initialEditorState` | `string \| SerializedEditorState` | empty           | The document to open. In a collaborative session it seeds the room only while the room is empty.                                                                                 |
-| `fileUploader`       | `Partial<FileUploader>`           | none            | The upload hook cards call as `useFileUpload("image")`, and the accepted file types. Without it the editor and its cards still work, and an upload attempt fails and logs why.   |
-| `cardConfig`         | `Record<string, unknown>`         | `{}`            | Card settings, for example `createSnippet` and `snippets` to turn on snippets.                                                                                                   |
-| `darkMode`           | `boolean`                         | `false`         | Use the dark card styles.                                                                                                                                                        |
-| `editable`           | `boolean`                         | `true`          | Start editable or read-only.                                                                                                                                                     |
-| `onError`            | `(error: Error) => void`          | `console.error` | Called with errors Lexical catches during updates.                                                                                                                               |
+| Prop                 | Type                                                   | Default               | What it does                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------------- | ------------------------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cards`              | `KoenigCardName[]`                                     | all                   | The shipped cards to register: `image`, `gallery`, `header`, `file`, `video`, `audio`, `button`, `markdown`, `divider`, `callout`, `toggle`, `toggleGroup`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing.                                                                                                                                                                           |
+| `cardRenderers`      | `KoenigCardRenderers`                                  | none                  | Your own layout for the `gallery` and `header` cards; see [Gallery and header cards](#-gallery-and-header-cards).                                                                                                                                                                                                                                                                                                                              |
+| `gallery`            | `{ maxImages?: number }`                               | `{ maxImages: 50 }`   | Options for the gallery card. `maxImages` is the most photos a gallery takes, and the ceiling for each gallery's own setting. It limits adding photos, never cuts off photos a document already has.                                                                                                                                                                                                                                           |
+| `customNodes`        | `EditorNodes`                                          | none                  | Your own node classes, registered after the shipped ones. A node with a static `kgMenu` (a `CardMenuItem` or a list) is listed in the menus.                                                                                                                                                                                                                                                                                                   |
+| `comments`           | `KoenigCommentsOptions`                                | off                   | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                                                                                                                                                                                                                                                                                     |
+| `menuItems`          | `CardMenuItem[]`                                       | none                  | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                                                                                                                                                                                                                                                                                             |
+| `strings`            | `KoenigStringsInput`                                   | English               | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                                                                                                                                                                                                                                                                                          |
+| `toolbar`            | `KoenigToolbarItem[]`                                  | all                   | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `textDirection`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`. |
+| `colors`             | `Partial<Record<KoenigColorSlot, KoenigColorSetting>>` | the editor's palettes | Per colour slot: a `palette` of swatches, `picker: false` to switch the colour wheel off, `none: false` to take away the editor's own colour. See [Colours](#-colours).                                                                                                                                                                                                                                                                        |
+| `fileIcons`          | `false \| { overrides? }`                              | on                    | The file card's type icons; `false` switches them off, `overrides` maps an extension to your own icon component; see [File, video and audio cards](#-file-video-and-audio-cards).                                                                                                                                                                                                                                                              |
+| `codeLanguages`      | `KoenigCodeLanguage[]`                                 | highlighter's         | The languages the code block's list offers, each a `label` and a Prism language `value`; see [Code blocks](#-code-blocks).                                                                                                                                                                                                                                                                                                                     |
+| `fonts`              | `KoenigFont[]`                                         | none                  | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                                                                                                                                                                                                                                                                                           |
+| `toolbarRows`        | `1 \| 2`                                               | `2`                   | The rows the selection toolbar uses; see [Toolbar actions](#-toolbar-actions).                                                                                                                                                                                                                                                                                                                                                                 |
+| `toolbarActions`     | `KoenigToolbarAction[]`                                | none                  | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                                                                                                                                                                                                                                                                                 |
+| `tools`              | `KoenigTool[]`                                         | all                   | The features that are not cards: `imageEditor`, `emojiPicker`, `preview`, `shortcuts`, `findReplace` and `cleanPaste`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview).                                                                                                                                                                                          |
+| `spellCheck`, `lang` | `boolean`, `string`                                    | on, none              | `spellCheck={false}` switches the browser's spell check off in the editing area; `lang` names the language of the text for it.                                                                                                                                                                                                                                                                                                                 |
+| `collaboration`      | `KoenigCollaboration \| null`                          | `null`                | The Yjs provider factory. Without it the editor works alone and asks for no provider.                                                                                                                                                                                                                                                                                                                                                          |
+| `nodes`              | `EditorNodes`                                          | `DEFAULT_NODES`       | The base node set the `cards` choice filters. `BASIC_NODES` and `MINIMAL_NODES` are smaller sets.                                                                                                                                                                                                                                                                                                                                              |
+| `initialEditorState` | `string \| SerializedEditorState`                      | empty                 | The document to open. In a collaborative session it seeds the room only while the room is empty.                                                                                                                                                                                                                                                                                                                                               |
+| `fileUploader`       | `Partial<FileUploader>`                                | none                  | The upload hook cards call as `useFileUpload("image")`, and the accepted file types. Without it the editor and its cards still work, and an upload attempt fails and logs why.                                                                                                                                                                                                                                                                 |
+| `cardConfig`         | `Record<string, unknown>`                              | `{}`                  | Card settings, for example `createSnippet` and `snippets` to turn on snippets.                                                                                                                                                                                                                                                                                                                                                                 |
+| `darkMode`           | `boolean`                                              | `false`               | Use the dark card styles.                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `editable`           | `boolean`                                              | `true`                | Start editable or read-only.                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `onError`            | `(error: Error) => void`                               | `console.error`       | Called with errors Lexical catches during updates.                                                                                                                                                                                                                                                                                                                                                                                             |
 
 `KoenigEditor` takes the per-editor props:
 
@@ -281,11 +281,7 @@ const actions: KoenigToolbarAction[] = [
     label: "Highlight note",
     Icon: NoteIcon, // optional; the first letters of the label show otherwise
     Card: ({ text, replaceSelection, close }) => (
-      <NoteCard
-        text={text}
-        onAccept={(note) => replaceSelection(note)}
-        onCancel={close}
-      />
+      <NoteCard text={text} onAccept={(note) => replaceSelection(note)} onCancel={close} />
     ),
   },
 ];
@@ -391,13 +387,13 @@ a place to write; in the reader's view (Preview), in print, and wherever the edi
 they are solid. In forced-colours mode the grid uses the system colours, with a heavier line under
 the header. Set the tokens on any ancestor of the editor:
 
-| Token                          | Default                             | What it does                                     |
-| ------------------------------ | ----------------------------------- | ------------------------------------------------ |
-| `--kg-table-border-color`      | `--grey-700`                        | Cell border colour                               |
-| `--kg-table-border-style`      | `solid`                             | Cell border style in the reader's view and print |
-| `--kg-table-edit-border-style` | `dashed`                            | Cell border style while the editor is editable   |
-| `--kg-table-header-bg`         | none (transparent)                  | Header row background                            |
-| `--kg-table-selected-bg`       | selection colour at 14%             | Background of the selected cells                 |
+| Token                          | Default                 | What it does                                     |
+| ------------------------------ | ----------------------- | ------------------------------------------------ |
+| `--kg-table-border-color`      | `--grey-700`            | Cell border colour                               |
+| `--kg-table-border-style`      | `solid`                 | Cell border style in the reader's view and print |
+| `--kg-table-edit-border-style` | `dashed`                | Cell border style while the editor is editable   |
+| `--kg-table-header-bg`         | none (transparent)      | Header row background                            |
+| `--kg-table-selected-bg`       | selection colour at 14% | Background of the selected cells                 |
 
 The table, its rows and cells carry the classes `kg-table`, `kg-table-row`, `kg-table-cell`,
 `kg-table-cell-header` and `kg-table-cell-selected` for your own rules, and the cell the cursor is
@@ -427,7 +423,7 @@ bar or a failure belongs to one picture. Files outside `fileUploader.fileTypes.i
 and images past the ninth, are refused with a message (`strings.gallery`) before the uploader is
 called. A gallery has its own caption too.
 
-*Full screen.* A button on the gallery, and one on each photo, opens a viewer that fills the
+_Full screen._ A button on the gallery, and one on each photo, opens a viewer that fills the
 screen, for editors and for people reading the document. It is a modal dialog: focus stays in it,
 Escape closes it and returns focus to the button, Left and Right (and swipe on a touch screen)
 move between photos, Home and End jump to the first and last, a thumbnail strip jumps to any
@@ -435,7 +431,7 @@ photo, and the photo's title and caption show over the bottom with the same coll
 fades only when the person has not asked for reduced motion. The photo's alt text is on the
 image, not printed over it.
 
-*Slideshow.* A selected gallery's settings panel also has **Auto-advance** with a seconds box (the
+_Slideshow._ A selected gallery's settings panel also has **Auto-advance** with a seconds box (the
 viewer goes to the next photo after that many seconds and starts over after the last; a Pause and
 Play button and the Space key stop and start it, and a move by hand starts the wait again),
 **Random order** (the strip and the counter keep the set order, the counter showing the photo's own
@@ -450,7 +446,7 @@ with `gallery={{ autoAdvance: false, shuffle: false, screenMode: false }}`; a sw
 is not shown and a stored one does not play. A custom `cardRenderers.gallery` gets `slideshow`,
 `setSlideshow` and `slideshowOptions`. The wording is `strings.gallery`.
 
-*How many photos.* `gallery.maxImages` (default 50) is the host's ceiling. Select a gallery and its
+_How many photos._ `gallery.maxImages` (default 50) is the host's ceiling. Select a gallery and its
 settings panel has a "Maximum number of images" box for that gallery: at most the host's ceiling,
 at least the number of photos already in it, and saved in the card, so the reader's view and the
 HTML output (`data-kg-max-images`, never more photos than that) keep to it. The card shows "n of
@@ -459,7 +455,7 @@ than the host's limit keeps them all: the limit is for adding. Many photos load 
 host's `fileUploader.upload` is called once per photo, up to three at a time, so a host's upload
 hook must cope with overlapping calls.
 
-*Title, caption and alt text.* Selecting a photo shows its icons: remove, and an icon that opens a
+_Title, caption and alt text._ Selecting a photo shows its icons: remove, and an icon that opens a
 dialog for that photo's title, caption and alt text (its help text says how to move the photo; focus stays in the dialog, Escape closes it without saving,
 Enter in the title saves). The text shows as an overlay along the bottom of the photo, on a solid
 dark band so it reads on any picture. Each photo's overlay has a control that collapses it, and
@@ -490,12 +486,12 @@ in the editor; the saved document and the HTML output are the same.
 
 **The gallery contract** (`KoenigGalleryRenderProps`) has four groups of props:
 
-| Group | Props |
-| --- | --- |
+| Group        | Props                                                                                                                                                                                                                   |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | What to show | `images` (each with `alt`, `title` and `caption`, all plain text, plus `src`, `previewSrc`, `width`, `height`), `caption` (the gallery's own caption editor, ready to place), `errorMessage`, `isUploading`, `progress` |
-| State | `isSelected`, and `readOnly`: true when the editor is not editable, so draw a reader's view with no editing controls |
-| Settings | `maxImages` (this gallery's limit), `hostMaxImages` (the ceiling it cannot exceed), `mimeTypes` |
-| Callbacks | `addFiles(files)`, `removeImage(index)`, `moveImage(from, to)`, `replaceImages(list)` (the whole list, for your own drag and drop), `updateImage(index, { alt, title, caption })`, `setMaxImages(n)`, `clearError()` |
+| State        | `isSelected`, and `readOnly`: true when the editor is not editable, so draw a reader's view with no editing controls                                                                                                    |
+| Settings     | `maxImages` (this gallery's limit), `hostMaxImages` (the ceiling it cannot exceed), `mimeTypes`                                                                                                                         |
+| Callbacks    | `addFiles(files)`, `removeImage(index)`, `moveImage(from, to)`, `replaceImages(list)` (the whole list, for your own drag and drop), `updateImage(index, { alt, title, caption })`, `setMaxImages(n)`, `clearError()`    |
 
 **The header contract** (`KoenigHeaderRenderProps`) carries the card's values (`title`,
 `subtitle`, `backgroundColor`, `backgroundImageSrc`, `buttonText`, `buttonEmoji`, `buttonUrl`, `alignment` (`left`, `center` or `right`), the
@@ -540,21 +536,35 @@ at its smallest:
 ```tsx
 import type { KoenigGalleryRenderProps } from "node-koenig-editor";
 
-const Strip = ({ images, addFiles, removeImage, updateImage, moveImage, caption, maxImages, readOnly }: KoenigGalleryRenderProps) => (
+const Strip = ({
+  images,
+  addFiles,
+  removeImage,
+  updateImage,
+  moveImage,
+  caption,
+  maxImages,
+  readOnly,
+}: KoenigGalleryRenderProps) => (
   <div className="my-gallery">
     {images.map((image, index) => (
       <figure key={image.fileName}>
         <img alt={image.alt} src={image.previewSrc ?? image.src} />
         {readOnly ? null : (
           <>
-            <input value={image.alt} onChange={(e) => updateImage(index, { alt: e.target.value })} />
+            <input
+              value={image.alt}
+              onChange={(e) => updateImage(index, { alt: e.target.value })}
+            />
             <button onClick={() => moveImage(index, index - 1)}>Earlier</button>
             <button onClick={() => removeImage(index)}>Remove</button>
           </>
         )}
       </figure>
     ))}
-    {!readOnly && images.length < maxImages ? <input multiple type="file" onChange={(e) => addFiles(e.target.files!)} /> : null}
+    {!readOnly && images.length < maxImages ? (
+      <input multiple type="file" onChange={(e) => addFiles(e.target.files!)} />
+    ) : null}
     {caption}
   </div>
 );
@@ -619,7 +629,11 @@ sits under and updates as the text changes. Place it in any component rendered i
 ```tsx
 const WordCount = () => {
   const { wordsLabel, readingTimeLabel } = useKoenigWordCount({ wordsPerMinute: 200 });
-  return <p>{wordsLabel} · {readingTimeLabel}</p>;
+  return (
+    <p>
+      {wordsLabel} · {readingTimeLabel}
+    </p>
+  );
 };
 
 <KoenigComposer>
@@ -638,7 +652,6 @@ and link, callout and toggle text, and the source of a Markdown card add nothing
 between spaces ("well-known" is one); Chinese, Japanese and Thai text is split with the browser's
 word segmenter.
 
-
 ## 📎 File, video and audio cards
 
 All three are in the default card set (`/file`, `/video`, `/audio`) and upload through your
@@ -647,7 +660,7 @@ Nothing is embedded from outside and nothing is fetched from a third party; a vi
 plays from the url your uploader returned.
 
 - **Limits.** If `fileUploader.fileTypes.file` (or `.video`, `.audio`) is set, the card checks the
-  chosen file against its `extensions`, `mimeTypes` and an optional `maxSize` in bytes *before*
+  chosen file against its `extensions`, `mimeTypes` and an optional `maxSize` in bytes _before_
   uploading, and names the file in the message (`strings.file.typeError`, `strings.file.sizeError`).
   A host with no `fileTypes` gets no pre-check; the uploader has the last word.
 - **File.** A title, a description, and the file name and size. It saves as a download link. The
@@ -670,8 +683,16 @@ plays from the url your uploader returned.
 ```tsx
 const uploader = {
   fileTypes: {
-    file: { extensions: [".pdf", ".zip"], mimeTypes: ["application/pdf", "application/zip"], maxSize: 20_000_000 },
-    video: { extensions: [".mp4", ".webm"], mimeTypes: ["video/mp4", "video/webm"], maxSize: 200_000_000 },
+    file: {
+      extensions: [".pdf", ".zip"],
+      mimeTypes: ["application/pdf", "application/zip"],
+      maxSize: 20_000_000,
+    },
+    video: {
+      extensions: [".mp4", ".webm"],
+      mimeTypes: ["video/mp4", "video/webm"],
+      maxSize: 200_000_000,
+    },
   },
   useFileUpload: (type) => useMyUploader(type), // returns { upload, isLoading, progress, errors }
 };
@@ -731,15 +752,15 @@ selection, focus and scroll position come back and no change is lost.
 A small bar next to the button lets the author check the result: **width** (desktop, tablet or
 phone, in a framed viewport), **theme** (light or dark) and **text size** (12 to 20).
 
-| Option on `KoenigComposer` | Type | Default | What it does |
-| --- | --- | --- | --- |
-| `preview` | `boolean` | uncontrolled | Controls the reader's view. When given, the editor only changes with this prop and reports a request to change through `onPreviewChange`. |
-| `defaultPreview` | `boolean` | `false` | Starts with the reader's view on, when `preview` is not given. |
-| `onPreviewChange` | `(preview: boolean) => void` | none | Called when the person (or the API) turns it on or off. |
-| `previewOptions` | `Partial<KoenigPreviewOptions>` | `desktop`, `light`, `16` | The reader simulation the view starts with: `width`, `theme` and `textSize`. |
-| `onPreviewOptionsChange` | `(options) => void` | none | Called when the simulation options change. |
-| `previewComments` | `boolean` | `false` | Show inline comment highlights in the reader's view. |
-| `showPreviewToggle` | `boolean` | `true` | Put the default button above the editor. Pass `false` to place your own. |
+| Option on `KoenigComposer` | Type                            | Default                  | What it does                                                                                                                              |
+| -------------------------- | ------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `preview`                  | `boolean`                       | uncontrolled             | Controls the reader's view. When given, the editor only changes with this prop and reports a request to change through `onPreviewChange`. |
+| `defaultPreview`           | `boolean`                       | `false`                  | Starts with the reader's view on, when `preview` is not given.                                                                            |
+| `onPreviewChange`          | `(preview: boolean) => void`    | none                     | Called when the person (or the API) turns it on or off.                                                                                   |
+| `previewOptions`           | `Partial<KoenigPreviewOptions>` | `desktop`, `light`, `16` | The reader simulation the view starts with: `width`, `theme` and `textSize`.                                                              |
+| `onPreviewOptionsChange`   | `(options) => void`             | none                     | Called when the simulation options change.                                                                                                |
+| `previewComments`          | `boolean`                       | `false`                  | Show inline comment highlights in the reader's view.                                                                                      |
+| `showPreviewToggle`        | `boolean`                       | `true`                   | Put the default button above the editor. Pass `false` to place your own.                                                                  |
 
 From the editor API: `api.isPreview()` and `api.setPreview(true | false)`. To place the controls
 yourself, render `<KoenigPreviewToggle />` (and `<KoenigPreviewOptionsPanel />`) inside the
@@ -1022,8 +1043,34 @@ export const collaboration: KoenigCollaboration = {
 - `getNestedXmlText(document, id)` keeps a nested editor's content inside the main document
   (a named top-level `XmlText`) when your transport carries one document per room.
 - `shouldBootstrap` (default `true`) seeds an empty room from `initialEditorState`.
-- `cursorsContainerRef`, `cursorColor`, `username` and `excludedProperties` go straight to
-  Lexical's `CollaborationPlugin`.
+- Every property of every built-in card is shared between the windows of a session, and each
+  card's nested text (captions, the header title and subtitle, callout text, toggle headings and
+  content, toggle group items) is a shared document of its own, found by the id Lexical hands your
+  `providerFactory`. Create the `Doc` for an id you have not seen, as the example above does.
+
+### Custom cards
+
+A card you add through `customNodes` is shared like any other node: all its properties go into the
+shared document. Collaboration for it is yours to provide, and one thing needs declaring. A property
+that Yjs cannot store (an editor's saved `EditorState`, a DOM node, a function, anything circular)
+stays in the window that made it. List it on the class:
+
+```ts
+class PollNode extends DecoratorNode<ReactNode> {
+  // kept in this window only; every other property is shared
+  static collabLocalProperties = ["__draftEditorState"];
+}
+```
+
+The package's own cards use the same list. `collaboration.excludedProperties` adds to it from the
+host side, for a node class you cannot edit.
+
+If the card holds a nested editor, keep it as a property of its own on the node (`__captionEditor`),
+never inside an array or an object. Lexical gives each such editor a shared document, with the same
+id in every window, and calls your `providerFactory` for it. List the editor's saved `EditorState`
+in `collabLocalProperties` too. An editor that sits inside an array or an object cannot be found by
+the other windows, and its editors reach the shared document as an object that cannot be encoded,
+which stops sync for the whole document.
 
 ## 🎨 Styles and theme tokens
 
@@ -1079,18 +1126,18 @@ root one unit is `0.625rem`, i.e. 10px, and it grows with the person's text-size
 pages that already use the 62.5% root set `--kg-rem: 1rem`. Set these on any ancestor of the
 editor.
 
-| Token                  | Default                        | What it sets                                                                                                                 |
-| ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| `--kg-rem`             | `0.625rem`                     | The length unit for everything the editor draws; the single scale knob.                                                      |
-| `--kg-font-size`       | `2rem` (in `--kg-rem` units)   | Body text size (paragraphs, quotes, lists).                                                                                  |
-| `--kg-line-height`     | `1.6em`                        | Body line height.                                                                                                            |
-| `--kg-font-body`       | `Georgia, Times, serif`        | Body font family (the menus and toolbars use `--kg-font-sans`).                                                              |
-| `--kg-font-size-h1`    | `4.4rem` (in `--kg-rem` units) | Heading sizes, H1 to H5: `--kg-font-size-h1` through `--kg-font-size-h5`.                                                    |
-| `--kg-selection-color` | black (white in dark mode)     | The colour of selected and focused cards, active toolbar buttons, drop lines and focus outlines. There is no built-in green. |
-| `--kg-menu-width`      | `28rem` (in `--kg-rem` units)  | Width of the "+" and slash menus.                                                                                            |
-| `--kg-menu-max-height` | `32rem` (in `--kg-rem` units)  | Tallest the menus grow before they scroll; they also shrink to fit the room.                                                 |
+| Token                  | Default                        | What it sets                                                                                                                                                                                                      |
+| ---------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--kg-rem`             | `0.625rem`                     | The length unit for everything the editor draws; the single scale knob.                                                                                                                                           |
+| `--kg-font-size`       | `2rem` (in `--kg-rem` units)   | Body text size (paragraphs, quotes, lists).                                                                                                                                                                       |
+| `--kg-line-height`     | `1.6em`                        | Body line height.                                                                                                                                                                                                 |
+| `--kg-font-body`       | `Georgia, Times, serif`        | Body font family (the menus and toolbars use `--kg-font-sans`).                                                                                                                                                   |
+| `--kg-font-size-h1`    | `4.4rem` (in `--kg-rem` units) | Heading sizes, H1 to H5: `--kg-font-size-h1` through `--kg-font-size-h5`.                                                                                                                                         |
+| `--kg-selection-color` | black (white in dark mode)     | The colour of selected and focused cards, active toolbar buttons, drop lines and focus outlines. There is no built-in green.                                                                                      |
+| `--kg-menu-width`      | `28rem` (in `--kg-rem` units)  | Width of the "+" and slash menus.                                                                                                                                                                                 |
+| `--kg-menu-max-height` | `32rem` (in `--kg-rem` units)  | Tallest the menus grow before they scroll; they also shrink to fit the room.                                                                                                                                      |
 | `--kg-breakout-room`   | `1.8rem` (in `--kg-rem` units) | How far a wide or full card (the gallery, a wide image) may extend past the text column on each side. Set it large (`100vw`) when the editor spans the whole page, to get the viewport-wide cards upstream draws. |
-| `--kg-plus-size`       | `2.2rem` (in `--kg-rem` units) | Diameter of the "+" button beside an empty line.                                                                             |
+| `--kg-plus-size`       | `2.2rem` (in `--kg-rem` units) | Diameter of the "+" button beside an empty line.                                                                                                                                                                  |
 
 The `--kg-font-size-h2`, `--kg-font-size-h3`, `--kg-font-size-h4` and `--kg-font-size-h5`
 defaults are `3.2rem`, `2.5rem`, `2.2rem` and `2rem`. The editor itself sets `--kg-menu-fit`

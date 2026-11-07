@@ -11,6 +11,9 @@ import {populateNestedEditor, setupNestedEditor} from '../utils/nested-editors';
 export const INSERT_TOGGLE_COMMAND = createCommand();
 
 export class ToggleNode extends BaseToggleNode {
+    // properties a shared session keeps in this window (see KoenigCollaboration)
+    static collabLocalProperties = ['__contentEditorInitialState', '__headingEditorInitialState'];
+
     // Lexical expects every registered class to declare these itself; the base class's
     // versions already build `this`, so they only need passing through.
     static getType() {

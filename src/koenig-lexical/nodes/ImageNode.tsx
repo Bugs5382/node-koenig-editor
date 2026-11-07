@@ -11,6 +11,9 @@ import {populateNestedEditor, setupNestedEditor} from '../utils/nested-editors';
 export const INSERT_IMAGE_COMMAND = createCommand();
 
 export class ImageNode extends BaseImageNode {
+    // properties a shared session keeps in this window (see KoenigCollaboration)
+    static collabLocalProperties = ['__captionEditorInitialState', '__initialFile', '__isImageHidden', '__previewSrc', '__selector', '__triggerFileDialog'];
+
     // Lexical expects every registered class to declare these itself; the base class's
     // versions already build `this`, so they only need passing through.
     static getType() {

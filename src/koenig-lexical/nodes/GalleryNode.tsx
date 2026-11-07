@@ -27,6 +27,9 @@ export function recalculateImageRows(images) {
 }
 
 export class GalleryNode extends BaseGalleryNode {
+    // properties a shared session keeps in this window (see KoenigCollaboration)
+    static collabLocalProperties = ['__captionEditorInitialState'];
+
     // Lexical expects every registered class to declare these itself; the base class's
     // versions already build `this`, so they only need passing through.
     static getType() {

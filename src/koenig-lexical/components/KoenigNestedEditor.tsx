@@ -30,6 +30,7 @@ const KoenigNestedEditor = ({
     hiddenFormats = [],
     useDefaultClasses = true,
     dataTestId,
+    skipCollabChecks,
     children
 }) => {
     const initialNodes = nodes === 'minimal' ? MINIMAL_NODES : BASIC_NODES;
@@ -41,6 +42,7 @@ const KoenigNestedEditor = ({
             initialEditorState={initialEditorState}
             initialNodes={initialNodes}
             initialTheme={initialTheme}
+            skipCollabChecks={skipCollabChecks}
         >
             <KoenigComposableEditor
                 className={textClassName}
