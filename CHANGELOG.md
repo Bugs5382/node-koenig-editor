@@ -8,6 +8,10 @@
 
 - fix(toolbar): single-swatch toggle, nested-editor focus guard, narrow toolbar @Bugs5382 (#95)
 
+#### 📄 Documentation
+
+- docs: move the README's per-feature detail into guides/ and shorten the README (#89) @Bugs5382 (#90)
+
 ### Extra
 
 **Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.2.0...v1.2.1
