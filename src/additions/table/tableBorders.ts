@@ -156,28 +156,32 @@ const CSS_PROPERTY: Record<BorderSide, string> = {
 
 /** Writes a cell's sides onto its element (inline, so they win over the table's default lines).
  *  Sides nobody set are left to the stylesheet. Inside an editor read or update. */
+export const $syncOneCellBorders = (editor: LexicalEditor, cell: TableCellNode): void => {
+  const element = editor.getElementByKey(cell.getKey());
+  if (!element) return;
+  const borders = $getCellBorders(cell);
+  let any = false;
+  for (const side of BORDER_SIDES) {
+    const edge = borders[side];
+    if (edge) {
+      any = true;
+      const css = borderCss(edge);
+      if (element.style.getPropertyValue(CSS_PROPERTY[side]) !== css)
+        element.style.setProperty(CSS_PROPERTY[side], css);
+    } else if (element.hasAttribute("data-kg-bordered")) {
+      element.style.removeProperty(CSS_PROPERTY[side]);
+    }
+  }
+  if (any) element.setAttribute("data-kg-bordered", "");
+  else element.removeAttribute("data-kg-bordered");
+};
+
+/** Writes every cell of a table onto its elements. Inside an editor read or update. */
 export const $syncCellBorders = (editor: LexicalEditor, table: TableNode): void => {
   for (const row of table.getChildren()) {
     if (!$isTableRowNode(row)) continue;
     for (const cell of row.getChildren()) {
-      if (!$isTableCellNode(cell)) continue;
-      const element = editor.getElementByKey(cell.getKey());
-      if (!element) continue;
-      const borders = $getCellBorders(cell);
-      let any = false;
-      for (const side of BORDER_SIDES) {
-        const edge = borders[side];
-        if (edge) {
-          any = true;
-          const css = borderCss(edge);
-          if (element.style.getPropertyValue(CSS_PROPERTY[side]) !== css)
-            element.style.setProperty(CSS_PROPERTY[side], css);
-        } else if (element.hasAttribute("data-kg-bordered")) {
-          element.style.removeProperty(CSS_PROPERTY[side]);
-        }
-      }
-      if (any) element.setAttribute("data-kg-bordered", "");
-      else element.removeAttribute("data-kg-bordered");
+      if ($isTableCellNode(cell)) $syncOneCellBorders(editor, cell);
     }
   }
 };

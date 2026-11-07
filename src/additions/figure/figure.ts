@@ -76,6 +76,34 @@ export const $figureNumber = (node: LexicalNode): number => {
   return 0;
 };
 
+/** The number of every numbered figure in the document, by node key, from one pass in reading order.
+ *  For code that draws many figures at once, so it does not walk the document for each one. */
+export const $figureNumbers = (): Map<string, number> => {
+  const counts = new Map<string, number>();
+  const numbers = new Map<string, number>();
+  for (const { node } of $dfs()) {
+    const figure = $getFigure(node);
+    if (!figure?.numbered || !figure.label.trim()) continue;
+    const label = figure.label.trim().toLowerCase();
+    const next = (counts.get(label) ?? 0) + 1;
+    counts.set(label, next);
+    numbers.set(node.getKey(), next);
+  }
+  return numbers;
+};
+
+/** The same text as `$figureText`, with the numbers taken from `$figureNumbers`. */
+export const $figureTextWith = (node: LexicalNode, numbers: Map<string, number>): string => {
+  const figure = $getFigure(node);
+  if (!figure) return "";
+  const label = figure.label.trim();
+  const number = numbers.get(node.getKey()) ?? 0;
+  const head = label ? (number ? `${label} ${number}` : label) : "";
+  const title = figure.title.trim();
+  if (head && title) return `${head}: ${title}`;
+  return head || title;
+};
+
 /** "Figure 2: Sunrise", "Figure: Sunrise" (not numbered), "Sunrise" (no label), or "" for nothing. */
 export const $figureText = (node: LexicalNode): string => {
   const figure = $getFigure(node);

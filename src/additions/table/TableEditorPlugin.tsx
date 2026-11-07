@@ -315,6 +315,12 @@ export const TableEditorPlugin = () => {
 
   const focusEditor = useCallback(() => {
     editor.focus();
+    // a menu that closes took the focus with it when React removed it, after the call above: put
+    // the focus back once it is gone, so the next key (an arrow, Alt with an arrow) reaches the table
+    requestAnimationFrame(() => {
+      const root = editor.getRootElement();
+      if (root && !root.contains(document.activeElement)) root.focus({ preventScroll: true });
+    });
   }, [editor]);
 
   const closeAll = useCallback(() => {
