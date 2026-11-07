@@ -6,6 +6,7 @@
 
 #### 🚀 Features
 
+- feat(editor): alignment buttons in the selection toolbar, with shortcuts, saved in the document @Bugs5382 (#52)
 - feat(editor): a Preview toggle that shows the document as a published reader sees it @Bugs5382 (#41)
 - feat(playground): demo app in the package repo with a live settings panel @Bugs5382 (#36)
 - feat(editor): file, video, audio, button and markdown cards, word count, image editor and emoji picker @Bugs5382 (#34)
