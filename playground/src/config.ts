@@ -200,7 +200,8 @@ export function serializeSettings(settings: Settings, catalog: Catalog): string 
   if (settings.selection !== defaults.selection)
     params.set("selection", settings.selection.slice(1));
   if (settings.size !== defaults.size) params.set("size", String(settings.size));
-  if (settings.toolbarRows !== defaults.toolbarRows) params.set("toolbarRows", String(settings.toolbarRows));
+  if (settings.toolbarRows !== defaults.toolbarRows)
+    params.set("toolbarRows", String(settings.toolbarRows));
   if (settings.tableBorder !== defaults.tableBorder)
     params.set("tableBorder", settings.tableBorder);
   if (settings.previewWidth !== defaults.previewWidth)
