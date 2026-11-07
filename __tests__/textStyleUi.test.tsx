@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { act, cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { $getRoot, $isTextNode, type TextNode } from "lexical";
 import { KOENIG_TOOLBAR_ITEMS, type KoenigEditorAPI } from "node-koenig-editor";
 import { afterEach, describe, expect, it } from "vitest";
@@ -113,7 +113,9 @@ describe("the menus", () => {
     await selectAll(api);
     await open("textColor");
     await waitFor(() =>
-      expect(document.querySelector("[data-kg-color-control]")?.getAttribute("aria-label")).toBe("Text colour"),
+      expect(document.querySelector("[data-kg-color-control]")?.getAttribute("aria-label")).toBe(
+        "Text colour",
+      ),
     );
     await pick("#D64545");
     expect(style(api)).toContain("color: #D64545");
@@ -175,7 +177,9 @@ describe("the menus", () => {
     await selectAll(api);
     await open("fontSize");
     const items = [...document.querySelectorAll("[data-kg-style-item]")] as HTMLElement[];
-    expect(document.activeElement).toBe(items.find((item) => item.getAttribute("aria-checked") === "true") ?? items[0]);
+    expect(document.activeElement).toBe(
+      items.find((item) => item.getAttribute("aria-checked") === "true") ?? items[0],
+    );
     const first = document.activeElement as HTMLElement;
     await act(async () => {
       fireEvent.keyDown(first, { key: "ArrowDown" });

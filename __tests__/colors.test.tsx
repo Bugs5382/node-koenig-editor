@@ -115,7 +115,9 @@ describe("the colour control in the toolbar", () => {
     await selectAll(api);
     await open("textColor");
     const swatches = [...document.querySelectorAll("[data-kg-color-swatch]")];
-    expect(swatches.map((swatch) => swatch.getAttribute("data-kg-color-swatch"))).toEqual(["#112233"]);
+    expect(swatches.map((swatch) => swatch.getAttribute("data-kg-color-swatch"))).toEqual([
+      "#112233",
+    ]);
     await act(async () => {
       fireEvent.click(swatches[0] as Element);
     });

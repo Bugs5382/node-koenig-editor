@@ -81,7 +81,9 @@ export const ColorControl: FC<ColorControlProps> = ({
   const choose = (next: null | string) => {
     if (isColorAllowed(setting, next)) onChange(next);
   };
-  const stop = keepFocus ? (event: { preventDefault: () => void }) => event.preventDefault() : undefined;
+  const stop = keepFocus
+    ? (event: { preventDefault: () => void }) => event.preventDefault()
+    : undefined;
   const custom = !!current && !setting.palette.some((swatch) => sameColor(swatch.value, current));
 
   return (
@@ -139,7 +141,14 @@ export const ColorControl: FC<ColorControlProps> = ({
         >
           <input
             aria-label={strings.custom}
-            style={{ cursor: "pointer", height: "100%", inset: 0, opacity: 0, position: "absolute", width: "100%" }}
+            style={{
+              cursor: "pointer",
+              height: "100%",
+              inset: 0,
+              opacity: 0,
+              position: "absolute",
+              width: "100%",
+            }}
             type="color"
             value={current ? normalizeColor(current) : "#000000"}
             onChange={(event) => choose(event.target.value)}

@@ -40,7 +40,15 @@ interface ColorMenuProps {
 // The colour list under a selection-toolbar button: the shared colour control in a floating box.
 // It opens with focus on the chosen swatch (or the first), Tab moves between swatches and the
 // picker, and Escape closes it. Pressing a swatch never takes the text selection away.
-export const ColorMenu: FC<ColorMenuProps> = ({ anchor, label, onClose, onPick, setting, slot, value }) => {
+export const ColorMenu: FC<ColorMenuProps> = ({
+  anchor,
+  label,
+  onClose,
+  onPick,
+  setting,
+  slot,
+  value,
+}) => {
   const container = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLDivElement>(null);
 
