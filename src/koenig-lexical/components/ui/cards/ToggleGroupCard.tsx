@@ -47,6 +47,7 @@ export function ToggleGroupCard({itemEditors = [], isEditing = false, onAddItem,
                                         nodes='minimal'
                                         placeholderClassName={'!font-sans !text-2xl !leading-[1.1] !font-bold !tracking-tight text-black dark:text-grey-50 opacity-40'}
                                         placeholderText={strings.toggle.headingPlaceholder}
+                                        skipCollabChecks={true}
                                         singleParagraph={true}
                                         textClassName={'koenig-lexical-heading heading-xsmall whitespace-normal text-black dark:text-grey-50 opacity-100'}
                                     />
@@ -92,6 +93,7 @@ export function ToggleGroupCard({itemEditors = [], isEditing = false, onAddItem,
                                     initialEditorState={item.contentEditorInitialState}
                                     placeholderClassName={'font-serif text-xl font-normal !leading-[1.6em] text-grey-900 dark:text-grey-100 opacity-40'}
                                     placeholderText={strings.toggle.contentPlaceholder}
+                                    skipCollabChecks={true}
                                     textClassName={'whitespace-normal font-serif text-xl font-normal text-grey-900 dark:text-grey-100 opacity-100'}
                                 />
                             </div>

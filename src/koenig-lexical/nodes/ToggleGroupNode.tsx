@@ -5,6 +5,7 @@ import {ToggleGroupNode as BaseToggleGroupNode, renderToggleGroupNode} from '#kg
 import {ToggleGroupNodeComponent} from './ToggleGroupNodeComponent';
 import {cleanBasicHtml} from '@tryghost/kg-clean-basic-html';
 import {createCommand} from 'lexical';
+import {itemsMatch} from '../utils/toggleGroupItems';
 import {populateNestedEditor, setupNestedEditor} from '../utils/nested-editors';
 
 export const INSERT_TOGGLE_GROUP_COMMAND = createCommand();
@@ -12,12 +13,18 @@ export const INSERT_TOGGLE_GROUP_COMMAND = createCommand();
 // A new group starts with two items; a person adds more (there is no limit).
 const NEW_GROUP_ITEMS = 2;
 
-const buildItem = ({heading = '', content = ''} = {}) => {
-    const item = {};
+// An item's id is what the other windows of a shared session find its editors by: each editor's
+// key is the id of its shared document, so it has to be the same in every window.
+const newItemId = () => (globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`);
+
+const buildItem = ({heading = '', content = '', id = newItemId()} = {}) => {
+    const item = {id};
     setupNestedEditor(item, 'headingEditor', {nodes: MINIMAL_NODES});
     setupNestedEditor(item, 'contentEditor', {nodes: BASIC_NODES});
     populateNestedEditor(item, 'headingEditor', heading);
     populateNestedEditor(item, 'contentEditor', content);
+    item.headingEditor._key = `${id}:heading`;
+    item.contentEditor._key = `${id}:content`;
     return item;
 };
 
@@ -30,6 +37,9 @@ const htmlOf = (editor, options) => {
 };
 
 export class ToggleGroupNode extends BaseToggleGroupNode {
+    // properties a shared session keeps in this window (see KoenigCollaboration)
+    static collabLocalProperties = ['__itemEditors'];
+
     static getType() {
         return super.getType();
     }
@@ -42,8 +52,24 @@ export class ToggleGroupNode extends BaseToggleGroupNode {
         return super.importJSON(serializedNode);
     }
 
-    // one entry per item: {headingEditor, headingEditorInitialState, contentEditor, contentEditorInitialState}
+    // one entry per item: {id, headingEditor, headingEditorInitialState, contentEditor, contentEditorInitialState}.
+    // The editors stay in this window; `__itemIds` is what a shared session carries, and the
+    // transform below builds the editors for any id this window does not have yet.
     __itemEditors;
+    __itemIds;
+
+    // Brings the editors in line with `__itemIds`. A shared session writes the ids from another
+    // window, and Lexical applies those updates without running node transforms, so the card
+    // calls this from an effect when it sees the two disagree.
+    syncItems() {
+        const wanted = this.getLatest().__itemIds;
+        const have = this.getLatest().__itemEditors;
+        if (!Array.isArray(wanted) || wanted.length === 0 || itemsMatch(wanted, have)) {
+            return;
+        }
+        const byId = new Map(have.map(item => [item.id, item]));
+        this.getWritable().__itemEditors = wanted.map(id => byId.get(id) ?? buildItem({id}));
+    }
 
     static kgMenu = [{
         label: 'Toggle group',
@@ -70,11 +96,13 @@ export class ToggleGroupNode extends BaseToggleGroupNode {
                 : Array.from({length: NEW_GROUP_ITEMS}, () => ({}));
             this.__itemEditors = items.map(buildItem);
         }
+        this.__itemIds = dataset.itemIds ?? this.__itemEditors.map(item => item.id);
     }
 
     getDataset() {
         const dataset = super.getDataset();
         dataset.itemEditors = this.getLatest().__itemEditors;
+        dataset.itemIds = this.getLatest().__itemIds;
         return dataset;
     }
 
@@ -85,6 +113,7 @@ export class ToggleGroupNode extends BaseToggleGroupNode {
     addItem() {
         const writable = this.getWritable();
         writable.__itemEditors = [...writable.__itemEditors, buildItem()];
+        writable.__itemIds = writable.__itemEditors.map(item => item.id);
     }
 
     removeItem(index) {
@@ -93,6 +122,7 @@ export class ToggleGroupNode extends BaseToggleGroupNode {
             return;
         }
         writable.__itemEditors = writable.__itemEditors.filter((_, position) => position !== index);
+        writable.__itemIds = writable.__itemEditors.map(item => item.id);
     }
 
     // the items as HTML, read from the nested editors, which hold the text as it is now
@@ -120,6 +150,7 @@ export class ToggleGroupNode extends BaseToggleGroupNode {
             <KoenigCardWrapper nodeKey={this.getKey()}>
                 <ToggleGroupNodeComponent
                     itemEditors={this.__itemEditors}
+                    itemIds={this.__itemIds}
                     nodeKey={this.getKey()}
                 />
             </KoenigCardWrapper>

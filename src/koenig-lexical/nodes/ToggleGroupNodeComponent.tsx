@@ -5,12 +5,13 @@ import {$getNodeByKey} from 'lexical';
 import {ActionToolbar} from '../components/ui/ActionToolbar';
 import {EDIT_CARD_COMMAND} from '../plugins/KoenigBehaviourPlugin';
 import {SnippetActionToolbar} from '../components/ui/SnippetActionToolbar.jsx';
+import {itemsMatch} from '../utils/toggleGroupItems';
 import {ToggleGroupCard} from '../components/ui/cards/ToggleGroupCard';
 import {ToolbarMenu, ToolbarMenuItem, ToolbarMenuSeparator} from '../components/ui/ToolbarMenu';
 import {useKoenigStrings} from '../../additions/options';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
-export function ToggleGroupNodeComponent({nodeKey, itemEditors}) {
+export function ToggleGroupNodeComponent({nodeKey, itemEditors, itemIds}) {
     const strings = useKoenigStrings();
     const [editor] = useLexicalComposerContext();
     const cardContext = React.useContext(CardContext);
@@ -31,6 +32,16 @@ export function ToggleGroupNodeComponent({nodeKey, itemEditors}) {
         }
     }, [isEditing, itemEditors]);
 
+    // another window of a shared session changed the items: build the editors this one lacks
+    const inStep = !Array.isArray(itemIds) || itemIds.length === 0 || itemsMatch(itemIds, itemEditors);
+    React.useEffect(() => {
+        if (!inStep) {
+            editor.update(() => {
+                $getNodeByKey(nodeKey)?.syncItems();
+            }, {tag: 'history-merge'});
+        }
+    }, [editor, inStep, nodeKey]);
+
     const addItem = () => {
         editor.update(() => {
             $getNodeByKey(nodeKey)?.addItem();
@@ -42,6 +53,10 @@ export function ToggleGroupNodeComponent({nodeKey, itemEditors}) {
             $getNodeByKey(nodeKey)?.removeItem(index);
         });
     };
+
+    if (!inStep) {
+        return null;
+    }
 
     return (
         <>

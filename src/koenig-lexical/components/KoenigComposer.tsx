@@ -128,7 +128,7 @@ const KoenigComposer = ({
 
     // the same Map on every render, so the collaboration binding is not rebuilt
     const hostExcluded = collaboration?.excludedProperties;
-    const excludedProperties = React.useMemo(() => withCardProperties(hostExcluded), [hostExcluded]);
+    const excludedProperties = React.useMemo(() => withCardProperties(nodes, hostExcluded), [nodes, hostExcluded]);
 
     // `fileUploader` and its `fileTypes` are optional (Bugs5382/node-koenig-editor#10): without
     // them the cards still render and edit, and only an upload attempt fails, with the reason

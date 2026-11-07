@@ -11,6 +11,9 @@ import {populateNestedEditor, setupNestedEditor} from '../utils/nested-editors';
 export const INSERT_CALLOUT_COMMAND = createCommand();
 
 export class CalloutNode extends BaseCalloutNode {
+    // properties a shared session keeps in this window (see KoenigCollaboration)
+    static collabLocalProperties = ['__calloutTextEditorInitialState'];
+
     // Lexical expects every registered class to declare these itself; the base class's
     // versions already build `this`, so they only need passing through.
     static getType() {
