@@ -83,7 +83,8 @@ the sources.
 | `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
 | `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
-| `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker` and `preview`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
+| `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker`, `preview`, `shortcuts`, `findReplace` and `cleanPaste`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
+| `spellCheck`, `lang` | `boolean`, `string`               | on, none        | `spellCheck={false}` switches the browser's spell check off in the editing area; `lang` names the language of the text for it. |
 | `collaboration`      | `KoenigCollaboration \| null`     | `null`          | The Yjs provider factory. Without it the editor works alone and asks for no provider.                                                                                            |
 | `nodes`              | `EditorNodes`                     | `DEFAULT_NODES` | The base node set the `cards` choice filters. `BASIC_NODES` and `MINIMAL_NODES` are smaller sets.                                                                                |
 | `initialEditorState` | `string \| SerializedEditorState` | empty           | The document to open. In a collaborative session it seeds the room only while the room is empty.                                                                                 |
@@ -726,6 +727,25 @@ the system colours in forced-colours mode.
 (`paragraphSpacing`: none, small, medium, large; the space after the block) apply to the selected
 blocks. They are saved on the block, drawn as inline CSS, and written as inline `line-height` and
 `margin-bottom` into the saved HTML. "Default" takes them off.
+
+## 📋 Paste, spell check and the shortcuts list
+
+**Clean paste** (the `cleanPaste` tool). HTML pasted from Word, Google Docs or a web page is cleaned
+before the editor reads it: the head, styles, comments and Office tags go, every font, size, colour
+and spacing setting goes, Word's lists (paragraphs with bullet characters) become real nested
+bulleted and numbered lists, Docs' `b` wrapper no longer makes the paste bold, and bold, italic,
+underline, strikethrough, superscript and subscript written as styles become the editor's own
+formats. Headings, links (safe ones only), tables and images stay. Copying inside the editor, a
+pasted link, and a picture with its file are left to the editor's own handling.
+
+**Spell check.** The browser's own spell check works in the editing area unless the composer says
+`spellCheck={false}`; `lang="de"` (any BCP 47 tag) tells the browser which language to check in and
+sets the `lang` attribute of the editing area.
+
+**Keyboard shortcuts** (the `shortcuts` tool). Ctrl or Cmd with **/** opens a list of the shortcuts
+that are on in this editor, in groups, with the keys for this platform; a shortcut whose button the
+host's `toolbar` option leaves out is not listed. Escape or Close returns to the text. Its wording is
+`strings.shortcuts`. `tools={["preview"]}` (any list without them) turns clean paste and the list off.
 
 ## ↔️ Text alignment
 
