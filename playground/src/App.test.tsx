@@ -26,7 +26,10 @@ import { App } from "./App";
 
 const snippet = () => document.querySelector("pre.code")?.textContent ?? "";
 
-beforeEach(() => window.history.replaceState(null, "", "/"));
+beforeEach(() => {
+  window.history.replaceState(null, "", "/");
+  window.localStorage.removeItem("koenig-demo-panel");
+});
 afterEach(cleanup);
 
 describe("playground", () => {
@@ -111,5 +114,51 @@ describe("playground", () => {
       true,
     );
     expect(screen.getByLabelText("sample images for uploads")).toBeDefined();
+  });
+});
+
+describe("the side panel", () => {
+  const aside = () => document.querySelector("aside") as HTMLElement;
+  const page = () => document.querySelector(".page") as HTMLElement;
+
+  it("is shown at first, with a button to hide it", () => {
+    render(<App />);
+    expect(aside().hidden).toBe(false);
+    const toggle = screen.getByRole("button", { name: "Hide side panel" });
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(page().classList.contains("panel-hidden")).toBe(false);
+  });
+
+  it("hides, so the editor takes the whole width, and brings it back", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Hide side panel" }));
+    expect(aside().hidden).toBe(true);
+    expect(page().classList.contains("panel-hidden")).toBe(true);
+    const toggle = screen.getByRole("button", { name: "Show side panel" });
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    // the editor is still there
+    expect(document.querySelector('[contenteditable="true"]')).not.toBeNull();
+    fireEvent.click(toggle);
+    expect(aside().hidden).toBe(false);
+    expect(page().classList.contains("panel-hidden")).toBe(false);
+  });
+
+  it("remembers the choice for the next visit", () => {
+    const first = render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Hide side panel" }));
+    expect(window.localStorage.getItem("koenig-demo-panel")).toBe("hidden");
+    first.unmount();
+    render(<App />);
+    expect(aside().hidden).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Show side panel" }));
+    expect(window.localStorage.getItem("koenig-demo-panel")).toBe("shown");
+  });
+
+  it("keeps the settings working while the panel is hidden", () => {
+    window.localStorage.setItem("koenig-demo-panel", "hidden");
+    window.history.replaceState(null, "", "/?comments=0");
+    render(<App />);
+    expect(snippet()).not.toContain("comments=");
+    expect(aside().hidden).toBe(true);
   });
 });
