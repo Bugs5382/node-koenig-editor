@@ -32,6 +32,16 @@ function ChevronIcon({className, up}) {
     );
 }
 
+// The positions 0..count-1 with `first` in front and the rest in a random order
+function shuffledOrder(count, first) {
+    const rest = Array.from({length: count}, (_, position) => position).filter(position => position !== first);
+    for (let i = rest.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [rest[i], rest[j]] = [rest[j], rest[i]];
+    }
+    return [first, ...rest];
+}
+
 function GalleryRow({index, images, deleteImage, isDragging, isSelected, listIndexOf, total, moveImage, text, announce, openViewer, readOnly, updateImageText, strings, unescapeHtml}) {
     const GalleryImages = images.map((image, idx) => {
         const position =
@@ -221,13 +231,14 @@ function GalleryImage({image, deleteImage, position, isDragging, isSelected, lis
     );
 }
 
-function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, isSelected, moveImage, readOnly, updateImageText, strings, unescapeHtml}) {
+function PopulatedGalleryCard({slideshow, images, deleteImage, reorderHandler, isDragging, isSelected, moveImage, readOnly, updateImageText, strings, unescapeHtml}) {
     const rows = [];
     const withText = images.filter(image => image.title || image.caption);
     const text = useGalleryText(images, withText);
     const [announcement, announce] = React.useState('');
     const [viewing, setViewing] = React.useState(null);
-    const openViewer = (index, opener) => setViewing({index, opener});
+    // With a random order the viewer plays the photos shuffled, starting with the one opened
+    const openViewer = (index, opener) => setViewing({pos: slideshow.shuffle ? 0 : index, opener, order: slideshow.shuffle ? shuffledOrder(images.length, index) : null});
     const noOfImages = images.length;
 
     // 3 images per row unless last row would have a single image in which
@@ -284,15 +295,17 @@ function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, 
             </div>
             {viewing ? (
                 <GalleryViewer
-                    index={viewing.index}
+                    autoplaySeconds={slideshow.autoplaySeconds}
+                    index={viewing.pos}
                     isCollapsed={text.isCollapsed}
                     opener={viewing.opener}
-                    photos={images}
+                    photos={viewing.order ? viewing.order.map(position => images[position]).filter(Boolean) : images}
+                    screenMode={slideshow.screenMode}
                     strings={strings}
                     toggleText={text.toggleImage}
                     unescape={unescapeHtml}
                     onClose={() => setViewing(null)}
-                    onIndexChange={index => setViewing(current => ({...current, index}))}
+                    onIndexChange={pos => setViewing(current => ({...current, pos}))}
                 />
             ) : null}
         </div>
@@ -301,7 +314,13 @@ function PopulatedGalleryCard({images, deleteImage, reorderHandler, isDragging, 
 
 // The editor's setting for how many photos this gallery takes. The host's limit is the most it can
 // be; the number already in the gallery is the least, so lowering it never drops a photo.
-function GallerySettings({count, hostMaxImages, maxImages, setMaxImages, strings}) {
+function GallerySettings({count, hostMaxImages, maxImages, setMaxImages, setSlideshow, slideshow, slideshowOptions, strings}) {
+    const [secondsDraft, setSecondsDraft] = React.useState(String(slideshow.autoplaySeconds || 5));
+    React.useEffect(() => {
+        if (slideshow.autoplaySeconds) {
+            setSecondsDraft(String(slideshow.autoplaySeconds));
+        }
+    }, [slideshow.autoplaySeconds]);
     const [draft, setDraft] = React.useState(String(maxImages));
     React.useEffect(() => setDraft(String(maxImages)), [maxImages]);
     const commit = () => {
@@ -333,6 +352,52 @@ function GallerySettings({count, hostMaxImages, maxImages, setMaxImages, strings
                 />
             </label>
             <span className="text-grey-600">{fill(strings.maxImagesHint, {host: hostMaxImages, n: count})}</span>
+            {slideshowOptions.autoAdvance ? (
+                <div className="flex flex-wrap items-center gap-2">
+                    <label className="flex items-center gap-2">
+                        <input
+                            checked={slideshow.autoplaySeconds > 0}
+                            data-gallery-autoplay-toggle
+                            type="checkbox"
+                            onChange={e => setSlideshow({autoplaySeconds: e.target.checked ? Number(secondsDraft) || 5 : 0})}
+                        />
+                        <span>{strings.autoAdvanceLabel}</span>
+                    </label>
+                    <input
+                        aria-label={strings.autoAdvanceSeconds}
+                        className="w-16 rounded border border-grey-300 bg-transparent px-2 py-1 disabled:opacity-50"
+                        data-gallery-autoplay-seconds
+                        disabled={!slideshow.autoplaySeconds}
+                        inputMode="numeric"
+                        max={3600}
+                        min={1}
+                        type="number"
+                        value={secondsDraft}
+                        onBlur={() => setSlideshow({autoplaySeconds: Number(secondsDraft) || 5})}
+                        onChange={e => setSecondsDraft(e.target.value)}
+                        onKeyDown={(e) => {
+                            e.stopPropagation();
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                setSlideshow({autoplaySeconds: Number(secondsDraft) || 5});
+                            }
+                        }}
+                    />
+                    <span>{strings.autoAdvanceSeconds}</span>
+                </div>
+            ) : null}
+            {slideshowOptions.shuffle ? (
+                <label className="flex items-center gap-2">
+                    <input checked={slideshow.shuffle} data-gallery-shuffle-toggle type="checkbox" onChange={e => setSlideshow({shuffle: e.target.checked})} />
+                    <span>{strings.shuffleLabel}</span>
+                </label>
+            ) : null}
+            {slideshowOptions.screenMode ? (
+                <label className="flex items-center gap-2">
+                    <input checked={slideshow.screenMode} data-gallery-screen-mode-toggle type="checkbox" onChange={e => setSlideshow({screenMode: e.target.checked})} />
+                    <span>{strings.screenModeLabel}</span>
+                </label>
+            ) : null}
         </div>
     );
 }
@@ -385,6 +450,9 @@ export function GalleryCard({
     maxImages,
     readOnly = false,
     setMaxImages,
+    setSlideshow,
+    slideshow = {autoplaySeconds: 0, screenMode: false, shuffle: false},
+    slideshowOptions = {autoAdvance: true, screenMode: true, shuffle: true},
     images = [],
     isSelected,
     moveImage,
@@ -408,7 +476,7 @@ export function GalleryCard({
         <figure>
             <div ref={filesDropper.setRef} className="not-kg-prose relative" data-testid="gallery-container">
                 {images.length
-                    ? <PopulatedGalleryCard deleteImage={deleteImage} images={images} isDragging={isDragging} isSelected={isSelected} moveImage={moveImage} readOnly={readOnly} reorderHandler={reorderHandler} strings={strings} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />
+                    ? <PopulatedGalleryCard slideshow={slideshow} deleteImage={deleteImage} images={images} isDragging={isDragging} isSelected={isSelected} moveImage={moveImage} readOnly={readOnly} reorderHandler={reorderHandler} strings={strings} unescapeHtml={unescapeHtml} updateImageText={updateImageText} />
                     : readOnly ? null : <EmptyGalleryCard isDraggedOver={isDragging} maxImages={maxImages} openFilePicker={openFilePicker} reorderHandler={reorderHandler} strings={strings} />
                 }
 
@@ -449,7 +517,7 @@ export function GalleryCard({
             {caption}
 
             {!readOnly && isSelected && images.length ? (
-                <GallerySettings count={images.length} hostMaxImages={hostMaxImages} maxImages={maxImages} setMaxImages={setMaxImages} strings={strings} />
+                <GallerySettings count={images.length} hostMaxImages={hostMaxImages} maxImages={maxImages} setMaxImages={setMaxImages} setSlideshow={setSlideshow} slideshow={slideshow} slideshowOptions={slideshowOptions} strings={strings} />
             ) : null}
         </figure>
     );

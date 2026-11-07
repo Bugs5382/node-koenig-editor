@@ -50,6 +50,9 @@ export function KoenigGalleryCard(props) {
         removeImage,
         replaceImages,
         setMaxImages,
+        setSlideshow,
+        slideshow,
+        slideshowOptions,
         updateImage
     } = props;
     const strings = useKoenigStrings();
@@ -80,6 +83,9 @@ export function KoenigGalleryCard(props) {
             readOnly={readOnly}
             reorderHandler={reorder}
             setMaxImages={setMaxImages}
+            setSlideshow={setSlideshow}
+            slideshow={slideshow}
+            slideshowOptions={slideshowOptions}
             strings={strings.gallery}
             unescapeHtml={keep}
             updateImageText={(index, changes) => updateImage(index, changes)}

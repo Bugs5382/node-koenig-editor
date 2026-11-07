@@ -23,6 +23,9 @@ interface GalleryNodeData {
     images: GalleryImage[];
     caption: string;
     maxImages?: number;
+    autoplaySeconds?: number;
+    shuffle?: boolean;
+    screenMode?: boolean;
 }
 
 interface GalleryRenderOptions extends ExportDOMOptions {
@@ -99,6 +102,16 @@ export function renderGalleryNode(node: GalleryNodeData, options: GalleryRenderO
     figure.setAttribute('class', 'kg-card kg-gallery-card kg-width-wide');
     if (limit) {
         figure.setAttribute('data-kg-max-images', String(limit));
+    }
+    // the slideshow settings, for a reader's page that plays the gallery
+    if (Number.isFinite(node.autoplaySeconds) && (node.autoplaySeconds as number) > 0) {
+        figure.setAttribute('data-kg-autoplay', String(node.autoplaySeconds));
+    }
+    if (node.shuffle) {
+        figure.setAttribute('data-kg-shuffle', 'true');
+    }
+    if (node.screenMode) {
+        figure.setAttribute('data-kg-screen-mode', 'true');
     }
 
     const container = document.createElement('div');

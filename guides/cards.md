@@ -79,11 +79,14 @@ pictures that are pure decoration.
 - Drag pictures to reorder them.
 - A **full-screen viewer** (button on the gallery and on each picture): Left and Right (or swipe)
   move between pictures, Home and End jump to the first and last, Escape closes.
+- **Slideshow** settings under a selected gallery: **Auto-advance** (set the seconds), **Random
+  order** and **Screen mode** (no thumbnails, controls hide until a key, tap or mouse move; Escape
+  shows them first, then exits). The exit control of the normal viewer is always visible.
 **Keyboard:** Tab onto a picture, then **Alt+Left** or **Alt+Right** moves it one place. A
 spoken message says where it went. A picture text can be collapsed; screen readers still read it.
 **Accessibility:** alt text for every picture; the viewer is a dialog that keeps focus inside and
 gives focus back when it closes.
-**Developer:** `cards` leaves it out; `gallery.maxImages` sets the limit; `cardRenderers.gallery`
+**Developer:** `cards` leaves it out; `gallery.maxImages` sets the limit; `gallery.autoAdvance`, `gallery.shuffle` and `gallery.screenMode` (each `false` to switch off) control the slideshow settings; `cardRenderers.gallery`
 replaces how it looks while the editor keeps the pictures, uploads and limits.
 
 ## Header

@@ -1229,6 +1229,10 @@
     width: 91.666667%;
 }
 
+.koenig-lexical .w-16 {
+    width: calc(6.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .w-20 {
     width: calc(8 * var(--kg-rem, 0.625rem));
 }
@@ -1501,6 +1505,10 @@
 
 .koenig-lexical .cursor-move {
     cursor: move;
+}
+
+.koenig-lexical .cursor-none {
+    cursor: none;
 }
 
 .koenig-lexical .cursor-nwse-resize {
@@ -2861,6 +2869,10 @@
 
 .koenig-lexical .duration-200 {
     transition-duration: 200ms;
+}
+
+.koenig-lexical .duration-300 {
+    transition-duration: 300ms;
 }
 
 .koenig-lexical .ease-in-out {
