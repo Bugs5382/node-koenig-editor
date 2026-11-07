@@ -919,3 +919,37 @@ describe("where the preview button sits", () => {
     expect(toggle()?.getAttribute("aria-pressed")).toBe("false");
   });
 });
+
+describe("the scroll restore after a flip", () => {
+  it("cancels what is still pending when the editor goes away, so nothing runs after the page is gone", async () => {
+    const frames: FrameRequestCallback[] = [];
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) =>
+      frames.push(callback),
+    );
+    const cancelFrame = vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    await mount({ composer: { initialEditorState: documentOf("Hello") } });
+    await press();
+    expect(frames.length).toBeGreaterThan(0);
+    cleanup();
+    expect(cancelFrame).toHaveBeenCalled();
+    vi.restoreAllMocks();
+  });
+
+  it("does not run a restore frame that fires after the editor is gone", async () => {
+    const frames: FrameRequestCallback[] = [];
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) =>
+      frames.push(callback),
+    );
+    vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    const timeouts = vi.spyOn(window, "setTimeout");
+    await mount({ composer: { initialEditorState: documentOf("Hello") } });
+    await press();
+    cleanup();
+    const before = timeouts.mock.calls.length;
+    for (const frame of [...frames]) frame(0);
+    for (const frame of [...frames]) frame(0);
+    // a frame that arrives late starts no new timer
+    expect(timeouts.mock.calls.length).toBe(before);
+    vi.restoreAllMocks();
+  });
+});
