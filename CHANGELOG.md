@@ -21,6 +21,7 @@
 
 #### 🐛 Bug Fixes
 
+- fix(ci): compare package growth with the PR's base commit, not the last release (#85) @Bugs5382 (#86)
 - fix(editor): collaboration with cards no longer throws, and the demo shows its status in the bar (#79) @Bugs5382 (#80)
 - fix(editor): let a composer run without a fileUploader @Bugs5382 (#11)
 - fix(editor): the selection toolbar stays inside the window at the top and bottom, and the demo sets its rows (#75) @Bugs5382 (#76)
