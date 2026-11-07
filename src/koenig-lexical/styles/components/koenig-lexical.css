@@ -324,3 +324,111 @@ em-emoji-picker {
 .koenig-lexical [data-header-subtitle] *:not(a) {
     color: inherit;
 }
+
+/* Check list. Each item draws its own box before the text (click it, or press Space with the
+   cursor in the item, to tick it); a ticked item has a filled box with a tick and softer text.
+   Both follow the selection colour token and the system colours in forced-colours mode. */
+.koenig-lexical .kg-checklist {
+    list-style: none;
+    padding-inline-start: 0;
+}
+
+.koenig-lexical .kg-checklist .kg-check-item {
+    list-style: none;
+    padding-inline-start: 2.8rem;
+    position: relative;
+}
+
+.koenig-lexical .kg-checklist .kg-check-item::before {
+    border: 2px solid var(--grey-700);
+    border-radius: 0.4rem;
+    content: "";
+    cursor: pointer;
+    height: 1.6rem;
+    inset-inline-start: 0;
+    position: absolute;
+    top: 0.55em;
+    width: 1.6rem;
+}
+
+.koenig-lexical .kg-checklist .kg-check-item-checked::before {
+    background-color: var(--kg-selection);
+    border-color: var(--kg-selection);
+}
+
+.koenig-lexical .kg-checklist .kg-check-item-checked::after {
+    border: solid var(--white);
+    border-width: 0 0.2rem 0.2rem 0;
+    content: "";
+    height: 0.9rem;
+    inset-inline-start: 0.55rem;
+    pointer-events: none;
+    position: absolute;
+    top: calc(0.55em + 0.15rem);
+    transform: rotate(45deg);
+    width: 0.5rem;
+}
+
+.koenig-lexical .kg-checklist .kg-check-item-checked {
+    opacity: 0.75;
+}
+
+@media (forced-colors: active) {
+    .koenig-lexical .kg-checklist .kg-check-item::before {
+        border-color: ButtonText;
+    }
+
+    .koenig-lexical .kg-checklist .kg-check-item-checked::before {
+        background-color: Highlight;
+        border-color: Highlight;
+    }
+
+    .koenig-lexical .kg-checklist .kg-check-item-checked::after {
+        border-color: HighlightText;
+    }
+}
+
+/* Find and replace: every match, and the current one, drawn with the CSS Custom Highlight API where
+   the browser has it. They follow the selection colour token. */
+.koenig-lexical ::highlight(kg-find) {
+    background-color: color-mix(in srgb, var(--kg-selection) 35%, transparent);
+}
+
+.koenig-lexical ::highlight(kg-find-current) {
+    background-color: var(--kg-selection);
+    color: var(--white);
+}
+
+@media (forced-colors: active) {
+    .koenig-lexical ::highlight(kg-find) {
+        background-color: Highlight;
+        color: HighlightText;
+    }
+
+    .koenig-lexical ::highlight(kg-find-current) {
+        background-color: ButtonText;
+        color: ButtonFace;
+    }
+}
+
+/* Right to left. A block set to (or reading as) right to left turns its list indent and quote
+   bar around, since the prose styles pad lists and quotes on the physical left. */
+.koenig-lexical ul[dir="rtl"] {
+    padding: 0 0.6rem 0 0;
+}
+
+.koenig-lexical ol[dir="rtl"] {
+    padding: 0 0.8rem 0 0;
+}
+
+.koenig-lexical blockquote[dir="rtl"] {
+    border-left: 0;
+    border-right: 0.25rem solid var(--kg-accent-color, #ff0095);
+    padding-left: 0;
+    padding-right: 2rem;
+}
+
+.koenig-lexical ul[dir="rtl"].kg-checklist .kg-check-item {
+    margin: 1rem 2.4rem 0 0;
+    padding: 0 2.8rem 0 0;
+}

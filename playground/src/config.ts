@@ -64,12 +64,20 @@ export function presetOf(cards: readonly string[], catalog: Catalog): PresetId |
 export interface Catalog {
   cards: readonly string[];
   tools: readonly string[];
+  /** The format toolbar's buttons, when the build exports them. */
+  toolbar?: readonly string[];
   wordCount?: boolean;
 }
 
 export interface Settings {
   cards: string[];
   tools: string[];
+  /** The format toolbar buttons that are on. */
+  toolbar: string[];
+  /** Offer sample fonts in the font button. */
+  fonts: boolean;
+  /** The browser's spell check in the editing area. */
+  spellCheck: boolean;
   comments: boolean;
   wordCount: boolean;
   readOnly: boolean;
@@ -96,6 +104,9 @@ export function defaultSettings(catalog: Catalog): Settings {
   return {
     cards: [...catalog.cards],
     tools: [...catalog.tools],
+    toolbar: [...(catalog.toolbar ?? [])],
+    fonts: false,
+    spellCheck: true,
     comments: true,
     wordCount: true,
     readOnly: false,
@@ -109,7 +120,16 @@ export function defaultSettings(catalog: Catalog): Settings {
   };
 }
 
-const FLAGS = ["comments", "wordCount", "readOnly", "dark", "sampleUploads", "preview"] as const;
+const FLAGS = [
+  "comments",
+  "wordCount",
+  "readOnly",
+  "dark",
+  "sampleUploads",
+  "preview",
+  "fonts",
+  "spellCheck",
+] as const;
 
 const sameList = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((v, i) => v === b[i]);
@@ -129,6 +149,8 @@ export function parseSettings(search: string, catalog: Catalog): Settings {
   if (cards !== null) settings.cards = pickKnown(cards, catalog.cards);
   const tools = params.get("tools");
   if (tools !== null) settings.tools = pickKnown(tools, catalog.tools);
+  const toolbar = params.get("toolbar");
+  if (toolbar !== null && catalog.toolbar) settings.toolbar = pickKnown(toolbar, catalog.toolbar);
 
   for (const flag of FLAGS) {
     const value = params.get(flag);
@@ -157,6 +179,8 @@ export function serializeSettings(settings: Settings, catalog: Catalog): string 
   const params = new URLSearchParams();
   if (!sameList(settings.cards, defaults.cards)) params.set("cards", settings.cards.join(","));
   if (!sameList(settings.tools, defaults.tools)) params.set("tools", settings.tools.join(","));
+  if (!sameList(settings.toolbar, defaults.toolbar))
+    params.set("toolbar", settings.toolbar.join(","));
   for (const flag of FLAGS) {
     if (settings[flag] !== defaults[flag]) params.set(flag, settings[flag] ? "1" : "0");
   }
@@ -180,6 +204,11 @@ export function buildSnippet(settings: Settings, catalog: Catalog): string {
   if (catalog.tools.length && !sameList(settings.tools, catalog.tools)) {
     props.push(`tools={${list(settings.tools)}}`);
   }
+  if (catalog.toolbar?.length && !sameList(settings.toolbar, catalog.toolbar)) {
+    props.push(`toolbar={${list(settings.toolbar)}}`);
+  }
+  if (settings.fonts) props.push("fonts={fonts}");
+  if (!settings.spellCheck) props.push("spellCheck={false}");
   if (settings.comments) props.push("comments={comments}");
   if (settings.readOnly) props.push("editable={false}");
   props.push("fileUploader={fileUploader}");

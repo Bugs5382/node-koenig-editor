@@ -264,3 +264,26 @@
 .toast-close {
   padding: 0 8px;
 }
+
+/* Forced colours remove backgrounds, so the switch draws its own track and thumb from system
+   colours: an outlined track, a filled one when on, and a thumb that always shows. */
+@media (forced-colors: active) {
+  .ctl-switch-track {
+    forced-color-adjust: none;
+    box-sizing: border-box;
+    border: 2px solid ButtonText;
+    background: Canvas;
+  }
+  .ctl-switch-thumb {
+    forced-color-adjust: none;
+    background: ButtonText;
+    box-shadow: none;
+  }
+  .ctl-switch[aria-checked="true"] .ctl-switch-track {
+    border-color: Highlight;
+    background: Highlight;
+  }
+  .ctl-switch[aria-checked="true"] .ctl-switch-thumb {
+    background: HighlightText;
+  }
+}

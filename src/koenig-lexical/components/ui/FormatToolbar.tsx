@@ -11,12 +11,14 @@ import {
     $getSelection,
     $isRangeSelection,
     FORMAT_ELEMENT_COMMAND,
-    FORMAT_TEXT_COMMAND
+    FORMAT_TEXT_COMMAND,
+    INDENT_CONTENT_COMMAND,
+    OUTDENT_CONTENT_COMMAND
 } from 'lexical';
 import {$getNearestNodeOfType} from '@lexical/utils';
 import {$alignInScope, $readTableState, TABLE_SCOPES} from '../../../additions/table/tableActions';
 import {$alignmentOfSelection, ALIGN_OF_ITEM, isAlignActive} from '../../../additions/alignment/alignment';
-import {$isListNode, ListNode} from '@lexical/list';
+import {$isListNode, INSERT_CHECK_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, ListNode, REMOVE_LIST_COMMAND} from '@lexical/list';
 import {$setBlocksType} from '@lexical/selection';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 import {
@@ -27,6 +29,15 @@ import {
 import {altOrOption, ctrlOrCmdSymbol, ctrlOrSymbol, shiftOrSymbol} from '../../utils/shortcutSymbols';
 
 const ALIGN_KEY = {left: 'L', center: 'E', right: 'R', justify: 'J'};
+
+// the inline formats after bold and italic, each with the keys that toggle it
+const INLINE_FORMATS = [
+    {item: 'underline', keys: () => [ctrlOrCmdSymbol(), 'U']},
+    {item: 'strikethrough', keys: () => [ctrlOrCmdSymbol(), shiftOrSymbol(), 'X']},
+    {item: 'subscript', keys: () => [ctrlOrCmdSymbol(), ',']},
+    {item: 'superscript', keys: () => [ctrlOrCmdSymbol(), '.']},
+    {item: 'code', keys: () => undefined}
+];
 
 // Text selected in a table cell aligns the cell, down as well as across, for the cell, its row, its
 // column or the whole table. The "apply to" button cycles the choice and shows it in a few letters.
@@ -41,6 +52,10 @@ const scopeIcon = text => function ScopeIcon({className}) {
 const SCOPE_ICONS = {cell: scopeIcon('Cell'), row: scopeIcon('Row'), column: scopeIcon('Col'), table: scopeIcon('All')};
 const SCOPE_STRING = {cell: 'scopeCell', row: 'scopeRow', column: 'scopeColumn', table: 'scopeTable'};
 import {getSelectedNode} from '../../utils/getSelectedNode';
+import {$getSelectionSpacing, $setSpacing, LINE_SPACINGS, PARAGRAPH_SPACINGS} from '../../../additions/spacing/spacing';
+import {$getSelectionDirection, $setDirection} from '../../../additions/direction/direction';
+import {StyleMenu} from '../../../additions/textStyle/StyleMenu';
+import {$clearFormatting, $getTextStyle, $setHighlight, $setTextStyle, FONT_SIZES, HIGHLIGHTS, TEXT_COLORS} from '../../../additions/textStyle/textStyle';
 import {ALIGNMENT_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
 
 const blockTypeToBlockName = {
@@ -90,11 +105,17 @@ export default function FormatToolbar({
     const strings = useKoenigStrings();
     const [isBold, setIsBold] = React.useState(false);
     const [isItalic, setIsItalic] = React.useState(false);
+    const [inlineOn, setInlineOn] = React.useState({});
     const [blockType, setBlockType] = React.useState('paragraph');
     const [alignment, setAlignment] = React.useState({direction: null, format: ''});
     const [cell, setCell] = React.useState(null);
     const [scope, setScope] = React.useState('cell');
-    const {cardConfig: {createSnippet}, toolbar, toolbarActions} = React.useContext(KoenigComposerContext);
+    const {cardConfig: {createSnippet}, toolbar, toolbarActions, fonts} = React.useContext(KoenigComposerContext);
+    // the style button whose list is open, and the button it hangs from
+    const [styleMenu, setStyleMenu] = React.useState(null);
+    const [styleNow, setStyleNow] = React.useState({});
+    const [spacingNow, setSpacingNow] = React.useState({});
+    const [directionNow, setDirectionNow] = React.useState(null);
     // the host's `toolbar` option names the buttons to show; leaving it out shows them all
     const isHidden = item => isToolbarItemHidden(toolbar, item);
 
@@ -143,6 +164,21 @@ export default function FormatToolbar({
                 setAlignment(current => (current.format === blockAlignment.format && current.direction === blockAlignment.direction ? current : blockAlignment));
             }
             setIsItalic(selection.hasFormat('italic'));
+            const nextInline = {};
+            for (const {item} of INLINE_FORMATS) {
+                nextInline[item] = selection.hasFormat(item);
+            }
+            const nextStyle = {
+                'font-size': $getTextStyle(selection, 'font-size'),
+                color: $getTextStyle(selection, 'color'),
+                'background-color': $getTextStyle(selection, 'background-color'),
+                'font-family': $getTextStyle(selection, 'font-family')
+            };
+            const nextSpacing = $getSelectionSpacing(selection) || {};
+            setDirectionNow($getSelectionDirection(selection));
+            setSpacingNow(current => (JSON.stringify(current) === JSON.stringify(nextSpacing) ? current : nextSpacing));
+            setStyleNow(current => (JSON.stringify(current) === JSON.stringify(nextStyle) ? current : nextStyle));
+            setInlineOn(current => (JSON.stringify(current) === JSON.stringify(nextInline) ? current : nextInline));
 
             const anchorNode = getSelectedNode(selection);
             const element = anchorNode.getKey() === 'root'
@@ -203,6 +239,14 @@ export default function FormatToolbar({
         }
     };
 
+    // a list button turns the selected blocks into that list, or back into paragraphs when they
+    // already are one
+    const LIST_COMMANDS = {bullet: INSERT_UNORDERED_LIST_COMMAND, number: INSERT_ORDERED_LIST_COMMAND, check: INSERT_CHECK_LIST_COMMAND};
+    const toggleList = (type) => {
+        editor.dispatchCommand(blockType === type ? REMOVE_LIST_COMMAND : LIST_COMMANDS[type], undefined);
+    };
+    const hideLists = !editor.hasNodes([ListNode]) || !!editor._parentEditor;
+
     const formatQuote = () => {
         editor.update(() => {
             const selection = $getSelection();
@@ -219,8 +263,105 @@ export default function FormatToolbar({
         });
     };
 
+    // Alt+F10 (see FloatingToolbarPlugin) puts focus on the first button. In the toolbar the arrow
+    // keys, Home and End move between buttons, and Escape goes back to the text.
+    const onToolbarKeyDown = (event) => {
+        const buttons = [...event.currentTarget.querySelectorAll('button')];
+        const index = buttons.indexOf(document.activeElement);
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            event.stopPropagation();
+            // restores the text selection and, since focus is on a button, the editing area itself
+            editor.focus();
+            editor.getRootElement()?.focus({preventScroll: true});
+            return;
+        }
+        if (index === -1 || !['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) {
+            return;
+        }
+        event.preventDefault();
+        const to = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : index + (event.key === 'ArrowRight' ? 1 : -1);
+        buttons[(to + buttons.length) % buttons.length]?.focus();
+    };
+
+    // the lists under the style buttons: what each offers, what the selection has now, and what
+    // choosing one does
+    const strings_ = strings.textStyle;
+    const closeStyleMenu = () => {
+        setStyleMenu(null);
+        editor.focus();
+        editor.getRootElement()?.focus({preventScroll: true});
+    };
+    const sizeNow = FONT_SIZES.find(size => size.value === (styleNow['font-size'] || null))?.id || 'normal';
+    const STYLE_MENUS = {
+        fontSize: {
+            label: strings.toolbar.fontSize,
+            options: FONT_SIZES.map(size => ({id: size.id, label: strings_.sizes[size.id], checked: sizeNow === size.id, sample: size.value ? {fontSize: size.value} : undefined})),
+            apply: id => $setTextStyle($getSelection(), 'font-size', FONT_SIZES.find(size => size.id === id)?.value || null)
+        },
+        textColor: {
+            label: strings.toolbar.textColor,
+            options: [
+                {id: 'default', label: strings_.defaultColour, checked: !styleNow.color || styleNow.color === 'inherit'},
+                ...TEXT_COLORS.map(color => ({id: color.id, label: strings_.colours[color.id], swatch: color.value, checked: (styleNow.color || '').toLowerCase() === color.value.toLowerCase()}))
+            ],
+            apply: id => $setTextStyle($getSelection(), 'color', TEXT_COLORS.find(color => color.id === id)?.value || null)
+        },
+        highlight: {
+            label: strings.toolbar.highlight,
+            options: [
+                {id: 'none', label: strings_.noHighlight, checked: !styleNow['background-color']},
+                ...HIGHLIGHTS.map(color => ({id: color.id, label: strings_.highlights[color.id], swatch: color.value, checked: (styleNow['background-color'] || '').toLowerCase() === color.value.toLowerCase()}))
+            ],
+            apply: id => $setHighlight($getSelection(), HIGHLIGHTS.find(color => color.id === id)?.value || null)
+        },
+        lineSpacing: {
+            label: strings.toolbar.lineSpacing,
+            options: [
+                {id: 'default', label: strings_.defaultSpacing, checked: spacingNow.line === undefined},
+                ...LINE_SPACINGS.map(entry => ({id: entry.id, label: strings_.lineSpacings[entry.id], checked: spacingNow.line === entry.value}))
+            ],
+            apply: id => $setSpacing($getSelection(), {line: LINE_SPACINGS.find(entry => entry.id === id)?.value ?? null})
+        },
+        paragraphSpacing: {
+            label: strings.toolbar.paragraphSpacing,
+            options: [
+                {id: 'default', label: strings_.defaultSpacing, checked: spacingNow.after === undefined},
+                ...PARAGRAPH_SPACINGS.map(entry => ({id: entry.id, label: strings_.paragraphSpacings[entry.id], checked: spacingNow.after === entry.id}))
+            ],
+            apply: id => $setSpacing($getSelection(), {after: PARAGRAPH_SPACINGS.find(entry => entry.id === id)?.id ?? null})
+        },
+        textDirection: {
+            label: strings.toolbar.textDirection,
+            options: ['auto', 'ltr', 'rtl'].map(id => ({id, label: strings_.directions[id], checked: (directionNow || 'auto') === id})),
+            apply: id => $setDirection($getSelection(), id === 'auto' ? null : id)
+        },
+        fontFamily: {
+            label: strings.toolbar.fontFamily,
+            options: [
+                {id: 'default', label: strings_.defaultFont, checked: !styleNow['font-family']},
+                ...(fonts || []).map((font, index) => ({id: `font-${index}`, label: font.label, checked: styleNow['font-family'] === font.value, sample: {fontFamily: font.value}}))
+            ],
+            apply: id => $setTextStyle($getSelection(), 'font-family', id === 'default' ? null : (fonts || [])[Number(id.slice(5))]?.value || null)
+        }
+    };
+    const styleButton = (item) => ({
+        ariaExpanded: styleMenu?.item === item,
+        ariaHasPopup: 'menu',
+        'data-kg-toolbar-button': item,
+        icon: item,
+        label: strings.toolbar[item],
+        onClick: (event) => {
+            const anchor = event.currentTarget;
+            setStyleMenu(current => (current?.item === item ? null : {item, anchor}));
+        }
+    });
+
+    const openMenu = styleMenu ? STYLE_MENUS[styleMenu.item] : null;
+
     return (
-        <ToolbarMenu>
+        <>
+        <ToolbarMenu aria-label={strings.toolbar.group} data-kg-selection-toolbar role="toolbar" onKeyDown={onToolbarKeyDown}>
             <ToolbarMenuItem
                 data-kg-toolbar-button="bold"
                 hide={hideBold}
@@ -238,6 +379,47 @@ export default function FormatToolbar({
                 label={strings.toolbar.italic}
                 shortcutKeys={[ctrlOrCmdSymbol(), 'I']}
                 onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
+            />
+            {INLINE_FORMATS.map(({item, keys}) => (
+                <ToolbarMenuItem
+                    key={item}
+                    data-kg-toolbar-button={item}
+                    hide={isHidden(item)}
+                    icon={item}
+                    isActive={!!inlineOn[item]}
+                    label={strings.toolbar[item]}
+                    shortcutKeys={keys()}
+                    onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, item)}
+                />
+            ))}
+            <ToolbarMenuItem
+                {...styleButton('fontSize')}
+                hide={isHidden('fontSize')}
+                isActive={sizeNow !== 'normal'}
+            />
+            <ToolbarMenuItem
+                {...styleButton('textColor')}
+                hide={isHidden('textColor')}
+                isActive={!!styleNow.color}
+            />
+            <ToolbarMenuItem
+                {...styleButton('highlight')}
+                hide={isHidden('highlight')}
+                isActive={!!styleNow['background-color']}
+            />
+            <ToolbarMenuItem
+                {...styleButton('fontFamily')}
+                hide={isHidden('fontFamily') || !fonts?.length}
+                isActive={!!styleNow['font-family']}
+            />
+            <ToolbarMenuItem
+                data-kg-toolbar-button="clearFormatting"
+                hide={isHidden('clearFormatting')}
+                icon="clearFormatting"
+                isActive={false}
+                label={strings.toolbar.clearFormatting}
+                shortcutKeys={[ctrlOrCmdSymbol(), '\\']}
+                onClick={() => editor.update(() => $clearFormatting(), {discrete: true})}
             />
             {HEADING_LEVELS.map(({tag, item, icon, key}) => (
                 <ToolbarMenuItem
@@ -260,6 +442,53 @@ export default function FormatToolbar({
                 label={strings.toolbar.quote}
                 shortcutKeys={[ctrlOrSymbol(), 'Q']}
                 onClick={formatQuote}
+            />
+
+            <ToolbarMenuSeparator hide={hideLists} />
+            {[['bulletList', 'bullet', 'U'], ['numberList', 'number', 'O'], ['checkList', 'check', 'X']].map(([item, type, key]) => (
+                <ToolbarMenuItem
+                    key={item}
+                    data-kg-toolbar-button={item}
+                    hide={hideLists || isHidden(item)}
+                    icon={item}
+                    isActive={blockType === type}
+                    label={strings.toolbar[item]}
+                    shortcutKeys={undefined}
+                    onClick={() => toggleList(type)}
+                />
+            ))}
+            <ToolbarMenuItem
+                data-kg-toolbar-button="outdent"
+                hide={hideLists || isHidden('outdent')}
+                icon="outdent"
+                isActive={false}
+                label={strings.toolbar.outdent}
+                onClick={() => editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)}
+            />
+            <ToolbarMenuItem
+                data-kg-toolbar-button="indent"
+                hide={hideLists || isHidden('indent')}
+                icon="indent"
+                isActive={false}
+                label={strings.toolbar.indent}
+                onClick={() => editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)}
+            />
+
+            <ToolbarMenuItem
+                {...styleButton('lineSpacing')}
+                hide={hideAlignment || isHidden('lineSpacing')}
+                isActive={spacingNow.line !== undefined}
+            />
+            <ToolbarMenuItem
+                {...styleButton('paragraphSpacing')}
+                hide={hideAlignment || isHidden('paragraphSpacing')}
+                isActive={spacingNow.after !== undefined}
+            />
+
+            <ToolbarMenuItem
+                {...styleButton('textDirection')}
+                hide={hideAlignment || isHidden('textDirection')}
+                isActive={!!directionNow}
             />
 
             <ToolbarMenuSeparator hide={hideAlignment} />
@@ -329,5 +558,18 @@ export default function FormatToolbar({
                 onClick={onSnippetClick}
             />
         </ToolbarMenu>
+        {openMenu ? (
+            <StyleMenu
+                anchor={styleMenu.anchor}
+                label={openMenu.label}
+                options={openMenu.options}
+                onClose={closeStyleMenu}
+                onPick={(id) => {
+                    editor.update(() => openMenu.apply(id), {discrete: true});
+                    closeStyleMenu();
+                }}
+            />
+        ) : null}
+        </>
     );
 }

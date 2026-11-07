@@ -18,7 +18,25 @@ import ImgFullIcon from '../../assets/icons/kg-img-full.svg?react';
 import ImgRegularIcon from '../../assets/icons/kg-img-regular.svg?react';
 import ImgReplaceIcon from '../../assets/icons/kg-replace.svg?react';
 import ImgWideIcon from '../../assets/icons/kg-img-wide.svg?react';
+import IndentIcon from '../../assets/icons/kg-indent.svg?react';
+import TextDirectionIcon from '../../assets/icons/kg-text-direction.svg?react';
+import LineSpacingIcon from '../../assets/icons/kg-line-spacing.svg?react';
+import ParagraphSpacingIcon from '../../assets/icons/kg-paragraph-spacing.svg?react';
+import ListBulletIcon from '../../assets/icons/kg-list-bullet.svg?react';
+import ListCheckIcon from '../../assets/icons/kg-list-check.svg?react';
+import ListNumberIcon from '../../assets/icons/kg-list-number.svg?react';
+import OutdentIcon from '../../assets/icons/kg-outdent.svg?react';
+import ClearFormatIcon from '../../assets/icons/kg-clear-format.svg?react';
+import CodeIcon from '../../assets/icons/kg-code.svg?react';
+import FontFamilyIcon from '../../assets/icons/kg-font-family.svg?react';
+import HighlightIcon from '../../assets/icons/kg-highlight.svg?react';
+import TextColorIcon from '../../assets/icons/kg-text-color.svg?react';
+import TextSizeIcon from '../../assets/icons/kg-text-size.svg?react';
 import ItalicIcon from '../../assets/icons/kg-italic.svg?react';
+import StrikethroughIcon from '../../assets/icons/kg-strikethrough.svg?react';
+import SubscriptIcon from '../../assets/icons/kg-subscript.svg?react';
+import SuperscriptIcon from '../../assets/icons/kg-superscript.svg?react';
+import UnderlineIcon from '../../assets/icons/kg-underline.svg?react';
 import LinkIcon from '../../assets/icons/kg-link.svg?react';
 import QuoteIcon from '../../assets/icons/kg-quote.svg?react';
 import QuoteOneIcon from '../../assets/icons/kg-quote-1.svg?react';
@@ -31,6 +49,24 @@ import {Tooltip} from './Tooltip';
 export const TOOLBAR_ICONS = {
     bold: BoldIcon,
     italic: ItalicIcon,
+    underline: UnderlineIcon,
+    strikethrough: StrikethroughIcon,
+    subscript: SubscriptIcon,
+    superscript: SuperscriptIcon,
+    code: CodeIcon,
+    fontSize: TextSizeIcon,
+    textColor: TextColorIcon,
+    highlight: HighlightIcon,
+    fontFamily: FontFamilyIcon,
+    clearFormatting: ClearFormatIcon,
+    bulletList: ListBulletIcon,
+    numberList: ListNumberIcon,
+    checkList: ListCheckIcon,
+    indent: IndentIcon,
+    lineSpacing: LineSpacingIcon,
+    textDirection: TextDirectionIcon,
+    paragraphSpacing: ParagraphSpacingIcon,
+    outdent: OutdentIcon,
     headingOne: HeadingOneIcon,
     headingTwo: HeadingTwoIcon,
     headingThree: HeadingThreeIcon,
@@ -76,7 +112,7 @@ export function ToolbarMenu({children, hide, ...props}) {
     );
 }
 
-export function ToolbarMenuItem({label, isActive, onClick, icon, CustomIcon, shortcutKeys, secondary, dataTestId, hide, ...props}) {
+export function ToolbarMenuItem({label, isActive, onClick, icon, CustomIcon, shortcutKeys, secondary, dataTestId, hide, ariaExpanded, ariaHasPopup, ...props}) {
     if (hide) {
         return null;
     }
@@ -86,6 +122,8 @@ export function ToolbarMenuItem({label, isActive, onClick, icon, CustomIcon, sho
     return (
         <li className="group relative m-0 flex p-0 first:m-0" {...props}>
             <button
+                aria-expanded={ariaExpanded}
+                aria-haspopup={ariaHasPopup}
                 aria-label={label}
                 className={`my-1 flex h-8 w-9 cursor-pointer items-center justify-center rounded-md transition hover:bg-grey-200/80 dark:hover:bg-grey-900 ${isActive ? 'bg-grey-200/80 dark:bg-grey-800 forced-colors:bg-[Highlight]' : 'bg-white dark:bg-grey-950'}`}
                 data-kg-active={isActive}

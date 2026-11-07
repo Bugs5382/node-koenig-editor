@@ -52,7 +52,8 @@ export type KoenigCardName =
   | "video";
 
 /** Features that are not cards. Pass a list as the composer's `tools` to keep only those. */
-export type KoenigTool = "emojiPicker" | "imageEditor" | "preview";
+export type KoenigTool =
+  "cleanPaste" | "emojiPicker" | "findReplace" | "imageEditor" | "preview" | "shortcuts";
 
 /** The emoji picker's groups, in tab order. */
 export type KoenigEmojiCategory =
@@ -73,15 +74,41 @@ export type KoenigToolbarItem =
   | "alignLeft"
   | "alignRight"
   | "bold"
+  | "bulletList"
+  | "checkList"
+  | "clearFormatting"
+  | "code"
+  | "fontFamily"
+  | "fontSize"
   | "heading1"
   | "heading2"
   | "heading3"
   | "heading4"
   | "heading5"
+  | "highlight"
+  | "indent"
   | "italic"
+  | "lineSpacing"
   | "link"
+  | "numberList"
+  | "outdent"
+  | "paragraphSpacing"
   | "quote"
-  | "snippet";
+  | "snippet"
+  | "strikethrough"
+  | "subscript"
+  | "superscript"
+  | "textColor"
+  | "textDirection"
+  | "underline";
+
+/** A font the host offers in the selection toolbar. */
+export interface KoenigFont {
+  /** What the menu shows. */
+  label: string;
+  /** A CSS `font-family` value, for example `Georgia, serif`. */
+  value: string;
+}
 
 /** What a host's toolbar button or card gets when the person uses it on a text selection. */
 export interface KoenigToolbarSelection {
@@ -157,9 +184,44 @@ export interface KoenigStrings {
     width: string;
   };
   menu: { addCard: string; removeSnippet: string; sections: Record<string, string> };
-  toolbar: Record<KoenigToolbarItem, string>;
-  /** The table card's controls; `toolbar` names the group for screen readers. The two announcements
-   *  take `{row}`, `{rows}`, `{column}`, `{columns}`, `{rowSpan}` and `{colSpan}`. */
+  toolbar: Record<KoenigToolbarItem, string> & {
+    /** Names the selection toolbar for screen readers. */
+    group: string;
+  };
+  find: {
+    close: string;
+    find: string;
+    matchCase: string;
+    next: string;
+    none: string;
+    previous: string;
+    replace: string;
+    replaceAll: string;
+    replaceOne: string;
+    /** `{count}` is the number replaced. */
+    replaced: string;
+    /** `{current}` and `{total}` are the position and the number of matches. */
+    status: string;
+    title: string;
+  };
+  shortcuts: {
+    actions: Record<"find" | "redo" | "shortcuts" | "toolbar" | "undo", string>;
+    close: string;
+    groups: Record<"align" | "blocks" | "general" | "text", string>;
+    title: string;
+  };
+  textStyle: {
+    colours: Record<"blue" | "green" | "grey" | "orange" | "purple" | "red", string>;
+    defaultColour: string;
+    defaultFont: string;
+    directions: Record<"auto" | "ltr" | "rtl", string>;
+    defaultSpacing: string;
+    lineSpacings: Record<"1" | "1.15" | "1.5" | "2", string>;
+    paragraphSpacings: Record<"large" | "medium" | "none" | "small", string>;
+    highlights: Record<"blue" | "green" | "orange" | "pink" | "purple" | "yellow", string>;
+    noHighlight: string;
+    sizes: Record<"large" | "larger" | "normal" | "small" | "smaller", string>;
+  };
   figure: {
     above: string;
     below: string;
@@ -173,6 +235,8 @@ export interface KoenigStrings {
     title: string;
     titlePlaceholder: string;
   };
+  /** The table card's controls; `toolbar` names the group for screen readers. The two announcements
+   *  take `{row}`, `{rows}`, `{column}`, `{columns}`, `{rowSpan}` and `{colSpan}`. */
   table: {
     addColumnLeft: string;
     addColumnRight: string;
@@ -722,6 +786,13 @@ export interface KoenigComposerProps {
   onError?: (error: Error) => void;
   /** The host's wording, laid over the English defaults. */
   strings?: KoenigStringsInput;
+  /** The browser's spell check in the editing area. Default: on (not set). `false` switches it off. */
+  spellCheck?: boolean;
+  /** The language of the text (a BCP 47 tag such as `de`), so the browser checks spelling in it. */
+  lang?: string;
+  /** The fonts the font button offers: a label and a CSS `font-family` value each. With none, the
+   *  button is not shown. */
+  fonts?: readonly KoenigFont[];
   /** The format toolbar buttons to show. Default: all of them. */
   toolbar?: readonly KoenigToolbarItem[];
   /** The host's own buttons and cards on the selection toolbar. */

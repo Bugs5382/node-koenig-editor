@@ -11,9 +11,15 @@ import ImagePlugin from '../plugins/ImagePlugin';
 import {CalloutPlugin} from '../plugins/CalloutPlugin';
 import {CardMenuPlugin} from '../plugins/CardMenuPlugin';
 import {KoenigSnippetPlugin} from '../plugins/KoenigSnippetPlugin';
+import {CheckListPlugin} from '@lexical/react/LexicalCheckListPlugin';
 import {ListPlugin} from '@lexical/react/LexicalListPlugin';
 import {ReadOnlyGuardPlugin} from '../../additions/preview/ReadOnlyGuardPlugin';
 import {AlignmentShortcutsPlugin} from '../../additions/alignment/AlignmentShortcutsPlugin';
+import {InlineFormatShortcutsPlugin} from '../../additions/inlineFormats/InlineFormatShortcutsPlugin';
+import {FindReplacePlugin} from '../../additions/find/FindReplacePlugin';
+import {CleanPastePlugin} from '../../additions/paste/CleanPastePlugin';
+import {ShortcutsPlugin} from '../../additions/shortcuts/ShortcutsPlugin';
+import {SpacingPlugin} from '../../additions/spacing/SpacingPlugin';
 import {TablePlugin} from '../../additions/table/TablePlugin';
 import {TogglePlugin} from '../plugins/TogglePlugin';
 import {useKoenigPreview} from '../../additions/preview/PreviewContext';
@@ -30,6 +36,7 @@ export const AllDefaultPlugins = () => {
         <>
             {/* Lexical Plugins */}
             <ListPlugin /> {/* adds indent/outdent/remove etc support */}
+            <CheckListPlugin /> {/* click or Space toggles a check list item */}
             {/* <TabIndentationPlugin /> tab/shift+tab triggers indent/outdent */}
 
             {/* Koenig Plugins */}
@@ -53,6 +60,11 @@ export const AllDefaultPlugins = () => {
             {hasNode(editor, 'audio') && <AudioPlugin />}
             <TablePlugin />
             <AlignmentShortcutsPlugin />
+            <InlineFormatShortcutsPlugin />
+            <SpacingPlugin />
+            <ShortcutsPlugin />
+            <CleanPastePlugin />
+            <FindReplacePlugin />
         </>
     );
 };

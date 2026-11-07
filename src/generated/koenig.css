@@ -773,6 +773,10 @@
     margin: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .m-auto {
+    margin: auto;
+}
+
 .koenig-lexical .\!-mx-3 {
     margin-left: calc(-1.2 * var(--kg-rem, 0.625rem)) !important;
     margin-right: calc(-1.2 * var(--kg-rem, 0.625rem)) !important;
@@ -1173,6 +1177,10 @@
     max-height: 30vh;
 }
 
+.koenig-lexical .max-h-\[85vh\] {
+    max-height: 85vh;
+}
+
 .koenig-lexical .max-h-\[95vh\] {
     max-height: 95vh;
 }
@@ -1277,6 +1285,14 @@
     width: 320px;
 }
 
+.koenig-lexical .w-\[34rem\] {
+    width: calc(34 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .w-\[46rem\] {
+    width: calc(46 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .w-\[min\(34rem\2c 95vw\)\] {
     width: min(calc(34 * var(--kg-rem, 0.625rem)), 95vw);
 }
@@ -1315,6 +1331,10 @@
 
 .koenig-lexical .min-w-11 {
     min-width: calc(4.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .min-w-\[16rem\] {
+    min-width: calc(16 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .min-w-\[18rem\] {
@@ -1363,6 +1383,10 @@
 
 .koenig-lexical .max-w-\[92vw\] {
     max-width: 92vw;
+}
+
+.koenig-lexical .max-w-\[94vw\] {
+    max-width: 94vw;
 }
 
 .koenig-lexical .max-w-\[96vw\] {
@@ -1736,6 +1760,11 @@
 .koenig-lexical .border-grey-300 {
     --tw-border-opacity: 1;
     border-color: color-mix(in srgb, var(--kg-color-grey-300, #DDE1E5) calc(var(--tw-border-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .border-grey-400 {
+    --tw-border-opacity: 1;
+    border-color: color-mix(in srgb, var(--kg-color-grey-400, #CED4D9) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .border-grey-500 {
@@ -2145,6 +2174,16 @@
     padding-right: calc(3.6 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .px-\[\.4rem\] {
+    padding-left: calc(.4 * var(--kg-rem, 0.625rem));
+    padding-right: calc(.4 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .px-\[0\.6rem\] {
+    padding-left: calc(0.6 * var(--kg-rem, 0.625rem));
+    padding-right: calc(0.6 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .px-\[1rem\] {
     padding-left: calc(1 * var(--kg-rem, 0.625rem));
     padding-right: calc(1 * var(--kg-rem, 0.625rem));
@@ -2180,9 +2219,19 @@
     padding-bottom: calc(2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .py-\[\.1rem\] {
+    padding-top: calc(.1 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(.1 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .py-\[\.3rem\] {
     padding-top: calc(.3 * var(--kg-rem, 0.625rem));
     padding-bottom: calc(.3 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .py-\[0\.1rem\] {
+    padding-top: calc(0.1 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(0.1 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-\[0\.7rem\] {
@@ -2210,6 +2259,10 @@
 
 .koenig-lexical .pb-3 {
     padding-bottom: calc(1.2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .pb-4 {
+    padding-bottom: calc(1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .pb-\[\.2rem\] {
@@ -2326,6 +2379,10 @@
 
 .koenig-lexical .text-2xs {
     font-size: calc(1.2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .text-\[\.9em\] {
+    font-size: .9em;
 }
 
 .koenig-lexical .text-\[0\.7rem\] {
@@ -2776,6 +2833,10 @@
     --kg-card-w: min(calc(100vw + 2px), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
 }
 
+.koenig-lexical .\[text-decoration-line\:underline_line-through\] {
+    text-decoration-line: underline line-through;
+}
+
 .koenig-lexical {
     position: relative;
     --cta-link-color-text: var(--grey-900);
@@ -3089,12 +3150,123 @@ em-emoji-picker {
 .koenig-lexical [data-header-subtitle] *:not(a) {
     color: inherit;
 }
+
+/* Check list. Each item draws its own box before the text (click it, or press Space with the
+   cursor in the item, to tick it); a ticked item has a filled box with a tick and softer text.
+   Both follow the selection colour token and the system colours in forced-colours mode. */
+.koenig-lexical .kg-checklist {
+    list-style: none;
+    padding-inline-start: 0;
+}
+
+.koenig-lexical .kg-checklist .kg-check-item {
+    list-style: none;
+    padding-inline-start: calc(2.8 * var(--kg-rem, 0.625rem));
+    position: relative;
+}
+
+.koenig-lexical .kg-checklist .kg-check-item::before {
+    border: 2px solid var(--grey-700);
+    border-radius: calc(0.4 * var(--kg-rem, 0.625rem));
+    content: "";
+    cursor: pointer;
+    height: calc(1.6 * var(--kg-rem, 0.625rem));
+    inset-inline-start: 0;
+    position: absolute;
+    top: 0.55em;
+    width: calc(1.6 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .kg-checklist .kg-check-item-checked::before {
+    background-color: var(--kg-selection);
+    border-color: var(--kg-selection);
+}
+
+.koenig-lexical .kg-checklist .kg-check-item-checked::after {
+    border: solid var(--white);
+    border-width: 0 calc(0.2 * var(--kg-rem, 0.625rem)) calc(0.2 * var(--kg-rem, 0.625rem)) 0;
+    content: "";
+    height: calc(0.9 * var(--kg-rem, 0.625rem));
+    inset-inline-start: calc(0.55 * var(--kg-rem, 0.625rem));
+    pointer-events: none;
+    position: absolute;
+    top: calc(0.55em + calc(0.15 * var(--kg-rem, 0.625rem)));
+    transform: rotate(45deg);
+    width: calc(0.5 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .kg-checklist .kg-check-item-checked {
+    opacity: 0.75;
+}
+
+@media (forced-colors: active) {
+    .koenig-lexical .kg-checklist .kg-check-item::before {
+        border-color: ButtonText;
+    }
+
+    .koenig-lexical .kg-checklist .kg-check-item-checked::before {
+        background-color: Highlight;
+        border-color: Highlight;
+    }
+
+    .koenig-lexical .kg-checklist .kg-check-item-checked::after {
+        border-color: HighlightText;
+    }
+}
+
+/* Find and replace: every match, and the current one, drawn with the CSS Custom Highlight API where
+   the browser has it. They follow the selection colour token. */
+.koenig-lexical ::highlight(kg-find) {
+    background-color: color-mix(in srgb, var(--kg-selection) 35%, transparent);
+}
+
+.koenig-lexical ::highlight(kg-find-current) {
+    background-color: var(--kg-selection);
+    color: var(--white);
+}
+
+@media (forced-colors: active) {
+    .koenig-lexical ::highlight(kg-find) {
+        background-color: Highlight;
+        color: HighlightText;
+    }
+
+    .koenig-lexical ::highlight(kg-find-current) {
+        background-color: ButtonText;
+        color: ButtonFace;
+    }
+}
+
+/* Right to left. A block set to (or reading as) right to left turns its list indent and quote
+   bar around, since the prose styles pad lists and quotes on the physical left. */
+.koenig-lexical ul[dir="rtl"] {
+    padding: 0 calc(0.6 * var(--kg-rem, 0.625rem)) 0 0;
+}
+
+.koenig-lexical ol[dir="rtl"] {
+    padding: 0 calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
+}
+
+.koenig-lexical blockquote[dir="rtl"] {
+    border-left: 0;
+    border-right: calc(0.25 * var(--kg-rem, 0.625rem)) solid var(--kg-accent-color, #ff0095);
+    padding-left: 0;
+    padding-right: calc(2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical ul[dir="rtl"].kg-checklist .kg-check-item {
+    margin: calc(1 * var(--kg-rem, 0.625rem)) calc(2.4 * var(--kg-rem, 0.625rem)) 0 0;
+    padding: 0 calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
+}
+
 /* Content Styles
     /*
     /* We use only margin-top to set the vertical spacings. The styles below
     /* set up the margin for content pairs (e.g. paragraph preceded by a heading).
     /* -------------------------------------------------------------------- */
+
 /* Reset margins */
+
 .koenig-lexical .kg-prose :where(
             p,
             h1,
@@ -3110,8 +3282,10 @@ em-emoji-picker {
             min-width: 100%;
             max-width: 100%;
         }
+
 /* Heading
         /* -------------------------------------------------------------------- */
+
 .koenig-lexical .kg-prose :where(
             h1,
             h2,
@@ -3124,6 +3298,7 @@ em-emoji-picker {
             font-weight: 700;
             color: var(--black);
         }
+
 .koenig-lexical .kg-prose :where(
             h1 strong,
             h2 strong,
@@ -3134,40 +3309,49 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-weight: 800;
         }
+
 /* H1 should be almost the same size as the post title to suggest avoid using it */
+
 .koenig-lexical .kg-prose :where(h1):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: var(--kg-font-size-h1, calc(4.4 * var(--kg-rem, 0.625rem)));
             line-height: 1.15em;
             letter-spacing: -0.015em;
         }
+
 .koenig-lexical .kg-prose :where(h2):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: var(--kg-font-size-h2, calc(3.2 * var(--kg-rem, 0.625rem)));
             line-height: 1.2em;
             letter-spacing: -0.014em;
         }
+
 .koenig-lexical .kg-prose :where(h3):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: var(--kg-font-size-h3, calc(2.5 * var(--kg-rem, 0.625rem)));
             line-height: 1.3em;
             letter-spacing: -0.013em;
         }
+
 /* H4 is almost the same size as H3 to discourage using it */
+
 .koenig-lexical .kg-prose :where(h4):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: var(--kg-font-size-h4, calc(2.2 * var(--kg-rem, 0.625rem)));
             line-height: 1.35em;
             letter-spacing: -0.011em;
         }
+
 .koenig-lexical .kg-prose :where(h5):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: var(--kg-font-size-h5, calc(2.0 * var(--kg-rem, 0.625rem)));
             line-height: 1.35em;
             font-weight: 700;
             letter-spacing: -0.011em;
         }
+
 .koenig-lexical .kg-prose :where(h6):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-size: calc(1.85 * var(--kg-rem, 0.625rem));
             line-height: 1.4em;
             font-weight: 700;
             letter-spacing: -0.008em;
         }
+
 .koenig-lexical .kg-prose :where(
             p + h1,
             p + h2,
@@ -3206,40 +3390,49 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 /* Heading 1 vertical rhythm */
+
 .koenig-lexical .kg-prose :where(
             h1 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h2 + h1,
             h3 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h4 + h1,
             h5 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h6 + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.6 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             div + h1
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 /* Heading 2 */
+
 .koenig-lexical .kg-prose :where(
             h1 + h2
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.6 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h2 + h2,
             h3 + h2,
@@ -3248,17 +3441,21 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h6 + h2
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             div + h2
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 /* Heading 3 - 6 (share common styles) */
+
 .koenig-lexical .kg-prose :where(
             h1 + h3,
             h2 + h3,
@@ -3274,11 +3471,13 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h3 + h4
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h3 + h3,
             h4 + h3,
@@ -3296,11 +3495,13 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h5 + h6
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h6 + h3,
             h6 + h4,
@@ -3309,6 +3510,7 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             div + h3,
             div + h4,
@@ -3317,7 +3519,9 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(4.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 /* Headings right after post title */
+
 .koenig-lexical .kg-prose :where(
             h1:first-child,
             h2:first-child,
@@ -3328,6 +3532,7 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin-top: 0;
         }
+
 @media (max-width: 500px) {
             .koenig-lexical .kg-prose :where(h1):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
                 font-size: calc(3.2 * var(--kg-rem, 0.625rem));
@@ -3353,8 +3558,10 @@ em-emoji-picker {
                 font-size: calc(1.9 * var(--kg-rem, 0.625rem));
             }
         }
+
 /* Paragraph
         /* -------------------------------------------------------------------- */
+
 .koenig-lexical .kg-prose :where(
             p,
             blockquote,
@@ -3367,6 +3574,7 @@ em-emoji-picker {
             line-height: var(--kg-line-height, 1.6em);
             font-size: var(--kg-font-size, calc(2.0 * var(--kg-rem, 0.625rem)));
         }
+
 .koenig-lexical .kg-prose :where(
             p strong,
             blockquote strong,
@@ -3376,16 +3584,19 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-weight: 700;
         }
+
 .koenig-lexical .kg-prose :where(
             h1 + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h2 + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h3 + p,
             h4 + p,
@@ -3394,6 +3605,7 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(0.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             p + p,
             blockquote + p,
@@ -3403,24 +3615,31 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 /*  Cards can be addressed by their wrapper div element */
+
 .koenig-lexical .kg-prose :where(
             div + p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 /*  Cards can be addressed by their wrapper div element */
+
 .koenig-lexical .kg-prose :where(
             div + figure
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 /* Paragraph right after title */
+
 .koenig-lexical .kg-prose :where(
             p:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin-top: 0;
         }
+
 @media (max-width: 500px) {
             .koenig-lexical .kg-prose :where(
                 p,
@@ -3432,8 +3651,10 @@ em-emoji-picker {
                 font-size: calc(1.8 * var(--kg-rem, 0.625rem));
             }
         }
+
 /* Lists
         /* -------------------------------------------------------------------- */
+
 .koenig-lexical .kg-prose :where(
             ul,
             ol
@@ -3443,6 +3664,7 @@ em-emoji-picker {
             min-width: 100%;
             max-width: 100%;
         }
+
 .koenig-lexical .kg-prose :where(
             ul li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3452,21 +3674,25 @@ em-emoji-picker {
             padding: 0 0 0 calc(0.6 * var(--kg-rem, 0.625rem));
             line-height: calc(3.2 * var(--kg-rem, 0.625rem));
         }
+
 .koenig-lexical .kg-prose :where(
             ul li:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: 0 0 0 calc(2.4 * var(--kg-rem, 0.625rem));
         }
+
 .koenig-lexical .kg-prose :where(
             ul ul li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             list-style-type: circle;
         }
+
 .koenig-lexical .kg-prose :where(
             ul ul ul li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             list-style-type: square;
         }
+
 .koenig-lexical .kg-prose :where(
             ol li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3476,27 +3702,32 @@ em-emoji-picker {
             padding: 0 0 0 calc(0.8 * var(--kg-rem, 0.625rem));
             line-height: calc(3.2 * var(--kg-rem, 0.625rem));
         }
+
 .koenig-lexical .kg-prose :where(
             ol li:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: 0 0 0 calc(2.2 * var(--kg-rem, 0.625rem));
         }
+
 .koenig-lexical .kg-prose :where(
             ol ol li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             list-style-type: lower-alpha;
         }
+
 .koenig-lexical .kg-prose :where(
             ol ol ol li
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             list-style-type: lower-roman;
         }
+
 .koenig-lexical .kg-prose :where(
             p + ul,
             p + ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(3.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             ul + ul,
             ul + ol,
@@ -3509,6 +3740,7 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(3.0 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h1 + ul,
             h1 + ol,
@@ -3517,6 +3749,7 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h3 + ul,
             h3 + ol,
@@ -3529,12 +3762,14 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             div + ul,
             div + ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             ul ul,
             ul ol,
@@ -3543,35 +3778,44 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(1.0 * var(--kg-rem, 0.625rem)) 0 calc(2 * var(--kg-rem, 0.625rem));
         }
+
 /* Lists right after title */
+
 .koenig-lexical .kg-prose :where(
             ul:first-child,
             ol:first-child
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin-top: 0;
         }
+
 /* Links
         /* -------------------------------------------------------------------- */
+
 /* Uses accent color defined by React, else fallback to default color. */
+
 .koenig-lexical .kg-prose :where(
             a
         ):not(.dark a):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             color: var(--kg-accent-color, #ff0095);
             text-decoration: underline;
         }
+
 .koenig-lexical .kg-prose :where(
             .dark a
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             font-weight: 600;
             text-decoration: underline;
         }
+
 /* Blockquote
         /* -------------------------------------------------------------------- */
+
 .koenig-lexical .kg-prose :where(
             blockquote p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: 0;
         }
+
 .koenig-lexical .kg-prose :where(
             blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3579,12 +3823,14 @@ em-emoji-picker {
             padding-left: calc(2.0 * var(--kg-rem, 0.625rem));
             font-style: italic;
         }
+
 .koenig-lexical .kg-prose :where(
             h1 + blockquote,
             h2 + blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h3 + blockquote,
             h4 + blockquote,
@@ -3593,25 +3839,31 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             p + blockquote,
             blockquote + blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 /* Cards can be selected by their wrapper div element */
+
 .koenig-lexical .kg-prose :where(
             div + blockquote
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 /* Aside, Blockquote Alternative
         /* -------------------------------------------------------------------- */
+
 .koenig-lexical .kg-prose :where(
             aside p
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: 0;
         }
+
 .koenig-lexical .kg-prose :where(
             aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3622,12 +3874,14 @@ em-emoji-picker {
             font-size: calc(2.4 * var(--kg-rem, 0.625rem));
             color: var(--grey-500);
         }
+
 .koenig-lexical .kg-prose :where(
             h1 + aside,
             h2 + aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h3 + aside,
             h4 + aside,
@@ -3636,12 +3890,14 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(.4 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             p + aside,
             blockquote + aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 @media (max-width: 800px) {
             .koenig-lexical .kg-prose :where(
                 aside
@@ -3650,6 +3906,7 @@ em-emoji-picker {
                 padding-right: calc(6 * var(--kg-rem, 0.625rem));
             }
         }
+
 @media (max-width: 500px) {
             .koenig-lexical .kg-prose :where(
                 aside
@@ -3657,30 +3914,37 @@ em-emoji-picker {
                 font-size: calc(2.2 * var(--kg-rem, 0.625rem));
             }
         }
+
 /* cards can be selected by their wrapper div element */
+
 .koenig-lexical .kg-prose :where(
             div + aside
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             margin: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 /* Cards in general
         /* -------------------------------------------------------------------- */
+
 .koenig-lexical .kg-prose :where(
             > div
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             line-height: 0;
             min-width: 100%;
         }
+
 .koenig-lexical .kg-prose > :where(
             div + div
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             padding: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose > :where(
             div[data-kg-card-width="full"] + div[data-kg-card-width="full"]
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             padding: 0;
         }
+
 .koenig-lexical .kg-prose :where(
             p + div,
             blockquote + div,
@@ -3690,11 +3954,13 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             padding: calc(3.2 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h1 + div
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             padding: calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             h2 + div,
             h3 + div,
@@ -3704,6 +3970,7 @@ em-emoji-picker {
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             padding: calc(1.6 * var(--kg-rem, 0.625rem)) 0 0;
         }
+
 .koenig-lexical .kg-prose :where(
             hr
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3712,8 +3979,10 @@ em-emoji-picker {
             border: 0;
             border-top: 1px solid var(--grey-300);
         }
+
 /* Code
         /* -------------------------------------------------------------------- */
+
 .koenig-lexical .kg-prose :where(
             code
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3728,8 +3997,10 @@ em-emoji-picker {
             vertical-align: middle;
             white-space: pre-wrap;
         }
+
 /* Code
         /* -------------------------------------------------------------------- */
+
 .koenig-lexical .kg-prose :where(
             pre
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
@@ -3743,17 +4014,22 @@ em-emoji-picker {
             vertical-align: middle;
             white-space: pre-wrap;
         }
+
 /* Images
         /* -------------------------------------------------------------------- */
+
 .koenig-lexical .kg-prose :where(
             img
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
             display: inline;
         }
+
 /* Dark mode
     /* -------------------------------------------------------------------- */
+
 /* `dark` can sit on the editor itself (the composer's darkMode), on an ancestor (a host's
        page), or on a descendant, so all three are matched. */
+
 .koenig-lexical.dark .kg-prose :where(
                     h1,
                     h2,
@@ -3780,6 +4056,7 @@ em-emoji-picker {
                 ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
                     color: var(--white);
                 }
+
 .koenig-lexical.dark .kg-prose :where(
                 code
             ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)), .dark .koenig-lexical .kg-prose :where(
@@ -4243,6 +4520,10 @@ em-emoji-picker {
     color: color-mix(in srgb, var(--kg-color-grey-500, #AEB7C1) calc(var(--tw-text-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .backdrop\:bg-black\/40::backdrop {
+    background-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(0.4 * 100%), transparent);
+}
+
 .koenig-lexical .before\:absolute::before {
     content: var(--tw-content);
     position: absolute;
@@ -4665,6 +4946,11 @@ em-emoji-picker {
         --tw-translate-y: 0px;
         transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
     }
+}
+
+.koenig-lexical .dark\:border-grey-700:is(.dark *) {
+    --tw-border-opacity: 1;
+    border-color: color-mix(in srgb, var(--kg-color-grey-700, #7C8B9A) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .dark\:border-grey-800:is(.dark *) {
