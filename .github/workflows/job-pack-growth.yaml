@@ -1,8 +1,9 @@
 name: Package Growth
-# Compares this PR's packed tarball with the release on the npm `latest`
-# dist-tag (npm view <pkg> dist.unpackedSize dist.fileCount) and fails when the
-# unpacked size or file count grows past package.json
-# config.packMaxGrowthPercent. An unpublished package passes with a note.
+# Compares this PR's packed tarball with the one built from the PR's base commit
+# and fails when the unpacked size or file count grows past package.json
+# config.packMaxGrowthPercent. (Against the last npm release it would charge every
+# PR for everything merged since that release.) A manual run, with no PR, compares
+# with the release on the npm `latest` dist-tag instead.
 #
 # Intended growth: add the `pack-size-approved` label and say why in the PR
 # body. The label events retrigger this workflow, and the payload is read per
@@ -46,7 +47,22 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Compare with the last published release
+      # The baseline is the PR's base commit, so the job measures what this PR changes and not
+      # everything merged since the last release. It sits inside the repo to reuse node_modules.
+      - name: Checkout the base commit
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .pack-base
+
+      - name: Build the base commit
+        if: github.event_name == 'pull_request'
+        working-directory: .pack-base
+        run: npm run build
+
+      - name: Compare with the base branch
         env:
+          PACK_GROWTH_BASE_DIR: ${{ github.event_name == 'pull_request' && '.pack-base' || '' }}
           PACK_GROWTH_APPROVED: ${{ contains(github.event.pull_request.labels.*.name, 'pack-size-approved') }}
         run: npm run check:pack:growth

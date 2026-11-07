@@ -20,12 +20,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-// Package growth gate: compare this build's tarball with the last published
-// release. Run it after `npm run build`:
+// Package growth gate: compare this build's tarball with a baseline. Run it after
+// `npm run build`:
 //
 //   npm run build && npm run check:pack:growth
 //
-// It reads `npm pack --dry-run --json --ignore-scripts` for this build and
+// In a pull request the baseline is the PR's base commit, built in the folder named by
+// PACK_GROWTH_BASE_DIR, so the check measures what the PR itself changes. Without it
+// (a local run, a release check) the baseline is the last published release. It reads
+// `npm pack --dry-run --json --ignore-scripts` for this build and
 // `npm view <name> version dist.unpackedSize dist.fileCount --json` for the
 // version on the `latest` dist-tag, and fails when the unpacked size or the
 // file count grows past the allowed percentage. A package that has never been
@@ -53,6 +56,7 @@ const configured = Number(manifest.config?.packMaxGrowthPercent);
 const fromConfig = Number.isFinite(configured) && configured >= 0;
 const maxGrowthPercent = fromConfig ? configured : DEFAULT_MAX_GROWTH_PERCENT;
 const approved = process.env.PACK_GROWTH_APPROVED === "true";
+const baseDir = process.env.PACK_GROWTH_BASE_DIR;
 console.log(
   `check:pack:growth: threshold ${maxGrowthPercent}% ` +
     `(${fromConfig ? "package.json config.packMaxGrowthPercent" : "default"}), ` +
@@ -98,15 +102,31 @@ const lastPublished = (name) => {
   }
 };
 
-console.log("check:pack:growth: running npm pack --dry-run --json --ignore-scripts");
-// npm 12 prints an object keyed by package name; earlier versions print an array.
-const parsed = JSON.parse(
-  execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "inherit"],
-  }),
-);
-const [pack] = Array.isArray(parsed) ? parsed : Object.values(parsed);
+// The tarball `npm pack` would make in a folder.
+const packIn = (cwd) => {
+  console.log(`check:pack:growth: running npm pack --dry-run --json --ignore-scripts in ${cwd}`);
+  // npm 12 prints an object keyed by package name; earlier versions print an array.
+  const parsed = JSON.parse(
+    execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
+      cwd,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "inherit"],
+    }),
+  );
+  return (Array.isArray(parsed) ? parsed : Object.values(parsed))[0];
+};
+
+// The PR's base commit, built in baseDir.
+const builtBase = (dir) => {
+  const built = packIn(dir);
+  return {
+    version: `${built.version} (base branch)`,
+    unpackedSize: Number(built.unpackedSize),
+    fileCount: Number(built.entryCount),
+  };
+};
+
+const pack = packIn(".");
 console.log(
   `check:pack:growth: this build ${pack.name}@${pack.version}: ` +
     `${pack.entryCount} files, ${pack.unpackedSize} bytes unpacked`,
@@ -138,7 +158,7 @@ const compare = (base) => {
     return 1;
   }
   console.log(
-    `check:pack:growth: last published ${pack.name}@${base.version}: ` +
+    `check:pack:growth: baseline ${pack.name}@${base.version}: ` +
       `${base.fileCount} files, ${base.unpackedSize} bytes unpacked`,
   );
 
@@ -183,12 +203,12 @@ const compare = (base) => {
       `label and say why it grew in the PR body:\n\n${list}`;
   }
   summary([
-    `### Package growth: ${pack.name}@${base.version} (published) vs this build`,
+    `### Package growth: ${pack.name}@${base.version} vs this build`,
     "",
     `Threshold ${maxGrowthPercent}%, ignoring growth under ${MIN_GROWTH_BYTES} bytes ` +
       `or ${MIN_GROWTH_FILES} files.`,
     "",
-    "| Measure | Published | This build | Change | % |",
+    "| Measure | Baseline | This build | Change | % |",
     "| --- | --- | --- | --- | --- |",
     ...rows,
     "",
@@ -215,5 +235,5 @@ const compare = (base) => {
   }
 };
 
-const base = lastPublished(pack.name);
+const base = baseDir ? builtBase(baseDir) : lastPublished(pack.name);
 process.exitCode = base === undefined ? reportUnpublished() : compare(base);
