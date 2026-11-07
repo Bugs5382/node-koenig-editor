@@ -5,7 +5,7 @@ import {AnchoredMenu} from '../../additions/placement/AnchoredMenu';
 import {CardMenu} from '../components/ui/CardMenu';
 import {SlashMenu} from '../components/ui/SlashMenu';
 import {buildCardMenu} from '../utils/buildCardMenu';
-import {getCardMenuNodes, useKoenigStrings} from '../../additions/options';
+import {getCardMenuNodes, useKoenigStrings, useKoenigTool} from '../../additions/options';
 import {getEditorCardNodes} from '../utils/getEditorCardNodes';
 import {getSelectedNode} from '../utils/getSelectedNode';
 import {mergeRegister} from '@lexical/utils';
@@ -23,6 +23,7 @@ function useSlashCardMenu(editor) {
     const containerRef = React.useRef(null);
     const {cardConfig, menuItems} = React.useContext(KoenigComposerContext);
     const strings = useKoenigStrings();
+    const emojiOn = useKoenigTool('emojiPicker');
 
     // the menu hangs from the line the slash was typed on (see AnchoredMenu)
     function setMenuPosition(elem) {
@@ -308,7 +309,7 @@ function useSlashCardMenu(editor) {
 
     // build up the card menu based on registered nodes and current search
     React.useEffect(() => {
-        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {menuItems, strings});
+        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {emoji: emojiOn, menuItems, strings});
         setCardMenu(buildCardMenu(cardNodes, {insert, query, config: cardConfig}));
         setSelectedItemIndex(0);
     }, [editor, query, insert, setCardMenu, setSelectedItemIndex, cardConfig, menuItems, strings]);

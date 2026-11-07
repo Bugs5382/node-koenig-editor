@@ -202,6 +202,8 @@ export interface KoenigStrings {
   close: string;
   searching: string;
   cards: Record<KoenigCardName, KoenigCardText>;
+  /** The Emoji entry of the "+" and "/" menus. Typing `/emoji` anywhere opens the same picker. */
+  emoji: KoenigCardText;
   /** The Preview button, and the reader simulation's controls. */
   preview: {
     /** The button that leaves the reader's view. */
@@ -460,11 +462,20 @@ export interface KoenigStrings {
   header: {
     alignCenter: string;
     alignLeft: string;
+    alignRight: string;
     alignment: string;
     backgroundColor: string;
     backgroundImage: string;
     button: string;
+    buttonColor: string;
+    buttonEmoji: string;
+    buttonLabel: string;
+    buttonLabelBoth: string;
+    buttonLabelEmoji: string;
+    buttonLabelText: string;
     buttonText: string;
+    buttonTextColor: string;
+    textColor: string;
     buttonUrl: string;
     removeImage: string;
     subtitlePlaceholder: string;
@@ -475,8 +486,14 @@ export interface KoenigStrings {
   button: {
     alignCenter: string;
     alignLeft: string;
+    alignRight: string;
     alignment: string;
+    backgroundColor: string;
+    emoji: string;
+    emojiPlaceholder: string;
+    emojiRemove: string;
     invalidUrl: string;
+    textColor: string;
     text: string;
     textPlaceholder: string;
     url: string;
@@ -495,7 +512,7 @@ export interface KoenigStrings {
   };
   video: KoenigMediaStrings & { captionPlaceholder: string };
   audio: KoenigMediaStrings & { titlePlaceholder: string };
-  callout: { background: string; emoji: string; placeholder: string };
+  callout: { background: string; emoji: string; placeholder: string; textColor: string };
   toggle: {
     /** The reader's button when the toggle is open. */
     collapse: string;

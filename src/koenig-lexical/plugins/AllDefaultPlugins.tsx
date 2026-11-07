@@ -21,6 +21,7 @@ import {CleanPastePlugin} from '../../additions/paste/CleanPastePlugin';
 import {ShortcutsPlugin} from '../../additions/shortcuts/ShortcutsPlugin';
 import {SpacingPlugin} from '../../additions/spacing/SpacingPlugin';
 import {TablePlugin} from '../../additions/table/TablePlugin';
+import {EmojiCommandPlugin} from '../../additions/emojiPicker/EmojiCommandPlugin';
 import {TogglePlugin} from '../plugins/TogglePlugin';
 import {useKoenigPreview} from '../../additions/preview/PreviewContext';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -65,6 +66,7 @@ export const AllDefaultPlugins = () => {
             <ShortcutsPlugin />
             <CleanPastePlugin />
             <FindReplacePlugin />
+            <EmojiCommandPlugin />
         </>
     );
 };
