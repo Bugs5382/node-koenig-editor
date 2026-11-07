@@ -77,7 +77,7 @@ describe("table borders and backgrounds are visible, and set by tokens", () => {
       rule(
         '.koenig-lexical table tr td[style*="background-color"],\n.koenig-lexical table tr th[style*="background-color"]',
       ),
-    ).toContain("color: #15171A");
+    ).toContain("color: var(--black)");
   });
 
   it("draws the caption from the table's own attribute, under the table", () => {

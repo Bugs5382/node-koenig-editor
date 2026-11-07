@@ -2939,7 +2939,7 @@ em-emoji-picker {
 /* A cell the author shaded keeps dark ink, so its text reads on the shade in light and dark. */
 .koenig-lexical table tr td[style*="background-color"],
 .koenig-lexical table tr th[style*="background-color"] {
-    color: #15171A;
+    color: var(--black);
 }
 
 /* The caption is the table's own text, drawn under it from an attribute (the editor cannot add a
