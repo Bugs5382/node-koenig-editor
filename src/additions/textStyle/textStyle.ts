@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { $getSelectionStyleValueForProperty, $patchStyleText } from "@lexical/selection";
+import { normalizeColor } from "../colors/colors";
 import {
   $getSelection,
   $isRangeSelection,
@@ -65,6 +66,17 @@ export const HIGHLIGHTS = [
 ] as const;
 
 export const HIGHLIGHT_INK = "#15171A";
+const LIGHT_INK = "#FFFFFF";
+
+/** Dark ink on a light highlight and light ink on a dark one, so any picked colour stays readable. */
+export const inkFor = (background: string): string => {
+  const hex = normalizeColor(background).slice(1);
+  if (hex.length !== 6) return HIGHLIGHT_INK;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const luminance = 0.2126 * lin(r!) + 0.7152 * lin(g!) + 0.0722 * lin(b!);
+  return luminance > 0.35 ? HIGHLIGHT_INK : LIGHT_INK;
+};
 
 export type TextStyleProperty = "background-color" | "color" | "font-family" | "font-size";
 
@@ -83,7 +95,7 @@ export const $setHighlight = (selection: BaseSelection | null, value: null | str
   if (!$isRangeSelection(selection)) return;
   $patchStyleText(selection, {
     "background-color": value,
-    color: value ? HIGHLIGHT_INK : null,
+    color: value ? inkFor(value) : null,
   });
 };
 

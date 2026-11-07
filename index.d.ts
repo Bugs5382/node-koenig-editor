@@ -102,6 +102,41 @@ export type KoenigToolbarItem =
   | "textDirection"
   | "underline";
 
+/** One colour in a palette. */
+export interface KoenigColorSwatch {
+  /** What the swatch is called (its tooltip and screen reader name). */
+  label: string;
+  /** A hex colour, `#rgb` or `#rrggbb`. */
+  value: string;
+}
+
+/** Where the editor asks for a colour. Each has its own palette. */
+export type KoenigColorSlot =
+  | "buttonBackground"
+  | "buttonText"
+  | "calloutBackground"
+  | "calloutText"
+  | "headerBackground"
+  | "headerButton"
+  | "headerButtonText"
+  | "headerText"
+  | "highlight"
+  | "tableBand"
+  | "tableBrand"
+  | "textColor";
+
+/** A host's choices for one colour slot. */
+export interface KoenigColorSetting {
+  /** Takes away the choice of the editor's own colour, so a colour from the host's list (or, with
+   *  the picker on, a picked one) is always set. Default: true (the choice is there). */
+  none?: boolean;
+  /** The swatches this slot shows, in place of the editor's. */
+  palette?: readonly KoenigColorSwatch[];
+  /** Whether the person can pick any colour with the colour wheel. Default: true. `false` limits
+   *  the slot to its palette. */
+  picker?: boolean;
+}
+
 /** A font the host offers in the selection toolbar. */
 export interface KoenigFont {
   /** What the menu shows. */
@@ -209,6 +244,12 @@ export interface KoenigStrings {
     close: string;
     groups: Record<"align" | "blocks" | "general" | "text", string>;
     title: string;
+  };
+  colors: {
+    custom: string;
+    /** `{label}` is the setting's name. */
+    group: string;
+    none: string;
   };
   textStyle: {
     colours: Record<"blue" | "green" | "grey" | "orange" | "purple" | "red", string>;
@@ -790,6 +831,10 @@ export interface KoenigComposerProps {
   spellCheck?: boolean;
   /** The language of the text (a BCP 47 tag such as `de`), so the browser checks spelling in it. */
   lang?: string;
+  /** The colour settings, per slot: each slot's palette, whether the colour wheel is on, and
+   *  whether the editor's own colour is a choice. With `picker: false` and `none: false` the host
+   *  forces the person to a colour from its list. */
+  colors?: Partial<Record<KoenigColorSlot, KoenigColorSetting>>;
   /** The fonts the font button offers: a label and a CSS `font-family` value each. With none, the
    *  button is not shown. */
   fonts?: readonly KoenigFont[];

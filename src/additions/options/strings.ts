@@ -117,6 +117,11 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     },
     title: "Keyboard shortcuts",
   },
+  colors: {
+    custom: "Custom colour",
+    group: "{label}",
+    none: "Default colour",
+  },
   textStyle: {
     colours: {
       blue: "Blue",

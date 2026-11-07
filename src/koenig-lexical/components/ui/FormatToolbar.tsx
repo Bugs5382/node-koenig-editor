@@ -54,8 +54,10 @@ const SCOPE_STRING = {cell: 'scopeCell', row: 'scopeRow', column: 'scopeColumn',
 import {getSelectedNode} from '../../utils/getSelectedNode';
 import {$getSelectionSpacing, $setSpacing, LINE_SPACINGS, PARAGRAPH_SPACINGS} from '../../../additions/spacing/spacing';
 import {$getSelectionDirection, $setDirection} from '../../../additions/direction/direction';
+import {useColorSetting} from '../../../additions/colors/ColorControl';
+import {ColorMenu} from '../../../additions/colors/ColorMenu';
 import {StyleMenu} from '../../../additions/textStyle/StyleMenu';
-import {$clearFormatting, $getTextStyle, $setHighlight, $setTextStyle, FONT_SIZES, HIGHLIGHTS, TEXT_COLORS} from '../../../additions/textStyle/textStyle';
+import {$clearFormatting, $getTextStyle, $setHighlight, $setTextStyle, FONT_SIZES} from '../../../additions/textStyle/textStyle';
 import {ALIGNMENT_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
 
 const blockTypeToBlockName = {
@@ -111,6 +113,8 @@ export default function FormatToolbar({
     const [cell, setCell] = React.useState(null);
     const [scope, setScope] = React.useState('cell');
     const {cardConfig: {createSnippet}, toolbar, toolbarActions, fonts} = React.useContext(KoenigComposerContext);
+    const textColorSetting = useColorSetting('textColor');
+    const highlightSetting = useColorSetting('highlight');
     // the style button whose list is open, and the button it hangs from
     const [styleMenu, setStyleMenu] = React.useState(null);
     const [styleNow, setStyleNow] = React.useState({});
@@ -301,19 +305,13 @@ export default function FormatToolbar({
         },
         textColor: {
             label: strings.toolbar.textColor,
-            options: [
-                {id: 'default', label: strings_.defaultColour, checked: !styleNow.color || styleNow.color === 'inherit'},
-                ...TEXT_COLORS.map(color => ({id: color.id, label: strings_.colours[color.id], swatch: color.value, checked: (styleNow.color || '').toLowerCase() === color.value.toLowerCase()}))
-            ],
-            apply: id => $setTextStyle($getSelection(), 'color', TEXT_COLORS.find(color => color.id === id)?.value || null)
+            colour: {slot: 'textColor', setting: textColorSetting, value: styleNow.color && styleNow.color !== 'inherit' ? styleNow.color : null},
+            apply: value => $setTextStyle($getSelection(), 'color', value)
         },
         highlight: {
             label: strings.toolbar.highlight,
-            options: [
-                {id: 'none', label: strings_.noHighlight, checked: !styleNow['background-color']},
-                ...HIGHLIGHTS.map(color => ({id: color.id, label: strings_.highlights[color.id], swatch: color.value, checked: (styleNow['background-color'] || '').toLowerCase() === color.value.toLowerCase()}))
-            ],
-            apply: id => $setHighlight($getSelection(), HIGHLIGHTS.find(color => color.id === id)?.value || null)
+            colour: {slot: 'highlight', setting: highlightSetting, value: styleNow['background-color'] || null},
+            apply: value => $setHighlight($getSelection(), value)
         },
         lineSpacing: {
             label: strings.toolbar.lineSpacing,
@@ -558,7 +556,20 @@ export default function FormatToolbar({
                 onClick={onSnippetClick}
             />
         </ToolbarMenu>
-        {openMenu ? (
+        {openMenu?.colour ? (
+            <ColorMenu
+                anchor={styleMenu.anchor}
+                label={openMenu.label}
+                setting={openMenu.colour.setting}
+                slot={openMenu.colour.slot}
+                value={openMenu.colour.value}
+                onClose={closeStyleMenu}
+                onPick={(value) => {
+                    editor.update(() => openMenu.apply(value), {discrete: true});
+                    closeStyleMenu();
+                }}
+            />
+        ) : openMenu ? (
             <StyleMenu
                 anchor={styleMenu.anchor}
                 label={openMenu.label}

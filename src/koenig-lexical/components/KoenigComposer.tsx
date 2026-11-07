@@ -54,6 +54,7 @@ const KoenigComposer = ({
     strings: hostStrings,
     toolbar,
     fonts,
+    colors,
     spellCheck,
     lang,
     toolbarActions,
@@ -141,6 +142,7 @@ const KoenigComposer = ({
                     gallery,
                     toolbar,
                     fonts,
+                    colors,
                     spellCheck,
                     lang,
                     toolbarActions
