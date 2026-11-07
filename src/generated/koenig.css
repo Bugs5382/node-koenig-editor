@@ -2348,6 +2348,10 @@
     font-size: calc(1.3 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .text-\[1\.4rem\] {
+    font-size: calc(1.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .text-\[1\.6rem\] {
     font-size: calc(1.6 * var(--kg-rem, 0.625rem));
 }
@@ -2944,6 +2948,12 @@ em-emoji-picker {
     min-width: calc(6 * var(--kg-rem, 0.625rem));
     padding: calc(0.8 * var(--kg-rem, 0.625rem)) calc(1.2 * var(--kg-rem, 0.625rem));
     border: 1px var(--kg-table-border-style, solid) var(--kg-table-border-color, var(--grey-700));
+}
+
+/* A table wider than its column scrolls sideways inside this box, not the page. */
+.koenig-lexical .kg-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
 }
 
 /* Size. A table the author has resized lets its columns go down to the smallest size the editor

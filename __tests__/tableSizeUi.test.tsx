@@ -130,6 +130,6 @@ describe("the size popover", () => {
   it("scrolls sideways inside its own box when it is wider than the column", async () => {
     await load();
     const table = document.querySelector("table") as HTMLElement;
-    expect(table.parentElement?.style.overflowX).toBe("auto");
+    expect(table.parentElement?.classList.contains("kg-table-scroll")).toBe(true);
   });
 });

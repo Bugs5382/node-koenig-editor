@@ -185,6 +185,12 @@ em-emoji-picker {
     border: 1px var(--kg-table-border-style, solid) var(--kg-table-border-color, var(--grey-700));
 }
 
+/* A table wider than its column scrolls sideways inside this box, not the page. */
+.koenig-lexical .kg-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
 /* Size. A table the author has resized lets its columns go down to the smallest size the editor
    allows; the width mode is fill the column (default), as narrow as the content, or the columns'
    total width. A table wider than its column scrolls inside its own box. */
