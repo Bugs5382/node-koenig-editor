@@ -67,6 +67,17 @@ describe("playground", () => {
     expect(snippet()).toContain("comments={comments}");
   });
 
+  it("Reset brings back the quick brown fox text and Clear leaves an empty document", () => {
+    render(<App />);
+    const text = () => (document.querySelector('[contenteditable="true"]') as HTMLElement).textContent;
+    fireEvent.click(screen.getByRole("button", { name: "Clear" }));
+    fireEvent.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Clear" }));
+    expect(text()).toBe("");
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    fireEvent.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Reset" }));
+    expect(text()).toBe("The quick brown fox jumps over the lazy dog.");
+  });
+
   it("starts with a header and a gallery made of the sample pictures", () => {
     render(<App />);
     const editor = document.querySelector('[contenteditable="true"]') as HTMLElement;

@@ -176,7 +176,7 @@ export function TopBar({
             <Button title="Empty the document, keep the settings" onClick={onClear}>
               Clear
             </Button>
-            <Button title="Empty document and default settings" onClick={onReset}>
+            <Button title="Default text and default settings" onClick={onReset}>
               Reset
             </Button>
           </div>

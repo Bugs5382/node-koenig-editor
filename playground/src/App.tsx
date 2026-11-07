@@ -46,6 +46,7 @@ import {
   appendCard,
   dropCards,
   emptyDocument,
+  foxDocument,
   galleryNode,
   imageNode,
   isEmptyDocument,
@@ -201,7 +202,7 @@ export function App() {
     if (!isEmptyDocument(docRef.current)) setConfirm("clear");
   };
   const requestReset = () => {
-    if (!isEmptyDocument(docRef.current) || serializeSettings(settingsRef.current, catalog)) {
+    if (docRef.current !== foxDocument() || serializeSettings(settingsRef.current, catalog)) {
       setConfirm("reset");
     }
   };
@@ -221,9 +222,9 @@ export function App() {
     settingsRef.current = defaults;
     setSettings(defaults);
     threadsRef.current = [];
-    rebuild(emptyDocument());
+    rebuild(foxDocument());
     setToast({
-      message: "Reset to an empty document and the default settings.",
+      message: "Reset to the default text and settings.",
       undo: () => restore(snap),
     });
   };
@@ -303,8 +304,8 @@ export function App() {
       )}
       {confirm === "reset" && (
         <ConfirmDialog
-          title="Reset to an empty document?"
-          message="The editor is emptied and every setting goes back to its default. You can undo this right after."
+          title="Reset to the default text?"
+          message="The editor goes back to the quick brown fox text and every setting goes back to its default. You can undo this right after."
           confirmLabel="Reset"
           onCancel={() => setConfirm(null)}
           onConfirm={doReset}

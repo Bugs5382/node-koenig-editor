@@ -298,15 +298,15 @@ describe("Clear", () => {
 });
 
 describe("Reset", () => {
-  it("returns to an empty document and the default settings, after asking", () => {
+  it("returns to the quick brown fox text and the default settings, after asking", () => {
     window.history.replaceState(null, "", "/?dark=1&size=20&cards=image,divider");
     render(<App />);
     fireEvent.click(within(bar()).getByRole("button", { name: "Reset" }));
     const dialog = screen.getByRole("alertdialog");
-    expect(dialog.textContent).toContain("Reset to an empty document?");
+    expect(dialog.textContent).toContain("Reset to the default text?");
     expect(dialog.textContent).toContain("default");
     fireEvent.click(confirmButton("Reset"));
-    expect(editorText()).toBe("");
+    expect(editorText()).toBe("The quick brown fox jumps over the lazy dog.");
     expect(window.location.search).toBe("");
     expect(document.documentElement.classList.contains("dark")).toBe(false);
     expect(toast().textContent).toContain("Reset");
