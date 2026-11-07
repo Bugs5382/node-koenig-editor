@@ -59,6 +59,13 @@ import { ThreadList } from "./ThreadList";
 import { fileUploader, setSampleUploads } from "./uploader";
 
 // Everything but the text size changes what the composer is built with, so it rebuilds.
+// fonts the demo offers when "sample fonts" is on, all from the system's own families
+const SAMPLE_FONTS = [
+  { label: "Serif", value: "Georgia, 'Times New Roman', serif" },
+  { label: "Sans", value: "system-ui, sans-serif" },
+  { label: "Mono", value: "ui-monospace, Menlo, monospace" },
+];
+
 const REBUILD: (keyof Settings)[] = ["cards", "tools", "comments", "readOnly", "dark"];
 
 // The enabled cards, or null when the package does not list its cards (every card is on).
@@ -247,6 +254,10 @@ export function App() {
   const optionalProps: Record<string, unknown> = catalog.tools.length
     ? { tools: settings.tools }
     : {};
+  // the toolbar list, fonts and spell check are newer options: passed loosely, and only when offered
+  if (catalog.toolbar?.length) optionalProps.toolbar = settings.toolbar;
+  if (settings.fonts) optionalProps.fonts = SAMPLE_FONTS;
+  if (!settings.spellCheck) optionalProps.spellCheck = false;
   if (previewAvailable) {
     // The bar's switch and width presets drive the editor, and the editor's own Preview button
     // and bar report back, so the two stay one state.

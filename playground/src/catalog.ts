@@ -28,6 +28,7 @@ import type { Catalog } from "./config";
 interface OptionalExports {
   KOENIG_CARD_NAMES?: readonly string[];
   KOENIG_TOOLS?: readonly string[];
+  KOENIG_TOOLBAR_ITEMS?: readonly string[];
   useKoenigWordCount?: () => { readingTimeLabel: string; words: number; wordsLabel: string };
   useKoenigPreview?: () => {
     options: { width: string };
@@ -43,5 +44,6 @@ export const usePreview = lib.useKoenigPreview;
 export const catalog: Catalog = {
   cards: lib.KOENIG_CARD_NAMES ?? [],
   tools: lib.KOENIG_TOOLS ?? [],
+  toolbar: lib.KOENIG_TOOLBAR_ITEMS ?? [],
   wordCount: typeof useWordCount === "function",
 };

@@ -247,6 +247,31 @@ cells). Text inside cards is not counted. Reading time assumes 238 words a minut
 developer changes it.
 **Developer:** do not use the hook and there is no word count.
 
+## The selection toolbar
+
+Not a card: the toolbar that appears over selected text. A developer can show only some of its
+buttons with the composer's `toolbar` option, and the demo's settings panel has a checkbox for each.
+
+**What is in it.** Bold, italic, underline, strikethrough, subscript, superscript and inline code;
+text size, text colour, highlight and, when the developer gives `fonts`, a font; clear formatting;
+bulleted, numbered and check lists, and increase and decrease indent; line spacing and paragraph
+spacing; text direction; Heading 1 to 5 and quote; align left, center, right and justify; link; and
+any buttons the developer adds.
+**Keyboard:** **Alt+F10** moves focus from the selected text to the toolbar; the arrow keys, Home and
+End move between its buttons, Enter or Space presses one, and Escape returns to the text with the
+selection kept. Ctrl or Cmd with **/** opens the list of every shortcut.
+**Shortcuts for formats:** Ctrl or Cmd with B, I, U; with Shift and X for strikethrough; with a comma
+for subscript, a period for superscript, a backslash to clear formatting.
+**Also in the editor:** **find and replace** (Ctrl or Cmd with F), **clean paste** from Word and
+Google Docs (lists, bold and italic kept, fonts and colours dropped), and the browser's spell check
+(the developer can turn it off with `spellCheck={false}` and name the language with `lang`).
+**Accessibility:** the toolbar is a labelled toolbar; each button has a name and, where it opens a list,
+says so; the lists work with the arrow keys; buttons are marked while the selection has that format.
+**Developer:** `toolbar` picks the buttons (`toolbar={["bold", "italic", "textColor"]}`), a button left
+out also turns its shortcut off; `fonts` gives the font list; `tools` switches clean paste
+(`cleanPaste`), find and replace (`findReplace`) and the shortcuts list (`shortcuts`) on or off. See
+the README for each.
+
 ## For developers: switching things off or replacing them
 
 | You want to | Use | Example |

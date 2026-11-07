@@ -77,6 +77,34 @@ export function SettingsPanel({ catalog, onChange, settings }: Props) {
           </div>
         </fieldset>
       )}
+      {catalog.toolbar && catalog.toolbar.length > 0 && (
+        <fieldset>
+          <legend>
+            Toolbar <code>toolbar</code>
+          </legend>
+          <div className="checks">
+            {catalog.toolbar.map((name) => (
+              <label key={name}>
+                <input
+                  type="checkbox"
+                  checked={settings.toolbar.includes(name)}
+                  onChange={(e) =>
+                    onChange({
+                      toolbar: toggle(
+                        settings.toolbar,
+                        name,
+                        e.target.checked,
+                        catalog.toolbar ?? [],
+                      ),
+                    })
+                  }
+                />{" "}
+                {name}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
       <fieldset>
         <legend>Features</legend>
         <div className="checks">
@@ -105,6 +133,22 @@ export function SettingsPanel({ catalog, onChange, settings }: Props) {
               onChange={(e) => onChange({ sampleUploads: e.target.checked })}
             />{" "}
             sample images for uploads
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={settings.fonts}
+              onChange={(e) => onChange({ fonts: e.target.checked })}
+            />{" "}
+            sample fonts
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={settings.spellCheck}
+              onChange={(e) => onChange({ spellCheck: e.target.checked })}
+            />{" "}
+            spell check
           </label>
           <label>
             <input

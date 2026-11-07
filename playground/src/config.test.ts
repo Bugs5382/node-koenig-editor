@@ -217,3 +217,51 @@ describe("card presets", () => {
     );
   });
 });
+
+describe("the toolbar, fonts and spell check settings", () => {
+  const withToolbar: Catalog = {
+    ...catalog,
+    toolbar: ["bold", "italic", "underline", "fontSize"],
+  };
+
+  it("start with every toolbar button on, no sample fonts and spell check on", () => {
+    const s = defaultSettings(withToolbar);
+    expect(s.toolbar).toEqual(withToolbar.toolbar);
+    expect(s.fonts).toBe(false);
+    expect(s.spellCheck).toBe(true);
+    expect(serializeSettings(s, withToolbar)).toBe("");
+  });
+
+  it("travel in the address, in the package's order, ignoring names it does not know", () => {
+    const s = {
+      ...defaultSettings(withToolbar),
+      toolbar: ["bold", "underline"],
+      fonts: true,
+      spellCheck: false,
+    };
+    const query = serializeSettings(s, withToolbar);
+    expect(query).toContain("toolbar=bold,underline");
+    expect(parseSettings(`?${query}`, withToolbar)).toEqual(s);
+    expect(parseSettings("?toolbar=underline,nope,bold", withToolbar).toolbar).toEqual([
+      "bold",
+      "underline",
+    ]);
+  });
+
+  it("show in the code snippet only when they differ", () => {
+    const base = defaultSettings(withToolbar);
+    expect(buildSnippet(base, withToolbar)).not.toContain("toolbar=");
+    const changed = { ...base, toolbar: ["bold"], fonts: true, spellCheck: false };
+    const snippet = buildSnippet(changed, withToolbar);
+    expect(snippet).toContain('toolbar={["bold"]}');
+    expect(snippet).toContain("fonts={fonts}");
+    expect(snippet).toContain("spellCheck={false}");
+  });
+
+  it("are not offered by a build that lacks the toolbar list", () => {
+    const old = defaultSettings(catalog);
+    expect(old.toolbar).toEqual([]);
+    expect(serializeSettings(old, catalog)).toBe("");
+    expect(buildSnippet(old, catalog)).not.toContain("toolbar=");
+  });
+});
