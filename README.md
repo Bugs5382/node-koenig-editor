@@ -744,10 +744,10 @@ Four buttons in the selection toolbar style the selected text, and a fifth takes
 
 - **Text size** (`fontSize`): smaller, small, normal, large, larger, set in `em` so the text follows
   the host's type scale.
-- **Text colour** (`textColor`): six colours that read on both a light and a dark page, or the
-  default colour.
-- **Highlight** (`highlight`): six light colours, saved together with dark ink so the text reads on
-  any page.
+- **Text colour** (`textColor`): six colours that read on both a light and a dark page, the
+  default colour, and a colour wheel for any colour (see [Colours](#colours)).
+- **Highlight** (`highlight`): six light colours and the colour wheel, saved together with ink
+  (dark on a light highlight, light on a dark one) so the text reads on any page.
 - **Font** (`fontFamily`): the fonts the host gives, shown in their own face. With no `fonts` the
   button is not shown.
 - **Clear formatting** (`clearFormatting`, Ctrl or Cmd+**backslash**): takes every inline format and style off
@@ -767,6 +767,42 @@ The styling is the text's own style, so it is saved in the document, survives a 
 inline CSS in the saved HTML. The lists open under their button; the arrow keys move, Enter picks,
 Escape closes and returns to the text. Each button is marked while the selection has that style.
 The wording is `strings.textStyle` and `strings.toolbar`.
+
+### Colours
+
+Every colour setting in the editor uses one control: the setting's own base palette, the editor's
+default colour, and a colour wheel for any colour. The `colors` option sets each one by its slot:
+
+| Slot | Where |
+| --- | --- |
+| `textColor`, `highlight` | the selection toolbar |
+| `tableBand`, `tableBrand` | a table's Style popover |
+| `calloutBackground`, `calloutText` | the Callout card |
+| `buttonBackground`, `buttonText` | the Button card |
+| `headerBackground`, `headerText`, `headerButton`, `headerButtonText` | the Header card |
+
+Each slot takes `palette` (swatches, each a `label` and a hex `value`, replacing the editor's),
+`picker` (`false` switches the colour wheel off, so only the palette is offered) and `none` (`false`
+takes away the default colour). A host forces its brand colours by setting a palette, `picker:
+false` and `none: false`:
+
+```tsx
+<KoenigComposer
+  colors={{
+    textColor: {
+      palette: [
+        { label: "Brand", value: "#B45309" },
+        { label: "Ink", value: "#1C1917" },
+      ],
+      picker: false,
+      none: false,
+    },
+    highlight: { picker: false }, // the editor's highlights only, no wheel
+  }}
+/>
+```
+
+A colour the setting does not allow is never applied. The wording is `strings.colors`.
 
 ## 📃 Lists and spacing
 
