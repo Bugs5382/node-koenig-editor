@@ -33,9 +33,9 @@ import { $clearFormatting } from "../textStyle/textStyle";
 // Cmd+Shift+X, subscript with Ctrl or Cmd+comma and superscript with Ctrl or Cmd+period. Each is
 // off when the host's `toolbar` option leaves its button out.
 export const INLINE_SHORTCUTS = [
-  { code: "KeyX", format: "strikethrough", item: "strikethrough", shift: true },
-  { code: "Comma", format: "subscript", item: "subscript", shift: false },
-  { code: "Period", format: "superscript", item: "superscript", shift: false },
+  { code: "KeyX", format: "strikethrough", item: "strikethrough", key: "x", shift: true },
+  { code: "Comma", format: "subscript", item: "subscript", key: ",", shift: false },
+  { code: "Period", format: "superscript", item: "superscript", key: ".", shift: false },
 ] as const;
 
 export const InlineFormatShortcutsPlugin = () => {
@@ -57,11 +57,10 @@ export const InlineFormatShortcutsPlugin = () => {
           $clearFormatting();
           return true;
         }
+        const typed = event.key?.toLowerCase();
         const found = INLINE_SHORTCUTS.find(
           (entry) =>
-            entry.shift === event.shiftKey &&
-            (event.code === entry.code ||
-              (!event.code && event.key === { KeyX: "x", Comma: ",", Period: "." }[entry.code])),
+            entry.shift === event.shiftKey && (event.code === entry.code || typed === entry.key),
         );
         if (!found) return false;
         if (isToolbarItemHidden(toolbar as never, found.item)) return false;

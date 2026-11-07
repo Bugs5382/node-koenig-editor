@@ -54,6 +54,7 @@ export const FindReplacePlugin = () => {
   const [message, setMessage] = useState("");
   const [editable, setEditable] = useState(editor.isEditable());
   const findRef = useRef<HTMLInputElement>(null);
+  const bar = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!enabled || editor._parentEditor) return undefined;
@@ -98,7 +99,26 @@ export const FindReplacePlugin = () => {
   }, [query, matchCase]);
 
   useEffect(() => {
-    if (open) findRef.current?.focus();
+    if (!open) return undefined;
+    const element = bar.current as
+      (HTMLDivElement & { hidePopover?: () => void; showPopover?: () => void }) | null;
+    // in the browser's top layer where it has one, so a host's sticky bar cannot cover it
+    if (element && typeof element.showPopover === "function") {
+      try {
+        element.setAttribute("popover", "manual");
+        element.showPopover();
+      } catch {
+        // stays a fixed box
+      }
+    }
+    findRef.current?.focus();
+    return () => {
+      try {
+        element?.hidePopover?.();
+      } catch {
+        // already hidden
+      }
+    };
   }, [open]);
 
   // highlights in the page, and the current match scrolled into view
@@ -195,9 +215,11 @@ export const FindReplacePlugin = () => {
     <FloatingPortal to={target}>
       <div
         aria-label={t.title}
-        className="not-kg-prose fixed right-2 top-2 z-[9999] flex w-[34rem] max-w-[94vw] flex-col gap-2 rounded-lg bg-white p-3 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white forced-colors:border forced-colors:border-[ButtonText]"
+        ref={bar}
+        className="not-kg-prose fixed z-[9999] m-0 flex w-[34rem] max-w-[94vw] flex-col gap-2 rounded-lg bg-white p-3 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white forced-colors:border forced-colors:border-[ButtonText]"
         data-kg-find-bar
         role="search"
+        style={{ inset: "auto", right: "0.8rem", top: "0.8rem" }}
         onKeyDown={(event) => {
           event.stopPropagation();
           if (event.key === "Escape") {
