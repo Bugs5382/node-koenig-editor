@@ -495,6 +495,13 @@ export interface KoenigStrings {
     viewerClose: string;
     /** The key shown in the exit control's tooltip. */
     viewerCloseHint: string;
+    /** The slideshow: its settings under the gallery, and the viewer's play and pause. */
+    autoAdvanceLabel: string;
+    autoAdvanceSeconds: string;
+    screenModeLabel: string;
+    shuffleLabel: string;
+    viewerPause: string;
+    viewerPlay: string;
     viewerLabel: string;
     viewerNext: string;
     viewerPrevious: string;
@@ -769,6 +776,13 @@ export interface KoenigGalleryRenderProps {
   removeImage: (index: number) => void;
   /** Replaces the whole list, in the order given: for your own drag and drop. */
   replaceImages: (images: readonly KoenigGalleryImage[]) => void;
+  /** Changes this gallery's slideshow settings; what is not named stays. `autoplaySeconds` is a
+   *  whole number from 1 to 3600, anything else (or 0) turns auto-advance off. */
+  setSlideshow: (changes: Partial<KoenigGallerySlideshow>) => void;
+  /** How the full-screen viewer plays this gallery; a setting the host switched off reads as off. */
+  slideshow: KoenigGallerySlideshow;
+  /** Which slideshow settings the host allows. */
+  slideshowOptions: { autoAdvance: boolean; screenMode: boolean; shuffle: boolean };
   /** Sets this gallery's limit, kept between `max(photos in the gallery, 1)` and `hostMaxImages`.
    *  Text that is not a number changes nothing. */
   setMaxImages: (value: number | string) => void;
@@ -833,8 +847,27 @@ export interface KoenigHeaderRenderProps {
 }
 
 /** The host's own layout for the cards that have one. Without an entry the default draws. */
+/** A gallery's slideshow settings, saved in the card and written to the saved HTML as
+ *  `data-kg-autoplay`, `data-kg-shuffle` and `data-kg-screen-mode`. */
+export interface KoenigGallerySlideshow {
+  /** Seconds between photos in the full-screen viewer; 0 is off. */
+  autoplaySeconds: number;
+  /** Plays the viewer in a screen mode: the thumbnail strip is hidden and the controls hide
+   *  themselves after a few seconds without input. Any key, a tap or a mouse move brings them
+   *  back, and Escape shows them before a second Escape closes the viewer. */
+  screenMode: boolean;
+  /** Shows the photos in a random order each time the viewer opens, starting with the one opened. */
+  shuffle: boolean;
+}
+
 /** The host's options for the gallery card. */
 export interface KoenigGalleryOptions {
+  /** `false` takes the auto-advance setting away (and stops a stored one playing). Default: on. */
+  autoAdvance?: boolean;
+  /** `false` takes the screen mode setting away. Default: on. */
+  screenMode?: boolean;
+  /** `false` takes the random order setting away. Default: on. */
+  shuffle?: boolean;
   /** The most photos a gallery takes: the ceiling for each gallery's own setting. A positive whole
    *  number; anything else means the default, 50. It limits adding photos, never cuts off the
    *  photos a stored document already has. */

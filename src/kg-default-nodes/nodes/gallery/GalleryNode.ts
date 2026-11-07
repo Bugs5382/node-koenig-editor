@@ -6,7 +6,12 @@ const galleryProperties = [
     {name: 'images', default: [] as unknown[]},
     {name: 'caption', default: '', wordCount: true},
     // This gallery's own limit on photos; 0 means the host's limit applies.
-    {name: 'maxImages', default: 0}
+    {name: 'maxImages', default: 0},
+    // Slideshow settings of the full-screen viewer: seconds between photos (0 is off), shuffled
+    // order, and a screen mode with the thumbnail strip hidden and the controls auto-hiding.
+    {name: 'autoplaySeconds', default: 0},
+    {name: 'shuffle', default: false},
+    {name: 'screenMode', default: false}
 ] as const satisfies readonly DecoratorNodeProperty[];
 
 export type GalleryData = DecoratorNodeData<typeof galleryProperties>;

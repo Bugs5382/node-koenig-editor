@@ -20,7 +20,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { type KeyboardEvent, type TouchEvent, useEffect, useId, useRef } from "react";
+import {
+  type KeyboardEvent,
+  type TouchEvent,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 
 import { TopLayerDialog } from "./TopLayerDialog";
 import { photoKey } from "./galleryText";
@@ -39,6 +47,8 @@ export interface ViewerStrings {
   hideImageText: string;
   showImageText: string;
   viewerClose: string;
+  viewerPause?: string;
+  viewerPlay?: string;
   viewerCloseHint: string;
   viewerLabel: string;
   viewerNext: string;
@@ -47,7 +57,14 @@ export interface ViewerStrings {
   viewerThumbnails: string;
 }
 
+/** Seconds without input before screen mode hides the controls. */
+export const CONTROLS_HIDE_AFTER = 3000;
+
 interface GalleryViewerProps {
+  /** Seconds between photos; 0 or none is off. The last photo goes back to the first. */
+  autoplaySeconds?: number;
+  /** The thumbnail strip is not shown and the controls hide themselves when nothing is touched. */
+  screenMode?: boolean;
   index: number;
   isCollapsed: (photo: ViewerPhoto) => boolean;
   onClose: () => void;
@@ -132,6 +149,8 @@ const Tip = ({
 // mounts under the editor's own root, outside the card, and takes every key typed in it, so the
 // card behind never sees them. Fixed, with no motion beyond a fade that reduced-motion turns off.
 export const GalleryViewer = ({
+  autoplaySeconds = 0,
+  screenMode = false,
   index,
   isCollapsed,
   onClose,
@@ -153,6 +172,32 @@ export const GalleryViewer = ({
   const target = opener?.closest(".koenig-lexical") ?? document.body;
   const photo = photos[index];
   const last = photos.length - 1;
+  const autoplay = autoplaySeconds > 0 && photos.length > 1;
+  const [playing, setPlaying] = useState(true);
+  const [hidden, setHidden] = useState(false);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Screen mode: the controls go after a few seconds without input and come back on any input
+  const reveal = useCallback(() => {
+    setHidden(false);
+    clearTimeout(hideTimer.current);
+    if (screenMode) hideTimer.current = setTimeout(() => setHidden(true), CONTROLS_HIDE_AFTER);
+  }, [screenMode]);
+  useEffect(() => {
+    reveal();
+    return () => clearTimeout(hideTimer.current);
+  }, [reveal]);
+
+  // Auto-advance: the next photo after the set seconds, starting over after the last. A move by
+  // hand starts the wait again.
+  useEffect(() => {
+    if (!autoplay || !playing) return undefined;
+    const timer = setTimeout(
+      () => onIndexChange(index >= photos.length - 1 ? 0 : index + 1),
+      autoplaySeconds * 1000,
+    );
+    return () => clearTimeout(timer);
+  }, [autoplay, autoplaySeconds, index, onIndexChange, photos.length, playing]);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -187,10 +232,19 @@ export const GalleryViewer = ({
   const onKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
     // Nothing typed here is for the document behind it.
     event.stopPropagation();
+    // In screen mode a key first brings the controls back; Escape then needs a second press to exit
+    const wasHidden = screenMode && hidden;
+    reveal();
     switch (event.key) {
       case "Escape":
         event.preventDefault();
-        close();
+        if (!wasHidden) close();
+        return;
+      case " ":
+        if (autoplay && (event.target as HTMLElement).tagName !== "BUTTON") {
+          event.preventDefault();
+          setPlaying((value) => !value);
+        }
         return;
       case "ArrowLeft":
         event.preventDefault();
@@ -249,7 +303,9 @@ export const GalleryViewer = ({
     <TopLayerDialog
       aria-label={strings.viewerLabel}
       aria-modal="true"
-      className="fixed inset-0 z-[2147483647] m-0 flex size-full max-h-none max-w-none flex-col overflow-hidden border-0 bg-black p-0 font-sans text-white transition-opacity motion-reduce:transition-none"
+      className={`fixed inset-0 z-[2147483647] m-0 flex size-full max-h-none max-w-none flex-col overflow-hidden border-0 bg-black p-0 font-sans text-white transition-opacity motion-reduce:transition-none ${screenMode && hidden ? "cursor-none" : ""}`}
+      data-gallery-viewer-controls={screenMode && hidden ? "hidden" : "shown"}
+      data-gallery-viewer-screen-mode={screenMode ? "true" : undefined}
       data-gallery-viewer
       role="dialog"
       to={target}
@@ -260,50 +316,68 @@ export const GalleryViewer = ({
       }}
       onKeyDown={onKeyDown}
       onKeyUp={(event) => event.stopPropagation()}
+      onMouseMove={screenMode ? reveal : undefined}
+      onPointerDown={screenMode ? reveal : undefined}
       onRequestClose={close}
       returnFocusTo={opener}
     >
       <div
-        className="flex items-center justify-between gap-4 pb-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(0.75rem,env(safe-area-inset-top))]"
+        className={`flex items-center justify-between gap-4 pb-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(0.75rem,env(safe-area-inset-top))] transition-opacity duration-300 motion-reduce:transition-none ${screenMode && hidden ? "invisible opacity-0" : ""}`}
         data-gallery-viewer-backdrop
         data-gallery-viewer-bar
       >
         <span aria-live="polite" className="text-sm tabular-nums" data-gallery-viewer-count>
           {fill(strings.countOf, { max: photos.length, n: index + 1 })}
         </span>
-        <span className="relative">
-          <button
-            ref={closeRef}
-            aria-describedby={closeTipId}
-            aria-label={strings.viewerClose}
-            className={`${CONTROL} h-11 min-w-11 gap-2 px-3 text-sm font-medium sm:px-4`}
-            data-gallery-viewer-close
-            type="button"
-            onClick={close}
-          >
-            <svg
-              aria-hidden="true"
-              className="size-5 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 16 16"
+        <span className="flex items-center gap-2">
+          {autoplay ? (
+            <button
+              aria-label={
+                playing ? (strings.viewerPause ?? "Pause") : (strings.viewerPlay ?? "Play")
+              }
+              aria-pressed={playing}
+              className={`${CONTROL} h-11 px-4 text-sm font-medium`}
+              data-gallery-viewer-play
+              type="button"
+              onClick={() => setPlaying((value) => !value)}
             >
-              <path
-                d="M3.5 3.5 12.5 12.5M12.5 3.5 3.5 12.5"
-                strokeLinecap="round"
-                strokeWidth="1.6"
-              />
-            </svg>
-            <span className="hidden sm:inline" data-gallery-viewer-close-text>
-              {strings.viewerClose}
-            </span>
-          </button>
-          <Tip
-            className="right-0 top-full mt-2"
-            hint={strings.viewerCloseHint}
-            id={closeTipId}
-            label={strings.viewerClose}
-          />
+              {playing ? (strings.viewerPause ?? "Pause") : (strings.viewerPlay ?? "Play")}
+            </button>
+          ) : null}
+          <span className="relative">
+            <button
+              ref={closeRef}
+              aria-describedby={closeTipId}
+              aria-label={strings.viewerClose}
+              className={`${CONTROL} h-11 min-w-11 gap-2 px-3 text-sm font-medium sm:px-4`}
+              data-gallery-viewer-close
+              type="button"
+              onClick={close}
+            >
+              <svg
+                aria-hidden="true"
+                className="size-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M3.5 3.5 12.5 12.5M12.5 3.5 3.5 12.5"
+                  strokeLinecap="round"
+                  strokeWidth="1.6"
+                />
+              </svg>
+              <span className="hidden sm:inline" data-gallery-viewer-close-text>
+                {strings.viewerClose}
+              </span>
+            </button>
+            <Tip
+              className="right-0 top-full mt-2"
+              hint={strings.viewerCloseHint}
+              id={closeTipId}
+              label={strings.viewerClose}
+            />
+          </span>
         </span>
       </div>
 
@@ -311,7 +385,9 @@ export const GalleryViewer = ({
         className="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-16"
         data-gallery-viewer-backdrop
       >
-        <div className="absolute left-2 z-10">
+        <div
+          className={`absolute left-2 z-10 transition-opacity duration-300 motion-reduce:transition-none ${screenMode && hidden ? "invisible opacity-0" : ""}`}
+        >
           <button
             aria-describedby={prevTipId}
             aria-label={strings.viewerPrevious}
@@ -345,7 +421,9 @@ export const GalleryViewer = ({
             src={photo.src || photo.previewSrc}
           />
         </div>
-        <div className="absolute right-2 z-10">
+        <div
+          className={`absolute right-2 z-10 transition-opacity duration-300 motion-reduce:transition-none ${screenMode && hidden ? "invisible opacity-0" : ""}`}
+        >
           <button
             aria-describedby={nextTipId}
             aria-label={strings.viewerNext}
@@ -409,40 +487,42 @@ export const GalleryViewer = ({
         ) : null}
       </div>
 
-      <div
-        ref={stripRef}
-        aria-label={strings.viewerThumbnails}
-        className="relative flex shrink-0 overflow-x-auto pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-3"
-        data-gallery-viewer-thumbs
-        role="group"
-      >
-        <div className="mx-auto flex gap-2">
-          {photos.map((item, position) => (
-            <button
-              key={photoKey(item) + position}
-              ref={position === index ? currentThumb : undefined}
-              aria-current={position === index ? "true" : undefined}
-              aria-label={fill(strings.viewerThumbnail, { n: position + 1 })}
-              className={`h-14 w-20 shrink-0 cursor-pointer overflow-hidden rounded border-2 bg-transparent p-0 outline-0 transition duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-transparent focus-visible:ring-2 focus-visible:ring-white/40 motion-reduce:transition-none ${
-                position === index
-                  ? "border-white/80 opacity-100"
-                  : "border-transparent opacity-60 hover:opacity-100"
-              }`}
-              data-gallery-viewer-thumb
-              type="button"
-              onClick={() => onIndexChange(position)}
-            >
-              <img
-                alt=""
-                className="size-full object-cover"
-                decoding="async"
-                loading="lazy"
-                src={item.src || item.previewSrc}
-              />
-            </button>
-          ))}
+      {screenMode ? null : (
+        <div
+          ref={stripRef}
+          aria-label={strings.viewerThumbnails}
+          className="relative flex shrink-0 overflow-x-auto pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-3"
+          data-gallery-viewer-thumbs
+          role="group"
+        >
+          <div className="mx-auto flex gap-2">
+            {photos.map((item, position) => (
+              <button
+                key={photoKey(item) + position}
+                ref={position === index ? currentThumb : undefined}
+                aria-current={position === index ? "true" : undefined}
+                aria-label={fill(strings.viewerThumbnail, { n: position + 1 })}
+                className={`h-14 w-20 shrink-0 cursor-pointer overflow-hidden rounded border-2 bg-transparent p-0 outline-0 transition duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-transparent focus-visible:ring-2 focus-visible:ring-white/40 motion-reduce:transition-none ${
+                  position === index
+                    ? "border-white/80 opacity-100"
+                    : "border-transparent opacity-60 hover:opacity-100"
+                }`}
+                data-gallery-viewer-thumb
+                type="button"
+                onClick={() => onIndexChange(position)}
+              >
+                <img
+                  alt=""
+                  className="size-full object-cover"
+                  decoding="async"
+                  loading="lazy"
+                  src={item.src || item.previewSrc}
+                />
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </TopLayerDialog>
   );
 };
