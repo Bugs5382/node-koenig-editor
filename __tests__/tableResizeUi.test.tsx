@@ -97,18 +97,19 @@ describe("resizing from the keyboard, with a column or row selected", () => {
     const api = await load();
     await select(api, 1, 1, "selectColumn");
     await key(api, "ArrowRight");
-    const after = widths(api)!;
-    expect(after[1]! - after[0]!).toBe(10);
+    // the border moves between this column and the next, so the table keeps its width
+    expect(widths(api)).toEqual([75, 85, 65]);
     await key(api, "ArrowLeft");
     await key(api, "ArrowLeft");
-    expect(widths(api)![1]! - widths(api)![0]!).toBe(-10);
+    expect(widths(api)).toEqual([75, 65, 85]);
   });
 
   it("Shift makes the step 40, and the width never goes under the minimum", async () => {
     const api = await load();
     await select(api, 1, 0, "selectColumn");
     await key(api, "ArrowRight", { shiftKey: true });
-    expect(widths(api)![0]! - widths(api)![1]!).toBe(40);
+    // 40 more, but the next column stops at its minimum
+    expect(widths(api)).toEqual([110, 40, 75]);
     for (let i = 0; i < 8; i += 1) await key(api, "ArrowLeft", { shiftKey: true });
     expect(widths(api)![0]).toBe(40);
   });
@@ -178,7 +179,7 @@ describe("resizing by dragging a border", () => {
     await act(async () => {
       fireEvent.mouseUp(window, { clientX: 137, clientY: 20 });
     });
-    expect(widths(api)).toEqual([140, 100, 100]);
+    expect(widths(api)).toEqual([140, 60, 100]);
     expect(document.querySelector("[data-kg-table-resize-tip]")).toBeNull();
   });
 

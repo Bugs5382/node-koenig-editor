@@ -34,6 +34,7 @@ import {
   $setTableWidthMode,
   MIN_COLUMN_WIDTH,
   MIN_ROW_HEIGHT,
+  movedBorder,
   resizedWidths,
 } from "../src/additions/table/tableResize";
 import { mount } from "./__utils__/mount";
@@ -62,6 +63,46 @@ const update = async (api: KoenigEditorAPI, fn: () => void) => {
 };
 const read = <T,>(api: KoenigEditorAPI, fn: () => T): T =>
   api.editorInstance.getEditorState().read(fn);
+
+describe("moving a column border", () => {
+  it("moves it between the column and the next one, so a filling table keeps its width", () => {
+    expect(movedBorder([100, 100, 100], 0, 30, "full")).toEqual({
+      fixed: false,
+      widths: [130, 70, 100],
+    });
+    expect(movedBorder([100, 100, 100], 1, -30, "fit")).toEqual({
+      fixed: false,
+      widths: [100, 70, 130],
+    });
+  });
+
+  it("stops when either column reaches the minimum", () => {
+    expect(movedBorder([100, 100, 100], 0, 500, "full").widths).toEqual([
+      160,
+      MIN_COLUMN_WIDTH,
+      100,
+    ]);
+    expect(movedBorder([100, 100, 100], 0, -500, "full").widths).toEqual([
+      MIN_COLUMN_WIDTH,
+      160,
+      100,
+    ]);
+  });
+
+  it("changes only the last column, and makes the table fixed, when the right edge moves", () => {
+    expect(movedBorder([100, 100, 100], 2, 30, "full")).toEqual({
+      fixed: true,
+      widths: [100, 100, 130],
+    });
+  });
+
+  it("changes only the one column in a fixed table", () => {
+    expect(movedBorder([100, 100, 100], 0, 30, "fixed")).toEqual({
+      fixed: false,
+      widths: [130, 100, 100],
+    });
+  });
+});
 
 describe("resizing columns", () => {
   it("moves one column's border and leaves the table's other columns as they were", () => {

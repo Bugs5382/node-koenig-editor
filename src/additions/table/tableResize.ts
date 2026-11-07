@@ -42,6 +42,36 @@ export const resizedWidths = (widths: readonly number[], column: number, delta: 
     index === column ? Math.max(Math.round(width + delta), MIN_COLUMN_WIDTH) : width,
   );
 
+/**
+ * Moves the right border of `column` by `delta` pixels. In a table that fills the column or fits
+ * its content, the border moves between this column and the next, so the table keeps its width
+ * (each stops at the minimum). The last column's right border is the table's edge, and in a fixed
+ * table every border is: only this column changes, and `fixed` says the table must now be fixed.
+ */
+export const movedBorder = (
+  widths: readonly number[],
+  column: number,
+  delta: number,
+  mode: TableWidthMode,
+): { fixed: boolean; widths: number[] } => {
+  const last = column >= widths.length - 1;
+  if (mode === "fixed" || last) {
+    return { fixed: mode !== "fixed", widths: resizedWidths(widths, column, delta) };
+  }
+  const own = widths[column] ?? MIN_COLUMN_WIDTH;
+  const next = widths[column + 1] ?? MIN_COLUMN_WIDTH;
+  const moved = Math.min(
+    Math.max(Math.round(delta), MIN_COLUMN_WIDTH - own),
+    next - MIN_COLUMN_WIDTH,
+  );
+  return {
+    fixed: false,
+    widths: widths.map((width, index) =>
+      index === column ? own + moved : index === column + 1 ? next - moved : width,
+    ),
+  };
+};
+
 /** Stores the table's column widths (one per column). Inside an editor update. */
 export const $setColumnWidths = (table: TableNode, widths: readonly number[]): void => {
   table.setColWidths(widths.map((width) => Math.max(Math.round(width), MIN_COLUMN_WIDTH)));

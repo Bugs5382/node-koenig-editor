@@ -48,7 +48,10 @@ import {
   MIN_COLUMN_WIDTH,
   measureWidths,
   MIN_ROW_HEIGHT,
-  resizedWidths,
+  $getTableWidthMode,
+  $setTableWidthMode,
+  movedBorder,
+  type TableWidthMode,
 } from "./tableResize";
 
 // Resizing a table with the pointer and the keyboard. Drag a cell's right border to set its column's
@@ -154,11 +157,13 @@ export const TableResizePlugin = () => {
       let target: Target | null = null;
       let element: HTMLElement | null = null;
       let stored: readonly number[] | undefined;
+      let startMode: TableWidthMode = "full";
       editor.read(() => {
         target = $targetOfCell(handle.cell, handle.kind);
         if (target) {
           element = editor.getElementByKey(target.table.getKey()) as HTMLElement | null;
           stored = target.table.getColWidths();
+          startMode = $getTableWidthMode(target.table);
         }
       });
       const start = target as Target | null;
@@ -173,14 +178,22 @@ export const TableResizePlugin = () => {
 
       const onDrag = (move: MouseEvent) => {
         if (handle.kind === "column") {
-          const widths = resizedWidths(startWidths, start.column, move.clientX - startX);
+          const moved = movedBorder(startWidths, start.column, move.clientX - startX, startMode);
+          const widths = moved.widths;
           last = fill(strings.current.columnWidthStatus, {
             column: start.column + 1,
             width: widths[start.column] ?? 0,
           });
-          editor.update(() => $setColumnWidths(start.table.getLatest(), widths), {
-            discrete: true,
-          });
+          editor.update(
+            () => {
+              const table = start.table.getLatest();
+              $setColumnWidths(table, widths);
+              // the table's right edge moved, so it is now as wide as its columns
+              if (moved.fixed) $setTableWidthMode(table, "fixed");
+            },
+            { discrete: true },
+          );
+          if (moved.fixed) startMode = "fixed";
           setTip({
             left: move.clientX + 12,
             text: `${widths[start.column]} px`,
@@ -266,8 +279,14 @@ export const TableResizePlugin = () => {
             first.getParent()?.getChildrenSize() ?? 0,
           );
           let widths = measureWidths(element, table.getColWidths(), count);
-          for (const column of columns) widths = resizedWidths(widths, column, step);
+          let mode = $getTableWidthMode(table);
+          for (const column of columns) {
+            const moved = movedBorder(widths, column, step, mode);
+            widths = moved.widths;
+            if (moved.fixed) mode = "fixed";
+          }
           $setColumnWidths(table, widths);
+          if (mode !== $getTableWidthMode(table)) $setTableWidthMode(table, mode);
           const column = columns[0] ?? 0;
           setStatus(
             fill(strings.current.columnWidthStatus, {

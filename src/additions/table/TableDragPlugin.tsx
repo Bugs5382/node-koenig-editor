@@ -29,7 +29,7 @@ import { FloatingPortal } from "../placement/FloatingPortal";
 import { $readTableState } from "./tableActions";
 import { dropIndex, type Line } from "./tableDrag";
 
-// Drag a row or column to a new place. A small grip sits at the left of the cursor's row and above
+// Drag a row or column to a new place. A small grip sits at the left of the cursor's row and under
 // its column; hold it and drag, and a line shows where the row or column will land. The same moves
 // are in the table menu and toolbar (move up, down, left, right) for anyone who does not drag.
 
@@ -245,7 +245,7 @@ export const TableDragPlugin = () => {
           role="button"
           style={{
             left: boxes.columnRect.left + boxes.columnRect.width / 2 - 12,
-            top: boxes.table.top - 20,
+            top: boxes.table.bottom + 4,
           }}
           tabIndex={-1}
           title={t.dragColumnHint}
