@@ -44,6 +44,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     image: { desc: "Upload, or embed with /image [url]", label: "Image" },
     table: { desc: "Insert a table", label: "Table" },
     toggle: { desc: "Add collapsible content", label: "Toggle" },
+    toggleGroup: { desc: "Add a stack of collapsible items", label: "Toggle group" },
     video: { desc: "Upload a video file", label: "Video" },
   },
   menu: {
@@ -445,6 +446,10 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     back: "Back to editing",
     toggle: "Preview",
     width: "Width",
+  },
+  toggleGroup: {
+    addItem: "Add a toggle",
+    removeItem: "Remove toggle {number}",
   },
   toggle: {
     collapse: "Hide content",

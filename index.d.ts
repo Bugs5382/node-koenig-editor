@@ -49,6 +49,7 @@ export type KoenigCardName =
   | "markdown"
   | "table"
   | "toggle"
+  | "toggleGroup"
   | "video";
 
 /** Features that are not cards. Pass a list as the composer's `tools` to keep only those. */
@@ -518,6 +519,12 @@ export interface KoenigStrings {
     /** The reader's button when the toggle is closed. */
     expand: string;
     headingPlaceholder: string;
+  };
+  /** The toggle group card: the single toggle's wording is used for the items themselves. */
+  toggleGroup: {
+    addItem: string;
+    /** `{number}` is the item's place in the stack, starting at 1. */
+    removeItem: string;
   };
   snippet: { namePlaceholder: string; replaceExisting: string };
   imageEditor: {

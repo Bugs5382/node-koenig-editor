@@ -5,6 +5,7 @@ import * as callout from './nodes/callout/CalloutNode.js';
 import * as aside from './nodes/aside/AsideNode.js';
 import * as horizontalrule from './nodes/horizontalrule/HorizontalRuleNode.js';
 import * as toggle from './nodes/toggle/ToggleNode.js';
+import * as toggleGroup from './nodes/toggle-group/ToggleGroupNode.js';
 import * as gallery from './nodes/gallery/GalleryNode.js';
 import * as header from './nodes/header/HeaderNode.js';
 import * as button from './nodes/button/ButtonNode.js';
@@ -23,6 +24,7 @@ export * from './nodes/callout/CalloutNode.js';
 export * from './nodes/aside/AsideNode.js';
 export * from './nodes/horizontalrule/HorizontalRuleNode.js';
 export * from './nodes/toggle/ToggleNode.js';
+export * from './nodes/toggle-group/ToggleGroupNode.js';
 export * from './nodes/gallery/GalleryNode.js';
 export * from './nodes/header/HeaderNode.js';
 export * from './nodes/button/ButtonNode.js';
@@ -66,6 +68,7 @@ export const DEFAULT_NODES = [
     aside.AsideNode,
     horizontalrule.HorizontalRuleNode,
     toggle.ToggleNode,
+    toggleGroup.ToggleGroupNode,
     gallery.GalleryNode,
     header.HeaderNode,
     button.ButtonNode,

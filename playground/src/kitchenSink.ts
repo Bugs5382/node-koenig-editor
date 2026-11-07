@@ -102,7 +102,7 @@ const table = (rows: string[][]): CardNode =>
     ),
   );
 
-// The twelve cards, each as saved data, keyed by the card name the composer's `cards` option uses.
+// The cards, each as saved data, keyed by the card name the composer's `cards` option uses.
 const CARD_NODES: Record<string, () => CardNode[]> = {
   header: () => [headerNode(SAMPLES[SAMPLES.length - 1]!)],
   image: () => [imageNode(SAMPLES[1]!)],
@@ -122,6 +122,17 @@ const CARD_NODES: Record<string, () => CardNode[]> = {
       version: 1,
       heading: "What is a toggle?",
       content: "Text that stays hidden until the reader opens it.",
+    },
+  ],
+  toggleGroup: () => [
+    {
+      type: "toggle-group",
+      version: 1,
+      items: [
+        { heading: "What is a toggle group?", content: "A stack of toggles that touch." },
+        { heading: "How many can it hold?", content: "As many as you add." },
+        { heading: "Can a reader open two at once?", content: "Yes, each one opens on its own." },
+      ],
     },
   ],
   divider: () => [{ type: "horizontalrule", version: 1 }],
@@ -183,6 +194,7 @@ const ORDER = [
   "gallery",
   "callout",
   "toggle",
+  "toggleGroup",
   "divider",
   "table",
   "markdown",
@@ -214,7 +226,14 @@ export function kitchenSink(
   ];
   for (const card of ORDER) {
     if (!on(card)) continue;
-    children.push(heading("h2", card[0]!.toUpperCase() + card.slice(1)), ...CARD_NODES[card]!());
+    children.push(
+      heading(
+        "h2",
+        (card === "toggleGroup" ? "Toggle group" : card)[0]!.toUpperCase() +
+          (card === "toggleGroup" ? "Toggle group" : card).slice(1),
+      ),
+      ...CARD_NODES[card]!(),
+    );
   }
   children.push(paragraph("That is every card."));
 
@@ -249,6 +268,11 @@ const TRY: Record<TryId, { label: string; hint: string; needs: string | null }> 
     label: "Toggle",
     hint: "Press the arrow to open and close it, and type in both parts.",
     needs: "toggle",
+  },
+  "toggle-group": {
+    label: "Toggle group",
+    hint: "Add and remove items; press an arrow to open one. There is no limit on how many.",
+    needs: "toggleGroup",
   },
   divider: {
     label: "Divider",
@@ -317,7 +341,7 @@ export function tryDocument(id: TryId, available: readonly string[]): string | n
   if (id === "word-count") children.push(paragraph(WORDS));
   else if (id === "image-editor") children.push({ type: "image", version: 1, src: "" });
   else if (id === "emoji-picker") children.push(...CARD_NODES.callout!());
-  else children.push(...CARD_NODES[id]!());
+  else children.push(...CARD_NODES[info.needs ?? id]!());
   children.push(paragraph(""));
 
   return JSON.stringify({

@@ -14,6 +14,7 @@ cards.
 | Header | A big title at the top of a section | `/header` | Colour or picture background, optional button |
 | Callout | A box that stands out | `/callout` | Nine colours, optional emoji |
 | Toggle | Text that opens and closes | `/toggle` | A header and hidden content |
+| Toggle group | A stack of toggles with no gap | `/toggle-group` | Any number of items; add and remove them |
 | Code | Code with line numbers | `/code` or three backticks | Language list, Copy button, highlighting |
 | Divider | A line between sections | `/hr` or type `---` | No settings |
 | Table | Rows and columns | `/table` | Merge cells, shading, alignment, caption; dashed grid while editing |
@@ -121,6 +122,19 @@ Enter picks; Escape closes.
 you press the header's arrow.
 **Accessibility:** keep the header a clear question or label, because it is what people see before they open it.
 **Developer:** `cards` leaves it out.
+
+## Toggle group
+
+**For:** a list of questions and answers, or any set of sections that open and close one by one.
+**Add it:** the plus button or `/toggle-group`.
+**What it can do:** a stack of toggles that touch, in one outline, with a line between them. A new group
+has two items; "Add a toggle" adds another and the cross on an item removes it. There is no limit on
+how many it holds. Each item has a header and a body, and a reader opens and closes each one on its own.
+**Accessibility:** each item's arrow is a button that says whether it is open; keep every header a clear
+question or label.
+**Developer:** `cards` leaves it out (`toggleGroup`); `strings.toggleGroup` is the wording for adding
+and removing, and the item placeholders and the open/close labels are the single toggle's. Saved as
+`<div class="kg-card kg-toggle-group-card">` holding one `kg-toggle-card` per item.
 
 ## Code
 

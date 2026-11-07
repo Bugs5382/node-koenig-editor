@@ -57,7 +57,7 @@ describe("page address", () => {
       expect(parseRoute(tryHref(id))).toEqual({ page: "editor", tryId: id });
   });
 
-  it("offers a try link for each of the twelve cards, the two tools and the word count", () => {
-    expect(TRY_IDS).toHaveLength(15);
+  it("offers a try link for each of the thirteen cards, the two tools and the word count", () => {
+    expect(TRY_IDS).toHaveLength(16);
   });
 });

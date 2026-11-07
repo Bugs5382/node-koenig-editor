@@ -37,6 +37,7 @@ const CARDS = [
   "Header",
   "Callout",
   "Toggle",
+  "Toggle group",
   "Code",
   "Divider",
   "Table",
