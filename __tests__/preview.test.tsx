@@ -818,10 +818,7 @@ describe("the reader simulation: width, theme and text size", () => {
     expect(stage.style.padding).toBe("");
     expect(frame().style.boxShadow).toBe("");
     expect(frame().style.border).not.toContain("1px solid");
-    await press();
     await choose("Width", "Phone");
-    await press();
-    await press();
     expect(frame().style.border).toContain("1px solid");
     expect((frame().closest("[data-kg-preview-stage]") as HTMLElement).style.background).toBe("");
   });
