@@ -30,7 +30,8 @@ interface EmojiPickerProps {
   onSelect: (emoji: { native: string }) => void;
 }
 
-const COLUMNS = 8;
+// Used only when the browser cannot say how many columns the grid has (the grid wraps to fit).
+const FALLBACK_COLUMNS = 8;
 
 // An offline emoji picker. Keyboard: Down from the search box enters the grid; arrows, Home and
 // End move through it (Up from the top row returns to the search); Enter picks; typing goes to
@@ -76,6 +77,15 @@ export const EmojiPicker: FC<EmojiPickerProps> = ({ onClose, onSelect }) => {
   const options = () => [
     ...(gridRef.current?.querySelectorAll<HTMLElement>("[role='option']") ?? []),
   ];
+  // The grid wraps to the room it has, so the number of columns is read from the layout.
+  const columns = () => {
+    const value = gridRef.current
+      ? window.getComputedStyle(gridRef.current).gridTemplateColumns
+      : "";
+    // "none" (no layout) and the like have no track sizes in them
+    const tracks = value.split(" ").filter((track) => /\d/.test(track));
+    return tracks.length > 0 ? tracks.length : FALLBACK_COLUMNS;
+  };
   const focusOption = (index: number) => {
     const list = options();
     list[Math.min(Math.max(index, 0), list.length - 1)]?.focus();
@@ -101,6 +111,7 @@ export const EmojiPicker: FC<EmojiPickerProps> = ({ onClose, onSelect }) => {
     }
     if (target.getAttribute("role") !== "option") return;
     const index = options().indexOf(target);
+    const perRow = columns();
     const move = (to: number) => {
       event.preventDefault();
       focusOption(to);
@@ -111,14 +122,14 @@ export const EmojiPicker: FC<EmojiPickerProps> = ({ onClose, onSelect }) => {
       case "ArrowLeft":
         return move(index - 1);
       case "ArrowDown":
-        return move(index + COLUMNS);
+        return move(index + perRow);
       case "ArrowUp":
-        if (index < COLUMNS) {
+        if (index < perRow) {
           event.preventDefault();
           searchRef.current?.focus();
           return;
         }
-        return move(index - COLUMNS);
+        return move(index - perRow);
       case "Home":
         return move(0);
       case "End":
@@ -138,7 +149,7 @@ export const EmojiPicker: FC<EmojiPickerProps> = ({ onClose, onSelect }) => {
   return (
     <div
       aria-label={t.label}
-      className="not-kg-prose flex w-[min(20rem,90vw)] flex-col gap-2 rounded-lg bg-white p-3 font-sans text-grey-900 shadow-lg dark:bg-grey-950 dark:text-grey-300"
+      className="not-kg-prose flex w-[min(36rem,92vw)] flex-col gap-2 rounded-lg bg-white p-3 font-sans text-grey-900 shadow-lg dark:bg-grey-950 dark:text-grey-300"
       role="dialog"
       onKeyDown={onKeyDown}
     >
@@ -153,7 +164,11 @@ export const EmojiPicker: FC<EmojiPickerProps> = ({ onClose, onSelect }) => {
         onChange={(event) => setQuery(event.target.value)}
       />
 
-      <div aria-label={t.categoriesLabel} className="flex justify-between" role="group">
+      <div
+        aria-label={t.categoriesLabel}
+        className="flex flex-wrap justify-between gap-1"
+        role="group"
+      >
         {(groups ?? []).map((group) => (
           <button
             key={group.category}
@@ -187,7 +202,7 @@ export const EmojiPicker: FC<EmojiPickerProps> = ({ onClose, onSelect }) => {
       <div
         ref={gridRef}
         aria-label={t.label}
-        className="grid max-h-56 grid-cols-8 gap-1 overflow-y-auto"
+        className="grid max-h-[min(22.4rem,40vh)] grid-cols-[repeat(auto-fill,minmax(3.4rem,1fr))] gap-1 overflow-y-auto overflow-x-hidden"
         id={`${idBase}-grid`}
         role="listbox"
       >
