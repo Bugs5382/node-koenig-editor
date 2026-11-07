@@ -1,0 +1,5 @@
+/* The reader's view (preview): a card is not outlined when hovered or selected. */
+.koenig-lexical[data-kg-preview] [data-kg-card],
+.koenig-lexical[data-kg-preview] [data-kg-card]:hover {
+    box-shadow: none !important;
+}

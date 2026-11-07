@@ -9,6 +9,7 @@ import {LexicalCollaboration} from '@lexical/react/LexicalCollaborationContext';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {CommentsPlugin, KoenigCommentsContext, useCommentsStoreFor} from '../../additions/comments';
 import {KoenigStringsContext, KoenigToolsContext, resolveStrings, resolveTools, selectEditorNodes} from '../../additions/options';
+import {KoenigPreviewBridge} from './KoenigPreviewBridge';
 import {MarkNode} from '@lexical/mark';
 
 // Catch any errors that occur during Lexical updates and log them
@@ -56,6 +57,13 @@ const KoenigComposer = ({
     collaboration = null,
     comments,
     editable = true,
+    preview,
+    defaultPreview,
+    onPreviewChange,
+    previewOptions,
+    onPreviewOptionsChange,
+    previewComments,
+    showPreviewToggle,
     children
 }) => {
     const hasComments = Boolean(comments);
@@ -128,6 +136,16 @@ const KoenigComposer = ({
                         <KoenigToolsContext.Provider value={enabledTools}>
                         <KoenigCommentsContext.Provider value={commentStore}>
                         <KoenigSelectedCardContext>
+                        <KoenigPreviewBridge
+                            defaultPreview={defaultPreview}
+                            editable={editable}
+                            preview={preview}
+                            previewComments={previewComments}
+                            previewOptions={previewOptions}
+                            showPreviewToggle={showPreviewToggle}
+                            onPreviewChange={onPreviewChange}
+                            onPreviewOptionsChange={onPreviewOptionsChange}
+                        >
                             {commentStore ? <CommentsPlugin store={commentStore} /> : null}
                             {collaboration ? (
                                 <CollaborationPlugin
@@ -142,6 +160,7 @@ const KoenigComposer = ({
                                 />
                             ) : null}
                             {children}
+                        </KoenigPreviewBridge>
                         </KoenigSelectedCardContext>
                         </KoenigCommentsContext.Provider>
                         </KoenigToolsContext.Provider>

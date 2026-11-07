@@ -24,7 +24,7 @@ import type { KoenigTool } from "node-koenig-editor";
 import { createContext, useContext } from "react";
 
 /** The features that are not cards, so `cards` cannot switch them off. */
-export const KOENIG_TOOLS: readonly KoenigTool[] = ["imageEditor", "emojiPicker"];
+export const KOENIG_TOOLS: readonly KoenigTool[] = ["imageEditor", "emojiPicker", "preview"];
 
 /** The composer's `tools`: every tool when the host gives none, only the listed ones otherwise. */
 export const resolveTools = (tools?: readonly KoenigTool[]): ReadonlySet<KoenigTool> =>

@@ -874,6 +874,10 @@
     margin-bottom: calc(1.2 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .mb-4 {
+    margin-bottom: calc(1.6 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .mb-\[1px\] {
     margin-bottom: 1px;
 }
@@ -967,6 +971,10 @@
 
 .koenig-lexical .flex {
     display: flex;
+}
+
+.koenig-lexical .inline-flex {
+    display: inline-flex;
 }
 
 .koenig-lexical .\!table {
@@ -1174,6 +1182,10 @@
 
 .koenig-lexical .min-h-\[40px\] {
     min-height: 40px;
+}
+
+.koenig-lexical .min-h-\[4rem\] {
+    min-height: calc(4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .min-h-\[8rem\] {
@@ -1509,6 +1521,14 @@
     gap: calc(.6 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .gap-x-4 {
+    column-gap: calc(1.6 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .gap-y-2 {
+    row-gap: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .self-stretch {
     align-self: stretch;
 }
@@ -1549,6 +1569,10 @@
 
 .koenig-lexical .whitespace-nowrap {
     white-space: nowrap;
+}
+
+.koenig-lexical .whitespace-pre-wrap {
+    white-space: pre-wrap;
 }
 
 .koenig-lexical .break-words {
@@ -2024,6 +2048,11 @@
     padding-right: calc(0.8 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .px-2\.5 {
+    padding-left: calc(1 * var(--kg-rem, 0.625rem));
+    padding-right: calc(1 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .px-3 {
     padding-left: calc(1.2 * var(--kg-rem, 0.625rem));
     padding-right: calc(1.2 * var(--kg-rem, 0.625rem));
@@ -2461,6 +2490,10 @@
     text-decoration-line: line-through;
 }
 
+.koenig-lexical .no-underline {
+    text-decoration-line: none;
+}
+
 .koenig-lexical .caret-black {
     caret-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(1 * 100%), transparent);
 }
@@ -2630,6 +2663,12 @@
 
 .koenig-lexical .transition-opacity {
     transition-property: opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.koenig-lexical .transition-transform {
+    transition-property: transform;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
 }
@@ -3969,6 +4008,11 @@ em-emoji-picker {
 .kg-header-accent, .kg-callout-accent {
     --kg-accent-color: var(--kg-color-white, #FFF);
 }
+/* The reader's view (preview): a card is not outlined when hovered or selected. */
+.koenig-lexical[data-kg-preview] [data-kg-card],
+.koenig-lexical[data-kg-preview] [data-kg-card]:hover {
+    box-shadow: none !important;
+}
 .koenig-lexical .react-colorful {
     width: 100%;
     height: 140px;
@@ -4003,6 +4047,11 @@ em-emoji-picker {
     background: var(--kg-comment-highlight-active, rgb(255 190 0 / 0.65));
 }
 
+/* The reader's view (preview) does not show comment highlights unless the host asks for them. */
+.koenig-lexical[data-kg-preview]:not([data-kg-preview-comments]) mark[data-kg-comment-ids] {
+    background: none;
+    cursor: auto;
+}
 /* Global Koenig content styles
 /* -------------------------------------------------------------------- */
 
@@ -4368,6 +4417,11 @@ em-emoji-picker {
     box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
+.koenig-lexical .focus-visible\:ring-grey-500:focus-visible {
+    --tw-ring-opacity: 1;
+    --tw-ring-color: color-mix(in srgb, var(--kg-color-grey-500, #AEB7C1) calc(var(--tw-ring-opacity, 1) * 100%), transparent);
+}
+
 .koenig-lexical .focus-visible\:ring-selection:focus-visible {
     --tw-ring-opacity: 1;
     --tw-ring-color: color-mix(in srgb, var(--kg-selection) calc(var(--tw-ring-opacity, 1) * 100%), transparent);
@@ -4453,6 +4507,21 @@ em-emoji-picker {
 
 .koenig-lexical :is(.peer:focus-visible ~ .peer-focus-visible\:flex) {
     display: flex;
+}
+
+.koenig-lexical .has-\[\:focus-visible\]\:ring-2:has(:focus-visible) {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.koenig-lexical .has-\[\:focus-visible\]\:ring-inset:has(:focus-visible) {
+    --tw-ring-inset: inset;
+}
+
+.koenig-lexical .has-\[\:focus-visible\]\:ring-grey-500:has(:focus-visible) {
+    --tw-ring-opacity: 1;
+    --tw-ring-color: color-mix(in srgb, var(--kg-color-grey-500, #AEB7C1) calc(var(--tw-ring-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .aria-pressed\:bg-grey-100[aria-pressed="true"] {
@@ -4544,6 +4613,11 @@ em-emoji-picker {
 
 .koenig-lexical .dark\:bg-transparent:is(.dark *) {
     background-color: transparent;
+}
+
+.koenig-lexical .dark\:bg-white:is(.dark *) {
+    --tw-bg-opacity: 1;
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
 }
 
 .koenig-lexical .dark\:fill-grey-600:is(.dark *) {

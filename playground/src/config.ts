@@ -70,7 +70,6 @@ export interface Catalog {
 export interface Settings {
   cards: string[];
   tools: string[];
-  toolbarActions: boolean;
   comments: boolean;
   wordCount: boolean;
   readOnly: boolean;
@@ -81,16 +80,22 @@ export interface Settings {
   size: number;
   /** The table's cell border while editing (--kg-table-edit-border-style). */
   tableBorder: TableBorder;
+  /** The reader's view (Preview) is showing. */
+  preview: boolean;
+  /** The reader's width in Preview. */
+  previewWidth: PreviewWidth;
 }
 
 export const TABLE_BORDERS = ["dashed", "solid"] as const;
 export type TableBorder = (typeof TABLE_BORDERS)[number];
 
+export const PREVIEW_WIDTHS = ["desktop", "tablet", "phone"] as const;
+export type PreviewWidth = (typeof PREVIEW_WIDTHS)[number];
+
 export function defaultSettings(catalog: Catalog): Settings {
   return {
     cards: [...catalog.cards],
     tools: [...catalog.tools],
-    toolbarActions: true,
     comments: true,
     wordCount: true,
     readOnly: false,
@@ -99,17 +104,12 @@ export function defaultSettings(catalog: Catalog): Settings {
     selection: "",
     size: DEFAULT_SIZE,
     tableBorder: "dashed",
+    preview: false,
+    previewWidth: "desktop",
   };
 }
 
-const FLAGS = [
-  "toolbarActions",
-  "comments",
-  "wordCount",
-  "readOnly",
-  "dark",
-  "sampleUploads",
-] as const;
+const FLAGS = ["comments", "wordCount", "readOnly", "dark", "sampleUploads", "preview"] as const;
 
 const sameList = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((v, i) => v === b[i]);
@@ -145,6 +145,9 @@ export function parseSettings(search: string, catalog: Catalog): Settings {
 
   const border = TABLE_BORDERS.find((b) => b === params.get("tableBorder"));
   if (border) settings.tableBorder = border;
+  const width = params.get("previewWidth");
+  const known = PREVIEW_WIDTHS.find((w) => w === width);
+  if (known) settings.previewWidth = known;
   return settings;
 }
 
@@ -162,6 +165,8 @@ export function serializeSettings(settings: Settings, catalog: Catalog): string 
   if (settings.size !== defaults.size) params.set("size", String(settings.size));
   if (settings.tableBorder !== defaults.tableBorder)
     params.set("tableBorder", settings.tableBorder);
+  if (settings.previewWidth !== defaults.previewWidth)
+    params.set("previewWidth", settings.previewWidth);
   // Commas stay readable in the address bar.
   return params.toString().replaceAll("%2C", ",");
 }
@@ -175,7 +180,6 @@ export function buildSnippet(settings: Settings, catalog: Catalog): string {
   if (catalog.tools.length && !sameList(settings.tools, catalog.tools)) {
     props.push(`tools={${list(settings.tools)}}`);
   }
-  if (settings.toolbarActions) props.push("toolbarActions={toolbarActions}");
   if (settings.comments) props.push("comments={comments}");
   if (settings.readOnly) props.push("editable={false}");
   props.push("fileUploader={fileUploader}");

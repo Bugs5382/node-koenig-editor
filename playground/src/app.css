@@ -253,21 +253,6 @@ ul.threads li.resolved {
   margin: 6px 0 0;
   padding-left: 16px;
 }
-.ai-card {
-  background: var(--panel);
-  color: var(--fg);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 8px;
-  width: 260px;
-  font-size: 13px;
-}
-.ai-card p {
-  margin: 6px 0;
-  max-height: 80px;
-  overflow: auto;
-}
-
 .samples {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));

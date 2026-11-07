@@ -6,6 +6,7 @@
 
 @import './components/koenig-lexical';
 @import './components/kg-prose';
+@import './components/kg-preview';
 @import './components/react-colorful';
 @import './components/kg-comments';
 

@@ -28,6 +28,7 @@ import {
   applyPreset,
   presetOf,
   PRESETS,
+  PREVIEW_WIDTHS,
   SELECTION_COLORS,
   SIZES,
   TABLE_BORDERS,
@@ -46,6 +47,8 @@ interface Props {
   onLoadSamples: () => void;
   onReset: () => void;
   page: "editor" | "guide";
+  /** Whether the package offers Preview and it is on and usable (not read-only). */
+  previewAvailable: boolean;
   settings: Settings;
 }
 
@@ -59,6 +62,7 @@ export function TopBar({
   onLoadSamples,
   onReset,
   page,
+  previewAvailable,
   settings,
 }: Props) {
   // The split layout is as tall as the window minus the bar, and the bar wraps, so it reports its height.
@@ -119,6 +123,26 @@ export function TopBar({
               }))}
               onChange={(tableBorder) => onChange({ tableBorder })}
             />
+            {previewAvailable && (
+              <>
+                <Switch
+                  label="Preview"
+                  checked={settings.preview}
+                  onChange={(preview) => onChange({ preview })}
+                />
+                {settings.preview && (
+                  <Segmented
+                    label="Reader width"
+                    value={settings.previewWidth}
+                    options={PREVIEW_WIDTHS.map((width) => ({
+                      label: width.charAt(0).toUpperCase() + width.slice(1),
+                      value: width,
+                    }))}
+                    onChange={(previewWidth) => onChange({ previewWidth })}
+                  />
+                )}
+              </>
+            )}
             {catalog.cards.length > 0 && (
               <Listbox<PresetId | "custom">
                 label="Cards"

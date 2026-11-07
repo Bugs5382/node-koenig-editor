@@ -61,7 +61,7 @@ describe("cards guide", () => {
   });
 
   it("has a section for each card, the two tools and the word count", () => {
-    for (const name of [...CARDS, "Image editor", "Emoji picker", "Word count"]) {
+    for (const name of [...CARDS, "Image editor", "Emoji picker", "Preview", "Word count"]) {
       expect(headings).toContain(name);
     }
   });

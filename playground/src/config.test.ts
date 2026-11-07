@@ -46,7 +46,6 @@ describe("settings in the page address", () => {
     expect(s.tools).toEqual(catalog.tools);
     expect(s).toMatchObject({
       comments: true,
-      toolbarActions: true,
       readOnly: false,
       sampleUploads: true,
       size: 16,
@@ -113,13 +112,36 @@ describe("table border style in the page address", () => {
   });
 });
 
+describe("preview in the page address", () => {
+  it("starts off at desktop width and writes nothing for that", () => {
+    const settings = parseSettings("", catalog);
+    expect(settings.preview).toBe(false);
+    expect(settings.previewWidth).toBe("desktop");
+    expect(serializeSettings(settings, catalog)).toBe("");
+  });
+
+  it("round-trips the switch and the width", () => {
+    const search = serializeSettings(
+      { ...parseSettings("", catalog), preview: true, previewWidth: "phone" },
+      catalog,
+    );
+    expect(search).toBe("preview=1&previewWidth=phone");
+    const back = parseSettings(search, catalog);
+    expect(back.preview).toBe(true);
+    expect(back.previewWidth).toBe("phone");
+  });
+
+  it("ignores a width it does not know", () => {
+    expect(parseSettings("previewWidth=watch", catalog).previewWidth).toBe("desktop");
+  });
+});
+
 describe("code snippet", () => {
   it("shows the bare composer for the defaults", () => {
     const code = buildSnippet(defaultSettings(catalog), catalog);
     expect(code).toContain("<KoenigComposer");
     expect(code).not.toContain("cards=");
     expect(code).not.toContain("tools=");
-    expect(code).toContain("toolbarActions={toolbarActions}");
     expect(code).toContain("comments={comments}");
   });
 
@@ -135,7 +157,6 @@ describe("code snippet", () => {
       ...defaultSettings(catalog),
       cards: [],
       tools: [],
-      toolbarActions: false,
       comments: false,
       readOnly: true,
     };
@@ -144,7 +165,6 @@ describe("code snippet", () => {
     expect(code).toContain("tools={[]}");
     expect(code).toContain("editable={false}");
     expect(code).toContain("<KoenigEditor readOnly />");
-    expect(code).not.toContain("toolbarActions");
     expect(code).not.toContain("comments=");
   });
 

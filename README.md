@@ -15,6 +15,7 @@ editor works alone.
 - 🧩 **Bring your own nodes** — register custom nodes and cards, and add your own "+" and slash menu entries.
 - 🗣️ **Your wording** — every label, placeholder and menu text comes from a `strings` option with English defaults.
 - 🖼️ **Crop, rotate and emoji, offline** — an image editor before upload and an emoji picker, both switchable with `tools`.
+- 👀 **Preview the reader's view** — a toggle that shows the same live document as a reader sees it, at desktop, tablet or phone width, light or dark.
 - 🎛️ **Your toolbar** — show only the format buttons you want.
 - 🎨 **Theme with tokens** — CSS custom properties with documented defaults; no class overrides needed.
 - 💬 **Inline comments** — threads anchored on any selected text, kept in the document, with events for your own storage.
@@ -81,7 +82,7 @@ the sources.
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
 | `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `heading1` to `heading5` (headings stop at H5), `quote`, `link`, `snippet`.                                                        |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
-| `tools`              | `KoenigTool[]`                    | both            | The features that are not cards: `imageEditor` and `emojiPicker`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker). |
+| `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker` and `preview`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
 | `collaboration`      | `KoenigCollaboration \| null`     | `null`          | The Yjs provider factory. Without it the editor works alone and asks for no provider.                                                                                            |
 | `nodes`              | `EditorNodes`                     | `DEFAULT_NODES` | The base node set the `cards` choice filters. `BASIC_NODES` and `MINIMAL_NODES` are smaller sets.                                                                                |
 | `initialEditorState` | `string \| SerializedEditorState` | empty           | The document to open. In a collaborative session it seeds the room only while the room is empty.                                                                                 |
@@ -265,18 +266,18 @@ export function MyEditor({
 
 `toolbarActions` adds your own buttons to the toolbar that appears over selected text, after
 Bold, Italic, the headings, Quote and Link. A button either runs a function or opens a card
-under the toolbar. This is how a host adds, for example, an AI card that rewrites the selection.
+under the toolbar. This is how a host adds, for example, a card that marks the selection as a note.
 
 ```tsx
 const actions: KoenigToolbarAction[] = [
   {
-    id: "rewrite",
-    label: "Rewrite",
-    Icon: WandIcon, // optional; the first letters of the label show otherwise
+    id: "highlight-note",
+    label: "Highlight note",
+    Icon: NoteIcon, // optional; the first letters of the label show otherwise
     Card: ({ text, replaceSelection, close }) => (
-      <RewriteCard
+      <NoteCard
         text={text}
-        onAccept={(rewritten) => replaceSelection(rewritten)}
+        onAccept={(note) => replaceSelection(note)}
         onCancel={close}
       />
     ),
@@ -551,7 +552,7 @@ const uploader = {
 
 Neither is a card, so the composer's `cards` option does not list them. Both are on by default;
 `tools` turns them off one by one: `tools={["emojiPicker"]}` keeps only the emoji picker, and
-`tools={[]}` turns both off.
+`tools={[]}` turns both off. The reader's view has its own tool, `preview`; see [Preview](#-preview).
 
 **Image editor.** When someone picks, drops or pastes a single image into an image card, a dialog
 opens first to crop and rotate it, and the edited copy (`photo-edited.jpg`) goes to your
@@ -582,6 +583,45 @@ esbuild).
   `insertEmoji(editor, native)` to put the pick into the text at the cursor (it returns `false`
   when the selection is not in text). From a toolbar action, use `replaceSelection(native)`
   instead, as in [Toolbar actions](#-toolbar-actions).
+
+## 👀 Preview
+
+A toggle above the editor shows the document the way a published reader sees it, and flips back to
+editing with nothing lost. It is on by default; the `preview` entry in `tools` turns it off
+(`tools={["imageEditor", "emojiPicker"]}`), and it never shows when `editable={false}`.
+
+In the reader's view the editor is read-only and shows no editing chrome: no "+" button or slash
+menu, no toolbars, no placeholders, no drag handles, no card selection or hover outline, and no
+comment highlights unless you pass `previewComments`. Every card draws its reader form (a file is a
+link, a toggle opens and closes, media show their title and captions, empty upload slots are gone).
+It is the one live document, not a copy: the same editor, the same state. When you flip back, the
+selection, focus and scroll position come back and no change is lost.
+
+A small bar next to the button lets the author check the result: **width** (desktop, tablet or
+phone, in a framed viewport), **theme** (light or dark) and **text size** (12 to 20).
+
+| Option on `KoenigComposer` | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `preview` | `boolean` | uncontrolled | Controls the reader's view. When given, the editor only changes with this prop and reports a request to change through `onPreviewChange`. |
+| `defaultPreview` | `boolean` | `false` | Starts with the reader's view on, when `preview` is not given. |
+| `onPreviewChange` | `(preview: boolean) => void` | none | Called when the person (or the API) turns it on or off. |
+| `previewOptions` | `Partial<KoenigPreviewOptions>` | `desktop`, `light`, `16` | The reader simulation the view starts with: `width`, `theme` and `textSize`. |
+| `onPreviewOptionsChange` | `(options) => void` | none | Called when the simulation options change. |
+| `previewComments` | `boolean` | `false` | Show inline comment highlights in the reader's view. |
+| `showPreviewToggle` | `boolean` | `true` | Put the default button above the editor. Pass `false` to place your own. |
+
+From the editor API: `api.isPreview()` and `api.setPreview(true | false)`. To place the controls
+yourself, render `<KoenigPreviewToggle />` (and `<KoenigPreviewOptionsPanel />`) inside the
+composer, or read the state with `useKoenigPreview()`. The wording is `strings.preview`.
+
+```tsx
+<KoenigComposer showPreviewToggle={false} onPreviewChange={(on) => track("preview", on)}>
+  <KoenigPreviewToggle className="my-button" />
+  <KoenigEditor />
+</KoenigComposer>
+```
+
+The demo (`npm run playground`) shows the toggle by default, and its Tools settings turn it off.
 
 ## ⌨️ Room around cards
 
@@ -837,8 +877,7 @@ one, apply the change by hand, and update the commit here. Upstream history is n
 ## 🧪 Playground
 
 A demo app in `playground/` runs the editor in your browser, with a checkbox for every card and
-tool, the toolbar actions, comments, word count and read-only mode, and the matching code next to
-them. The page splits 50/50 under a sticky top bar (the editor on the left, the options, code,
+tool, comments, word count and read-only mode, and the matching code next to them. The page splits 50/50 under a sticky top bar (the editor on the left, the options, code,
 sample images, comments and saved state stacked on the right, each side scrolling on its own; under
 1000px the right side drops below the editor). The bar holds the Editor and Guide tabs, the switches (dark, read only), a
 text-size control, a selection colour picker, a card preset list, and the Load sample images, Load
@@ -860,6 +899,15 @@ npm run playground:published  # against the latest published node-koenig-editor
 
 It opens on http://127.0.0.1:5178. The demo has its own `package.json`, lint and tests
 (`npm run playground:check`), and it is not part of the published package.
+
+### Build your own playground
+
+The demo is generic on purpose: it shows what the package does and nothing that belongs to one
+product. An app that wants a playground of its own (with its own toolbar actions, its own cards, its
+own tokens and its own sample content) builds one. Start from `playground/`: copy the folder into
+your app, point its `node-koenig-editor` import at your install, and swap in your options. The
+settings panel, the page-address sync and the code view are plain React and have no dependency on
+the rest of this repo.
 
 ## 🛠 Develop
 

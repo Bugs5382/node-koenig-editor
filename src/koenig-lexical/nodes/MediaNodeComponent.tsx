@@ -14,6 +14,7 @@ import {hasCaptions} from '../../additions/media/renderMedia';
 import {isVtt, safeMediaUrl} from '../../additions/media/safeMediaUrl';
 import {openFileSelection} from '../utils/openFileSelection';
 import {readMediaMetadata} from '../../additions/media/readMediaMetadata';
+import {useKoenigEditable} from '../../additions/preview/PreviewContext';
 import {useKoenigStrings} from '../../additions/options';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
@@ -127,6 +128,8 @@ function MediaNodeComponent({
     const safeTrack = safeMediaUrl(trackSrc);
     const errors = [...(problem ? [{message: problem}] : []), ...(uploader.errors || []), ...(trackUploader.errors || [])];
     const Player = kind;
+    // a reader sees the player and the text, not the fields, the warning or the settings
+    const editable = useKoenigEditable();
 
     const field = 'w-full bg-transparent font-sans text-sm text-grey-900 placeholder:text-grey-500 dark:text-grey-200';
 
@@ -138,7 +141,8 @@ function MediaNodeComponent({
                 </div>
             ) : safeSrc ? (
                 <div className="not-kg-prose">
-                    {kind === 'audio' && (isSelected || textValue) && (
+                    {kind === 'audio' && !editable && textValue ? <p className="mb-2 font-sans text-sm font-semibold text-grey-900 dark:text-grey-200" data-kg-media-text="title">{textValue}</p> : null}
+                    {kind === 'audio' && editable && (isSelected || textValue) && (
                         <input
                             aria-label={text.titlePlaceholder}
                             className={`${field} mb-2 font-semibold`}
@@ -168,12 +172,14 @@ function MediaNodeComponent({
                             />
                         )}
                     </Player>
-                    {!hasCaptions({trackSrc, transcript}) && (
+                    {editable && !hasCaptions({trackSrc, transcript}) && (
                         <p className="mt-2 font-sans text-sm font-semibold text-red" data-kg-captions-missing role="status">
                             {text.captionsMissing}
                         </p>
                     )}
-                    {kind === 'video' && (isSelected || textValue) && (
+                    {kind === 'video' && !editable && textValue ? <p className="mt-2 text-center font-sans text-sm text-grey-800 dark:text-grey-500" data-kg-media-text="caption">{textValue}</p> : null}
+                    {!editable && transcript?.trim() ? <div className="mt-2 whitespace-pre-wrap font-sans text-sm text-grey-800 dark:text-grey-500" data-kg-media-text="transcript">{transcript}</div> : null}
+                    {kind === 'video' && editable && (isSelected || textValue) && (
                         <input
                             aria-label={text.captionPlaceholder}
                             className={`${field} mt-2 text-center`}
@@ -183,7 +189,7 @@ function MediaNodeComponent({
                             onChange={event => update({caption: event.target.value})}
                         />
                     )}
-                    {isSelected && (
+                    {editable && isSelected && (
                         <div className="mt-3 flex flex-col gap-2" data-kg-media-settings>
                             <textarea
                                 aria-label={text.transcriptPlaceholder}
