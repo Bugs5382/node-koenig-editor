@@ -117,3 +117,37 @@ describe("the selection toolbar's place", () => {
     }
   });
 });
+
+describe("the selection toolbar's width", () => {
+  const widthFor = (editorWidth: number, windowWidth = WINDOW_WIDTH) => {
+    Object.defineProperty(document.documentElement, "clientWidth", {
+      configurable: true,
+      value: windowWidth,
+    });
+    const toolbar = document.createElement("div");
+    toolbar.getBoundingClientRect = () => rect(0, 40, 0, 486) as DOMRect;
+    const anchor = document.createElement("div");
+    const scroller = document.createElement("div");
+    // the anchor's parent can be the whole page; the editor's own box is what bounds the toolbar
+    scroller.getBoundingClientRect = () => rect(0, WINDOW_HEIGHT, 0, WINDOW_WIDTH) as DOMRect;
+    scroller.append(anchor);
+    const editorBox = document.createElement("div");
+    editorBox.getBoundingClientRect = () => rect(0, WINDOW_HEIGHT, 100, editorWidth) as DOMRect;
+    setFloatingElemPosition(rect(300, 20, 150, 50), toolbar, anchor, { boundsElem: editorBox });
+    return Number.parseFloat(toolbar.style.maxWidth);
+  };
+
+  it("wraps within a narrow editor instead of running past its edge (#94)", () => {
+    expect(widthFor(320)).toBe(320);
+    expect(widthFor(480)).toBe(480);
+  });
+
+  it("is not narrower than a few buttons, however small the editor", () => {
+    expect(widthFor(120)).toBe(240);
+  });
+
+  it("is never wider than the window, whatever the editor", () => {
+    expect(widthFor(900, 500)).toBe(484);
+    expect(widthFor(2000)).toBe(WINDOW_WIDTH - 16);
+  });
+});
