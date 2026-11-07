@@ -82,6 +82,7 @@ the sources.
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
 | `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `textDirection`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
 | `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
+| `toolbarRows`        | `1 \| 2`                          | `2`             | The rows the selection toolbar uses; see [Toolbar actions](#-toolbar-actions). |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
 | `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker`, `preview`, `shortcuts`, `findReplace` and `cleanPaste`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
 | `spellCheck`, `lang` | `boolean`, `string`               | on, none        | `spellCheck={false}` switches the browser's spell check off in the editing area; `lang` names the language of the text for it. |
@@ -295,6 +296,26 @@ after focus has moved into your card or the answer arrives later. It returns `fa
 nothing when that text has been edited or removed in the meantime. Set `hidden: true` to leave
 a button out for the person using it (permissions, a feature switch). An action with no `Card`
 calls `onSelect` with the same object. The button's `data-kg-toolbar-button` value is its `id`.
+
+### Rows and where a button goes
+
+The toolbar has two rows: the text formats and styles on the first (Bold to Clear formatting),
+blocks, lists, spacing, alignment and Link on the second. Pass `toolbarRows={1}` for a single row
+that wraps where the window is narrow. An action chooses its place with two optional fields:
+
+- `row`: the row, counted from 1. Without it the button ends the last built-in row. A number past
+  the built-in rows adds a row of your own.
+- `after`: a built-in button's name (`"italic"`, `"heading2"`, `"link"`, any value of the `toolbar`
+  option) or another action's `id`. The button goes right after it, in that button's row. A name
+  that is not known is ignored and `row` decides.
+
+```tsx
+const actions: KoenigToolbarAction[] = [
+  { id: "note", label: "Note", after: "highlight" }, // first row, next to Highlight
+  { id: "cite", label: "Cite", row: 2 }, // end of the second row
+  { id: "ai", label: "Rewrite", row: 3 }, // a third row
+];
+```
 
 ## 📋 Tables
 

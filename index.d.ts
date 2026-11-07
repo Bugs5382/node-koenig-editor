@@ -162,8 +162,15 @@ export interface KoenigToolbarSelection {
 export interface KoenigToolbarAction {
   /** Opens under the toolbar when the button is pressed. Without it the button calls `onSelect`. */
   Card?: FC<KoenigToolbarSelection>;
+  /** The built-in button (or another action's `id`) this one goes right after. Without it, or when
+   *  the name is not known, the button goes at the end of its row. */
+  after?: KoenigToolbarItem | (string & {});
   /** True leaves the button out, for example when the person may not use it. */
   hidden?: boolean;
+  /** The toolbar row, counted from 1. The built-in buttons use rows 1 (text) and 2 (blocks, lists,
+   *  spacing, alignment, link); a higher number adds a row of the host's own. Default: the last
+   *  row of the built-ins. */
+  row?: number;
   /** The button's icon; without one the first letters of `label` show. */
   Icon?: FC<{ className?: string }>;
   /** Names the button: it becomes the `data-kg-toolbar-button` value. */
@@ -840,6 +847,10 @@ export interface KoenigComposerProps {
   fonts?: readonly KoenigFont[];
   /** The format toolbar buttons to show. Default: all of them. */
   toolbar?: readonly KoenigToolbarItem[];
+  /** How many rows the built-in selection toolbar buttons use: 2 (the default: text formats on the
+   *  first, blocks, lists, spacing, alignment and link on the second) or 1 (one row that wraps
+   *  where the window is narrow). */
+  toolbarRows?: 1 | 2;
   /** The host's own buttons and cards on the selection toolbar. */
   toolbarActions?: readonly KoenigToolbarAction[];
   /** The features that are not cards: `imageEditor` (crop and rotate before upload) and

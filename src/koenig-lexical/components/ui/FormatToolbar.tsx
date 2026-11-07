@@ -58,7 +58,7 @@ import {useColorSetting} from '../../../additions/colors/ColorControl';
 import {ColorMenu} from '../../../additions/colors/ColorMenu';
 import {StyleMenu} from '../../../additions/textStyle/StyleMenu';
 import {$clearFormatting, $getTextStyle, $setHighlight, $setTextStyle, FONT_SIZES} from '../../../additions/textStyle/textStyle';
-import {ALIGNMENT_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
+import {ALIGNMENT_ITEMS, KOENIG_TOOLBAR_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
 
 const blockTypeToBlockName = {
     bullet: 'Bulleted List',
@@ -95,6 +95,11 @@ function quoteIcon(blockType = '') {
     }
 }
 
+// the data-kg-toolbar-button value of a toolbar item (the headings are named by their tag)
+const buttonId = item => (/^heading\d$/.test(item) ? `h${item.slice(7)}` : item);
+// the first button of the second row
+const ROW_TWO_START = ['h1'];
+
 export default function FormatToolbar({
     editor,
     isSnippetsEnabled,
@@ -112,7 +117,7 @@ export default function FormatToolbar({
     const [alignment, setAlignment] = React.useState({direction: null, format: ''});
     const [cell, setCell] = React.useState(null);
     const [scope, setScope] = React.useState('cell');
-    const {cardConfig: {createSnippet}, toolbar, toolbarActions, fonts} = React.useContext(KoenigComposerContext);
+    const {cardConfig: {createSnippet}, toolbar, toolbarActions, toolbarRows, fonts} = React.useContext(KoenigComposerContext);
     const textColorSetting = useColorSetting('textColor');
     const highlightSetting = useColorSetting('highlight');
     // the style button whose list is open, and the button it hangs from
@@ -357,9 +362,32 @@ export default function FormatToolbar({
 
     const openMenu = styleMenu ? STYLE_MENUS[styleMenu.item] : null;
 
-    return (
+    // The toolbar is laid out in rows: the text formats and styles on the first, blocks, lists,
+    // spacing, alignment and link on the second (one row with `toolbarRows: 1`). A host's action
+    // names its row, and the default button it goes after.
+    const rowCount = toolbarRows === 1 ? 1 : 2;
+    const visibleActions = (toolbarActions || []).filter(action => !action.hidden);
+    const knownIds = new Set([...visibleActions.map(action => action.id), ...KOENIG_TOOLBAR_ITEMS.map(buttonId)]);
+    const lastRow = Math.max(rowCount, ...visibleActions.map(action => action.row || 1));
+    const anchored = action => !!action.after && knownIds.has(buttonId(action.after)) && action.after !== action.id;
+    const actionButton = action => (
+        <React.Fragment key={`host-${action.id}`}>
+            <ToolbarMenuItem
+                CustomIcon={action.Icon}
+                data-kg-toolbar-button={action.id}
+                icon={action.id}
+                isActive={false}
+                label={action.label}
+                onClick={() => onActionClick?.(action)}
+            />
+            {actionsAfter(action.id)}
+        </React.Fragment>
+    );
+    const actionsAfter = id => visibleActions.filter(action => anchored(action) && buttonId(action.after) === id).map(actionButton);
+    const actionsAtEndOf = row => visibleActions.filter(action => !anchored(action) && (action.row || rowCount) === row).map(actionButton);
+    const rowBreak = row => <li key={`row-${row}`} aria-hidden="true" className="m-0 h-0 basis-full p-0" data-kg-toolbar-row-break={row} role="presentation" />;
+    const defaultButtons = React.Children.toArray((
         <>
-        <ToolbarMenu aria-label={strings.toolbar.group} data-kg-selection-toolbar role="toolbar" onKeyDown={onToolbarKeyDown}>
             <ToolbarMenuItem
                 data-kg-toolbar-button="bold"
                 hide={hideBold}
@@ -534,17 +562,6 @@ export default function FormatToolbar({
                 onClick={onLinkClick}
             />
 
-            {(toolbarActions || []).filter(action => !action.hidden).map(action => (
-                <ToolbarMenuItem
-                    key={action.id}
-                    CustomIcon={action.Icon}
-                    data-kg-toolbar-button={action.id}
-                    icon={action.id}
-                    isActive={false}
-                    label={action.label}
-                    onClick={() => onActionClick?.(action)}
-                />
-            ))}
 
             <ToolbarMenuSeparator hide={hideSnippets} />
             <ToolbarMenuItem
@@ -555,6 +572,30 @@ export default function FormatToolbar({
                 label={strings.toolbar.snippet}
                 onClick={onSnippetClick}
             />
+        </>
+    ).props.children);
+    const placed = [];
+    let row = 1;
+    for (const element of defaultButtons) {
+        const id = element?.props?.['data-kg-toolbar-button'];
+        if (rowCount > 1 && row === 1 && ROW_TWO_START.includes(id)) {
+            placed.push(...actionsAtEndOf(1), rowBreak(1));
+            row = 2;
+        }
+        placed.push(element);
+        if (id) {
+            placed.push(...actionsAfter(id));
+        }
+    }
+    placed.push(...actionsAtEndOf(row));
+    for (let extra = row + 1; extra <= lastRow; extra++) {
+        placed.push(rowBreak(extra - 1), ...actionsAtEndOf(extra));
+    }
+
+    return (
+        <>
+        <ToolbarMenu aria-label={strings.toolbar.group} data-kg-selection-toolbar role="toolbar" onKeyDown={onToolbarKeyDown}>
+            {placed}
         </ToolbarMenu>
         {openMenu?.colour ? (
             <ColorMenu
