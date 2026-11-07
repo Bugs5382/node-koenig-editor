@@ -214,7 +214,9 @@ describe("the toolbar buttons in forced-colours mode", () => {
     expect(inactive.querySelector("svg")?.getAttribute("class")).toContain(
       "forced-colors:text-[ButtonText]",
     );
-    expect(active.closest("[data-kg-selection-toolbar]")?.className).toContain("forced-colors:border-[ButtonText]");
+    expect(active.closest("[data-kg-selection-toolbar]")?.className).toContain(
+      "forced-colors:border-[ButtonText]",
+    );
   });
 });
 
