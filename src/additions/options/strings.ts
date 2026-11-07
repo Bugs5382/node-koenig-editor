@@ -118,6 +118,8 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     widthMenu: "Width",
     widthNarrow: "Narrow",
     widthWide: "Wide",
+    columnWidthStatus: "Column {column} is {width} pixels wide",
+    rowHeightStatus: "Row {row} is {height} pixels tall",
     colours: {
       blue: "Blue",
       green: "Green",

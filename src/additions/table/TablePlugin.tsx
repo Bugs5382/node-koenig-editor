@@ -26,6 +26,7 @@ import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 
 import { TableActionsPlugin } from "./TableActionsPlugin";
 import { TableEditorPlugin } from "./TableEditorPlugin";
+import { TableResizePlugin } from "./TableResizePlugin";
 import { TablePastePlugin } from "./pasteTable";
 
 // Mounts Lexical's own table behaviour (cell selection, tab navigation, the insert command)
@@ -40,6 +41,7 @@ export const TablePlugin = () => {
       <LexicalTablePlugin hasCellBackgroundColor={true} hasCellMerge={true} hasTabHandler={true} />
       <TableActionsPlugin />
       <TableEditorPlugin />
+      <TableResizePlugin />
       <TablePastePlugin />
     </>
   );

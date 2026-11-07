@@ -212,6 +212,8 @@ export interface KoenigStrings {
     widthNarrow: string;
     widthWide: string;
     /** Names of the cell colours, by their key. */
+    columnWidthStatus: string;
+    rowHeightStatus: string;
     colours: Record<
       "blue" | "green" | "grey" | "orange" | "pink" | "purple" | "red" | "yellow",
       string
