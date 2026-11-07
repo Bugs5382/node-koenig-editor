@@ -24,7 +24,7 @@ import { $isTableNode, type TableCellNode, type TableNode } from "@lexical/table
 import { act, cleanup, fireEvent } from "@testing-library/react";
 import { $getRoot, type ElementNode } from "lexical";
 import type { KoenigEditorAPI } from "node-koenig-editor";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { $runTableAction } from "../src/additions/table/tableActions";
 import { mount } from "./__utils__/mount";
@@ -86,6 +86,11 @@ const height = (api: KoenigEditorAPI, r: number) =>
     .read(() =>
       ($table().getChildAtIndex(r) as unknown as { getHeight(): number | undefined }).getHeight(),
     );
+
+// jsdom has no hit testing; the plus-button plugin asks for the element under the pointer
+beforeAll(() => {
+  if (!document.elementFromPoint) document.elementFromPoint = () => null;
+});
 
 describe("resizing from the keyboard, with a column or row selected", () => {
   it("Alt+Right and Alt+Left widen and narrow the selected column by 10 pixels", async () => {

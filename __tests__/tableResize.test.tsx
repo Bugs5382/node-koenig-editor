@@ -20,14 +20,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import {
-  $isTableNode,
-  type TableCellNode,
-  type TableNode,
-  type TableRowNode,
-} from "@lexical/table";
+import { $isTableNode, type TableNode, type TableRowNode } from "@lexical/table";
 import { act, cleanup } from "@testing-library/react";
-import { $getRoot, type ElementNode } from "lexical";
+import { $getRoot } from "lexical";
 import type { KoenigEditorAPI } from "node-koenig-editor";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -58,8 +53,6 @@ const grid = () =>
 
 const $table = () => $getRoot().getChildren().find($isTableNode) as TableNode;
 const $row = (index: number) => $table().getChildAtIndex(index) as TableRowNode;
-const $cell = (r: number, c: number) =>
-  ($row(r) as ElementNode).getChildAtIndex(c) as TableCellNode;
 
 const load = async () => (await mount({ composer: { initialEditorState: grid() } })).api;
 const update = async (api: KoenigEditorAPI, fn: () => void) => {

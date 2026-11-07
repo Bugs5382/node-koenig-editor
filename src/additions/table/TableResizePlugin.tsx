@@ -35,7 +35,6 @@ import { $findMatchingParent } from "@lexical/utils";
 import {
   $getNearestNodeFromDOMNode,
   $getSelection,
-  $isRangeSelection,
   COMMAND_PRIORITY_LOW,
   KEY_DOWN_COMMAND,
 } from "lexical";
@@ -328,7 +327,6 @@ export const TableResizePlugin = () => {
     };
   }, [editor]);
 
-  void $isRangeSelection;
   return (
     <>
       <div aria-live="polite" className="sr-only" data-kg-table-resize-status role="status">
