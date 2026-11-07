@@ -21,6 +21,7 @@
 
 #### 🐛 Bug Fixes
 
+- fix(editor): the code bar sits centred above the block, and the preview shows its language (#87) @Bugs5382 (#88)
 - fix(editor): card text and properties sync live between collaborating windows (#83) @Bugs5382 (#84)
 - fix(ci): compare package growth with the PR's base commit, not the last release (#85) @Bugs5382 (#86)
 - fix(editor): collaboration with cards no longer throws, and the demo shows its status in the bar (#79) @Bugs5382 (#80)
