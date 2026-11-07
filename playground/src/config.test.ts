@@ -286,6 +286,8 @@ describe("the toolbar, fonts and spell check settings", () => {
       true,
     );
     expect(buildSnippet(on, withToolbar)).toContain("collaboration={collaboration}");
+  });
+
   it("start with the two-row selection toolbar, and one row travels in the address and the snippet", () => {
     const base = defaultSettings(withToolbar);
     expect(base.toolbarRows).toBe(2);
