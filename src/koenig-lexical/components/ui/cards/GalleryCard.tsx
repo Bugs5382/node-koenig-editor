@@ -312,6 +312,11 @@ function PopulatedGalleryCard({slideshow, images, deleteImage, reorderHandler, i
     );
 }
 
+// The look of the table editor's option buttons: a flat button that is filled while it is on
+function optionButton(on) {
+    return `flex h-8 cursor-pointer items-center justify-center rounded-md px-2 text-sm font-medium hover:bg-grey-200/80 focus-visible:ring-2 focus-visible:ring-selection dark:hover:bg-grey-900 forced-colors:focus-visible:outline forced-colors:focus-visible:outline-2 ${on ? 'bg-grey-200 dark:bg-grey-900 forced-colors:border forced-colors:border-[Highlight]' : ''}`;
+}
+
 // The editor's setting for how many photos this gallery takes. The host's limit is the most it can
 // be; the number already in the gallery is the least, so lowering it never drops a photo.
 function GallerySettings({count, hostMaxImages, maxImages, setMaxImages, setSlideshow, slideshow, slideshowOptions, strings}) {
@@ -352,52 +357,68 @@ function GallerySettings({count, hostMaxImages, maxImages, setMaxImages, setSlid
                 />
             </label>
             <span className="text-grey-600">{fill(strings.maxImagesHint, {host: hostMaxImages, n: count})}</span>
-            {slideshowOptions.autoAdvance ? (
-                <div className="flex flex-wrap items-center gap-2">
-                    <label className="flex items-center gap-2">
-                        <input
-                            checked={slideshow.autoplaySeconds > 0}
+            <div aria-label={strings.slideshowLabel} className="mt-1 flex max-w-full flex-wrap items-center gap-1 self-start rounded-lg bg-white px-1 py-1 shadow-md dark:bg-grey-950 forced-colors:border forced-colors:border-[ButtonText]" data-gallery-options role="toolbar">
+                {slideshowOptions.autoAdvance ? (
+                    <>
+                        <button
+                            aria-pressed={slideshow.autoplaySeconds > 0}
+                            className={optionButton(slideshow.autoplaySeconds > 0)}
                             data-gallery-autoplay-toggle
-                            type="checkbox"
-                            onChange={e => setSlideshow({autoplaySeconds: e.target.checked ? Number(secondsDraft) || 5 : 0})}
+                            type="button"
+                            onClick={() => setSlideshow({autoplaySeconds: slideshow.autoplaySeconds > 0 ? 0 : Number(secondsDraft) || 5})}
+                            onMouseDown={e => e.preventDefault()}
+                        >
+                            {strings.autoAdvanceLabel}
+                        </button>
+                        <input
+                            aria-label={strings.autoAdvanceSeconds}
+                            className="h-8 w-14 rounded-md border border-grey-300 bg-transparent px-2 disabled:opacity-50"
+                            data-gallery-autoplay-seconds
+                            disabled={!slideshow.autoplaySeconds}
+                            inputMode="numeric"
+                            max={3600}
+                            min={1}
+                            title={strings.autoAdvanceSeconds}
+                            type="number"
+                            value={secondsDraft}
+                            onBlur={() => setSlideshow({autoplaySeconds: Number(secondsDraft) || 5})}
+                            onChange={e => setSecondsDraft(e.target.value)}
+                            onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    setSlideshow({autoplaySeconds: Number(secondsDraft) || 5});
+                                }
+                            }}
                         />
-                        <span>{strings.autoAdvanceLabel}</span>
-                    </label>
-                    <input
-                        aria-label={strings.autoAdvanceSeconds}
-                        className="w-16 rounded border border-grey-300 bg-transparent px-2 py-1 disabled:opacity-50"
-                        data-gallery-autoplay-seconds
-                        disabled={!slideshow.autoplaySeconds}
-                        inputMode="numeric"
-                        max={3600}
-                        min={1}
-                        type="number"
-                        value={secondsDraft}
-                        onBlur={() => setSlideshow({autoplaySeconds: Number(secondsDraft) || 5})}
-                        onChange={e => setSecondsDraft(e.target.value)}
-                        onKeyDown={(e) => {
-                            e.stopPropagation();
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                setSlideshow({autoplaySeconds: Number(secondsDraft) || 5});
-                            }
-                        }}
-                    />
-                    <span>{strings.autoAdvanceSeconds}</span>
-                </div>
-            ) : null}
-            {slideshowOptions.shuffle ? (
-                <label className="flex items-center gap-2">
-                    <input checked={slideshow.shuffle} data-gallery-shuffle-toggle type="checkbox" onChange={e => setSlideshow({shuffle: e.target.checked})} />
-                    <span>{strings.shuffleLabel}</span>
-                </label>
-            ) : null}
-            {slideshowOptions.screenMode ? (
-                <label className="flex items-center gap-2">
-                    <input checked={slideshow.screenMode} data-gallery-screen-mode-toggle type="checkbox" onChange={e => setSlideshow({screenMode: e.target.checked})} />
-                    <span>{strings.screenModeLabel}</span>
-                </label>
-            ) : null}
+                        <span className="pr-1">{strings.autoAdvanceSeconds}</span>
+                    </>
+                ) : null}
+                {slideshowOptions.shuffle ? (
+                    <button
+                        aria-pressed={slideshow.shuffle}
+                        className={optionButton(slideshow.shuffle)}
+                        data-gallery-shuffle-toggle
+                        type="button"
+                        onClick={() => setSlideshow({shuffle: !slideshow.shuffle})}
+                        onMouseDown={e => e.preventDefault()}
+                    >
+                        {strings.shuffleLabel}
+                    </button>
+                ) : null}
+                {slideshowOptions.screenMode ? (
+                    <button
+                        aria-pressed={slideshow.screenMode}
+                        className={optionButton(slideshow.screenMode)}
+                        data-gallery-screen-mode-toggle
+                        type="button"
+                        onClick={() => setSlideshow({screenMode: !slideshow.screenMode})}
+                        onMouseDown={e => e.preventDefault()}
+                    >
+                        {strings.screenModeLabel}
+                    </button>
+                ) : null}
+            </div>
         </div>
     );
 }

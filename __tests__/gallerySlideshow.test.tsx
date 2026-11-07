@@ -289,10 +289,12 @@ describe("the settings and the saved HTML", () => {
       (document.querySelector("[data-gallery-autoplay-seconds]") as HTMLInputElement).disabled,
     ).toBe(false);
     expect(
-      (document.querySelector("[data-gallery-shuffle-toggle]") as HTMLInputElement).checked,
+      document.querySelector("[data-gallery-shuffle-toggle]")?.getAttribute("aria-pressed") ===
+        "true",
     ).toBe(true);
     expect(
-      (document.querySelector("[data-gallery-screen-mode-toggle]") as HTMLInputElement).checked,
+      document.querySelector("[data-gallery-screen-mode-toggle]")?.getAttribute("aria-pressed") ===
+        "true",
     ).toBe(true);
   });
 

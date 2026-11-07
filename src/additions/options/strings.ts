@@ -367,6 +367,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     autoAdvanceSeconds: "seconds",
     screenModeLabel: "Screen mode (no thumbnails, controls hide)",
     shuffleLabel: "Random order",
+    slideshowLabel: "Slideshow settings",
     viewerPause: "Pause",
     viewerPlay: "Play",
     viewerLabel: "Gallery viewer",

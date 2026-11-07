@@ -175,6 +175,8 @@ export const GalleryViewer = ({
   const autoplay = autoplaySeconds > 0 && photos.length > 1;
   const [playing, setPlaying] = useState(true);
   const [hidden, setHidden] = useState(false);
+  const onIndexRef = useRef(onIndexChange);
+  onIndexRef.current = onIndexChange;
   const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Screen mode: the controls go after a few seconds without input and come back on any input
@@ -193,11 +195,11 @@ export const GalleryViewer = ({
   useEffect(() => {
     if (!autoplay || !playing) return undefined;
     const timer = setTimeout(
-      () => onIndexChange(index >= photos.length - 1 ? 0 : index + 1),
+      () => onIndexRef.current(index >= photos.length - 1 ? 0 : index + 1),
       autoplaySeconds * 1000,
     );
     return () => clearTimeout(timer);
-  }, [autoplay, autoplaySeconds, index, onIndexChange, photos.length, playing]);
+  }, [autoplay, autoplaySeconds, index, photos.length, playing]);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -224,7 +226,8 @@ export const GalleryViewer = ({
 
   if (!photo) return null;
 
-  const go = (next: number) => onIndexChange(Math.min(Math.max(next, 0), last));
+  // Past the last photo is the first, and before the first is the last, by hand and by the timer
+  const go = (next: number) => onIndexChange(next > last ? 0 : next < 0 ? last : next);
   const close = () => {
     onClose();
   };
@@ -393,7 +396,7 @@ export const GalleryViewer = ({
             aria-label={strings.viewerPrevious}
             className={`${CONTROL} size-11`}
             data-gallery-viewer-prev
-            disabled={index <= 0}
+            disabled={photos.length < 2}
             type="button"
             onClick={() => go(index - 1)}
           >
@@ -429,7 +432,7 @@ export const GalleryViewer = ({
             aria-label={strings.viewerNext}
             className={`${CONTROL} size-11`}
             data-gallery-viewer-next
-            disabled={index >= last}
+            disabled={photos.length < 2}
             type="button"
             onClick={() => go(index + 1)}
           >
