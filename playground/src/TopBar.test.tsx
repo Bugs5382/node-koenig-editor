@@ -79,6 +79,22 @@ describe("switches", () => {
   });
 });
 
+describe("live collaboration", () => {
+  it("is a switch in the bar that follows the setting, with a status while it is on", () => {
+    render(<App />);
+    const switchEl = screen.getByRole("switch", { name: "Live collaboration" });
+    expect(switchEl.getAttribute("aria-checked")).toBe("false");
+    expect(document.querySelector("[data-collab-status]")).toBeNull();
+    fireEvent.click(switchEl);
+    expect(switchEl.getAttribute("aria-checked")).toBe("true");
+    expect(window.location.search).toContain("collaboration=1");
+    expect(document.querySelector("[data-collab-status]")?.textContent).toMatch(/Room demo/);
+    expect(
+      (screen.getByLabelText("live collaboration (two windows)") as HTMLInputElement).checked,
+    ).toBe(true);
+  });
+});
+
 describe("text size", () => {
   it("is five segments, one selected", () => {
     render(<App />);

@@ -57,7 +57,7 @@ import {
 import { SettingsPanel } from "./SettingsPanel";
 import { TopBar } from "./TopBar";
 import { ThreadList } from "./ThreadList";
-import { broadcastProviderFactory } from "./collab";
+import { broadcastProviderFactory, roomFromAddress } from "./collab";
 import { fileUploader, setSampleUploads } from "./uploader";
 
 // Everything but the text size changes what the composer is built with, so it rebuilds.
@@ -143,7 +143,7 @@ export function App() {
   // (default "demo"); each window is a person with a name and a caret colour of its own.
   const cursorsRef = useRef<HTMLDivElement | null>(null);
   const collaboration = useMemo(() => {
-    const room = new URLSearchParams(window.location.search).get("room") || "demo";
+    const room = roomFromAddress(window.location.search);
     const number = Math.floor(Math.random() * 90) + 10;
     const hue = Math.floor(Math.random() * 360);
     return {

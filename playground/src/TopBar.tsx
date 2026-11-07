@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 // The sticky bar: the title and the controls that change how the page looks and works, in groups.
 import { useEffect, useRef } from "react";
+import { useCollabStatus } from "./collab";
 import { editorHref, guideHref } from "./route";
 import { Button, Listbox, Segmented, SwatchPicker, Switch } from "./controls";
 import {
@@ -50,6 +51,21 @@ interface Props {
   /** Whether the package offers Preview and it is on and usable (not read-only). */
   previewAvailable: boolean;
   settings: Settings;
+}
+
+// Room name and how many windows are in it, in every window that has collaboration on
+function CollabBadge() {
+  const { room, windows } = useCollabStatus();
+  const count = Math.max(1, windows);
+  return (
+    <span
+      className="collab-status"
+      data-collab-status
+      title="Open this address in a second window to edit together"
+    >
+      Room {room} · {count} {count === 1 ? "window" : "windows"}
+    </span>
+  );
 }
 
 export function TopBar({
@@ -108,6 +124,12 @@ export function TopBar({
       {page === "editor" && (
         <>
           <div className="bar-group" role="group" aria-label="Editor">
+            <Switch
+              label="Live collaboration"
+              checked={settings.collaboration}
+              onChange={(collaboration) => onChange({ collaboration })}
+            />
+            {settings.collaboration && <CollabBadge />}
             <Switch
               label="Read only"
               checked={settings.readOnly}

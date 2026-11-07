@@ -493,3 +493,11 @@ ul.threads li.resolved {
     break-inside: avoid;
   }
 }
+
+.collab-status {
+  font-size: 0.8125rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
