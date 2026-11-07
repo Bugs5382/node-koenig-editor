@@ -137,17 +137,18 @@ describe("the full-screen gallery viewer", () => {
     expect(document.activeElement).toBe(stops[0]);
   });
 
-  it("moves with the Left and Right arrow keys, Home and End, and stops at the ends", async () => {
+  it("moves with the Left and Right arrow keys, Home and End, and goes round at the ends", async () => {
     await open();
     await openFromGallery();
     await press("ArrowRight");
     expect(counter()).toBe("2 of 12");
     await press("ArrowLeft");
-    await press("ArrowLeft");
     expect(counter()).toBe("1 of 12");
     await press("End");
     expect(counter()).toBe("12 of 12");
     await press("ArrowRight");
+    expect(counter()).toBe("1 of 12");
+    await press("ArrowLeft");
     expect(counter()).toBe("12 of 12");
     await press("Home");
     expect(counter()).toBe("1 of 12");
@@ -665,11 +666,10 @@ describe("the viewer's controls share one soft, quiet look", () => {
     }
   });
 
-  it("shows a disabled arrow quietly, and does not lift it", async () => {
+  it("styles a disabled arrow quietly, and does not lift it", async () => {
     await open();
     await openFromGallery();
     const prev = viewer()?.querySelector("[data-gallery-viewer-prev]") as HTMLButtonElement;
-    expect(prev.disabled).toBe(true);
     expect(prev.className).toContain("disabled:opacity-30");
     expect(prev.className).toContain("disabled:hover:translate-y-0");
   });
