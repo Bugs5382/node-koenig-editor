@@ -4,6 +4,7 @@ import React from 'react';
 import {$getNodeByKey, CLICK_COMMAND, COMMAND_PRIORITY_LOW} from 'lexical';
 import {CardWrapper} from './ui/CardWrapper';
 import {EDIT_CARD_COMMAND, SELECT_CARD_COMMAND, SHOW_CARD_VISIBILITY_SETTINGS_COMMAND} from '../plugins/KoenigBehaviourPlugin';
+import {CardFigure} from '../../additions/figure/CardFigure';
 import {VISIBILITY_SETTINGS} from '../utils/visibility';
 import {mergeRegister} from '@lexical/utils';
 import {useKoenigSelectedCardContext} from '../context/KoenigSelectedCardContext';
@@ -137,6 +138,9 @@ const KoenigCardWrapper = ({nodeKey, width, wrapperStyle, IndicatorIcon, childre
         };
     }, [editor, isSelected, isEditing, nodeKey, containerRef]);
 
+    // the optional figure entry (label, number, title) belongs to picture cards
+    const hasFigure = cardType === 'image' || cardType === 'gallery';
+
     let isVisibilityActive = false;
     if (cardConfig?.visibilitySettings !== VISIBILITY_SETTINGS.NONE) {
         editor.getEditorState().read(() => {
@@ -170,7 +174,9 @@ const KoenigCardWrapper = ({nodeKey, width, wrapperStyle, IndicatorIcon, childre
                 wrapperStyle={wrapperStyle}
                 onIndicatorClick={handleVisibilityToggle}
             >
+                {hasFigure && <CardFigure nodeKey={nodeKey} selected={isSelected} slot="above" />}
                 {children}
+                {hasFigure && <CardFigure nodeKey={nodeKey} selected={isSelected} slot="below" />}
             </CardWrapper>
         </CardContext.Provider>
     );

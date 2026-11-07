@@ -21,45 +21,94 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { TableNode } from "@lexical/table";
-import { $nodesOfType } from "lexical";
+import { $isTableCellNode, $isTableNode, TableNode } from "@lexical/table";
+import { $getNodeByKey, $nodesOfType } from "lexical";
 import { useEffect } from "react";
 
-import { $getTableCaption } from "./tableActions";
+import { $figureNumbers, $figureTextWith, $getFigure } from "../figure/figure";
+import { $getTableCaption, $getTableFigure } from "./tableActions";
+import { $syncCellBorders, $syncOneCellBorders } from "./tableBorders";
+import { $getTableWidthMode } from "./tableResize";
 
 // A table's caption is node state (see tableActions). In the editor it is drawn from attributes on
 // the table element, not from a child element: Lexical removes DOM nodes it did not put there, and
 // re-adding one would never settle. `data-kg-caption` carries the text for a CSS caption box
 // (`table::after`), and `aria-label` gives the table its accessible name. The exported HTML has a
 // real `caption` element.
+// The table's width mode and sizing, as attributes the stylesheet reads and a width where one is
+// needed (a fixed table is as wide as its columns).
+const syncSize = (table: TableNode, element: Element) => {
+  const mode = $getTableWidthMode(table);
+  const widths = table.getColWidths();
+  const total = widths?.reduce((sum, width) => sum + width, 0) ?? 0;
+  const html = element as HTMLElement;
+  if (element.getAttribute("data-kg-table-width") !== mode)
+    element.setAttribute("data-kg-table-width", mode);
+  if (widths?.length) {
+    if (!element.hasAttribute("data-kg-sized")) element.setAttribute("data-kg-sized", "");
+  } else if (element.hasAttribute("data-kg-sized")) {
+    element.removeAttribute("data-kg-sized");
+  }
+  const width = mode === "fit" ? "auto" : mode === "fixed" && total > 0 ? `${total}px` : "";
+  if (html.style.width !== width) html.style.width = width;
+};
+
 export const useTableCaptions = (): void => {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     if (!editor.hasNodes([TableNode])) return undefined;
-    const sync = () => {
+    const elementOf = (table: TableNode) => {
+      const found = editor.getElementByKey(table.getKey());
+      return found?.tagName === "TABLE" ? found : found?.querySelector("table");
+    };
+    // the table-wide attributes: size, and the caption (which depends on the numbers across the document)
+    const syncTable = (table: TableNode, numbers: Map<string, number>) => {
+      const element = elementOf(table);
+      if (!element) return;
+      syncSize(table, element);
+      const text = $getFigure(table) ? $figureTextWith(table, numbers) : $getTableCaption(table);
+      if (!text) {
+        element.removeAttribute("data-kg-caption");
+        element.removeAttribute("data-kg-caption-above");
+        if (element.hasAttribute("data-kg-captioned")) {
+          element.removeAttribute("aria-label");
+          element.removeAttribute("data-kg-captioned");
+        }
+        return;
+      }
+      if (element.getAttribute("data-kg-caption") !== text)
+        element.setAttribute("data-kg-caption", text);
+      if (element.getAttribute("aria-label") !== text) element.setAttribute("aria-label", text);
+      element.setAttribute("data-kg-captioned", "");
+      if ($getTableFigure(table)?.above) element.setAttribute("data-kg-caption-above", "");
+      else element.removeAttribute("data-kg-caption-above");
+    };
+    const syncAll = () => {
       editor.getEditorState().read(() => {
+        const numbers = $figureNumbers();
         for (const table of $nodesOfType(TableNode)) {
-          const found = editor.getElementByKey(table.getKey());
-          const element = found?.tagName === "TABLE" ? found : found?.querySelector("table");
-          if (!element) continue;
-          const text = $getTableCaption(table);
-          if (!text) {
-            element.removeAttribute("data-kg-caption");
-            if (element.hasAttribute("data-kg-captioned")) {
-              element.removeAttribute("aria-label");
-              element.removeAttribute("data-kg-captioned");
-            }
-            continue;
-          }
-          if (element.getAttribute("data-kg-caption") !== text)
-            element.setAttribute("data-kg-caption", text);
-          if (element.getAttribute("aria-label") !== text) element.setAttribute("aria-label", text);
-          element.setAttribute("data-kg-captioned", "");
+          syncTable(table, numbers);
+          $syncCellBorders(editor, table);
         }
       });
     };
-    sync();
-    return editor.registerUpdateListener(sync);
+    syncAll();
+    // after that, work only on what the update changed: the table-wide attributes of every table
+    // (cheap, and a new or removed table renumbers the others), and the borders of the cells that
+    // were themselves changed
+    return editor.registerUpdateListener(({ dirtyElements, editorState }) => {
+      if (dirtyElements.size === 0) return;
+      editorState.read(() => {
+        const numbers = $figureNumbers();
+        for (const table of $nodesOfType(TableNode)) syncTable(table, numbers);
+        for (const [key, intentional] of dirtyElements) {
+          if (!intentional) continue;
+          const node = $getNodeByKey(key);
+          if ($isTableCellNode(node)) $syncOneCellBorders(editor, node);
+          else if ($isTableNode(node)) $syncCellBorders(editor, node);
+        }
+      });
+    });
   }, [editor]);
 };
 

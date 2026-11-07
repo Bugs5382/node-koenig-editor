@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { TableCellNode, TableNode } from "@lexical/table";
+import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import type {
   DOMExportOutput,
   DOMExportOutputMap,
@@ -29,7 +29,9 @@ import type {
   LexicalNode,
 } from "lexical";
 
-import { $getTableCaption, TABLE_CELL_INK } from "./tableActions";
+import { $getTableCaption, $getTableFigure, TABLE_CELL_INK } from "./tableActions";
+import { $getCellBorders, BORDER_SIDES, borderCss } from "./tableBorders";
+import { $getTableWidthMode } from "./tableResize";
 
 // What a reader's page gets in the saved HTML. Stock table export already carries merged cells
 // (colspan, rowspan), the shading (an inline background colour), vertical alignment and the cell's
@@ -43,12 +45,42 @@ export const TABLE_HTML_EXPORT: DOMExportOutputMap = new Map<
   [
     TableNode,
     (editor, target) => {
-      const output = (target as TableNode).exportDOM(editor);
-      const caption = $getTableCaption(target as TableNode);
-      if (caption && output.element instanceof HTMLElement) {
+      const table = target as TableNode;
+      const output = table.exportDOM(editor);
+      if (!(output.element instanceof HTMLElement)) return output;
+      const caption = $getTableCaption(table);
+      if (caption) {
         const element = output.element.ownerDocument.createElement("caption");
         element.textContent = caption;
+        if (!$getTableFigure(table)?.above) element.style.captionSide = "bottom";
         output.element.insertBefore(element, output.element.firstChild);
+      }
+      // column widths as shares of the whole, so the table reads the same in any column width
+      const widths = table.getColWidths();
+      const total = widths?.reduce((sum, width) => sum + width, 0) ?? 0;
+      const cols = output.element.querySelectorAll("col");
+      if (widths && total > 0) {
+        cols.forEach((col, index) => {
+          const width = widths[index];
+          if (width) col.style.width = `${Math.round((width / total) * 10000) / 100}%`;
+        });
+      }
+      const mode = $getTableWidthMode(table);
+      output.element.setAttribute("data-kg-table-width", mode);
+      output.element.style.width =
+        mode === "fit" ? "auto" : mode === "fixed" && total > 0 ? `${total}px` : "100%";
+      output.element.style.maxWidth = "100%";
+      return output;
+    },
+  ],
+  [
+    TableRowNode,
+    (editor, target) => {
+      const output = (target as TableRowNode).exportDOM(editor);
+      // a row height is a minimum: taller content still grows the row
+      if (output.element instanceof HTMLElement && output.element.style.height) {
+        output.element.style.minHeight = output.element.style.height;
+        output.element.style.removeProperty("height");
       }
       return output;
     },
@@ -59,6 +91,11 @@ export const TABLE_HTML_EXPORT: DOMExportOutputMap = new Map<
       const cell = target as TableCellNode;
       const output = cell.exportDOM(editor);
       if (output.element instanceof HTMLElement) {
+        const borders = $getCellBorders(cell);
+        for (const side of BORDER_SIDES) {
+          const edge = borders[side];
+          if (edge) output.element.style.setProperty(`border-${side}`, borderCss(edge));
+        }
         if (cell.getBackgroundColor()) output.element.style.color = TABLE_CELL_INK;
         // the stock export always writes text-align: start; the cell's own alignment wins
         const format = cell.getFormatType();

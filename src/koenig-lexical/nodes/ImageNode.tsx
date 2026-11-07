@@ -4,6 +4,7 @@ import {ImageNode as BaseImageNode} from '#kg-default-nodes';
 import {ImageNodeComponent} from './ImageNodeComponent';
 import {KoenigCardWrapper, MINIMAL_NODES} from '../index.js';
 import {cleanBasicHtml} from '@tryghost/kg-clean-basic-html';
+import {$getFigure, $setFigure} from '../../additions/figure/figure';
 import {createCommand} from 'lexical';
 import {populateNestedEditor, setupNestedEditor} from '../utils/nested-editors';
 
@@ -21,7 +22,12 @@ export class ImageNode extends BaseImageNode {
     }
 
     static importJSON(serializedNode) {
-        return super.importJSON(serializedNode);
+        const node = super.importJSON(serializedNode);
+        // the optional figure entry (label, number, title) is node state; see additions/figure
+        if (serializedNode.figure) {
+            $setFigure(node, serializedNode.figure);
+        }
+        return node;
     }
 
     // transient properties used to control node behaviour
@@ -117,6 +123,11 @@ export class ImageNode extends BaseImageNode {
                 const cleanedHtml = cleanBasicHtml(html, {firstChildInnerContent: true});
                 json.caption = cleanedHtml;
             });
+        }
+
+        const figure = $getFigure(this);
+        if (figure) {
+            json.figure = figure;
         }
 
         return json;
