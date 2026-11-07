@@ -11,7 +11,7 @@ import {sanitizeHtml} from '../utils/sanitize-html';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {useKoenigStrings} from '../../additions/options';
 
-export function CalloutNodeComponent({nodeKey, textEditor, textEditorInitialState, backgroundColor, calloutEmoji}) {
+export function CalloutNodeComponent({nodeKey, textEditor, textEditorInitialState, backgroundColor, calloutEmoji, textColor}) {
     const strings = useKoenigStrings();
     const [editor] = useLexicalComposerContext();
 
@@ -39,7 +39,14 @@ export function CalloutNodeComponent({nodeKey, textEditor, textEditorInitialStat
     const handleColorChange = (color) => {
         editor.update(() => {
             const node = $getNodeByKey(nodeKey);
-            node.backgroundColor = color;
+            node.backgroundColor = color || 'white';
+        });
+    };
+
+    const handleTextColorChange = (color) => {
+        editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            node.textColor = color || '';
         });
     };
 
@@ -79,6 +86,8 @@ export function CalloutNodeComponent({nodeKey, textEditor, textEditorInitialStat
                 calloutEmoji={calloutEmoji}
                 changeEmoji={handleEmojiChange}
                 color={backgroundColor}
+                handleTextColorChange={handleTextColorChange}
+                textColor={textColor}
                 handleColorChange={handleColorChange}
                 hasEmoji={hasEmoji}
                 isEditing={isEditing}

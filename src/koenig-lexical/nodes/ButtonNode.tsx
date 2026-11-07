@@ -43,6 +43,9 @@ export class ButtonNode extends BaseButtonNode {
             >
                 <ButtonNodeComponent
                     alignment={this.alignment}
+                    backgroundColor={this.backgroundColor}
+                    buttonEmoji={this.buttonEmoji}
+                    textColor={this.textColor}
                     buttonText={this.buttonText}
                     buttonUrl={this.buttonUrl}
                     nodeKey={this.getKey()}

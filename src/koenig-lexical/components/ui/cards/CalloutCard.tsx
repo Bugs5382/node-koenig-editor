@@ -1,7 +1,9 @@
 import KoenigComposerContext from '../../../context/KoenigComposerContext.jsx';
 import KoenigNestedEditor from '../../KoenigNestedEditor';
 import React from 'react';
-import {ColorOptionSetting, SettingsPanel, ToggleSetting} from '../SettingsPanel';
+import {ColorSetting} from '../../../../additions/colors/ColorSetting';
+import {SettingsPanel, ToggleSetting} from '../SettingsPanel';
+import {isHexColor} from '../../../../additions/colors/colors';
 import {ReadOnlyOverlay} from '../ReadOnlyOverlay';
 import {AnchoredMenu} from '../../../../additions/placement/AnchoredMenu';
 import {EmojiPicker} from '../../../../additions/emojiPicker/EmojiPicker';
@@ -91,6 +93,8 @@ export function CalloutCard({
     toggleEmoji,
     hasEmoji = true,
     handleColorChange,
+    handleTextColorChange,
+    textColor,
     changeEmoji,
     calloutEmoji = '\u{1F4A1}',
     textEditor,
@@ -112,9 +116,16 @@ export function CalloutCard({
         }
     }, [isEditing, setShowEmojiPicker]);
 
+    const customBackground = isHexColor(color);
+    const customText = isHexColor(textColor);
+
     return (
         <>
-            <div className={`flex rounded-md border px-7 py-5 ${CALLOUT_COLORS[color]} `} data-testid={`callout-bg-${color}`}>
+            <div
+                className={`flex rounded-md border px-7 py-5 ${customBackground ? 'border-transparent' : CALLOUT_COLORS[color]} `}
+                data-testid={`callout-bg-${customBackground ? 'custom' : color}`}
+                style={{...(customBackground ? {backgroundColor: color} : {}), ...(customText ? {color: textColor} : {})}}
+            >
                 <div className="relative">
                     {hasEmoji &&
                     <>
@@ -150,7 +161,7 @@ export function CalloutCard({
                     placeholderClassName={`font-serif text-xl font-normal tracking-wide text-grey-500 !dark:text-white opacity-30`}
                     placeholderText={strings.callout.placeholder}
                     singleParagraph={true}
-                    textClassName={`!my-0 w-full whitespace-normal bg-transparent font-serif text-xl font-normal ${CALLOUT_TEXT_COLORS[color]}`}
+                    textClassName={`!my-0 w-full whitespace-normal bg-transparent font-serif text-xl font-normal ${customText ? 'caret-current' : (customBackground ? TEXT_BLACK : CALLOUT_TEXT_COLORS[color])}`}
                 />
             </div>
             {
@@ -164,12 +175,19 @@ export function CalloutCard({
                             label={strings.callout.emoji}
                             onChange={toggleEmoji}
                         />
-                        <ColorOptionSetting
-                            buttons={calloutColorPicker}
+                        <ColorSetting
                             dataTestId='callout-color-picker'
                             label={strings.callout.background}
-                            selectedName={color}
-                            onClick={handleColorChange}
+                            slot='calloutBackground'
+                            value={color}
+                            onChange={handleColorChange}
+                        />
+                        <ColorSetting
+                            dataTestId='callout-text-color-picker'
+                            label={strings.callout.textColor}
+                            slot='calloutText'
+                            value={textColor}
+                            onChange={handleTextColorChange}
                         />
                     </SettingsPanel>
                 ) : (

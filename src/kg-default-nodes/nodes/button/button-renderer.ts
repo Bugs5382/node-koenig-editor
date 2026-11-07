@@ -7,6 +7,9 @@ interface ButtonNodeData {
     buttonUrl: string;
     buttonText: string;
     alignment: string;
+    buttonEmoji?: string;
+    backgroundColor?: string;
+    textColor?: string;
 }
 
 interface RenderOptions extends ExportDOMOptions {}
@@ -28,7 +31,24 @@ export function renderButtonNode(node: ButtonNodeData, options: RenderOptions = 
     const button = document.createElement('a');
     button.setAttribute('href', href);
     button.setAttribute('class', 'kg-btn kg-btn-accent');
-    button.textContent = node.buttonText || 'Button Title';
+    const label = [node.buttonEmoji, node.buttonText || (node.buttonEmoji ? '' : 'Button Title')].filter(Boolean).join(' ');
+    button.textContent = label;
+    if (node.buttonEmoji) {
+        button.setAttribute('data-button-emoji', node.buttonEmoji);
+    }
+
+    // colours picked by the person are hex values and go on the link as inline style
+    const isHex = (value?: string) => !!value && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value);
+    const styles: string[] = [];
+    if (isHex(node.backgroundColor)) {
+        styles.push(`background-color: ${node.backgroundColor}`);
+    }
+    if (isHex(node.textColor)) {
+        styles.push(`color: ${node.textColor}`);
+    }
+    if (styles.length) {
+        button.setAttribute('style', styles.join('; '));
+    }
 
     cardDiv.appendChild(button);
     return {element: cardDiv, type: 'outer' as const};
@@ -37,7 +57,7 @@ export function renderButtonNode(node: ButtonNodeData, options: RenderOptions = 
 function getCardClasses(node: ButtonNodeData) {
     const cardClasses = ['kg-card kg-button-card'];
 
-    if (node.alignment === 'left' || node.alignment === 'center') {
+    if (node.alignment === 'left' || node.alignment === 'center' || node.alignment === 'right') {
         cardClasses.push(`kg-align-${node.alignment}`);
     }
 

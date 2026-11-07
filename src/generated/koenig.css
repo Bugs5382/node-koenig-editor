@@ -1373,6 +1373,10 @@
     max-width: 240px;
 }
 
+.koenig-lexical .max-w-\[26rem\] {
+    max-width: calc(26 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .max-w-\[30rem\] {
     max-width: calc(30 * var(--kg-rem, 0.625rem));
 }
@@ -2624,6 +2628,10 @@
 
 .koenig-lexical .caret-black {
     caret-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(1 * 100%), transparent);
+}
+
+.koenig-lexical .caret-current {
+    caret-color: currentColor;
 }
 
 .koenig-lexical .caret-grey-800 {
