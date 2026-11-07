@@ -212,24 +212,40 @@ const PreviewController = ({
     const getElement = (key: string) => editor.getElementByKey(key) as HTMLElement | null;
     // Layout is not done when the mode flips (lazy images and the reflow of a new width land a
     // moment later), so the scroll is put back once the frame has settled and again shortly after,
-    // unless the person has scrolled in between.
-    const settle = (action: () => void) =>
-      window.requestAnimationFrame(() =>
+    // unless the person has scrolled in between. The frames and the timer are cancelled when the
+    // effect runs again or the editor goes away, and a late one does nothing, so none of it can run
+    // after the page (or a test's window) is gone.
+    let stopped = false;
+    const frames: number[] = [];
+    let timer: number | undefined;
+    const settle = (action: () => void) => {
+      frames.push(
         window.requestAnimationFrame(() => {
-          action();
-          const scroller = root ? scrollerOf(root) : null;
-          const position = () => (scroller ? scroller.scrollTop : window.scrollY);
-          const at = position();
-          window.setTimeout(() => {
-            if (Math.abs(position() - at) < 1) action();
-          }, 250);
+          frames.push(
+            window.requestAnimationFrame(() => {
+              if (stopped || typeof window === "undefined") return;
+              action();
+              const scroller = root ? scrollerOf(root) : null;
+              const position = () => (scroller ? scroller.scrollTop : window.scrollY);
+              const at = position();
+              timer = window.setTimeout(() => {
+                if (!stopped && Math.abs(position() - at) < 1) action();
+              }, 250);
+            }),
+          );
         }),
       );
+    };
+    const cancel = () => {
+      stopped = true;
+      for (const frame of frames) window.cancelAnimationFrame(frame);
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
 
     if (first.current) {
       first.current = false;
       if (preview) editor.setEditable(false);
-      return;
+      return cancel;
     }
     if (preview) {
       // A flip from the host's own `preview` prop has no earlier moment to note it in.
@@ -262,6 +278,7 @@ const PreviewController = ({
       if (focused && root) root.focus({ preventScroll: true });
       if (root) settle(() => restoreScroll(root, scroll, getElement));
     }
+    return cancel;
     // only a change of preview does anything
   }, [preview]);
 
