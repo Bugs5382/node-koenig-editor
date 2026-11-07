@@ -30,6 +30,7 @@ import type {
 } from "lexical";
 
 import { $getTableCaption, $getTableFigure, TABLE_CELL_INK } from "./tableActions";
+import { $cellLookOf } from "./tableLook";
 import { $getCellBorders, BORDER_SIDES, borderCss } from "./tableBorders";
 import { $getTableWidthMode } from "./tableResize";
 
@@ -97,6 +98,15 @@ export const TABLE_HTML_EXPORT: DOMExportOutputMap = new Map<
           if (edge) output.element.style.setProperty(`border-${side}`, borderCss(edge));
         }
         if (cell.getBackgroundColor()) output.element.style.color = TABLE_CELL_INK;
+        else {
+          // the table's stripes and brand colour, written on the cell: a reader's page has no
+          // stylesheet of ours, and the ink is chosen to read on the colour
+          const look = $cellLookOf(cell);
+          if (look) {
+            output.element.style.backgroundColor = look.background;
+            output.element.style.color = look.ink;
+          }
+        }
         // the stock export always writes text-align: start; the cell's own alignment wins
         const format = cell.getFormatType();
         if (format) output.element.style.textAlign = format;

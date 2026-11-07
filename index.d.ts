@@ -328,6 +328,14 @@ export interface KoenigStrings {
     rowMovedStatus: string;
     columnMovedStatus: string;
     sizeMenu: string;
+    /** The Style popover: header row and column, stripes and brand colours. */
+    lookMenu: string;
+    bandRows: string;
+    bandColumns: string;
+    bandColour: string;
+    brandRows: string;
+    brandColumns: string;
+    brandColour: string;
     sizeDone: string;
     columnWidthLabel: string;
     rowHeightLabel: string;

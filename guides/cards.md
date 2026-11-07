@@ -136,7 +136,7 @@ you press the header's arrow.
 adds, moves and deletes rows and columns, turns the header row and header column on and off, merges
 a selected range of cells and splits them again, shades cells, aligns text across and down, sets a
 column's width and height (type a size, drag a border, double-click a border to fit the text, or use
-Alt with the arrow keys on a selected row or column), draws borders, drags rows and columns to a new
+Alt with the arrow keys on a selected row or column), draws borders, sets the table's Style (header row and column, banded rows and columns, a brand colour on the header row or first column; band and brand colours come from the shared colour control), drags rows and columns to a new
 place and gives the table a caption with an optional label and automatic number ("Table 1: ..."). Drag across cells to select a range, or use Select
 row, Select column or Select table, and the shading and alignment apply to all of it. Paste cells
 copied from a spreadsheet and they fill the table, adding the rows and columns they need.
@@ -149,7 +149,8 @@ selected cells are highlighted.
 **Accessibility:** the header row is marked up as column headers (and a header column as row
 headers); the toolbar buttons and menu items have names; the row and column of the cell you move to
 are announced, and so is what a merged cell spans; the caption names the table.
-**Developer:** `cards` leaves it out; the wording is `strings.table`. The borders and header colour
+**Developer:** `cards` leaves it out; the wording is `strings.table`. The band and brand colours are
+the `tableBand` and `tableBrand` slots of the composer's `colors` option. The borders and header colour
 are tokens (`--kg-table-edit-border-style` for the dashed editing line, `--kg-table-border-color`,
 `--kg-table-header-bg`); see the README.
 

@@ -325,6 +325,14 @@ right-click menu with the same actions) edits it:
   palette, on the outer lines, the inner lines or all lines of a cell, selected range, row, column or
   the whole table. A line two cells share is written on both. They are saved on the cell and written
   into the saved HTML, and "Remove borders" goes back to the table's default lines.
+- **Style**: header row and header column switches (the header row is marked up as column headers
+  and the header column as row headers), banded rows and banded columns (every second row or column
+  in a band colour), and a brand colour on the header row and/or the first column. Each table has
+  its own settings. The band and brand colours use the editor's shared colour control: a palette per
+  slot, an optional colour wheel, and the host's choices through the composer's `colors` option
+  (`colors.tableBand` and `colors.tableBrand`: `palette`, `picker: false` to limit the choice to the
+  palette). The ink on each colour is chosen to read on it. The colours are written onto the cells in
+  the saved HTML, and a cell you shaded yourself keeps its own colour.
 - **Caption**: the figure entry (see below) for the table: a label such as "Table", an automatic
   number, a title, above or below. The text is the table's accessible name in the editor and a real
   `caption` element in the saved HTML.

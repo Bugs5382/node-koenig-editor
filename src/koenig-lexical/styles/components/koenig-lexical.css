@@ -223,6 +223,23 @@ em-emoji-picker {
     text-align: start;
 }
 
+/* A table's look. Stripes (every second row or column) take the band colour, the header row and
+   the first column take the brand colour; the table's own attributes and custom properties are
+   set by the editor from the table's state. A cell the author shaded keeps its own colour, and the
+   ink is chosen to read on each colour. Only rows are counted by type, because the column group
+   sits among the rows. */
+.koenig-lexical table[data-kg-band-rows] tr:nth-of-type(even) :is(td, th):not([style*="background-color"]),
+.koenig-lexical table[data-kg-band-columns] tr :is(td, th):nth-child(even):not([style*="background-color"]) {
+    background: var(--kg-table-band);
+    color: var(--kg-table-band-ink);
+}
+
+.koenig-lexical table[data-kg-brand-rows] tr:nth-of-type(1) :is(td, th):not([style*="background-color"]),
+.koenig-lexical table[data-kg-brand-columns] tr :is(td, th):nth-child(1):not([style*="background-color"]) {
+    background: var(--kg-table-brand);
+    color: var(--kg-table-brand-ink);
+}
+
 /* A cell the author shaded keeps dark ink, so its text reads on the shade in light and dark. */
 .koenig-lexical table tr td[style*="background-color"],
 .koenig-lexical table tr th[style*="background-color"] {
@@ -278,6 +295,11 @@ em-emoji-picker {
 
     .koenig-lexical table tr th {
         border-bottom-width: 3px;
+    }
+
+    .koenig-lexical table[data-kg-band-rows] tr:nth-of-type(even) :is(td, th),
+    .koenig-lexical table[data-kg-band-columns] tr :is(td, th):nth-child(even) {
+        border-style: dotted;
     }
 
     .koenig-lexical .kg-table-cell-selected {

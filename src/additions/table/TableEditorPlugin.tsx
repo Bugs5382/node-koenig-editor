@@ -61,6 +61,14 @@ import {
   type TableGroupId,
   type TableScope,
 } from "./tableActions";
+import { ColorControl, useColorSetting } from "../colors/ColorControl";
+import {
+  $getTableLook,
+  $setTableLook,
+  DEFAULT_BAND_COLOR,
+  DEFAULT_BRAND_COLOR,
+  type TableLook,
+} from "./tableLook";
 import {
   $applyBorders,
   BORDER_STYLES,
@@ -101,6 +109,7 @@ interface Snapshot {
   headerColumn: boolean;
   headerRow: boolean;
   isRange: boolean;
+  look: TableLook;
   row: number;
   rowHeight: number | null;
   rowSpan: number;
@@ -131,6 +140,7 @@ const $snapshot = (): Snapshot | null => {
     headerColumn: state.headerColumn,
     headerRow: state.headerRow,
     isRange: state.isRange,
+    look: $getTableLook(state.table),
     row: state.row,
     rowHeight: (state.table.getChildAtIndex(state.row) as TableRowNode | null)?.getHeight() ?? null,
     rowSpan: cell.getRowSpan(),
@@ -179,7 +189,7 @@ const labelOf = (id: TableActionId, t: Strings): string =>
 const fill = (template: string, values: Record<string, number>) =>
   template.replaceAll(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ""));
 
-type MenuGroup = TableGroupId | "borders" | "caption" | "colour" | "size";
+type MenuGroup = TableGroupId | "borders" | "caption" | "colour" | "look" | "size";
 
 const TOOLBAR: readonly MenuGroup[] = [
   "row",
@@ -190,6 +200,7 @@ const TOOLBAR: readonly MenuGroup[] = [
   "width",
   "size",
   "borders",
+  "look",
   "caption",
   "table",
 ];
@@ -346,6 +357,21 @@ export const TableEditorPlugin = () => {
     [closeAll, editor, focusEditor],
   );
 
+  // a change from a popover that stays open while the person sets several things (the table's look)
+  const applyKeepingOpen = useCallback(
+    (change: () => void) => {
+      const saved = savedSelection.current;
+      editor.update(
+        () => {
+          if (saved) $setSelection(saved.clone());
+          change();
+        },
+        { discrete: true },
+      );
+    },
+    [editor],
+  );
+
   // Alt+F10 moves focus into the toolbar from the cell; Escape closes a menu, then returns to the cell.
   useEffect(() => {
     if (!snapshot) return undefined;
@@ -483,6 +509,26 @@ export const TableEditorPlugin = () => {
           });
           continue;
         }
+        if (group === "look") {
+          sections.push({
+            items: [
+              {
+                id: "look",
+                label: t.lookMenu,
+                onSelect: () => {
+                  frozen.current = true;
+                  setContext(null);
+                  setOpen((current) => ({
+                    group: "look",
+                    left: current?.left ?? 16,
+                    top: current?.top ?? 60,
+                  }));
+                },
+              },
+            ],
+          });
+          continue;
+        }
         if (group === "caption") {
           sections.push({
             items: [
@@ -559,6 +605,7 @@ export const TableEditorPlugin = () => {
       cell: t.cellMenu,
       colour: t.colourMenu,
       column: t.columnMenu,
+      look: t.lookMenu,
       row: t.rowMenu,
       size: t.sizeMenu,
       table: t.deleteTable,
@@ -608,7 +655,10 @@ export const TableEditorPlugin = () => {
               aria-haspopup={
                 direct
                   ? undefined
-                  : group === "caption" || group === "size" || group === "borders"
+                  : group === "caption" ||
+                      group === "size" ||
+                      group === "borders" ||
+                      group === "look"
                     ? "dialog"
                     : "menu"
               }
@@ -650,6 +700,7 @@ export const TableEditorPlugin = () => {
       {open &&
       open.group !== "borders" &&
       open.group !== "caption" &&
+      open.group !== "look" &&
       open.group !== "size" &&
       open.group !== "table" ? (
         <PointMenu at={open}>
@@ -724,6 +775,18 @@ export const TableEditorPlugin = () => {
           />
         </PointMenu>
       ) : null}
+      {open?.group === "look" ? (
+        <PointMenu at={open}>
+          <LookFields
+            snapshot={snapshot}
+            onApply={applyKeepingOpen}
+            onClose={() => {
+              closeAll();
+              focusEditor();
+            }}
+          />
+        </PointMenu>
+      ) : null}
       {open?.group === "caption" ? (
         <PointMenu at={open}>
           <FigureEntry
@@ -757,6 +820,7 @@ export const TableEditorPlugin = () => {
                 "width",
                 "size",
                 "borders",
+                "look",
                 "caption",
                 "table",
               ].filter((g) => g !== "table") as MenuGroup[],
@@ -780,6 +844,150 @@ export const TableEditorPlugin = () => {
         {announcement}
       </div>
     </FloatingPortal>
+  );
+};
+
+const LookFields = ({
+  onApply,
+  onClose,
+  snapshot,
+}: {
+  onApply: (change: () => void) => void;
+  onClose: () => void;
+  snapshot: Snapshot;
+}) => {
+  const t = useKoenigStrings().table;
+  const bandSetting = useColorSetting("tableBand");
+  const brandSetting = useColorSetting("tableBrand");
+  const [look, setLook] = useState<TableLook>(snapshot.look);
+  const [headerRow, setHeaderRow] = useState(snapshot.headerRow);
+  const [headerColumn, setHeaderColumn] = useState(snapshot.headerColumn);
+  const first = useRef<HTMLInputElement>(null);
+  useEffect(() => first.current?.focus(), []);
+  const change = (next: Partial<TableLook>) => {
+    setLook((current) => ({ ...current, ...next }));
+    onApply(() => {
+      const state = $readTableState();
+      if (state) $setTableLook(state.table, next);
+    });
+  };
+  const toggleHeader = (id: "headerColumn" | "headerRow") => {
+    if (id === "headerRow") setHeaderRow((on) => !on);
+    else setHeaderColumn((on) => !on);
+    onApply(() => $runTableAction(id));
+  };
+  const check = "mr-2 size-4 align-middle";
+  const row = "flex cursor-pointer items-center py-1";
+  return (
+    <div
+      aria-label={t.lookMenu}
+      className="not-kg-prose flex w-[30rem] max-w-[92vw] flex-col gap-1 rounded-lg bg-white p-3 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white forced-colors:border forced-colors:border-[ButtonText]"
+      data-kg-table-popover
+      role="dialog"
+      onKeyDown={(event) => {
+        event.stopPropagation();
+        if (event.key === "Escape") {
+          event.preventDefault();
+          onClose();
+        }
+      }}
+    >
+      <label className={row}>
+        <input
+          ref={first}
+          checked={headerRow}
+          className={check}
+          data-kg-table-look="headerRow"
+          type="checkbox"
+          onChange={() => toggleHeader("headerRow")}
+        />
+        {t.headerRow}
+      </label>
+      <label className={row}>
+        <input
+          checked={headerColumn}
+          className={check}
+          data-kg-table-look="headerColumn"
+          type="checkbox"
+          onChange={() => toggleHeader("headerColumn")}
+        />
+        {t.headerColumn}
+      </label>
+      <label className={row}>
+        <input
+          checked={look.bandRows}
+          className={check}
+          data-kg-table-look="bandRows"
+          type="checkbox"
+          onChange={(event) => change({ bandRows: event.target.checked })}
+        />
+        {t.bandRows}
+      </label>
+      <label className={row}>
+        <input
+          checked={look.bandColumns}
+          className={check}
+          data-kg-table-look="bandColumns"
+          type="checkbox"
+          onChange={(event) => change({ bandColumns: event.target.checked })}
+        />
+        {t.bandColumns}
+      </label>
+      {look.bandRows || look.bandColumns ? (
+        <div className="py-1" data-kg-table-look-colour="band">
+          <ColorControl
+            keepFocus
+            label={t.bandColour}
+            setting={bandSetting}
+            slot="tableBand"
+            value={look.bandColor ?? DEFAULT_BAND_COLOR}
+            onChange={(value) => change({ bandColor: value })}
+          />
+        </div>
+      ) : null}
+      <label className={row}>
+        <input
+          checked={look.brandRows}
+          className={check}
+          data-kg-table-look="brandRows"
+          type="checkbox"
+          onChange={(event) => change({ brandRows: event.target.checked })}
+        />
+        {t.brandRows}
+      </label>
+      <label className={row}>
+        <input
+          checked={look.brandColumns}
+          className={check}
+          data-kg-table-look="brandColumns"
+          type="checkbox"
+          onChange={(event) => change({ brandColumns: event.target.checked })}
+        />
+        {t.brandColumns}
+      </label>
+      {look.brandRows || look.brandColumns ? (
+        <div className="py-1" data-kg-table-look-colour="brand">
+          <ColorControl
+            keepFocus
+            label={t.brandColour}
+            setting={brandSetting}
+            slot="tableBrand"
+            value={look.brandColor ?? DEFAULT_BRAND_COLOR}
+            onChange={(value) => change({ brandColor: value })}
+          />
+        </div>
+      ) : null}
+      <div className="flex justify-end">
+        <button
+          className="cursor-pointer rounded-md px-2 py-1 font-medium hover:bg-grey-200/80 dark:hover:bg-grey-900"
+          data-kg-table-look-done
+          type="button"
+          onClick={onClose}
+        >
+          {t.sizeDone}
+        </button>
+      </div>
+    </div>
   );
 };
 
