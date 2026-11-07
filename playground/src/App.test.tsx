@@ -76,7 +76,7 @@ describe("playground", () => {
     expect(text()).toBe("");
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
     fireEvent.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Reset" }));
-    expect(text()).toBe("The quick brown fox jumps over the lazy dog.");
+    expect(text()).toBe("The quick brown fox jumps over the lazy dog");
   });
 
   it("starts with a header and a gallery made of the sample pictures", () => {

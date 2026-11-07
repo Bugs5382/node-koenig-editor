@@ -108,7 +108,7 @@ export function emptyDocument(): string {
 }
 
 /** The default content Reset returns to: one paragraph of the pangram. */
-export const FOX_TEXT = "The quick brown fox jumps over the lazy dog.";
+export const FOX_TEXT = "The quick brown fox jumps over the lazy dog";
 export function foxDocument(): string {
   return JSON.stringify(documentOf([paragraph(FOX_TEXT)]));
 }

@@ -306,7 +306,7 @@ describe("Reset", () => {
     expect(dialog.textContent).toContain("Reset to the default text?");
     expect(dialog.textContent).toContain("default");
     fireEvent.click(confirmButton("Reset"));
-    expect(editorText()).toBe("The quick brown fox jumps over the lazy dog.");
+    expect(editorText()).toBe("The quick brown fox jumps over the lazy dog");
     expect(window.location.search).toBe("");
     expect(document.documentElement.classList.contains("dark")).toBe(false);
     expect(toast().textContent).toContain("Reset");
