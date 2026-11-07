@@ -191,23 +191,12 @@ describe("buttons", () => {
     ).toBe(true);
   });
 
-  it("says what failed when the package cannot start with the chosen cards, and recovers", () => {
-    // A composer without the divider card throws; the page must explain it, and Reset must fix it.
+  it("starts with only the image card, with no divider", () => {
+    // A composer without the divider card used to throw on mount; it starts now
     window.history.replaceState(null, "", "/?cards=image");
-    const noise = console.error;
-    console.error = () => {};
-    try {
-      render(<App />);
-      expect(screen.getByRole("alert").textContent).toContain("could not start");
-      fireEvent.click(within(bar()).getByRole("button", { name: "Reset" }));
-      fireEvent.click(
-        within(screen.getByRole("alertdialog")).getByRole("button", { name: "Reset" }),
-      );
-      expect(screen.queryByRole("alert")).toBeNull();
-      expect(document.querySelector('[contenteditable="true"]')).not.toBeNull();
-    } finally {
-      console.error = noise;
-    }
+    render(<App />);
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(document.querySelector('[contenteditable="true"]')).not.toBeNull();
   });
 
   it("Load the kitchen sink replaces the document with one that shows the cards, and loads cleanly", () => {
