@@ -12,7 +12,7 @@ configurable base: it ships the cards, menus, toolbar and styles, and each host 
 or off, adds its own nodes, wording and theme. Two things to know before changing it:
 
 - The code under `src/koenig-lexical`, `src/kg-default-nodes` and `src/kg-default-transforms` is
-  upstream Koenig (pinned commit in the README). Keep upstream's layout and style there; put new
+  upstream Koenig (pinned commit in `guides/upstream.md`). Keep upstream's layout and style there; put new
   code in `src/additions/` and change upstream files only where a feature needs a hook.
 - Consumers type-check against the hand-written `index.d.ts`, not the sources. Every public
   value must be declared there, and the surface test fails when a declared value is missing at
@@ -23,7 +23,7 @@ or off, adds its own nodes, wording and theme. Two things to know before changin
 - Entry points: `node-koenig-editor` (components, node sets, options) and
   `node-koenig-editor/styles.css`. Nothing else is public.
 - Host options live on `KoenigComposer`: `cards`, `customNodes`, `menuItems`, `strings`,
-  `toolbar`, `collaboration`. The README documents each, with a complete host component.
+  `toolbar`, `collaboration`. The README has the options table; `guides/host-component.md` has a complete host component.
 - No product code or wording goes into this package. Product nodes, translations and theme stay
   in the host app.
 - Lexical, `@lexical/*`, React and Yjs are peers and must never be bundled.
@@ -86,3 +86,9 @@ Follow the logging rules in `CLAUDE.md`. In short:
   `DEFAULT_NODES`, a `KoenigCardName`, an entry in `CARD_NODE_TYPES` and its wording in
   `DEFAULT_STRINGS`, and its plugin guarded in `AllDefaultPlugins`.
 - New user-facing text goes through `useKoenigStrings()` with an English default, never a literal.
+
+## Documentation
+
+- The README stays short (about 150 lines: highlights, install, a minimal example, the options table, links, license) because it ships in the npm package. The detail lives in `guides/`, one file per topic, linked from the README; add a new feature's guide there and link it from the README's Guides list.
+- `docs/` is TypeDoc output (gitignored), never hand-written. `guides/cards.md` is also the playground's Guide tab.
+- A guide links to another with a relative path (`./styles.md#-colours`); the README uses absolute GitHub URLs, because the npm page cannot follow relative ones.
