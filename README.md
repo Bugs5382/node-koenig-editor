@@ -859,7 +859,7 @@ different for each setting; the `colors` option changes it per setting (a "slot"
 - `picker`: `false` takes the colour wheel away, so the person can only use the palette.
 - `none`: `false` takes away the editor's own colour, so a colour is always set.
 
-With `picker: false` and `none: false` the host forces the colours of that setting to its list.
+With `picker: false` and `none: false` the host forces the colours of that setting to its list. If that list has one swatch, the toolbar button for a text colour or highlight applies it directly and takes it off again, with no menu.
 The slots are `textColor`, `highlight`, `calloutBackground`, `calloutText`, `buttonBackground`,
 `buttonText`, `headerBackground`, `headerText`, `headerButton`, `headerButtonText`, `tableBand` and
 `tableBrand`. Highlight writes dark or light text with the colour, whichever reads on it.
