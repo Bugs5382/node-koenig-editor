@@ -1450,11 +1450,6 @@
     transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.koenig-lexical .-translate-x-full {
-    --tw-translate-x: -100%;
-    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
 .koenig-lexical .-translate-y-full {
     --tw-translate-y: -100%;
     transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -3426,6 +3421,20 @@ em-emoji-picker {
 .koenig-lexical .kg-token-inserted { color: var(--kg-code-inserted); }
 .koenig-lexical .kg-token-operator,
 .koenig-lexical .kg-token-punctuation { color: var(--kg-code-fg); opacity: 0.8; }
+
+/* Read only (the preview): there is no language bar, so the block names its language itself. */
+.koenig-lexical [contenteditable="false"] code.kg-code-block[data-language]::after {
+    color: var(--kg-code-gutter);
+    content: attr(data-language);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: calc(1.1 * var(--kg-rem, 0.625rem));
+    line-height: 1;
+    pointer-events: none;
+    position: absolute;
+    right: calc(0.8 * var(--kg-rem, 0.625rem));
+    top: calc(0.6 * var(--kg-rem, 0.625rem));
+    user-select: none;
+}
 
 @media (forced-colors: active) {
     .koenig-lexical code.kg-code-block {

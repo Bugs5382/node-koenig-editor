@@ -199,7 +199,7 @@ export const CodePlugin: FC = () => {
     };
   }, [editor, hasCode]);
 
-  // keep the bar at the block's top right edge
+  // keep the bar centred on the block's top edge, above it, so it never covers the code
   useEffect(() => {
     if (!active) {
       setRect(null);
@@ -207,7 +207,7 @@ export const CodePlugin: FC = () => {
     }
     const place = () => {
       const box = active.element.getBoundingClientRect();
-      setRect({ left: box.right, top: box.top });
+      setRect({ left: box.left + box.width / 2, top: box.top });
     };
     place();
     window.addEventListener("scroll", place, true);
@@ -252,9 +252,9 @@ export const CodePlugin: FC = () => {
     <FloatingPortal to={host}>
       <div
         ref={bar}
-        className="not-kg-prose fixed z-[9999999] flex -translate-x-full items-center gap-1 rounded-md bg-white/95 p-1 font-sans text-[1.2rem] text-grey-800 shadow dark:bg-grey-950/95 dark:text-grey-300 forced-colors:border forced-colors:border-[ButtonText]"
+        className="not-kg-prose fixed z-[9999999] flex -translate-x-1/2 -translate-y-full items-center gap-1 rounded-md bg-white/95 p-1 font-sans text-[1.2rem] text-grey-800 shadow dark:bg-grey-950/95 dark:text-grey-300 forced-colors:border forced-colors:border-[ButtonText]"
         data-kg-code-bar
-        style={{ left: rect.left - 8, top: rect.top + 8 }}
+        style={{ left: rect.left, top: rect.top }}
         onMouseLeave={() => setHovered(null)}
       >
         {editable ? (

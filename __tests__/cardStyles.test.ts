@@ -111,3 +111,15 @@ describe("hidden tooltips take no room", () => {
     expect(source).toContain("group-focus-visible:flex");
   });
 });
+
+// The preview is the editor read only, so a code block there has no language bar. Its language
+// comes from the block's own `data-language`.
+describe("the code block's language label", () => {
+  it("is drawn from data-language when the editor is read only", () => {
+    const rule = css.match(
+      /\[contenteditable="false"\] code\.kg-code-block\[data-language\]::after\s*\{[^}]*\}/,
+    );
+    expect(rule).not.toBeNull();
+    expect(rule?.[0]).toContain("content: attr(data-language)");
+  });
+});
