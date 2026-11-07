@@ -438,8 +438,9 @@ image, not printed over it.
 *Slideshow.* A selected gallery's settings panel also has **Auto-advance** with a seconds box (the
 viewer goes to the next photo after that many seconds and starts over after the last; a Pause and
 Play button and the Space key stop and start it, and a move by hand starts the wait again),
-**Random order** (each time the viewer opens, the photos play shuffled, starting with the one
-opened) and **Screen mode** (no thumbnail strip; the controls hide after three seconds without
+**Random order** (the viewer keeps the set order, and Next and Previous follow it; only the
+automatic advance jumps to a random photo, never the current one, and every photo shows once before
+any repeats) and **Screen mode** (no thumbnail strip; the controls hide after three seconds without
 input, and a key, a tap or a mouse move brings them back; Escape shows them first and a second
 Escape exits). The exit control of the normal viewer never hides. The settings are saved in the
 card and written to the saved HTML as `data-kg-autoplay` (seconds), `data-kg-shuffle` and

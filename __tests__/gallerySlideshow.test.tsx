@@ -157,35 +157,141 @@ describe("auto-advance", () => {
   });
 });
 
-describe("random order", () => {
-  it("plays every photo once, starting with the one that was opened", async () => {
-    vi.spyOn(Math, "random").mockReturnValue(0.1);
-    await load({ shuffle: true }, {}, 5);
+describe("going round", () => {
+  it("goes from the last photo to the first and from the first to the last, by hand", async () => {
+    await load({}, {}, 10);
     await openViewer();
-    expect(counter()).toBe("1 of 5");
-    const seen = [shownSrc()];
-    for (let step = 0; step < 4; step++) {
-      await act(async () => {
-        fireEvent.keyDown(viewer() as Element, { key: "ArrowRight" });
-      });
-      seen.push(shownSrc());
-    }
-    expect(new Set(seen).size).toBe(5);
-    expect(seen[0]).toContain("#0");
-    expect(seen.join()).not.toBe([0, 1, 2, 3, 4].map((n) => `${PIXEL}#${n}`).join());
+    expect(counter()).toBe("1 of 10");
+    await act(async () => {
+      fireEvent.keyDown(viewer() as Element, { key: "ArrowLeft" });
+    });
+    expect(counter()).toBe("10 of 10");
+    await act(async () => {
+      fireEvent.click(viewer()?.querySelector("[data-gallery-viewer-next]") as Element);
+    });
+    expect(counter()).toBe("1 of 10");
+    await act(async () => {
+      fireEvent.click(viewer()?.querySelector("[data-gallery-viewer-prev]") as Element);
+    });
+    expect(counter()).toBe("10 of 10");
   });
 
-  it("keeps the order when it is off", async () => {
-    await load({}, {}, 4);
+  it("disables the arrows only when there is a single photo", async () => {
+    await load({}, {}, 1);
     await openViewer();
-    const seen = [shownSrc()];
-    for (let step = 0; step < 3; step++) {
-      await act(async () => {
-        fireEvent.keyDown(viewer() as Element, { key: "ArrowRight" });
-      });
-      seen.push(shownSrc());
+    expect(
+      (viewer()?.querySelector("[data-gallery-viewer-next]") as HTMLButtonElement).disabled,
+    ).toBe(true);
+  });
+
+  it("keeps playing in order past 10 of 10 with ten photos", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    await load({ autoplaySeconds: 5 }, {}, 10);
+    await openViewer();
+    for (let step = 1; step < 10; step++) await tick(5100);
+    expect(counter()).toBe("10 of 10");
+    await tick(5100);
+    expect(counter()).toBe("1 of 10");
+  });
+});
+
+describe("random order", () => {
+  beforeEach(() => vi.useFakeTimers({ shouldAdvanceTime: true }));
+  const key = async (name: string) => {
+    await act(async () => {
+      fireEvent.keyDown(viewer() as Element, { key: name });
+    });
+  };
+  const photoNumber = () => Number(shownSrc()?.split("#").pop());
+
+  it("keeps the strip and the counter in the set order, and Next and Previous in that order", async () => {
+    await load({ shuffle: true }, {}, 6);
+    await openViewer();
+    const strip = [...(viewer()?.querySelectorAll("[data-gallery-viewer-thumbs] img") ?? [])].map(
+      (img) => (img.getAttribute("src") ?? "").split("#").pop(),
+    );
+    expect(strip).toEqual(["0", "1", "2", "3", "4", "5"]);
+    for (let n = 1; n < 6; n++) {
+      await key("ArrowRight");
+      expect(counter()).toBe(`${n + 1} of 6`);
+      expect(photoNumber()).toBe(n);
     }
-    expect(seen).toEqual([0, 1, 2, 3].map((n) => `${PIXEL}#${n}`));
+    await key("ArrowRight");
+    expect(counter()).toBe("1 of 6");
+  });
+
+  it.each([2, 10])(
+    "shows every one of %i photos once before any repeats, in each of three passes, with no repeat across a pass boundary",
+    async (size) => {
+      await load({ autoplaySeconds: 5, shuffle: true }, {}, size);
+      await openViewer();
+      const sequence = [photoNumber()];
+      for (let step = 1; step < size * 3; step++) {
+        await tick(5100);
+        sequence.push(photoNumber());
+        // the counter is the photo's own number
+        expect(counter()).toBe(`${photoNumber() + 1} of ${size}`);
+      }
+      for (let pass = 0; pass < 3; pass++) {
+        expect(new Set(sequence.slice(pass * size, (pass + 1) * size)).size).toBe(size);
+      }
+      for (let n = 1; n < sequence.length; n++) {
+        expect(sequence[n]).not.toBe(sequence[n - 1]);
+      }
+      if (size >= 10) {
+        expect(sequence.slice(0, size).join()).not.toBe(
+          Array.from({ length: size }, (_, n) => n).join(),
+        );
+      }
+    },
+  );
+
+  it("stays on the one photo of a gallery of one", async () => {
+    await load({ autoplaySeconds: 5, shuffle: true }, {}, 1);
+    await openViewer();
+    await tick(20000);
+    expect(counter()).toBe("1 of 1");
+  });
+
+  it("counts a photo reached by hand as shown", async () => {
+    await load({ autoplaySeconds: 5, shuffle: true }, {}, 4);
+    await openViewer();
+    await key("ArrowRight");
+    await key("ArrowRight");
+    const shown = [0, 1, 2];
+    await tick(5100);
+    expect(shown).not.toContain(photoNumber());
+    expect(photoNumber()).toBe(3);
+  });
+
+  it("keeps the set order in the auto-advance when it is off", async () => {
+    await load({ autoplaySeconds: 5 }, {}, 4);
+    await openViewer();
+    const shown = [photoNumber()];
+    for (let step = 0; step < 3; step++) {
+      await tick(5100);
+      shown.push(photoNumber());
+    }
+    expect(shown).toEqual([0, 1, 2, 3]);
+  });
+});
+
+describe("the exit control's notice", () => {
+  it("does not repeat the visible 'Exit full screen' text in a second box, and never asks the browser for full screen", async () => {
+    const request = vi.fn();
+    (document.documentElement as unknown as { requestFullscreen: () => void }).requestFullscreen =
+      request;
+    await load({}, {}, 3);
+    await openViewer();
+    const close = viewer()?.querySelector("[data-gallery-viewer-close]") as HTMLElement;
+    const tip = document.getElementById(close.getAttribute("aria-describedby") as string);
+    // the button shows its own text from the small breakpoint up, so its tooltip only exists below it
+    expect(close.querySelector("[data-gallery-viewer-close-text]")?.className).toContain(
+      "sm:inline",
+    );
+    expect(tip?.className).toContain("sm:peer-hover:hidden");
+    expect(tip?.className).toContain("sm:peer-focus-visible:hidden");
+    expect(request).not.toHaveBeenCalled();
   });
 });
 

@@ -5433,6 +5433,14 @@ em-emoji-picker {
         padding-left: calc(1.6 * var(--kg-rem, 0.625rem));
         padding-right: calc(1.6 * var(--kg-rem, 0.625rem));
     }
+
+    .koenig-lexical :is(.peer:hover ~ .sm\:peer-hover\:hidden) {
+        display: none;
+    }
+
+    .koenig-lexical :is(.peer:focus-visible ~ .sm\:peer-focus-visible\:hidden) {
+        display: none;
+    }
 }
 
 @media (min-width: 768px) {

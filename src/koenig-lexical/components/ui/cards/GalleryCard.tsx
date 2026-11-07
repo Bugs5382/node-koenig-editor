@@ -32,16 +32,6 @@ function ChevronIcon({className, up}) {
     );
 }
 
-// The positions 0..count-1 with `first` in front and the rest in a random order
-function shuffledOrder(count, first) {
-    const rest = Array.from({length: count}, (_, position) => position).filter(position => position !== first);
-    for (let i = rest.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [rest[i], rest[j]] = [rest[j], rest[i]];
-    }
-    return [first, ...rest];
-}
-
 function GalleryRow({index, images, deleteImage, isDragging, isSelected, listIndexOf, total, moveImage, text, announce, openViewer, readOnly, updateImageText, strings, unescapeHtml}) {
     const GalleryImages = images.map((image, idx) => {
         const position =
@@ -237,8 +227,7 @@ function PopulatedGalleryCard({slideshow, images, deleteImage, reorderHandler, i
     const text = useGalleryText(images, withText);
     const [announcement, announce] = React.useState('');
     const [viewing, setViewing] = React.useState(null);
-    // With a random order the viewer plays the photos shuffled, starting with the one opened
-    const openViewer = (index, opener) => setViewing({pos: slideshow.shuffle ? 0 : index, opener, order: slideshow.shuffle ? shuffledOrder(images.length, index) : null});
+    const openViewer = (index, opener) => setViewing({pos: index, opener});
     const noOfImages = images.length;
 
     // 3 images per row unless last row would have a single image in which
@@ -299,7 +288,8 @@ function PopulatedGalleryCard({slideshow, images, deleteImage, reorderHandler, i
                     index={viewing.pos}
                     isCollapsed={text.isCollapsed}
                     opener={viewing.opener}
-                    photos={viewing.order ? viewing.order.map(position => images[position]).filter(Boolean) : images}
+                    photos={images}
+                    shuffle={slideshow.shuffle}
                     screenMode={slideshow.screenMode}
                     strings={strings}
                     toggleText={text.toggleImage}

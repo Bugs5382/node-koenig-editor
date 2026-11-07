@@ -61,6 +61,8 @@ export interface ViewerStrings {
 export const CONTROLS_HIDE_AFTER = 3000;
 
 interface GalleryViewerProps {
+  /** Auto-advance jumps to a random photo that is not the current one, none twice until all have shown. */
+  shuffle?: boolean;
   /** Seconds between photos; 0 or none is off. The last photo goes back to the first. */
   autoplaySeconds?: number;
   /** The thumbnail strip is not shown and the controls hide themselves when nothing is touched. */
@@ -160,6 +162,7 @@ export const GalleryViewer = ({
   strings,
   toggleText,
   unescape,
+  shuffle = false,
 }: GalleryViewerProps) => {
   const stripRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -175,6 +178,8 @@ export const GalleryViewer = ({
   const autoplay = autoplaySeconds > 0 && photos.length > 1;
   const [playing, setPlaying] = useState(true);
   const [hidden, setHidden] = useState(false);
+  // photos already shown in this pass of a random auto-advance
+  const shown = useRef<Set<number>>(new Set());
   const onIndexRef = useRef(onIndexChange);
   onIndexRef.current = onIndexChange;
   const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -190,16 +195,29 @@ export const GalleryViewer = ({
     return () => clearTimeout(hideTimer.current);
   }, [reveal]);
 
+  // every photo that gets on screen counts as shown in this pass, however it got there
+  useEffect(() => {
+    shown.current.add(index);
+  }, [index]);
+
   // Auto-advance: the next photo after the set seconds, starting over after the last. A move by
   // hand starts the wait again.
   useEffect(() => {
     if (!autoplay || !playing) return undefined;
-    const timer = setTimeout(
-      () => onIndexRef.current(index >= photos.length - 1 ? 0 : index + 1),
-      autoplaySeconds * 1000,
-    );
+    const timer = setTimeout(() => {
+      if (!shuffle) {
+        onIndexRef.current(index >= photos.length - 1 ? 0 : index + 1);
+        return;
+      }
+      let pool = photos.map((_, position) => position).filter((p) => !shown.current.has(p));
+      if (pool.length === 0) {
+        shown.current = new Set();
+        pool = photos.map((_, position) => position).filter((p) => p !== index);
+      }
+      onIndexRef.current(pool[Math.floor(Math.random() * pool.length)] ?? 0);
+    }, autoplaySeconds * 1000);
     return () => clearTimeout(timer);
-  }, [autoplay, autoplaySeconds, index, photos.length, playing]);
+  }, [autoplay, autoplaySeconds, index, photos.length, playing, shuffle]);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -374,8 +392,10 @@ export const GalleryViewer = ({
                 {strings.viewerClose}
               </span>
             </button>
+            {/* from the small breakpoint up the button shows "Exit full screen" itself, so a tooltip
+                repeating it would be a second exit notice; below it the button is an icon only */}
             <Tip
-              className="right-0 top-full mt-2"
+              className="right-0 top-full mt-2 sm:peer-hover:hidden sm:peer-focus-visible:hidden"
               hint={strings.viewerCloseHint}
               id={closeTipId}
               label={strings.viewerClose}
