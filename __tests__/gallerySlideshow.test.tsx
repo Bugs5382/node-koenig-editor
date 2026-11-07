@@ -204,20 +204,111 @@ describe("random order", () => {
   };
   const photoNumber = () => Number(shownSrc()?.split("#").pop());
 
-  it("keeps the strip and the counter in the set order, and Next and Previous in that order", async () => {
-    await load({ shuffle: true }, {}, 6);
+  const thumbs = () =>
+    [...(viewer()?.querySelectorAll("[data-gallery-viewer-thumb]") ?? [])] as HTMLElement[];
+  const withRandom = (extra = {}) => ({ autoplaySeconds: 5, shuffle: true, ...extra });
+
+  it("keeps the strip and the counter in the set order, the counter being the photo's own number", async () => {
+    await load(withRandom(), {}, 6);
     await openViewer();
     const strip = [...(viewer()?.querySelectorAll("[data-gallery-viewer-thumbs] img") ?? [])].map(
       (img) => (img.getAttribute("src") ?? "").split("#").pop(),
     );
     expect(strip).toEqual(["0", "1", "2", "3", "4", "5"]);
-    for (let n = 1; n < 6; n++) {
+    for (let n = 0; n < 8; n++) {
+      expect(counter()).toBe(`${photoNumber() + 1} of 6`);
       await key("ArrowRight");
-      expect(counter()).toBe(`${n + 1} of 6`);
-      expect(photoNumber()).toBe(n);
     }
+  });
+
+  it("makes Next follow the shuffled pass: every photo once, then a new pass that does not start where the last ended", async () => {
+    await load(withRandom(), {}, 10);
+    await openViewer();
+    const sequence = [photoNumber()];
+    for (let step = 1; step < 30; step++) {
+      await key("ArrowRight");
+      sequence.push(photoNumber());
+    }
+    for (let pass = 0; pass < 3; pass++) {
+      expect(new Set(sequence.slice(pass * 10, pass * 10 + 10)).size).toBe(10);
+    }
+    for (let n = 1; n < sequence.length; n++) expect(sequence[n]).not.toBe(sequence[n - 1]);
+    expect(sequence.slice(0, 10).join()).not.toBe("0,1,2,3,4,5,6,7,8,9");
+  });
+
+  it("makes Previous go back along the same pass", async () => {
+    await load(withRandom(), {}, 10);
+    await openViewer();
+    const forward = [photoNumber()];
+    for (let step = 0; step < 6; step++) {
+      await key("ArrowRight");
+      forward.push(photoNumber());
+    }
+    const back: number[] = [];
+    for (let step = 0; step < 6; step++) {
+      await key("ArrowLeft");
+      back.push(photoNumber());
+    }
+    expect(back).toEqual(forward.slice(0, 6).reverse());
+    // and Next walks the same way again
     await key("ArrowRight");
-    expect(counter()).toBe("1 of 6");
+    expect(photoNumber()).toBe(forward[1]);
+  });
+
+  it("uses the buttons the same way as the keys", async () => {
+    await load(withRandom(), {}, 6);
+    await openViewer();
+    const first = photoNumber();
+    await act(async () => {
+      fireEvent.click(viewer()?.querySelector("[data-gallery-viewer-next]") as Element);
+    });
+    const second = photoNumber();
+    expect(second).not.toBe(first);
+    await act(async () => {
+      fireEvent.click(viewer()?.querySelector("[data-gallery-viewer-prev]") as Element);
+    });
+    expect(photoNumber()).toBe(first);
+  });
+
+  it("jumps to a thumbnail that was clicked and counts it as shown", async () => {
+    await load(withRandom(), {}, 5);
+    await openViewer();
+    const seen = [photoNumber()];
+    const target = [0, 1, 2, 3, 4].find((n) => n !== seen[0]) as number;
+    await act(async () => {
+      fireEvent.click(thumbs()[target] as Element);
+    });
+    expect(photoNumber()).toBe(target);
+    seen.push(target);
+    for (let step = 0; step < 3; step++) {
+      await key("ArrowRight");
+      seen.push(photoNumber());
+    }
+    expect(new Set(seen).size).toBe(5);
+  });
+
+  it("uses the same sequence for the timer and for Next", async () => {
+    await load(withRandom(), {}, 6);
+    await openViewer();
+    const seen = [photoNumber()];
+    await tick(5100);
+    seen.push(photoNumber());
+    await key("ArrowRight");
+    seen.push(photoNumber());
+    await tick(5100);
+    seen.push(photoNumber());
+    expect(new Set(seen).size).toBe(4);
+  });
+
+  it("keeps Next and Previous in the set order when random order is off or the slideshow is", async () => {
+    await load({ shuffle: true }, {}, 4); // no auto-advance: random order does nothing
+    await openViewer();
+    const seen = [photoNumber()];
+    for (let step = 0; step < 3; step++) {
+      await key("ArrowRight");
+      seen.push(photoNumber());
+    }
+    expect(seen).toEqual([0, 1, 2, 3]);
   });
 
   it.each([2, 10])(
@@ -251,17 +342,6 @@ describe("random order", () => {
     await openViewer();
     await tick(20000);
     expect(counter()).toBe("1 of 1");
-  });
-
-  it("counts a photo reached by hand as shown", async () => {
-    await load({ autoplaySeconds: 5, shuffle: true }, {}, 4);
-    await openViewer();
-    await key("ArrowRight");
-    await key("ArrowRight");
-    const shown = [0, 1, 2];
-    await tick(5100);
-    expect(shown).not.toContain(photoNumber());
-    expect(photoNumber()).toBe(3);
   });
 
   it("keeps the set order in the auto-advance when it is off", async () => {
@@ -363,6 +443,52 @@ describe("the normal viewer", () => {
     expect(viewer()?.getAttribute("data-gallery-viewer-controls")).toBe("shown");
     expect(bar.className).not.toMatch(/(^|\s)(invisible|opacity-0)(\s|$)/);
     expect(viewer()?.querySelector("[data-gallery-viewer-close]")).not.toBeNull();
+  });
+});
+
+describe("which settings depend on which", () => {
+  const select = async (extra: Record<string, unknown> = {}) => {
+    await mount({ composer: { initialEditorState: galleryDocument(extra, 3) } });
+    await act(async () => {
+      fireEvent.click(document.querySelector("[data-kg-card='gallery']") as HTMLElement);
+    });
+    await waitFor(() =>
+      expect(document.querySelector("[data-gallery-autoplay-toggle]")).not.toBeNull(),
+    );
+  };
+  const el = (name: string) => document.querySelector(`[data-gallery-${name}]`) as HTMLElement;
+
+  it("disables Random order, with the reason, while auto-advance is off, and turns it on with auto-advance", async () => {
+    await select();
+    const shuffle = el("shuffle-toggle") as HTMLButtonElement;
+    expect(shuffle.disabled).toBe(true);
+    expect(shuffle.title).toBe("Needs auto-advance");
+    expect(el("shuffle-reason")?.textContent).toBe("Needs auto-advance");
+    await act(async () => {
+      fireEvent.click(el("autoplay-toggle"));
+    });
+    expect((el("shuffle-toggle") as HTMLButtonElement).disabled).toBe(false);
+    expect(el("shuffle-reason")).toBeNull();
+    await act(async () => {
+      fireEvent.click(el("shuffle-toggle"));
+    });
+    expect(el("shuffle-toggle").getAttribute("aria-pressed")).toBe("true");
+    await act(async () => {
+      fireEvent.click(el("autoplay-toggle"));
+    });
+    // switched off again: disabled once more, and the choice is kept for next time
+    expect((el("shuffle-toggle") as HTMLButtonElement).disabled).toBe(true);
+    expect(el("shuffle-toggle").getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("keeps the seconds box tied to auto-advance and Screen mode independent of it", async () => {
+    await select();
+    expect((el("autoplay-seconds") as HTMLInputElement).disabled).toBe(true);
+    expect((el("screen-mode-toggle") as HTMLButtonElement).disabled).toBe(false);
+    await act(async () => {
+      fireEvent.click(el("autoplay-toggle"));
+    });
+    expect((el("autoplay-seconds") as HTMLInputElement).disabled).toBe(false);
   });
 });
 

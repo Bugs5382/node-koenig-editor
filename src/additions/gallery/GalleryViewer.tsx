@@ -61,7 +61,7 @@ export interface ViewerStrings {
 export const CONTROLS_HIDE_AFTER = 3000;
 
 interface GalleryViewerProps {
-  /** Auto-advance jumps to a random photo that is not the current one, none twice until all have shown. */
+  /** Next, Previous and the auto-advance follow a random pass: every photo once, then a new pass. */
   shuffle?: boolean;
   /** Seconds between photos; 0 or none is off. The last photo goes back to the first. */
   autoplaySeconds?: number;
@@ -178,8 +178,10 @@ export const GalleryViewer = ({
   const autoplay = autoplaySeconds > 0 && photos.length > 1;
   const [playing, setPlaying] = useState(true);
   const [hidden, setHidden] = useState(false);
-  // photos already shown in this pass of a random auto-advance
-  const shown = useRef<Set<number>>(new Set());
+  // The random pass: every photo once in a shuffled order, and where in it the viewer is. Next and
+  // Previous (and the timer) walk it; a new pass starts when the last one is used up.
+  const pass = useRef<{ cursor: number; order: number[] } | null>(null);
+  const moveRef = useRef<(direction: number) => void>(() => undefined);
   const onIndexRef = useRef(onIndexChange);
   onIndexRef.current = onIndexChange;
   const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -195,29 +197,13 @@ export const GalleryViewer = ({
     return () => clearTimeout(hideTimer.current);
   }, [reveal]);
 
-  // every photo that gets on screen counts as shown in this pass, however it got there
-  useEffect(() => {
-    shown.current.add(index);
-  }, [index]);
-
   // Auto-advance: the next photo after the set seconds, starting over after the last. A move by
   // hand starts the wait again.
   useEffect(() => {
     if (!autoplay || !playing) return undefined;
-    const timer = setTimeout(() => {
-      if (!shuffle) {
-        onIndexRef.current(index >= photos.length - 1 ? 0 : index + 1);
-        return;
-      }
-      let pool = photos.map((_, position) => position).filter((p) => !shown.current.has(p));
-      if (pool.length === 0) {
-        shown.current = new Set();
-        pool = photos.map((_, position) => position).filter((p) => p !== index);
-      }
-      onIndexRef.current(pool[Math.floor(Math.random() * pool.length)] ?? 0);
-    }, autoplaySeconds * 1000);
+    const timer = setTimeout(() => moveRef.current(1), autoplaySeconds * 1000);
     return () => clearTimeout(timer);
-  }, [autoplay, autoplaySeconds, index, photos.length, playing, shuffle]);
+  }, [autoplay, autoplaySeconds, index, photos.length, playing]);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -246,6 +232,65 @@ export const GalleryViewer = ({
 
   // Past the last photo is the first, and before the first is the last, by hand and by the timer
   const go = (next: number) => onIndexChange(next > last ? 0 : next < 0 ? last : next);
+
+  // A pass through all the photos in a random order; `first` leads it (a new pass never starts
+  // with `avoid`, the photo that is on screen).
+  const makePass = (first: number | null, avoid: number | null) => {
+    const all = photos.map((_, position) => position);
+    const rest = all.filter((position) => position !== first);
+    for (let i = rest.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [rest[i], rest[j]] = [rest[j] as number, rest[i] as number];
+    }
+    if (first === null && rest.length > 1 && rest[0] === avoid) {
+      [rest[0], rest[1]] = [rest[1] as number, rest[0] as number];
+    }
+    return { cursor: 0, order: first === null ? rest : [first, ...rest] };
+  };
+  const current = () => {
+    const now = pass.current;
+    if (!now || now.order.length !== photos.length || now.order[now.cursor] !== index) {
+      pass.current = makePass(index, null);
+    }
+    return pass.current as { cursor: number; order: number[] };
+  };
+
+  // Next (1) and Previous (-1): in the set order, or along the random pass when it is on
+  const move = (direction: number) => {
+    if (!shuffle || photos.length < 2) {
+      go(index + direction);
+      return;
+    }
+    const now = current();
+    if (direction > 0 && now.cursor >= now.order.length - 1) {
+      pass.current = makePass(null, index);
+    } else {
+      now.cursor =
+        direction > 0 ? now.cursor + 1 : now.cursor > 0 ? now.cursor - 1 : now.order.length - 1;
+    }
+    onIndexChange(
+      (pass.current as { order: number[]; cursor: number }).order[
+        (pass.current as { cursor: number }).cursor
+      ] as number,
+    );
+  };
+  moveRef.current = move;
+  // A thumbnail, Home or End: straight there. In a random pass the photo counts as shown, so it is
+  // not shown again before the pass ends.
+  const jump = (position: number) => {
+    if (shuffle && photos.length > 1) {
+      const now = current();
+      const at = now.order.indexOf(position);
+      if (at > now.cursor) {
+        now.order.splice(at, 1);
+        now.order.splice(now.cursor + 1, 0, position);
+        now.cursor += 1;
+      } else if (at >= 0) {
+        now.cursor = at;
+      }
+    }
+    onIndexChange(position);
+  };
   const close = () => {
     onClose();
   };
@@ -269,19 +314,19 @@ export const GalleryViewer = ({
         return;
       case "ArrowLeft":
         event.preventDefault();
-        go(index - 1);
+        move(-1);
         return;
       case "ArrowRight":
         event.preventDefault();
-        go(index + 1);
+        move(1);
         return;
       case "Home":
         event.preventDefault();
-        go(0);
+        jump(0);
         return;
       case "End":
         event.preventDefault();
-        go(last);
+        jump(last);
         return;
       case "Tab": {
         const stops = [...event.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE)];
@@ -314,7 +359,7 @@ export const GalleryViewer = ({
     const dy = touch.clientY - start.y;
     // a mostly sideways drag of a real length
     if (Math.abs(dx) < SWIPE_DISTANCE || Math.abs(dy) > Math.abs(dx) * 0.6) return;
-    go(dx < 0 ? index + 1 : index - 1);
+    move(dx < 0 ? 1 : -1);
   };
 
   const hasText = Boolean(photo.title || photo.caption);
@@ -418,7 +463,7 @@ export const GalleryViewer = ({
             data-gallery-viewer-prev
             disabled={photos.length < 2}
             type="button"
-            onClick={() => go(index - 1)}
+            onClick={() => move(-1)}
           >
             <Chevron left />
           </button>
@@ -454,7 +499,7 @@ export const GalleryViewer = ({
             data-gallery-viewer-next
             disabled={photos.length < 2}
             type="button"
-            onClick={() => go(index + 1)}
+            onClick={() => move(1)}
           >
             <Chevron />
           </button>
@@ -532,7 +577,7 @@ export const GalleryViewer = ({
                 }`}
                 data-gallery-viewer-thumb
                 type="button"
-                onClick={() => onIndexChange(position)}
+                onClick={() => jump(position)}
               >
                 <img
                   alt=""

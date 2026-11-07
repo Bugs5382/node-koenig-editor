@@ -500,6 +500,7 @@ export interface KoenigStrings {
     autoAdvanceSeconds: string;
     screenModeLabel: string;
     shuffleLabel: string;
+    shuffleNeedsAutoAdvance: string;
     slideshowLabel: string;
     viewerPause: string;
     viewerPlay: string;
@@ -857,7 +858,7 @@ export interface KoenigGallerySlideshow {
    *  themselves after a few seconds without input. Any key, a tap or a mouse move brings them
    *  back, and Escape shows them before a second Escape closes the viewer. */
   screenMode: boolean;
-  /** The automatic advance jumps to a random photo, every photo once before any repeats. The viewer keeps the set order. */
+  /** Next, Previous and the automatic advance follow a random pass, every photo once before any repeats. The strip and the counter keep the set order. Needs auto-advance. */
   shuffle: boolean;
 }
 
