@@ -53,6 +53,9 @@ to embed a picture that is already online.
 - A link on the picture.
 - Width: regular, wide or full. (Animated GIFs stay as they are and have no width choice.)
 - Before upload, the **image editor** opens to crop and rotate a single picture you add.
+- A **figure label**: select the card and choose "Figure label" to add a label such as "Figure", an
+  automatic number, a title and a position above or below the picture ("Figure 2: Sunrise"). Numbers
+  follow the reading order. In the saved HTML it is the figure's `figcaption`.
 
 **Keyboard:** select the card; its alt text and caption fields are on the card, and Ctrl+Enter (Cmd+Enter on a Mac) opens or closes its settings.
 **Accessibility:** write alt text for every picture that carries meaning. Leave it empty only for
@@ -70,10 +73,10 @@ pictures that are pure decoration.
   below the number of pictures it already holds. The card shows "9 of 50".
 - Each picture has a title, a caption and alt text (open them from the picture's icon).
 - A caption for the whole gallery.
+- The same optional **figure label** as an image ("Figure 3: Harbour at dusk").
 - Drag pictures to reorder them.
 - A **full-screen viewer** (button on the gallery and on each picture): Left and Right (or swipe)
   move between pictures, Home and End jump to the first and last, Escape closes.
-
 **Keyboard:** Tab onto a picture, then **Alt+Left** or **Alt+Right** moves it one place. A
 spoken message says where it went. A picture text can be collapsed; screen readers still read it.
 **Accessibility:** alt text for every picture; the viewer is a dialog that keeps focus inside and
@@ -132,7 +135,9 @@ you press the header's arrow.
 **What it can do:** while the cursor is in a table, a toolbar above it (or a right-click on a cell)
 adds, moves and deletes rows and columns, turns the header row and header column on and off, merges
 a selected range of cells and splits them again, shades cells, aligns text across and down, sets a
-column's width and gives the table a caption. Drag across cells to select a range, or use Select
+column's width and height (type a size, drag a border, double-click a border to fit the text, or use
+Alt with the arrow keys on a selected row or column), draws borders, drags rows and columns to a new
+place and gives the table a caption with an optional label and automatic number ("Table 1: ..."). Drag across cells to select a range, or use Select
 row, Select column or Select table, and the shading and alignment apply to all of it. Paste cells
 copied from a spreadsheet and they fill the table, adding the rows and columns they need.
 **How it looks:** the grid is drawn dashed while you write, so an empty table shows where to type,
