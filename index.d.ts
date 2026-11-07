@@ -188,8 +188,6 @@ export interface KoenigStrings {
     /** Names the selection toolbar for screen readers. */
     group: string;
   };
-  /** The table card's controls; `toolbar` names the group for screen readers. The two announcements
-   *  take `{row}`, `{rows}`, `{column}`, `{columns}`, `{rowSpan}` and `{colSpan}`. */
   find: {
     close: string;
     find: string;
@@ -224,6 +222,21 @@ export interface KoenigStrings {
     noHighlight: string;
     sizes: Record<"large" | "larger" | "normal" | "small" | "smaller", string>;
   };
+  figure: {
+    above: string;
+    below: string;
+    button: string;
+    done: string;
+    label: string;
+    labelPlaceholder: string;
+    numbered: string;
+    position: string;
+    remove: string;
+    title: string;
+    titlePlaceholder: string;
+  };
+  /** The table card's controls; `toolbar` names the group for screen readers. The two announcements
+   *  take `{row}`, `{rows}`, `{column}`, `{columns}`, `{rowSpan}` and `{colSpan}`. */
   table: {
     addColumnLeft: string;
     addColumnRight: string;
@@ -242,6 +255,46 @@ export interface KoenigStrings {
     alignMiddle: string;
     alignRight: string;
     alignTop: string;
+    bordersMenu: string;
+    bordersApplyTo: string;
+    bordersScopeCell: string;
+    bordersScopeRow: string;
+    bordersScopeColumn: string;
+    bordersScopeTable: string;
+    bordersLines: string;
+    bordersLinesAll: string;
+    bordersLinesOuter: string;
+    bordersLinesInner: string;
+    bordersStyle: string;
+    bordersStyleNone: string;
+    bordersStyleSolid: string;
+    bordersStyleDashed: string;
+    bordersStyleDotted: string;
+    bordersThickness: string;
+    bordersThin: string;
+    bordersMedium: string;
+    bordersThick: string;
+    bordersColour: string;
+    bordersColourDefault: string;
+    bordersColourInk: string;
+    bordersColourGrey: string;
+    bordersApply: string;
+    bordersReset: string;
+    dragRow: string;
+    dragRowHint: string;
+    dragColumn: string;
+    dragColumnHint: string;
+    rowMovedStatus: string;
+    columnMovedStatus: string;
+    sizeMenu: string;
+    sizeDone: string;
+    columnWidthLabel: string;
+    rowHeightLabel: string;
+    tableWidthLabel: string;
+    tableWidthFull: string;
+    tableWidthFit: string;
+    tableWidthFixed: string;
+    equalColumns: string;
     caption: string;
     captionDone: string;
     captionLabel: string;
@@ -276,6 +329,8 @@ export interface KoenigStrings {
     widthNarrow: string;
     widthWide: string;
     /** Names of the cell colours, by their key. */
+    columnWidthStatus: string;
+    rowHeightStatus: string;
     colours: Record<
       "blue" | "green" | "grey" | "orange" | "pink" | "purple" | "red" | "yellow",
       string

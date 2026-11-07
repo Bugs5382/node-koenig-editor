@@ -185,6 +185,30 @@ em-emoji-picker {
     border: 1px var(--kg-table-border-style, solid) var(--kg-table-border-color, var(--grey-700));
 }
 
+/* A table wider than its column scrolls sideways inside this box, not the page. */
+.koenig-lexical .kg-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Size. A table the author has resized lets its columns go down to the smallest size the editor
+   allows; the width mode is fill the column (default), as narrow as the content, or the columns'
+   total width. A table wider than its column scrolls inside its own box. */
+.koenig-lexical table[data-kg-sized] tr td,
+.koenig-lexical table[data-kg-sized] tr th {
+    min-width: 40px;
+    overflow-wrap: anywhere;
+}
+
+.koenig-lexical table[data-kg-table-width="fixed"] {
+    max-width: none;
+    table-layout: fixed;
+}
+
+.koenig-lexical table[data-kg-table-width="fit"] {
+    width: auto;
+}
+
 /* While editing, the grid is drawn dashed so an empty table reads as a place to write. */
 .koenig-lexical [contenteditable="true"] table tr td,
 .koenig-lexical [contenteditable="true"] table tr th {
@@ -207,6 +231,10 @@ em-emoji-picker {
 
 /* The caption is the table's own text, drawn under it from an attribute (the editor cannot add a
    child element to the table; the exported HTML has a real caption element). */
+.koenig-lexical table[data-kg-caption][data-kg-caption-above]::after {
+    caption-side: top;
+}
+
 .koenig-lexical table[data-kg-caption]::after {
     content: attr(data-kg-caption);
     display: table-caption;

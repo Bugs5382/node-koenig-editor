@@ -313,8 +313,24 @@ right-click menu with the same actions) edits it:
   range. The selection toolbar offers the same for text selected in a cell, applied to this cell, the
   row, the column or the table.
 - **Width**: automatic, narrow, medium or wide for the cell's column.
-- **Caption**: a line under the table. It is stored on the table, moves with it, is the table's
-  accessible name in the editor, and is a real `caption` element in the saved HTML.
+- **Size**: the width of the cursor's column and the height of its row in pixels (never narrower than
+  40 or shorter than 24), how wide the table is (fill the column, fit its content, or the total of its
+  columns), and a button that makes the columns equal again. You can also drag the right border of a
+  column or the bottom border of a row (a tip shows the size), double-click a column border to fit the
+  column to its text, or select a row or column and press **Alt** with the arrow keys (10 pixels, 40
+  with Shift). Column widths are saved as shares of the whole table and row heights as minimum
+  heights, so the table looks the same in Preview, in print and in the saved HTML; a table wider than
+  its column scrolls sideways inside its own box.
+- **Borders**: none, solid, dashed or dotted lines, thin, medium or thick, in a colour from the
+  palette, on the outer lines, the inner lines or all lines of a cell, selected range, row, column or
+  the whole table. A line two cells share is written on both. They are saved on the cell and written
+  into the saved HTML, and "Remove borders" goes back to the table's default lines.
+- **Caption**: the figure entry (see below) for the table: a label such as "Table", an automatic
+  number, a title, above or below. The text is the table's accessible name in the editor and a real
+  `caption` element in the saved HTML.
+- **Drag a row or column**: a grip at the left of the cursor's row and above its column moves it; a
+  line shows where it will land. Move up, down, left and right in the menu do the same from the
+  keyboard.
 - Drag across cells, or use Shift with the arrow keys, to select a range; pasting text from a
   spreadsheet (tabs and line breaks) fills the cells from the cursor and adds the rows and columns it
   needs. A table in the pasted HTML is ignored, so one is never nested in a cell.
@@ -356,6 +372,16 @@ The table, its rows and cells carry the classes `kg-table`, `kg-table-row`, `kg-
 in has `data-kg-active-cell`. The saved HTML is a plain `table`: to show it with the same look on
 your own page, wrap it in an element with the class `koenig-lexical` (the stylesheet is scoped to
 it), or copy the border and header rules from the tokens above.
+
+### Figure label (tables, images and galleries)
+
+One optional entry gives a table, an image card or a gallery card a **label**, an **automatic number**,
+a **title** and a position, **above** or **below**: "Table 1: Quarterly totals". Numbers count the
+figures with the same label in reading order and can be switched off per entry. On a table it is the
+caption; on an image or gallery card it shows as a line next to the picture (select the card and use
+"Figure label"). It is saved with the node, and in the saved HTML it becomes the table's `caption` or
+the figure's `figcaption` (a card that already has an author caption keeps it, with the entry as its
+own line before it). Its wording is `strings.figure`.
 
 ## 🖼️ Gallery and header cards
 

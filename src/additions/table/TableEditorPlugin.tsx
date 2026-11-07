@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $findMatchingParent } from "@lexical/utils";
-import { $isTableCellNode, $isTableSelection } from "@lexical/table";
+import { $isTableCellNode, $isTableSelection, type TableRowNode } from "@lexical/table";
 import {
   $getNearestNodeFromDOMNode,
   $getSelection,
@@ -39,6 +39,8 @@ import {
   useState,
 } from "react";
 
+import { FigureEntry } from "../figure/FigureEntry";
+import type { Figure } from "../figure/figure";
 import { useKoenigStrings } from "../options";
 import { AnchoredMenu } from "../placement/AnchoredMenu";
 import { FloatingPortal } from "../placement/FloatingPortal";
@@ -48,13 +50,38 @@ import {
   $readTableState,
   $runTableAction,
   $setCellColor,
-  $setTableCaption,
+  $cellsInScope,
+  $getTableFigure,
+  $setTableFigure,
+  TABLE_CELL_INK,
   TABLE_COLORS,
   TABLE_GROUPS,
+  TABLE_SCOPES,
   type TableActionId,
   type TableGroupId,
+  type TableScope,
 } from "./tableActions";
+import {
+  $applyBorders,
+  BORDER_STYLES,
+  BORDER_WIDTHS,
+  type BorderStyle,
+  type BorderWhere,
+  type BorderWidth,
+} from "./tableBorders";
 import { useTableCaptions } from "./tableCaption";
+import {
+  $equalColumns,
+  $getTableWidthMode,
+  $setColumnWidths,
+  $setRowHeight,
+  $setTableWidthMode,
+  DEFAULT_COLUMN_WIDTH,
+  measureWidths,
+  MIN_COLUMN_WIDTH,
+  MIN_ROW_HEIGHT,
+  type TableWidthMode,
+} from "./tableResize";
 
 // The table editor's controls: a toolbar above the table whose buttons open menus (row, column,
 // cell, colour, alignment, width, caption), and the same actions in a right-click menu. Both are
@@ -63,10 +90,11 @@ import { useTableCaptions } from "./tableCaption";
 
 interface Snapshot {
   align: string;
-  caption: string;
+  figure: Figure | null;
   cellKey: string;
   color: string | null;
   colSpan: number;
+  columnWidth: number | null;
   column: number;
   columns: number;
   enabled: Partial<Record<TableActionId, boolean>>;
@@ -74,10 +102,12 @@ interface Snapshot {
   headerRow: boolean;
   isRange: boolean;
   row: number;
+  rowHeight: number | null;
   rowSpan: number;
   rows: number;
   tableKey: string;
   verticalAlign: string;
+  widthMode: TableWidthMode;
 }
 
 const ALL_ACTIONS = TABLE_GROUPS.flatMap((group) => group.actions);
@@ -90,10 +120,11 @@ const $snapshot = (): Snapshot | null => {
   for (const id of ALL_ACTIONS) enabled[id] = $isTableActionEnabled(id, state);
   return {
     align: state.align,
-    caption: state.caption,
+    figure: $getTableFigure(state.table),
     cellKey: cell.getKey(),
     color: state.color === "mixed" ? null : state.color,
     colSpan: cell.getColSpan(),
+    columnWidth: state.table.getColWidths()?.[state.column] ?? null,
     column: state.column,
     columns: state.columns,
     enabled,
@@ -101,10 +132,12 @@ const $snapshot = (): Snapshot | null => {
     headerRow: state.headerRow,
     isRange: state.isRange,
     row: state.row,
+    rowHeight: (state.table.getChildAtIndex(state.row) as TableRowNode | null)?.getHeight() ?? null,
     rowSpan: cell.getRowSpan(),
     rows: state.rows,
     tableKey: state.table.getKey(),
     verticalAlign: state.verticalAlign,
+    widthMode: $getTableWidthMode(state.table),
   };
 };
 
@@ -146,7 +179,7 @@ const labelOf = (id: TableActionId, t: Strings): string =>
 const fill = (template: string, values: Record<string, number>) =>
   template.replaceAll(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ""));
 
-type MenuGroup = TableGroupId | "caption" | "colour";
+type MenuGroup = TableGroupId | "borders" | "caption" | "colour" | "size";
 
 const TOOLBAR: readonly MenuGroup[] = [
   "row",
@@ -155,6 +188,8 @@ const TOOLBAR: readonly MenuGroup[] = [
   "colour",
   "align",
   "width",
+  "size",
+  "borders",
   "caption",
   "table",
 ];
@@ -280,6 +315,12 @@ export const TableEditorPlugin = () => {
 
   const focusEditor = useCallback(() => {
     editor.focus();
+    // a menu that closes took the focus with it when React removed it, after the call above: put
+    // the focus back once it is gone, so the next key (an arrow, Alt with an arrow) reaches the table
+    requestAnimationFrame(() => {
+      const root = editor.getRootElement();
+      if (root && !root.contains(document.activeElement)) root.focus({ preventScroll: true });
+    });
   }, [editor]);
 
   const closeAll = useCallback(() => {
@@ -402,6 +443,46 @@ export const TableEditorPlugin = () => {
           });
           continue;
         }
+        if (group === "borders") {
+          sections.push({
+            items: [
+              {
+                id: "borders",
+                label: t.bordersMenu,
+                onSelect: () => {
+                  frozen.current = true;
+                  setContext(null);
+                  setOpen((current) => ({
+                    group: "borders",
+                    left: current?.left ?? 16,
+                    top: current?.top ?? 60,
+                  }));
+                },
+              },
+            ],
+          });
+          continue;
+        }
+        if (group === "size") {
+          sections.push({
+            items: [
+              {
+                id: "size",
+                label: t.sizeMenu,
+                onSelect: () => {
+                  frozen.current = true;
+                  setContext(null);
+                  setOpen((current) => ({
+                    group: "size",
+                    left: current?.left ?? 16,
+                    top: current?.top ?? 60,
+                  }));
+                },
+              },
+            ],
+          });
+          continue;
+        }
         if (group === "caption") {
           sections.push({
             items: [
@@ -473,11 +554,13 @@ export const TableEditorPlugin = () => {
   const groupLabel = (group: MenuGroup): string =>
     ({
       align: t.alignMenu,
+      borders: t.bordersMenu,
       caption: t.caption,
       cell: t.cellMenu,
       colour: t.colourMenu,
       column: t.columnMenu,
       row: t.rowMenu,
+      size: t.sizeMenu,
       table: t.deleteTable,
       width: t.widthMenu,
     })[group];
@@ -522,7 +605,13 @@ export const TableEditorPlugin = () => {
             <button
               key={group}
               aria-expanded={direct ? undefined : open?.group === group}
-              aria-haspopup={direct ? undefined : group === "caption" ? "dialog" : "menu"}
+              aria-haspopup={
+                direct
+                  ? undefined
+                  : group === "caption" || group === "size" || group === "borders"
+                    ? "dialog"
+                    : "menu"
+              }
               aria-label={groupLabel(group)}
               className="flex h-8 cursor-pointer items-center justify-center rounded-md px-2 text-[1.2rem] font-medium hover:bg-grey-200/80 focus-visible:ring-2 focus-visible:ring-selection dark:hover:bg-grey-900 forced-colors:focus-visible:outline forced-colors:focus-visible:outline-2"
               data-kg-table-action={direct ? "delete-table" : undefined}
@@ -558,7 +647,11 @@ export const TableEditorPlugin = () => {
           );
         })}
       </div>
-      {open && open.group !== "caption" && open.group !== "table" ? (
+      {open &&
+      open.group !== "borders" &&
+      open.group !== "caption" &&
+      open.group !== "size" &&
+      open.group !== "table" ? (
         <PointMenu at={open}>
           <TableActionMenu
             label={groupLabel(open.group)}
@@ -570,18 +663,81 @@ export const TableEditorPlugin = () => {
           />
         </PointMenu>
       ) : null}
-      {open?.group === "caption" ? (
+      {open?.group === "borders" ? (
         <PointMenu at={open}>
-          <CaptionField
-            caption={snapshot.caption}
+          <BorderFields
+            onApply={(values) =>
+              run(() => {
+                const state = $readTableState();
+                if (!state) return;
+                $applyBorders(
+                  state.table,
+                  $cellsInScope(state, values.scope),
+                  values.where,
+                  values.reset
+                    ? null
+                    : { color: values.color, style: values.style, width: values.width },
+                );
+              })
+            }
             onClose={() => {
               closeAll();
               focusEditor();
             }}
-            onCommit={(text) =>
+          />
+        </PointMenu>
+      ) : null}
+      {open?.group === "size" ? (
+        <PointMenu at={open}>
+          <SizeField
+            snapshot={snapshot}
+            onClose={() => {
+              closeAll();
+              focusEditor();
+            }}
+            onCommit={(values) =>
               run(() => {
                 const state = $readTableState();
-                if (state) $setTableCaption(state.table, text);
+                if (!state) return;
+                const { table } = state;
+                if (values.mode !== $getTableWidthMode(table))
+                  $setTableWidthMode(table, values.mode);
+                if (values.columnWidth !== null && values.columnWidth !== snapshot.columnWidth) {
+                  const element = editor.getElementByKey(table.getKey()) as HTMLElement | null;
+                  const count = Math.max(table.getColWidths()?.length ?? 0, state.columns);
+                  const widths = measureWidths(element, table.getColWidths(), count);
+                  widths[state.column] = values.columnWidth;
+                  $setColumnWidths(table, widths);
+                }
+                if (values.rowHeight !== null && values.rowHeight !== snapshot.rowHeight) {
+                  const rowNode = table.getChildAtIndex(state.row) as TableRowNode | null;
+                  if (rowNode) $setRowHeight(rowNode, values.rowHeight);
+                }
+              })
+            }
+            onEqual={() =>
+              run(() => {
+                const state = $readTableState();
+                if (state) $equalColumns(state.table);
+              })
+            }
+          />
+        </PointMenu>
+      ) : null}
+      {open?.group === "caption" ? (
+        <PointMenu at={open}>
+          <FigureEntry
+            figure={snapshot.figure}
+            initialAbove
+            initialLabel="Table"
+            onClose={() => {
+              closeAll();
+              focusEditor();
+            }}
+            onCommit={(figure) =>
+              run(() => {
+                const state = $readTableState();
+                if (state) $setTableFigure(state.table, figure);
               })
             }
           />
@@ -592,9 +748,18 @@ export const TableEditorPlugin = () => {
           <TableActionMenu
             label={t.contextMenu}
             sections={sectionsFor(
-              ["row", "column", "cell", "colour", "align", "width", "caption", "table"].filter(
-                (g) => g !== "table",
-              ) as MenuGroup[],
+              [
+                "row",
+                "column",
+                "cell",
+                "colour",
+                "align",
+                "width",
+                "size",
+                "borders",
+                "caption",
+                "table",
+              ].filter((g) => g !== "table") as MenuGroup[],
             ).concat({
               items: [
                 {
@@ -618,20 +783,59 @@ export const TableEditorPlugin = () => {
   );
 };
 
-interface CaptionFieldProps {
-  caption: string;
-  onClose: () => void;
-  onCommit: (text: string) => void;
+interface BorderValues {
+  color: string | null;
+  reset: boolean;
+  scope: TableScope;
+  style: BorderStyle;
+  where: BorderWhere;
+  width: BorderWidth;
 }
 
-const CaptionField = ({ caption, onClose, onCommit }: CaptionFieldProps) => {
+const BorderFields = ({
+  onApply,
+  onClose,
+}: {
+  onApply: (values: BorderValues) => void;
+  onClose: () => void;
+}) => {
   const t = useKoenigStrings().table;
-  const [text, setText] = useState(caption);
-  const input = useRef<HTMLInputElement>(null);
-  useEffect(() => input.current?.focus(), []);
+  const [scope, setScope] = useState<TableScope>("cell");
+  const [where, setWhere] = useState<BorderWhere>("all");
+  const [style, setStyle] = useState<BorderStyle>("solid");
+  const [width, setWidth] = useState<BorderWidth>("thin");
+  const [color, setColor] = useState("");
+  const first = useRef<HTMLSelectElement>(null);
+  useEffect(() => first.current?.focus(), []);
+  const field = "w-full rounded-md border border-grey-300 bg-white px-2 py-1 dark:bg-grey-900";
+  const scopeNames: Record<TableScope, string> = {
+    cell: t.bordersScopeCell,
+    column: t.bordersScopeColumn,
+    row: t.bordersScopeRow,
+    table: t.bordersScopeTable,
+  };
+  const styleNames: Record<BorderStyle, string> = {
+    dashed: t.bordersStyleDashed,
+    dotted: t.bordersStyleDotted,
+    none: t.bordersStyleNone,
+    solid: t.bordersStyleSolid,
+  };
+  const widthNames: Record<BorderWidth, string> = {
+    medium: t.bordersMedium,
+    thick: t.bordersThick,
+    thin: t.bordersThin,
+  };
+  const values = (reset: boolean): BorderValues => ({
+    color: color || null,
+    reset,
+    scope,
+    style,
+    where,
+    width,
+  });
   return (
     <div
-      aria-label={t.caption}
+      aria-label={t.bordersMenu}
       className="not-kg-prose flex w-[28rem] max-w-[92vw] flex-col gap-2 rounded-lg bg-white p-3 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white forced-colors:border forced-colors:border-[ButtonText]"
       data-kg-table-popover
       role="dialog"
@@ -640,39 +844,204 @@ const CaptionField = ({ caption, onClose, onCommit }: CaptionFieldProps) => {
         if (event.key === "Escape") {
           event.preventDefault();
           onClose();
-        } else if (event.key === "Enter") {
-          event.preventDefault();
-          onCommit(text);
         }
       }}
     >
-      <input
-        ref={input}
-        aria-label={t.captionLabel}
-        className="w-full rounded-md border border-grey-300 bg-white px-2 py-1 dark:bg-grey-900"
-        placeholder={t.captionPlaceholder}
-        type="text"
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-      />
+      <label className="flex flex-col gap-1">
+        {t.bordersApplyTo}
+        <select
+          ref={first}
+          className={field}
+          value={scope}
+          onChange={(event) => setScope(event.target.value as TableScope)}
+        >
+          {TABLE_SCOPES.map((entry) => (
+            <option key={entry} value={entry}>
+              {scopeNames[entry]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col gap-1">
+        {t.bordersLines}
+        <select
+          className={field}
+          value={where}
+          onChange={(event) => setWhere(event.target.value as BorderWhere)}
+        >
+          <option value="all">{t.bordersLinesAll}</option>
+          <option value="outer">{t.bordersLinesOuter}</option>
+          <option value="inner">{t.bordersLinesInner}</option>
+        </select>
+      </label>
+      <label className="flex flex-col gap-1">
+        {t.bordersStyle}
+        <select
+          className={field}
+          value={style}
+          onChange={(event) => setStyle(event.target.value as BorderStyle)}
+        >
+          {BORDER_STYLES.map((entry) => (
+            <option key={entry} value={entry}>
+              {styleNames[entry]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col gap-1">
+        {t.bordersThickness}
+        <select
+          className={field}
+          value={width}
+          onChange={(event) => setWidth(event.target.value as BorderWidth)}
+        >
+          {BORDER_WIDTHS.map((entry) => (
+            <option key={entry} value={entry}>
+              {widthNames[entry]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col gap-1">
+        {t.bordersColour}
+        <select className={field} value={color} onChange={(event) => setColor(event.target.value)}>
+          <option value="">{t.bordersColourDefault}</option>
+          <option value={TABLE_CELL_INK}>{t.bordersColourInk}</option>
+          <option value="#6B7280">{t.bordersColourGrey}</option>
+          {TABLE_COLORS.map((entry) => (
+            <option key={entry.name} value={entry.value}>
+              {t.colours[entry.name as keyof Strings["colours"]]}
+            </option>
+          ))}
+        </select>
+      </label>
       <div className="flex justify-end gap-2">
-        {caption ? (
-          <button
-            className="cursor-pointer rounded-md px-2 py-1 hover:bg-grey-200/80 dark:hover:bg-grey-900"
-            data-kg-table-caption-remove
-            type="button"
-            onClick={() => onCommit("")}
-          >
-            {t.captionRemove}
-          </button>
-        ) : null}
+        <button
+          className="cursor-pointer rounded-md px-2 py-1 hover:bg-grey-200/80 dark:hover:bg-grey-900"
+          data-kg-table-borders-reset
+          type="button"
+          onClick={() => onApply(values(true))}
+        >
+          {t.bordersReset}
+        </button>
         <button
           className="cursor-pointer rounded-md px-2 py-1 font-medium hover:bg-grey-200/80 dark:hover:bg-grey-900"
-          data-kg-table-caption-done
+          data-kg-table-borders-apply
           type="button"
-          onClick={() => onCommit(text)}
+          onClick={() => onApply(values(false))}
         >
-          {t.captionDone}
+          {t.bordersApply}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+interface SizeValues {
+  columnWidth: number | null;
+  mode: TableWidthMode;
+  rowHeight: number | null;
+}
+
+interface SizeFieldProps {
+  onClose: () => void;
+  onCommit: (values: SizeValues) => void;
+  onEqual: () => void;
+  snapshot: Snapshot;
+}
+
+const toNumber = (text: string, minimum: number): number | null => {
+  const value = Number.parseFloat(text);
+  return Number.isFinite(value) ? Math.max(Math.round(value), minimum) : null;
+};
+
+const SizeField = ({ onClose, onCommit, onEqual, snapshot }: SizeFieldProps) => {
+  const t = useKoenigStrings().table;
+  const [width, setWidth] = useState(
+    snapshot.columnWidth === null ? "" : String(snapshot.columnWidth),
+  );
+  const [height, setHeight] = useState(
+    snapshot.rowHeight === null ? "" : String(snapshot.rowHeight),
+  );
+  const [mode, setMode] = useState<TableWidthMode>(snapshot.widthMode);
+  const input = useRef<HTMLInputElement>(null);
+  useEffect(() => input.current?.focus(), []);
+  const commit = () =>
+    onCommit({
+      columnWidth: toNumber(width, MIN_COLUMN_WIDTH),
+      mode,
+      rowHeight: toNumber(height, MIN_ROW_HEIGHT),
+    });
+  const field = "w-full rounded-md border border-grey-300 bg-white px-2 py-1 dark:bg-grey-900";
+  return (
+    <div
+      aria-label={t.sizeMenu}
+      className="not-kg-prose flex w-[28rem] max-w-[92vw] flex-col gap-2 rounded-lg bg-white p-3 font-sans text-[1.3rem] text-black shadow-lg dark:bg-grey-950 dark:text-white forced-colors:border forced-colors:border-[ButtonText]"
+      data-kg-table-popover
+      role="dialog"
+      onKeyDown={(event) => {
+        event.stopPropagation();
+        if (event.key === "Escape") {
+          event.preventDefault();
+          onClose();
+        } else if (event.key === "Enter" && event.target instanceof HTMLInputElement) {
+          event.preventDefault();
+          commit();
+        }
+      }}
+    >
+      <label className="flex flex-col gap-1">
+        {t.columnWidthLabel}
+        <input
+          ref={input}
+          className={field}
+          inputMode="numeric"
+          min={MIN_COLUMN_WIDTH}
+          placeholder={String(DEFAULT_COLUMN_WIDTH)}
+          type="number"
+          value={width}
+          onChange={(event) => setWidth(event.target.value)}
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        {t.rowHeightLabel}
+        <input
+          className={field}
+          inputMode="numeric"
+          min={MIN_ROW_HEIGHT}
+          type="number"
+          value={height}
+          onChange={(event) => setHeight(event.target.value)}
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        {t.tableWidthLabel}
+        <select
+          className={field}
+          value={mode}
+          onChange={(event) => setMode(event.target.value as TableWidthMode)}
+        >
+          <option value="full">{t.tableWidthFull}</option>
+          <option value="fit">{t.tableWidthFit}</option>
+          <option value="fixed">{t.tableWidthFixed}</option>
+        </select>
+      </label>
+      <div className="flex justify-end gap-2">
+        <button
+          className="cursor-pointer rounded-md px-2 py-1 hover:bg-grey-200/80 dark:hover:bg-grey-900"
+          data-kg-table-equal-columns
+          type="button"
+          onClick={onEqual}
+        >
+          {t.equalColumns}
+        </button>
+        <button
+          className="cursor-pointer rounded-md px-2 py-1 font-medium hover:bg-grey-200/80 dark:hover:bg-grey-900"
+          data-kg-table-size-done
+          type="button"
+          onClick={commit}
+        >
+          {t.sizeDone}
         </button>
       </div>
     </div>
