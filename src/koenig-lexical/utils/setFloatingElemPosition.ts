@@ -2,15 +2,15 @@ const VERTICAL_GAP = 10;
 const VIEWPORT_MARGIN = 8;
 
 export function setFloatingElemPosition(
-    targetRect,
-    floatingElem,
-    anchorElem,
-    options = {}
+    targetRect: {bottom: number; height: number; left: number; top: number; width: number} | undefined,
+    floatingElem: HTMLElement | null | undefined,
+    anchorElem: HTMLElement,
+    givenOptions: {controlOpacity?: boolean; verticalGap?: number} = {}
 ) {
-    options = Object.assign({
+    const options = Object.assign({
         verticalGap: VERTICAL_GAP,
         controlOpacity: false
-    }, options);
+    }, givenOptions);
 
     const scrollerElem = anchorElem.parentElement;
 
@@ -26,7 +26,21 @@ export function setFloatingElemPosition(
     const floatingElemRect = floatingElem.getBoundingClientRect();
     const editorScrollerRect = scrollerElem.getBoundingClientRect();
 
-    let top = targetRect.top - floatingElemRect.height - options.verticalGap;
+    // Above the selection when it fits (the whole toolbar, every row), else below it, else
+    // whichever side has more room, and in every case inside the window.
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const gap = options.verticalGap;
+    const height = floatingElemRect.height;
+    const above = targetRect.top - height - gap;
+    const below = targetRect.bottom + gap;
+    let top = above;
+    if (above < VIEWPORT_MARGIN) {
+        const roomAbove = targetRect.top - VIEWPORT_MARGIN;
+        const roomBelow = viewportHeight - VIEWPORT_MARGIN - targetRect.bottom;
+        top = below + height <= viewportHeight - VIEWPORT_MARGIN || roomBelow >= roomAbove ? below : above;
+    }
+    top = Math.min(top, viewportHeight - VIEWPORT_MARGIN - height);
+    top = Math.max(top, 0);
     let left = targetRect.left + targetRect.width / 2 - floatingElemRect.width / 2;
 
     if (left < editorScrollerRect.left) {
