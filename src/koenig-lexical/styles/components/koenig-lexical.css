@@ -351,6 +351,14 @@ em-emoji-picker {
     width: 1.6rem;
 }
 
+/* A nested list sits in a wrapper item that Lexical gives the same class; only an item that is a
+   checkbox draws one, or Tab would put a second box on the same line. */
+.koenig-lexical .kg-checklist .kg-check-item:not([role="checkbox"])::before,
+.koenig-lexical .kg-checklist .kg-check-item:not([role="checkbox"])::after {
+    content: none;
+    display: none;
+}
+
 .koenig-lexical .kg-checklist .kg-check-item-checked::before {
     background-color: var(--kg-selection);
     border-color: var(--kg-selection);

@@ -1373,6 +1373,10 @@
     max-width: 240px;
 }
 
+.koenig-lexical .max-w-\[26rem\] {
+    max-width: calc(26 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .max-w-\[30rem\] {
     max-width: calc(30 * var(--kg-rem, 0.625rem));
 }
@@ -3175,6 +3179,14 @@ em-emoji-picker {
     position: absolute;
     top: 0.55em;
     width: calc(1.6 * var(--kg-rem, 0.625rem));
+}
+
+/* A nested list sits in a wrapper item that Lexical gives the same class; only an item that is a
+   checkbox draws one, or Tab would put a second box on the same line. */
+.koenig-lexical .kg-checklist .kg-check-item:not([role="checkbox"])::before,
+.koenig-lexical .kg-checklist .kg-check-item:not([role="checkbox"])::after {
+    content: none;
+    display: none;
 }
 
 .koenig-lexical .kg-checklist .kg-check-item-checked::before {

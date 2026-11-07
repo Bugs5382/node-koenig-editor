@@ -88,4 +88,8 @@ describe("theme tokens", () => {
       expect(readme).toContain(token);
     }
   });
+
+  it("draws a checklist box only on an item that is a checkbox, not on a nested list's wrapper", () => {
+    expect(css).toContain('.kg-check-item:not([role="checkbox"])::before');
+  });
 });
