@@ -52,6 +52,10 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     sections: { Primary: "Primary", Snippets: "Snippets" },
   },
   toolbar: {
+    alignCenter: "Align center",
+    alignJustify: "Justify",
+    alignLeft: "Align left",
+    alignRight: "Align right",
     bold: "Bold",
     heading1: "Heading 1",
     heading2: "Heading 2",
