@@ -1,11 +1,13 @@
 const VERTICAL_GAP = 10;
 const VIEWPORT_MARGIN = 8;
+// A toolbar is never squeezed below a few buttons wide, however small the editor.
+const MIN_TOOLBAR_WIDTH = 240;
 
 export function setFloatingElemPosition(
     targetRect: {bottom: number; height: number; left: number; top: number; width: number} | undefined,
     floatingElem: HTMLElement | null | undefined,
     anchorElem: HTMLElement,
-    givenOptions: {controlOpacity?: boolean; verticalGap?: number} = {}
+    givenOptions: {boundsElem?: HTMLElement | null; controlOpacity?: boolean; verticalGap?: number} = {}
 ) {
     const options = Object.assign({
         verticalGap: VERTICAL_GAP,
@@ -18,13 +20,20 @@ export function setFloatingElemPosition(
         return;
     }
 
-    // Never wider than the window: a toolbar of many buttons wraps onto more rows (the menu is a
-    // wrapping flex row) instead of running off the edge of a narrow screen.
+    // Never wider than the editor (but not narrower than a few buttons), and never wider than the
+    // window: a toolbar of many buttons wraps onto more rows (the menu is a wrapping flex row)
+    // instead of running off the edge of a narrow editor or screen.
     const viewportWidth = document.documentElement.clientWidth;
-    floatingElem.style.maxWidth = `${Math.max(viewportWidth - 2 * VIEWPORT_MARGIN, 0)}px`;
+    const editorScrollerRect = scrollerElem.getBoundingClientRect();
+    // the editor's own box when the caller has it: the anchor's parent is often the whole page
+    const editorWidth = (options.boundsElem || scrollerElem).getBoundingClientRect().width;
+    const widest = Math.min(
+        Math.max(viewportWidth - 2 * VIEWPORT_MARGIN, 0),
+        Math.max(editorWidth, MIN_TOOLBAR_WIDTH)
+    );
+    floatingElem.style.maxWidth = `${widest}px`;
 
     const floatingElemRect = floatingElem.getBoundingClientRect();
-    const editorScrollerRect = scrollerElem.getBoundingClientRect();
 
     // Above the selection when it fits (the whole toolbar, every row), else below it, else
     // whichever side has more room, and in every case inside the window.

@@ -133,7 +133,14 @@ describe("the colour control in the toolbar", () => {
   it("has no picker and no default choice when the host forces its colours", async () => {
     const api = await load({
       colors: {
-        highlight: { none: false, palette: [{ label: "Brand", value: "#FFEEAA" }], picker: false },
+        highlight: {
+          none: false,
+          palette: [
+            { label: "Brand", value: "#FFEEAA" },
+            { label: "Mint", value: "#C8E6C9" },
+          ],
+          picker: false,
+        },
       },
     });
     await selectAll(api);
@@ -141,7 +148,7 @@ describe("the colour control in the toolbar", () => {
     await waitFor(() => expect(document.querySelector("[data-kg-color-control]")).not.toBeNull());
     expect(document.querySelector("[data-kg-color-picker]")).toBeNull();
     expect(document.querySelector("[data-kg-color-none]")).toBeNull();
-    expect(document.querySelectorAll("[data-kg-color-swatch]")).toHaveLength(1);
+    expect(document.querySelectorAll("[data-kg-color-swatch]")).toHaveLength(2);
   });
 
   it("writes light ink over a dark picked highlight", async () => {
@@ -154,6 +161,44 @@ describe("the colour control in the toolbar", () => {
     });
     expect(style(api)).toContain("background-color: #101820");
     expect(style(api).toLowerCase()).toContain("color: #ffffff");
+  });
+
+  it("toggles a lone swatch from the button, with no menu (#91)", async () => {
+    const api = await load({
+      colors: {
+        highlight: {
+          none: false,
+          palette: [{ label: "Yellow", value: "#fff59d" }],
+          picker: false,
+        },
+      },
+    });
+    await selectAll(api);
+    await open("highlight");
+    expect(document.querySelector("[data-kg-style-menu]")).toBeNull();
+    expect(style(api)).toContain("background-color: #fff59d");
+    await open("highlight");
+    expect(style(api)).not.toContain("background-color");
+    expect(document.querySelector("[data-kg-style-menu]")).toBeNull();
+  });
+
+  it("still opens the menu when there is a choice to make (#91)", async () => {
+    const api = await load({
+      colors: {
+        highlight: {
+          none: false,
+          palette: [
+            { label: "Yellow", value: "#fff59d" },
+            { label: "Green", value: "#c8e6c9" },
+          ],
+          picker: false,
+        },
+      },
+    });
+    await selectAll(api);
+    await open("highlight");
+    await waitFor(() => expect(document.querySelector("[data-kg-style-menu]")).not.toBeNull());
+    expect(style(api)).not.toContain("background-color");
   });
 
   it("draws the list in the toolbar's own layer, so a host's stacking context cannot put it under the toolbar", async () => {

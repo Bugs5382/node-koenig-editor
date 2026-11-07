@@ -57,6 +57,7 @@ import {$getSelectionSpacing, $setSpacing, LINE_SPACINGS, PARAGRAPH_SPACINGS} fr
 import {$getSelectionDirection, $setDirection} from '../../../additions/direction/direction';
 import {useColorSetting} from '../../../additions/colors/ColorControl';
 import {ColorMenu} from '../../../additions/colors/ColorMenu';
+import {sameColor} from '../../../additions/colors/colors';
 import {StyleMenu} from '../../../additions/textStyle/StyleMenu';
 import {$clearFormatting, $getTextStyle, $setHighlight, $setTextStyle, FONT_SIZES} from '../../../additions/textStyle/textStyle';
 import {ALIGNMENT_ITEMS, KOENIG_TOOLBAR_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
@@ -356,6 +357,18 @@ export default function FormatToolbar({
         icon: item,
         label: strings.toolbar[item],
         onClick: (event) => {
+            // a colour slot with one swatch, no picker and no "none" has nothing to choose:
+            // the button applies that colour, or takes it off when the selection has it
+            const colour = STYLE_MENUS[item]?.colour;
+            const lone = colour && !colour.setting.picker && !colour.setting.none && colour.setting.palette.length === 1
+                ? colour.setting.palette[0].value
+                : null;
+            if (lone) {
+                const has = sameColor(colour.value, lone);
+                editor.update(() => STYLE_MENUS[item].apply(has ? null : lone), {discrete: true});
+                setStyleMenu(null);
+                return;
+            }
             const anchor = event.currentTarget;
             setStyleMenu(current => (current?.item === item ? null : {item, anchor}));
         }
