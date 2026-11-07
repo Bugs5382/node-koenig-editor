@@ -107,6 +107,12 @@ export function emptyDocument(): string {
   return JSON.stringify(documentOf([{ ...paragraph(""), children: [] }]));
 }
 
+/** The default content Reset returns to: one paragraph of the pangram. */
+export const FOX_TEXT = "The quick brown fox jumps over the lazy dog";
+export function foxDocument(): string {
+  return JSON.stringify(documentOf([paragraph(FOX_TEXT)]));
+}
+
 /** True for no document at all, or one that is a single empty paragraph. */
 export function isEmptyDocument(state: string | undefined): boolean {
   if (!state) return true;

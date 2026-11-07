@@ -100,15 +100,26 @@ function LabelIcon({label, className}) {
     return <span aria-hidden="true" className={className} style={{fontSize: '1.2rem', fontWeight: 700, lineHeight: 1}}>{label}</span>;
 }
 
-export function ToolbarMenu({children, hide, ...props}) {
+// `rows`: the children are rows (each its own list), stacked, and the toolbar is as wide as its widest row
+export function ToolbarMenu({children, hide, rows, ...props}: any) {
     if (hide) {
         return null;
     }
 
     return (
-        <ul className="relative m-0 flex max-w-full flex-wrap items-center justify-evenly gap-1 rounded-lg bg-white px-1 font-sans text-md font-normal text-black shadow-md dark:bg-grey-950 forced-colors:border forced-colors:border-[ButtonText]" {...props}>
+        <ul className={`relative m-0 flex max-w-full ${rows ? 'flex-col items-stretch' : 'flex-wrap items-center justify-evenly'} gap-1 rounded-lg bg-white px-1 font-sans text-md font-normal text-black shadow-md dark:bg-grey-950 forced-colors:border forced-colors:border-[ButtonText]`} {...props}>
             {children}
         </ul>
+    );
+}
+
+export function ToolbarMenuRow({children, row}: any) {
+    return (
+        <li className="m-0 list-none p-0" data-kg-toolbar-row={row} role="presentation">
+            <ul className="m-0 flex flex-wrap items-center justify-start gap-1 p-0" role="presentation">
+                {children}
+            </ul>
+        </li>
     );
 }
 

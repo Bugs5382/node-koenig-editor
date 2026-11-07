@@ -1,4 +1,6 @@
 import React from 'react';
+import {ColorControl, useColorSetting} from '../../../../additions/colors/ColorControl';
+import {EmojiField} from '../../../../additions/emojiPicker/EmojiField';
 
 // Every length is a multiple of --kg-rem and the type reads the host's font tokens, so the
 // card scales with the rest of the editor. Colours are the card's own saved values.
@@ -33,7 +35,25 @@ const choiceStyle = (checked) => ({
     justifyContent: 'center'
 });
 
-function Settings({backgroundColor, backgroundImageSrc, buttonEnabled, buttonText, buttonUrl, alignment, strings, update, uploadBackgroundImage, uploadError}) {
+// A colour row of the settings panel: the label, then the shared colour control for one slot. The
+// editor's own colour for the slot is the card's default.
+function ColorRow({fallback, label, onChange, slot, value}) {
+    const setting = useColorSetting(slot);
+    return (
+        <div style={{...rowStyle, alignItems: 'start'}}>
+            <span data-header-label style={labelStyle}>{label}</span>
+            <ColorControl
+                label={label}
+                setting={setting}
+                slot={slot}
+                value={/^#/.test(value) ? value : null}
+                onChange={color => onChange(color || fallback)}
+            />
+        </div>
+    );
+}
+
+function Settings({backgroundColor, backgroundImageSrc, buttonColor, buttonEmoji, buttonEnabled, buttonText, buttonTextColor, buttonUrl, alignment, strings, textColor, update, uploadBackgroundImage, uploadError}) {
     const fileInputRef = React.useRef(null);
     const alignmentName = React.useId();
 
@@ -45,16 +65,8 @@ function Settings({backgroundColor, backgroundImageSrc, buttonEnabled, buttonTex
             data-koenig-dnd-disabled
             style={{display: 'grid', gap: rem(0.8), padding: rem(1.2), fontFamily: 'var(--kg-font-sans, sans-serif)'}}
         >
-            <label style={rowStyle}>
-                <span data-header-label style={labelStyle}>{strings.backgroundColor}</span>
-                <input
-                    style={{justifySelf: 'start'}}
-                    data-header-background-color
-                    type="color"
-                    value={backgroundColor}
-                    onChange={e => update({backgroundColor: e.target.value})}
-                />
-            </label>
+            <ColorRow fallback="#000000" label={strings.backgroundColor} slot="headerBackground" value={backgroundColor} onChange={color => update({backgroundColor: color})} />
+            <ColorRow fallback="#FFFFFF" label={strings.textColor} slot="headerText" value={textColor} onChange={color => update({textColor: color})} />
             <div style={{display: 'flex', gap: rem(0.8)}}>
                 <button data-header-background-image style={fieldStyle} type="button" onClick={() => fileInputRef.current?.click()}>
                     {strings.backgroundImage}
@@ -83,8 +95,8 @@ function Settings({backgroundColor, backgroundImageSrc, buttonEnabled, buttonTex
                 <span data-header-label style={labelStyle}>{strings.alignment}</span>
                 {/* Two choices: a radio group opens nothing, so there is no list to land in the wrong place,
                     and the arrow keys move between the choices. */}
-                <div aria-label={strings.alignment} role="radiogroup" style={{display: 'grid', gap: rem(0.8), gridTemplateColumns: '1fr 1fr'}}>
-                    {[['left', strings.alignLeft], ['center', strings.alignCenter]].map(([value, text]) => (
+                <div aria-label={strings.alignment} role="radiogroup" style={{display: 'grid', gap: rem(0.8), gridTemplateColumns: '1fr 1fr 1fr'}}>
+                    {[['left', strings.alignLeft], ['center', strings.alignCenter], ['right', strings.alignRight]].map(([value, text]) => (
                         <label key={value} style={choiceStyle(alignment === value)}>
                             <input
                                 checked={alignment === value}
@@ -105,7 +117,19 @@ function Settings({backgroundColor, backgroundImageSrc, buttonEnabled, buttonTex
             </label>
             {buttonEnabled ? (
                 <>
-                    <input data-header-button-text placeholder={strings.buttonText} style={fieldStyle} type="text" value={buttonText} onChange={e => update({buttonText: e.target.value})} />
+                    <div style={{display: 'flex', gap: rem(0.8)}}>
+                        <EmojiField
+                            label={strings.buttonEmoji}
+                            placeholder={'\u{1F642}'}
+                            removeLabel={strings.buttonEmoji}
+                            style={{...fieldStyle, width: 'auto'}}
+                            value={buttonEmoji}
+                            onChange={emoji => update({buttonEmoji: emoji})}
+                        />
+                        <input data-header-button-text placeholder={strings.buttonText} style={fieldStyle} type="text" value={buttonText} onChange={e => update({buttonText: e.target.value})} />
+                    </div>
+                    <ColorRow fallback="#FFFFFF" label={strings.buttonColor} slot="headerButton" value={buttonColor} onChange={color => update({buttonColor: color})} />
+                    <ColorRow fallback="#000000" label={strings.buttonTextColor} slot="headerButtonText" value={buttonTextColor} onChange={color => update({buttonTextColor: color})} />
                     <input data-header-button-url placeholder={strings.buttonUrl} style={fieldStyle} type="url" value={buttonUrl} onChange={e => update({buttonUrl: e.target.value})} />
                 </>
             ) : null}
@@ -118,6 +142,7 @@ export function HeaderCard({
     backgroundColor,
     backgroundImageSrc,
     buttonColor,
+    buttonEmoji,
     buttonEnabled,
     buttonText,
     buttonTextColor,
@@ -132,7 +157,7 @@ export function HeaderCard({
     uploadBackgroundImage,
     uploadError
 }) {
-    const align = alignment === 'left' ? 'left' : 'center';
+    const align = alignment === 'left' ? 'left' : alignment === 'right' ? 'right' : 'center';
     const style = {
         backgroundColor,
         backgroundImage: backgroundImageSrc ? `url("${backgroundImageSrc}")` : undefined,
@@ -159,7 +184,7 @@ export function HeaderCard({
                 >
                     {subtitleField}
                 </div>
-                {buttonEnabled && (buttonText || isEditing) ? (
+                {buttonEnabled && (buttonText || buttonEmoji || isEditing) ? (
                     <div style={{marginTop: rem(2.4)}}>
                         <span
                             data-header-button
@@ -173,7 +198,7 @@ export function HeaderCard({
                                 padding: `${rem(1)} ${rem(2.4)}`
                             }}
                         >
-                            {buttonText || strings.buttonText}
+                            {[buttonEmoji, buttonText || (buttonEmoji ? '' : strings.buttonText)].filter(Boolean).join(' ')}
                         </span>
                     </div>
                 ) : null}
@@ -183,10 +208,14 @@ export function HeaderCard({
                     alignment={alignment}
                     backgroundColor={backgroundColor}
                     backgroundImageSrc={backgroundImageSrc}
+                    buttonColor={buttonColor}
+                    buttonEmoji={buttonEmoji}
                     buttonEnabled={buttonEnabled}
                     buttonText={buttonText}
+                    buttonTextColor={buttonTextColor}
                     buttonUrl={buttonUrl}
                     strings={strings}
+                    textColor={textColor}
                     update={update}
                     uploadBackgroundImage={uploadBackgroundImage}
                     uploadError={uploadError}

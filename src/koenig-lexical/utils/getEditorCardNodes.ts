@@ -1,3 +1,4 @@
+import {CODE_MENU_ITEM} from '../../additions/code/codeMenu';
 import {TABLE_MENU_ITEM} from '../../additions/table/tableMenu';
 
 export function getEditorCardNodes(editor) {
@@ -11,6 +12,10 @@ export function getEditorCardNodes(editor) {
         }
 
         cardNodes.push([nodeType, klass]);
+    }
+
+    if (allNodes.has('code')) {
+        cardNodes.push(['code', {kgMenu: CODE_MENU_ITEM}]);
     }
 
     if (allNodes.has('table')) {

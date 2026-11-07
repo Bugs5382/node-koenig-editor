@@ -86,6 +86,7 @@ export class CalloutNode extends BaseCalloutNode {
                 <CalloutNodeComponent
                     backgroundColor={this.backgroundColor}
                     calloutEmoji={this.calloutEmoji}
+                    textColor={this.textColor}
                     nodeKey={this.getKey()}
                     textEditor={this.__calloutTextEditor}
                     textEditorInitialState={this.__calloutTextEditorInitialState}

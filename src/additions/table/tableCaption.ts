@@ -28,7 +28,10 @@ import { useEffect } from "react";
 import { $figureNumbers, $figureTextWith, $getFigure } from "../figure/figure";
 import { $getTableCaption, $getTableFigure } from "./tableActions";
 import { $syncCellBorders, $syncOneCellBorders } from "./tableBorders";
+import { $getTableLook } from "./tableLook";
 import { $getTableWidthMode } from "./tableResize";
+import { inkFor } from "../textStyle/textStyle";
+import { DEFAULT_BAND_COLOR, DEFAULT_BRAND_COLOR } from "./tableLook";
 
 // A table's caption is node state (see tableActions). In the editor it is drawn from attributes on
 // the table element, not from a child element: Lexical removes DOM nodes it did not put there, and
@@ -53,6 +56,35 @@ const syncSize = (table: TableNode, element: Element) => {
   if (html.style.width !== width) html.style.width = width;
 };
 
+// The table's look (stripes and brand colour) as attributes the stylesheet reads, with the two
+// colours and their ink as custom properties. Written only when they changed.
+const syncLook = (table: TableNode, element: Element) => {
+  const look = $getTableLook(table);
+  const html = element as HTMLElement;
+  const flag = (name: string, on: boolean) => {
+    if (on !== element.hasAttribute(name)) {
+      if (on) element.setAttribute(name, "");
+      else element.removeAttribute(name);
+    }
+  };
+  flag("data-kg-band-rows", look.bandRows);
+  flag("data-kg-band-columns", look.bandColumns);
+  flag("data-kg-brand-rows", look.brandRows);
+  flag("data-kg-brand-columns", look.brandColumns);
+  const set = (name: string, value: string) => {
+    if (html.style.getPropertyValue(name) !== value) {
+      if (value) html.style.setProperty(name, value);
+      else html.style.removeProperty(name);
+    }
+  };
+  const band = look.bandRows || look.bandColumns ? (look.bandColor ?? DEFAULT_BAND_COLOR) : "";
+  const brand = look.brandRows || look.brandColumns ? (look.brandColor ?? DEFAULT_BRAND_COLOR) : "";
+  set("--kg-table-band", band);
+  set("--kg-table-band-ink", band ? inkFor(band) : "");
+  set("--kg-table-brand", brand);
+  set("--kg-table-brand-ink", brand ? inkFor(brand) : "");
+};
+
 export const useTableCaptions = (): void => {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
@@ -66,6 +98,7 @@ export const useTableCaptions = (): void => {
       const element = elementOf(table);
       if (!element) return;
       syncSize(table, element);
+      syncLook(table, element);
       const text = $getFigure(table) ? $figureTextWith(table, numbers) : $getTableCaption(table);
       if (!text) {
         element.removeAttribute("data-kg-caption");

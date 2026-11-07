@@ -14,6 +14,8 @@ cards.
 | Header | A big title at the top of a section | `/header` | Colour or picture background, optional button |
 | Callout | A box that stands out | `/callout` | Nine colours, optional emoji |
 | Toggle | Text that opens and closes | `/toggle` | A header and hidden content |
+| Toggle group | A stack of toggles with no gap | `/toggle-group` | Any number of items; add and remove them |
+| Code | Code with line numbers | `/code` or three backticks | Language list, Copy button, highlighting |
 | Divider | A line between sections | `/hr` or type `---` | No settings |
 | Table | Rows and columns | `/table` | Merge cells, shading, alignment, caption; dashed grid while editing |
 | File | A download | `/file` | Title, description, name and size |
@@ -90,9 +92,9 @@ replaces how it looks while the editor keeps the pictures, uploads and limits.
 **Add it:** the plus button or `/header`.
 **What it can do:**
 - A title and a subtitle.
-- A background colour or a background picture.
-- Left or centred writing.
-- An optional button with a label and a link.
+- A background colour or a background picture, and the text colour, from the shared colour control.
+- Left, centred or right writing.
+- An optional button with a label (text, an emoji or both), a link, and its own colours.
 
 **Accessibility:** the title is a styled block, not a heading, so it does not appear in a page
 outline. Use a heading for the real structure of the page.
@@ -103,14 +105,17 @@ outline. Use a heading for the real structure of the page.
 **For:** a note, a tip or a warning that should not be missed.
 **Add it:** the plus button or `/callout`.
 **What it can do:**
-- Text inside a coloured box: white, grey, blue, green, yellow, red, pink, purple or the site's
-  accent colour.
+- Text inside a coloured box. The background and the text colour each come from the shared colour
+  control: a row of base colours and, unless the host switched it off, a colour wheel for any
+  colour. Saved as a named class when a base colour of the old set is kept, and as inline CSS when a
+  colour is picked.
 - An optional emoji at the start, picked from the **emoji picker** (searchable, works offline).
 
 **Keyboard (emoji picker):** Down from the search box enters the grid; arrows, Home and End move;
 Enter picks; Escape closes.
 **Accessibility:** do not rely on the colour alone to say what the note means; say it in words.
-**Developer:** `cards` leaves it out; `tools` without `emojiPicker` removes the emoji button.
+**Developer:** `cards` leaves it out; `tools` without `emojiPicker` removes the emoji button; the
+`colors` option sets the palettes (`calloutBackground`, `calloutText`) or limits them.
 
 ## Toggle
 
@@ -120,6 +125,31 @@ Enter picks; Escape closes.
 you press the header's arrow.
 **Accessibility:** keep the header a clear question or label, because it is what people see before they open it.
 **Developer:** `cards` leaves it out.
+
+## Toggle group
+
+**For:** a list of questions and answers, or any set of sections that open and close one by one.
+**Add it:** the plus button or `/toggle-group`.
+**What it can do:** a stack of toggles that touch, in one outline, with a line between them. A new group
+has two items; "Add a toggle" adds another and the cross on an item removes it. There is no limit on
+how many it holds. Each item has a header and a body, and a reader opens and closes each one on its own.
+**Accessibility:** each item's arrow is a button that says whether it is open; keep every header a clear
+question or label.
+**Developer:** `cards` leaves it out (`toggleGroup`); `strings.toggleGroup` is the wording for adding
+and removing, and the item placeholders and the open/close labels are the single toggle's. Saved as
+`<div class="kg-card kg-toggle-group-card">` holding one `kg-toggle-card` per item.
+
+## Code
+
+**For:** snippets, commands and configuration that should keep their spacing.
+**Add it:** the plus button, `/code`, or three backticks and a language on an empty line.
+**What it can do:** line numbers, syntax highlighting for the chosen language, a language list and a
+Copy button on the block (hover it, or put the cursor in it). The copied text has no line numbers.
+A reader gets the Copy button only.
+**Accessibility:** the language list and the Copy button are real controls with labels; the copy
+result is announced.
+**Developer:** `codeLanguages` lists the languages; `strings.code` is the wording. The block is part of
+the base node set and cannot be left out with `cards`.
 
 ## Divider
 
@@ -136,7 +166,7 @@ you press the header's arrow.
 adds, moves and deletes rows and columns, turns the header row and header column on and off, merges
 a selected range of cells and splits them again, shades cells, aligns text across and down, sets a
 column's width and height (type a size, drag a border, double-click a border to fit the text, or use
-Alt with the arrow keys on a selected row or column), draws borders, drags rows and columns to a new
+Alt with the arrow keys on a selected row or column), draws borders, sets the table's Style (header row and column, banded rows and columns, a brand colour on the header row or first column; band and brand colours come from the shared colour control), drags rows and columns to a new
 place and gives the table a caption with an optional label and automatic number ("Table 1: ..."). Drag across cells to select a range, or use Select
 row, Select column or Select table, and the shading and alignment apply to all of it. Paste cells
 copied from a spreadsheet and they fill the table, adding the rows and columns they need.
@@ -149,7 +179,8 @@ selected cells are highlighted.
 **Accessibility:** the header row is marked up as column headers (and a header column as row
 headers); the toolbar buttons and menu items have names; the row and column of the cell you move to
 are announced, and so is what a merged cell spans; the caption names the table.
-**Developer:** `cards` leaves it out; the wording is `strings.table`. The borders and header colour
+**Developer:** `cards` leaves it out; the wording is `strings.table`. The band and brand colours are
+the `tableBand` and `tableBrand` slots of the composer's `colors` option. The borders and header colour
 are tokens (`--kg-table-edit-border-style` for the dashed editing line, `--kg-table-border-color`,
 `--kg-table-header-bg`); see the README.
 
@@ -158,10 +189,13 @@ are tokens (`--kg-table-edit-border-style` for the dashed editing line, `--kg-ta
 **For:** a document people can download, such as a PDF.
 **Add it:** the plus button, `/file`, or dragging a file in.
 **What it can do:** a title, a description, and the file's name and size. It is saved as a
-download link.
+download link. A picture for the file's type sits beside the text (a PDF, a spreadsheet, an archive
+and many more; an unknown type gets a plain page with its extension). Select the card and untick
+"Show the file type icon" to hide it on that card.
 **Limits:** if the developer sets `fileTypes.file`, the card checks the type and size (`maxSize`)
 before uploading and names the file in its message.
-**Developer:** `cards` leaves it out.
+**Developer:** `cards` leaves it out; `fileIcons={false}` removes the icons everywhere and
+`fileIcons={{ overrides: { pdf: MyIcon } }}` draws your own for a type.
 
 ## Video
 
@@ -188,7 +222,8 @@ transcript or a `.vtt` file.
 
 **For:** one clear link that you want people to follow.
 **Add it:** the plus button or `/button` (typing `cta` or `link` finds it too).
-**What it can do:** a label, a link, and left or centred placement.
+**What it can do:** a label, a link, left, centre or right placement, an optional emoji before the
+label (an emoji alone is fine), and the button and text colours from the shared colour control.
 **Limits:** only absolute `http`, `https` and `mailto` links are kept. Others (`javascript:`,
 `data:`, relative links) are refused and the field says so. A button with no valid link is left
 out of the saved HTML.
@@ -218,8 +253,10 @@ Shift with the arrows resizes it.
 
 ## Emoji picker
 
-**For:** adding an emoji to a callout.
-**It opens:** from the emoji button in the callout card.
+**For:** adding an emoji to a callout, to a Button or Header card's label, or to any text.
+**It opens:** from the emoji button in the callout card, from the emoji field in a Button or Header
+card's settings, from the **Emoji** entry of the plus and slash menus, or by typing `/emoji` anywhere
+in the text (inside a sentence, in a callout, in a table cell). Escape closes it and leaves the text.
 **What it can do:** search by name and browse the nine standard groups, fully offline.
 **Developer:** `tools` leaves it out (`tools={["imageEditor"]}` keeps only the image editor,
 `tools={[]}` turns both off).

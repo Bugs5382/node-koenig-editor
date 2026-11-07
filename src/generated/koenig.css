@@ -1281,6 +1281,14 @@
     width: calc(28 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .w-\[3\.2rem\] {
+    width: calc(3.2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .w-\[30rem\] {
+    width: calc(30 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .w-\[320px\] {
     width: 320px;
 }
@@ -1369,8 +1377,16 @@
     max-width: calc(76.8 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .max-w-\[12rem\] {
+    max-width: calc(12 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .max-w-\[240px\] {
     max-width: 240px;
+}
+
+.koenig-lexical .max-w-\[26rem\] {
+    max-width: calc(26 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .max-w-\[30rem\] {
@@ -1427,6 +1443,11 @@
 
 .koenig-lexical .-translate-x-1\/2 {
     --tw-translate-x: -50%;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.koenig-lexical .-translate-x-full {
+    --tw-translate-x: -100%;
     transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
@@ -1518,6 +1539,10 @@
     list-style-type: none !important;
 }
 
+.koenig-lexical .list-none {
+    list-style-type: none;
+}
+
 .koenig-lexical .appearance-none {
     appearance: none;
 }
@@ -1552,6 +1577,10 @@
 
 .koenig-lexical .items-center {
     align-items: center;
+}
+
+.koenig-lexical .items-stretch {
+    align-items: stretch;
 }
 
 .koenig-lexical .justify-start {
@@ -1604,6 +1633,10 @@
 
 .koenig-lexical .gap-y-2 {
     row-gap: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .self-center {
+    align-self: center;
 }
 
 .koenig-lexical .self-stretch {
@@ -1988,6 +2021,10 @@
     background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.9 * 100%), transparent);
 }
 
+.koenig-lexical .bg-white\/95 {
+    background-color: color-mix(in srgb, var(--kg-color-white, #FFF) calc(0.95 * 100%), transparent);
+}
+
 .koenig-lexical .bg-yellow\/10 {
     background-color: color-mix(in srgb, var(--kg-color-yellow, #FFB41F) calc(0.1 * 100%), transparent);
 }
@@ -2189,6 +2226,11 @@
     padding-right: calc(1 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .py-0\.5 {
+    padding-top: calc(0.2 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(0.2 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .py-1 {
     padding-top: calc(0.4 * var(--kg-rem, 0.625rem));
     padding-bottom: calc(0.4 * var(--kg-rem, 0.625rem));
@@ -2347,6 +2389,10 @@
 
 .koenig-lexical .text-right {
     text-align: right;
+}
+
+.koenig-lexical .align-middle {
+    vertical-align: middle;
 }
 
 .koenig-lexical .\!font-sans {
@@ -2624,6 +2670,10 @@
 
 .koenig-lexical .caret-black {
     caret-color: color-mix(in srgb, var(--kg-color-black, #15171A) calc(1 * 100%), transparent);
+}
+
+.koenig-lexical .caret-current {
+    caret-color: currentColor;
 }
 
 .koenig-lexical .caret-grey-800 {
@@ -3049,6 +3099,23 @@ em-emoji-picker {
     text-align: start;
 }
 
+/* A table's look. Stripes (every second row or column) take the band colour, the header row and
+   the first column take the brand colour; the table's own attributes and custom properties are
+   set by the editor from the table's state. A cell the author shaded keeps its own colour, and the
+   ink is chosen to read on each colour. Only rows are counted by type, because the column group
+   sits among the rows. */
+.koenig-lexical table[data-kg-band-rows] tr:nth-of-type(even) :is(td, th):not([style*="background-color"]),
+.koenig-lexical table[data-kg-band-columns] tr :is(td, th):nth-child(even):not([style*="background-color"]) {
+    background: var(--kg-table-band);
+    color: var(--kg-table-band-ink);
+}
+
+.koenig-lexical table[data-kg-brand-rows] tr:nth-of-type(1) :is(td, th):not([style*="background-color"]),
+.koenig-lexical table[data-kg-brand-columns] tr :is(td, th):nth-child(1):not([style*="background-color"]) {
+    background: var(--kg-table-brand);
+    color: var(--kg-table-brand-ink);
+}
+
 /* A cell the author shaded keeps dark ink, so its text reads on the shade in light and dark. */
 .koenig-lexical table tr td[style*="background-color"],
 .koenig-lexical table tr th[style*="background-color"] {
@@ -3104,6 +3171,11 @@ em-emoji-picker {
 
     .koenig-lexical table tr th {
         border-bottom-width: 3px;
+    }
+
+    .koenig-lexical table[data-kg-band-rows] tr:nth-of-type(even) :is(td, th),
+    .koenig-lexical table[data-kg-band-columns] tr :is(td, th):nth-child(even) {
+        border-style: dotted;
     }
 
     .koenig-lexical .kg-table-cell-selected {
@@ -3175,6 +3247,14 @@ em-emoji-picker {
     position: absolute;
     top: 0.55em;
     width: calc(1.6 * var(--kg-rem, 0.625rem));
+}
+
+/* A nested list sits in a wrapper item that Lexical gives the same class; only an item that is a
+   checkbox draws one, or Tab would put a second box on the same line. */
+.koenig-lexical .kg-checklist .kg-check-item:not([role="checkbox"])::before,
+.koenig-lexical .kg-checklist .kg-check-item:not([role="checkbox"])::after {
+    content: none;
+    display: none;
 }
 
 .koenig-lexical .kg-checklist .kg-check-item-checked::before {
@@ -3257,6 +3337,88 @@ em-emoji-picker {
 .koenig-lexical ul[dir="rtl"].kg-checklist .kg-check-item {
     margin: calc(1 * var(--kg-rem, 0.625rem)) calc(2.4 * var(--kg-rem, 0.625rem)) 0 0;
     padding: 0 calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
+}
+
+/* Code block (the element selector keeps these above the prose rule for `code`). Line numbers are generated content from the block's data-gutter, so they are never
+   selected or copied. Token colours are set with --kg-code-* tokens a host can override. */
+.koenig-lexical code.kg-code-block {
+    --kg-code-fg: var(--kg-color-grey-900, #15171a);
+    --kg-code-bg: var(--kg-color-grey-100, #f1f3f4);
+    --kg-code-gutter: var(--kg-color-grey-600, #626d79);
+    --kg-code-comment: #5f6b7a;
+    --kg-code-keyword: #a11d6f;
+    --kg-code-string: #0b6e3a;
+    --kg-code-number: #b3470b;
+    --kg-code-function: #1d4fd1;
+    --kg-code-attr: #7a4fc1;
+    --kg-code-builtin: #0a6f86;
+    --kg-code-deleted: #b3261e;
+    --kg-code-inserted: #0b6e3a;
+    background: var(--kg-code-bg);
+    border-radius: calc(0.6 * var(--kg-rem, 0.625rem));
+    color: var(--kg-code-fg);
+    display: block;
+    font-family: var(--kg-font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+    font-size: calc(1.4 * var(--kg-rem, 0.625rem));
+    line-height: 1.6;
+    margin: 0 0 1.5em;
+    overflow-x: auto;
+    padding: calc(1.2 * var(--kg-rem, 0.625rem)) calc(1.6 * var(--kg-rem, 0.625rem)) calc(1.2 * var(--kg-rem, 0.625rem)) calc(5.2 * var(--kg-rem, 0.625rem));
+    position: relative;
+    tab-size: 2;
+    white-space: pre;
+}
+
+.dark .koenig-lexical code.kg-code-block,
+.koenig-lexical .dark code.kg-code-block {
+    --kg-code-fg: var(--kg-color-grey-100, #f1f3f4);
+    --kg-code-bg: var(--kg-color-grey-950, #0b0c0d);
+    --kg-code-gutter: var(--kg-color-grey-500, #7c8b9a);
+    --kg-code-comment: #8b97a5;
+    --kg-code-keyword: #f08fcb;
+    --kg-code-string: #7fd6a0;
+    --kg-code-number: #f2a56b;
+    --kg-code-function: #8fb4ff;
+    --kg-code-attr: #c8a7ff;
+    --kg-code-builtin: #6fd3e6;
+    --kg-code-deleted: #ff8a80;
+    --kg-code-inserted: #7fd6a0;
+}
+
+.koenig-lexical code.kg-code-block::before {
+    color: var(--kg-code-gutter);
+    content: attr(data-gutter);
+    left: 0;
+    padding: calc(1.2 * var(--kg-rem, 0.625rem)) 0 calc(1.2 * var(--kg-rem, 0.625rem)) 0;
+    pointer-events: none;
+    position: absolute;
+    text-align: right;
+    top: 0;
+    user-select: none;
+    white-space: pre;
+    width: calc(3.6 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .kg-token-comment { color: var(--kg-code-comment); font-style: italic; }
+.koenig-lexical .kg-token-keyword { color: var(--kg-code-keyword); }
+.koenig-lexical .kg-token-string { color: var(--kg-code-string); }
+.koenig-lexical .kg-token-number { color: var(--kg-code-number); }
+.koenig-lexical .kg-token-function { color: var(--kg-code-function); }
+.koenig-lexical .kg-token-attr { color: var(--kg-code-attr); }
+.koenig-lexical .kg-token-builtin { color: var(--kg-code-builtin); }
+.koenig-lexical .kg-token-deleted { color: var(--kg-code-deleted); }
+.koenig-lexical .kg-token-inserted { color: var(--kg-code-inserted); }
+.koenig-lexical .kg-token-operator,
+.koenig-lexical .kg-token-punctuation { color: var(--kg-code-fg); opacity: 0.8; }
+
+@media (forced-colors: active) {
+    .koenig-lexical code.kg-code-block {
+        border: 1px solid CanvasText;
+        color: CanvasText;
+        background: Canvas;
+    }
+    .koenig-lexical code.kg-code-block::before { color: GrayText; }
+    .koenig-lexical [class*="kg-token-"] { color: CanvasText; }
 }
 
 /* Content Styles
@@ -5016,6 +5178,10 @@ em-emoji-picker {
 .koenig-lexical .dark\:bg-grey-950:is(.dark *) {
     --tw-bg-opacity: 1;
     background-color: color-mix(in srgb, var(--kg-color-grey-950, #23292F) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
+}
+
+.koenig-lexical .dark\:bg-grey-950\/95:is(.dark *) {
+    background-color: color-mix(in srgb, var(--kg-color-grey-950, #23292F) calc(0.95 * 100%), transparent);
 }
 
 .koenig-lexical .dark\:bg-lime-800:is(.dark *) {

@@ -223,6 +223,23 @@ em-emoji-picker {
     text-align: start;
 }
 
+/* A table's look. Stripes (every second row or column) take the band colour, the header row and
+   the first column take the brand colour; the table's own attributes and custom properties are
+   set by the editor from the table's state. A cell the author shaded keeps its own colour, and the
+   ink is chosen to read on each colour. Only rows are counted by type, because the column group
+   sits among the rows. */
+.koenig-lexical table[data-kg-band-rows] tr:nth-of-type(even) :is(td, th):not([style*="background-color"]),
+.koenig-lexical table[data-kg-band-columns] tr :is(td, th):nth-child(even):not([style*="background-color"]) {
+    background: var(--kg-table-band);
+    color: var(--kg-table-band-ink);
+}
+
+.koenig-lexical table[data-kg-brand-rows] tr:nth-of-type(1) :is(td, th):not([style*="background-color"]),
+.koenig-lexical table[data-kg-brand-columns] tr :is(td, th):nth-child(1):not([style*="background-color"]) {
+    background: var(--kg-table-brand);
+    color: var(--kg-table-brand-ink);
+}
+
 /* A cell the author shaded keeps dark ink, so its text reads on the shade in light and dark. */
 .koenig-lexical table tr td[style*="background-color"],
 .koenig-lexical table tr th[style*="background-color"] {
@@ -278,6 +295,11 @@ em-emoji-picker {
 
     .koenig-lexical table tr th {
         border-bottom-width: 3px;
+    }
+
+    .koenig-lexical table[data-kg-band-rows] tr:nth-of-type(even) :is(td, th),
+    .koenig-lexical table[data-kg-band-columns] tr :is(td, th):nth-child(even) {
+        border-style: dotted;
     }
 
     .koenig-lexical .kg-table-cell-selected {
@@ -349,6 +371,14 @@ em-emoji-picker {
     position: absolute;
     top: 0.55em;
     width: 1.6rem;
+}
+
+/* A nested list sits in a wrapper item that Lexical gives the same class; only an item that is a
+   checkbox draws one, or Tab would put a second box on the same line. */
+.koenig-lexical .kg-checklist .kg-check-item:not([role="checkbox"])::before,
+.koenig-lexical .kg-checklist .kg-check-item:not([role="checkbox"])::after {
+    content: none;
+    display: none;
 }
 
 .koenig-lexical .kg-checklist .kg-check-item-checked::before {
@@ -431,4 +461,86 @@ em-emoji-picker {
 .koenig-lexical ul[dir="rtl"].kg-checklist .kg-check-item {
     margin: 1rem 2.4rem 0 0;
     padding: 0 2.8rem 0 0;
+}
+
+/* Code block (the element selector keeps these above the prose rule for `code`). Line numbers are generated content from the block's data-gutter, so they are never
+   selected or copied. Token colours are set with --kg-code-* tokens a host can override. */
+.koenig-lexical code.kg-code-block {
+    --kg-code-fg: var(--kg-color-grey-900, #15171a);
+    --kg-code-bg: var(--kg-color-grey-100, #f1f3f4);
+    --kg-code-gutter: var(--kg-color-grey-600, #626d79);
+    --kg-code-comment: #5f6b7a;
+    --kg-code-keyword: #a11d6f;
+    --kg-code-string: #0b6e3a;
+    --kg-code-number: #b3470b;
+    --kg-code-function: #1d4fd1;
+    --kg-code-attr: #7a4fc1;
+    --kg-code-builtin: #0a6f86;
+    --kg-code-deleted: #b3261e;
+    --kg-code-inserted: #0b6e3a;
+    background: var(--kg-code-bg);
+    border-radius: 0.6rem;
+    color: var(--kg-code-fg);
+    display: block;
+    font-family: var(--kg-font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+    font-size: 1.4rem;
+    line-height: 1.6;
+    margin: 0 0 1.5em;
+    overflow-x: auto;
+    padding: 1.2rem 1.6rem 1.2rem 5.2rem;
+    position: relative;
+    tab-size: 2;
+    white-space: pre;
+}
+
+.dark .koenig-lexical code.kg-code-block,
+.koenig-lexical .dark code.kg-code-block {
+    --kg-code-fg: var(--kg-color-grey-100, #f1f3f4);
+    --kg-code-bg: var(--kg-color-grey-950, #0b0c0d);
+    --kg-code-gutter: var(--kg-color-grey-500, #7c8b9a);
+    --kg-code-comment: #8b97a5;
+    --kg-code-keyword: #f08fcb;
+    --kg-code-string: #7fd6a0;
+    --kg-code-number: #f2a56b;
+    --kg-code-function: #8fb4ff;
+    --kg-code-attr: #c8a7ff;
+    --kg-code-builtin: #6fd3e6;
+    --kg-code-deleted: #ff8a80;
+    --kg-code-inserted: #7fd6a0;
+}
+
+.koenig-lexical code.kg-code-block::before {
+    color: var(--kg-code-gutter);
+    content: attr(data-gutter);
+    left: 0;
+    padding: 1.2rem 0 1.2rem 0;
+    pointer-events: none;
+    position: absolute;
+    text-align: right;
+    top: 0;
+    user-select: none;
+    white-space: pre;
+    width: 3.6rem;
+}
+
+.koenig-lexical .kg-token-comment { color: var(--kg-code-comment); font-style: italic; }
+.koenig-lexical .kg-token-keyword { color: var(--kg-code-keyword); }
+.koenig-lexical .kg-token-string { color: var(--kg-code-string); }
+.koenig-lexical .kg-token-number { color: var(--kg-code-number); }
+.koenig-lexical .kg-token-function { color: var(--kg-code-function); }
+.koenig-lexical .kg-token-attr { color: var(--kg-code-attr); }
+.koenig-lexical .kg-token-builtin { color: var(--kg-code-builtin); }
+.koenig-lexical .kg-token-deleted { color: var(--kg-code-deleted); }
+.koenig-lexical .kg-token-inserted { color: var(--kg-code-inserted); }
+.koenig-lexical .kg-token-operator,
+.koenig-lexical .kg-token-punctuation { color: var(--kg-code-fg); opacity: 0.8; }
+
+@media (forced-colors: active) {
+    .koenig-lexical code.kg-code-block {
+        border: 1px solid CanvasText;
+        color: CanvasText;
+        background: Canvas;
+    }
+    .koenig-lexical code.kg-code-block::before { color: GrayText; }
+    .koenig-lexical [class*="kg-token-"] { color: CanvasText; }
 }

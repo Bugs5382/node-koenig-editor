@@ -46,6 +46,7 @@ import {
   appendCard,
   dropCards,
   emptyDocument,
+  foxDocument,
   galleryNode,
   imageNode,
   isEmptyDocument,
@@ -65,6 +66,38 @@ const SAMPLE_FONTS = [
   { label: "Sans", value: "system-ui, sans-serif" },
   { label: "Mono", value: "ui-monospace, Menlo, monospace" },
 ];
+
+// the colour settings the demo passes: a brand palette in every slot (the editor's own colour is not
+// offered), and the colour wheel off, as the switches say
+const BRAND = [
+  { label: "Brand blue", value: "#1D4ED8" },
+  { label: "Brand teal", value: "#0F766E" },
+  { label: "Brand amber", value: "#B45309" },
+  { label: "Brand ink", value: "#111827" },
+  { label: "Brand paper", value: "#FEF3C7" },
+];
+const COLOR_SLOTS = [
+  "textColor",
+  "highlight",
+  "calloutBackground",
+  "calloutText",
+  "buttonBackground",
+  "buttonText",
+  "headerBackground",
+  "headerText",
+  "headerButton",
+  "headerButtonText",
+];
+const colorOptions = (settings: Settings) =>
+  Object.fromEntries(
+    COLOR_SLOTS.map((slot) => [
+      slot,
+      {
+        ...(settings.brandColors ? { none: false, palette: BRAND } : {}),
+        ...(settings.colorPicker ? {} : { picker: false }),
+      },
+    ]),
+  );
 
 const REBUILD: (keyof Settings)[] = ["cards", "tools", "comments", "readOnly", "dark"];
 
@@ -201,7 +234,7 @@ export function App() {
     if (!isEmptyDocument(docRef.current)) setConfirm("clear");
   };
   const requestReset = () => {
-    if (!isEmptyDocument(docRef.current) || serializeSettings(settingsRef.current, catalog)) {
+    if (docRef.current !== foxDocument() || serializeSettings(settingsRef.current, catalog)) {
       setConfirm("reset");
     }
   };
@@ -221,9 +254,9 @@ export function App() {
     settingsRef.current = defaults;
     setSettings(defaults);
     threadsRef.current = [];
-    rebuild(emptyDocument());
+    rebuild(foxDocument());
     setToast({
-      message: "Reset to an empty document and the default settings.",
+      message: "Reset to the default text and settings.",
       undo: () => restore(snap),
     });
   };
@@ -258,6 +291,7 @@ export function App() {
   if (catalog.toolbar?.length) optionalProps.toolbar = settings.toolbar;
   if (settings.fonts) optionalProps.fonts = SAMPLE_FONTS;
   if (!settings.spellCheck) optionalProps.spellCheck = false;
+  if (settings.brandColors || !settings.colorPicker) optionalProps.colors = colorOptions(settings);
   if (previewAvailable) {
     // The bar's switch and width presets drive the editor, and the editor's own Preview button
     // and bar report back, so the two stay one state.
@@ -303,8 +337,8 @@ export function App() {
       )}
       {confirm === "reset" && (
         <ConfirmDialog
-          title="Reset to an empty document?"
-          message="The editor is emptied and every setting goes back to its default. You can undo this right after."
+          title="Reset to the default text?"
+          message="The editor goes back to the quick brown fox text and every setting goes back to its default. You can undo this right after."
           confirmLabel="Reset"
           onCancel={() => setConfirm(null)}
           onConfirm={doReset}

@@ -49,6 +49,7 @@ export type KoenigCardName =
   | "markdown"
   | "table"
   | "toggle"
+  | "toggleGroup"
   | "video";
 
 /** Features that are not cards. Pass a list as the composer's `tools` to keep only those. */
@@ -102,6 +103,61 @@ export type KoenigToolbarItem =
   | "textDirection"
   | "underline";
 
+/** One colour in a palette. */
+export interface KoenigColorSwatch {
+  /** What the swatch is called (its tooltip and screen reader name). */
+  label: string;
+  /** A hex colour, `#rgb` or `#rrggbb`. */
+  value: string;
+}
+
+/** Where the editor asks for a colour. Each has its own palette. */
+export type KoenigColorSlot =
+  | "buttonBackground"
+  | "buttonText"
+  | "calloutBackground"
+  | "calloutText"
+  | "headerBackground"
+  | "headerButton"
+  | "headerButtonText"
+  | "headerText"
+  | "highlight"
+  | "tableBand"
+  | "tableBrand"
+  | "textColor";
+
+/** A host's choices for one colour slot. */
+export interface KoenigColorSetting {
+  /** Takes away the choice of the editor's own colour, so a colour from the host's list (or, with
+   *  the picker on, a picked one) is always set. Default: true (the choice is there). */
+  none?: boolean;
+  /** The swatches this slot shows, in place of the editor's. */
+  palette?: readonly KoenigColorSwatch[];
+  /** Whether the person can pick any colour with the colour wheel. Default: true. `false` limits
+   *  the slot to its palette. */
+  picker?: boolean;
+}
+
+/** A file-type icon a host draws itself: the extension (lower case, no dot) is passed in. */
+export type KoenigFileIconOverrides = Record<string, FC<{ extension: string }>>;
+
+/** The file card's type icons. `false` switches them off. Without a setting they are on. */
+export type KoenigFileIcons =
+  | false
+  | {
+      /** Your own icon per extension, for example `{ pdf: PdfIcon }`; any other type keeps the
+       *  default picture. */
+      overrides?: KoenigFileIconOverrides;
+    };
+
+/** A language the code card offers. */
+export interface KoenigCodeLanguage {
+  /** What the list shows. */
+  label: string;
+  /** The language name the highlighter knows, for example `typescript`. */
+  value: string;
+}
+
 /** A font the host offers in the selection toolbar. */
 export interface KoenigFont {
   /** What the menu shows. */
@@ -127,8 +183,15 @@ export interface KoenigToolbarSelection {
 export interface KoenigToolbarAction {
   /** Opens under the toolbar when the button is pressed. Without it the button calls `onSelect`. */
   Card?: FC<KoenigToolbarSelection>;
+  /** The built-in button (or another action's `id`) this one goes right after. Without it, or when
+   *  the name is not known, the button goes at the end of its row. */
+  after?: KoenigToolbarItem | (string & {});
   /** True leaves the button out, for example when the person may not use it. */
   hidden?: boolean;
+  /** The toolbar row, counted from 1. The built-in buttons use rows 1 (text) and 2 (blocks, lists,
+   *  spacing, alignment, link); a higher number adds a row of the host's own. Default: the last
+   *  row of the built-ins. */
+  row?: number;
   /** The button's icon; without one the first letters of `label` show. */
   Icon?: FC<{ className?: string }>;
   /** Names the button: it becomes the `data-kg-toolbar-button` value. */
@@ -167,6 +230,8 @@ export interface KoenigStrings {
   close: string;
   searching: string;
   cards: Record<KoenigCardName, KoenigCardText>;
+  /** The Emoji entry of the "+" and "/" menus. Typing `/emoji` anywhere opens the same picker. */
+  emoji: KoenigCardText;
   /** The Preview button, and the reader simulation's controls. */
   preview: {
     /** The button that leaves the reader's view. */
@@ -209,6 +274,19 @@ export interface KoenigStrings {
     close: string;
     groups: Record<"align" | "blocks" | "general" | "text", string>;
     title: string;
+  };
+  code: {
+    copied: string;
+    copy: string;
+    copyFailed: string;
+    language: string;
+    plainText: string;
+  };
+  colors: {
+    custom: string;
+    /** `{label}` is the setting's name. */
+    group: string;
+    none: string;
   };
   textStyle: {
     colours: Record<"blue" | "green" | "grey" | "orange" | "purple" | "red", string>;
@@ -287,6 +365,14 @@ export interface KoenigStrings {
     rowMovedStatus: string;
     columnMovedStatus: string;
     sizeMenu: string;
+    /** The Style popover: header row and column, stripes and brand colours. */
+    lookMenu: string;
+    bandRows: string;
+    bandColumns: string;
+    bandColour: string;
+    brandRows: string;
+    brandColumns: string;
+    brandColour: string;
     sizeDone: string;
     columnWidthLabel: string;
     rowHeightLabel: string;
@@ -419,11 +505,20 @@ export interface KoenigStrings {
   header: {
     alignCenter: string;
     alignLeft: string;
+    alignRight: string;
     alignment: string;
     backgroundColor: string;
     backgroundImage: string;
     button: string;
+    buttonColor: string;
+    buttonEmoji: string;
+    buttonLabel: string;
+    buttonLabelBoth: string;
+    buttonLabelEmoji: string;
+    buttonLabelText: string;
     buttonText: string;
+    buttonTextColor: string;
+    textColor: string;
     buttonUrl: string;
     removeImage: string;
     subtitlePlaceholder: string;
@@ -434,8 +529,14 @@ export interface KoenigStrings {
   button: {
     alignCenter: string;
     alignLeft: string;
+    alignRight: string;
     alignment: string;
+    backgroundColor: string;
+    emoji: string;
+    emojiPlaceholder: string;
+    emojiRemove: string;
     invalidUrl: string;
+    textColor: string;
     text: string;
     textPlaceholder: string;
     url: string;
@@ -446,6 +547,7 @@ export interface KoenigStrings {
   file: {
     descriptionPlaceholder: string;
     select: string;
+    showIcon: string;
     /** `{name}` is replaced with the file name and `{limit}` with the size limit. */
     sizeError: string;
     titlePlaceholder: string;
@@ -454,7 +556,7 @@ export interface KoenigStrings {
   };
   video: KoenigMediaStrings & { captionPlaceholder: string };
   audio: KoenigMediaStrings & { titlePlaceholder: string };
-  callout: { background: string; emoji: string; placeholder: string };
+  callout: { background: string; emoji: string; placeholder: string; textColor: string };
   toggle: {
     /** The reader's button when the toggle is open. */
     collapse: string;
@@ -462,6 +564,12 @@ export interface KoenigStrings {
     /** The reader's button when the toggle is closed. */
     expand: string;
     headingPlaceholder: string;
+  };
+  /** The toggle group card: the single toggle's wording is used for the items themselves. */
+  toggleGroup: {
+    addItem: string;
+    /** `{number}` is the item's place in the stack, starting at 1. */
+    removeItem: string;
   };
   snippet: { namePlaceholder: string; replaceExisting: string };
   imageEditor: {
@@ -673,10 +781,13 @@ export interface KoenigGalleryRenderProps {
 
 /** What the composer's `cardRenderers.header` component receives. */
 export interface KoenigHeaderRenderProps {
+  /** `left`, `center` or `right`. */
   alignment: string;
   backgroundColor: string;
   backgroundImageSrc: string;
   buttonColor: string;
+  /** An emoji shown before the button's text, or empty. */
+  buttonEmoji?: string;
   buttonEnabled: boolean;
   buttonText: string;
   buttonTextColor: string;
@@ -704,6 +815,7 @@ export interface KoenigHeaderRenderProps {
         | "backgroundColor"
         | "backgroundImageSrc"
         | "buttonColor"
+        | "buttonEmoji"
         | "buttonEnabled"
         | "buttonText"
         | "buttonTextColor"
@@ -790,11 +902,25 @@ export interface KoenigComposerProps {
   spellCheck?: boolean;
   /** The language of the text (a BCP 47 tag such as `de`), so the browser checks spelling in it. */
   lang?: string;
+  /** The colour settings, per slot: each slot's palette, whether the colour wheel is on, and
+   *  whether the editor's own colour is a choice. With `picker: false` and `none: false` the host
+   *  forces the person to a colour from its list. */
+  colors?: Partial<Record<KoenigColorSlot, KoenigColorSetting>>;
+  /** The icons the file card shows for a file's type; `false` switches them off. */
+  fileIcons?: KoenigFileIcons;
+  /** The languages the code card's list offers. Default: the ones the highlighter ships with
+   *  (JavaScript, TypeScript, CSS, HTML, Python, Java, Go, Rust, SQL and a few more). "Plain text"
+   *  is always offered. */
+  codeLanguages?: readonly KoenigCodeLanguage[];
   /** The fonts the font button offers: a label and a CSS `font-family` value each. With none, the
    *  button is not shown. */
   fonts?: readonly KoenigFont[];
   /** The format toolbar buttons to show. Default: all of them. */
   toolbar?: readonly KoenigToolbarItem[];
+  /** How many rows the built-in selection toolbar buttons use: 2 (the default: text formats on the
+   *  first, blocks, lists, spacing, alignment and link on the second) or 1 (one row that wraps
+   *  where the window is narrow). */
+  toolbarRows?: 1 | 2;
   /** The host's own buttons and cards on the selection toolbar. */
   toolbarActions?: readonly KoenigToolbarAction[];
   /** The features that are not cards: `imageEditor` (crop and rotate before upload) and

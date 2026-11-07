@@ -33,6 +33,7 @@ export const TRY_IDS = [
   "header",
   "callout",
   "toggle",
+  "toggle-group",
   "divider",
   "table",
   "file",

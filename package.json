@@ -21,7 +21,7 @@
     "*.css"
   ],
   "config": {
-    "packMaxUnpackedBytes": 1010000,
+    "packMaxUnpackedBytes": 1070000,
     "packMaxGrowthPercent": 25
   },
   "engines": {
@@ -66,6 +66,7 @@
   "peerDependencies": {
     "@lexical/clipboard": "^0.52.0",
     "@lexical/code": "^0.52.0",
+    "@lexical/code-prism": "^0.52.0",
     "@lexical/html": "^0.52.0",
     "@lexical/link": "^0.52.0",
     "@lexical/list": "^0.52.0",
@@ -91,12 +92,14 @@
     "lodash": "^4.18.1",
     "markdown-it": "^14.3.3",
     "react-error-boundary": "^6.1.6",
+    "react-file-icon": "^1.6.0",
     "unicode-emoji-json": "^0.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@lexical/clipboard": "^0.52.0",
     "@lexical/code": "^0.52.0",
+    "@lexical/code-prism": "^0.52.0",
     "@lexical/html": "^0.52.0",
     "@lexical/link": "^0.52.0",
     "@lexical/list": "^0.52.0",
@@ -116,6 +119,7 @@
     "@types/node": "^22.10.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@types/react-file-icon": "^1.0.5",
     "@vitejs/plugin-react": "^6.1.2",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",

@@ -48,19 +48,15 @@ export const KoenigPreviewFrame = ({ children }: { children: ReactNode }) => {
     );
   }
 
-  const stage: CSSProperties = {
-    background: dark ? "#0b0c0e" : "#eceef0",
-    borderRadius: 8,
-    boxSizing: "border-box",
-    display: "block",
-    overflowX: "auto",
-    padding: 16,
-  };
+  // A desktop preview is the document as it is on the page: no backdrop, no box. A tablet or phone
+  // preview is narrower than the page, so its edge gets a hairline (not a grey panel around it).
+  const device = options.width !== "desktop";
+  const stage: CSSProperties = { display: "block", overflowX: "auto" };
   const frame = {
     "--kg-rem": `${options.textSize * 0.625}px`,
     background: dark ? "#15171a" : "#ffffff",
-    borderRadius: 6,
-    boxShadow: "0 1px 4px rgb(0 0 0 / 0.15)",
+    border: device ? `1px solid ${dark ? "#2c2f33" : "#dde1e5"}` : "none",
+    borderRadius: device ? 6 : 0,
     boxSizing: "border-box",
     colorScheme: dark ? "dark" : "light",
     display: "block",

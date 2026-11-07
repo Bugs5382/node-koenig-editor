@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { act, cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { $getRoot, $isTextNode, type TextNode } from "lexical";
 import { KOENIG_TOOLBAR_ITEMS, type KoenigEditorAPI } from "node-koenig-editor";
 import { afterEach, describe, expect, it } from "vitest";
@@ -59,8 +59,16 @@ const open = async (name: string) => {
   });
 };
 const pick = async (id: string) => {
+  // colours come from the shared colour control: a swatch by its hex, the editor's own colour by "default" or "none"
+  const target =
+    id === "default" || id === "none"
+      ? document.querySelector("[data-kg-color-none]") ||
+        document.querySelector(`[data-kg-style-item="${id}"]`)
+      : id.startsWith("#")
+        ? document.querySelector(`[data-kg-color-swatch="${id}"]`)
+        : document.querySelector(`[data-kg-style-item="${id}"]`);
   await act(async () => {
-    fireEvent.click(document.querySelector(`[data-kg-style-item="${id}"]`) as Element);
+    fireEvent.click(target as Element);
   });
 };
 const read = <T,>(api: KoenigEditorAPI, fn: (node: TextNode) => T): T =>
@@ -104,12 +112,16 @@ describe("the menus", () => {
     const api = await load();
     await selectAll(api);
     await open("textColor");
-    expect(screen.getByRole("menu", { name: "Text colour" })).toBeTruthy();
-    await pick("red");
+    await waitFor(() =>
+      expect(document.querySelector("[data-kg-color-control]")?.getAttribute("aria-label")).toBe(
+        "Text colour",
+      ),
+    );
+    await pick("#D64545");
     expect(style(api)).toContain("color: #D64545");
     await waitFor(() => expect(button("textColor")?.getAttribute("data-kg-active")).toBe("true"));
     // the menu closes and focus is back in the text
-    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.querySelector("[data-kg-color-control]")).toBeNull();
     await open("textColor");
     await pick("default");
     expect(style(api)).not.toContain("color");
@@ -130,7 +142,7 @@ describe("the menus", () => {
     const api = await load();
     await selectAll(api);
     await open("highlight");
-    await pick("yellow");
+    await pick("#FFF3B0");
     expect(style(api)).toContain("background-color: #FFF3B0");
     await open("highlight");
     await pick("none");
@@ -156,20 +168,23 @@ describe("the menus", () => {
     await act(async () => {
       fireEvent.keyDown(document.activeElement as Element, { key: "Escape" });
     });
-    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.querySelector("[data-kg-color-control]")).toBeNull();
     await waitFor(() => expect(document.activeElement).toBe(api.editorInstance.getRootElement()));
   });
 
   it("moves between items with the arrow keys", async () => {
     const api = await load();
     await selectAll(api);
-    await open("textColor");
+    await open("fontSize");
     const items = [...document.querySelectorAll("[data-kg-style-item]")] as HTMLElement[];
-    expect(document.activeElement).toBe(items[0]);
+    expect(document.activeElement).toBe(
+      items.find((item) => item.getAttribute("aria-checked") === "true") ?? items[0],
+    );
+    const first = document.activeElement as HTMLElement;
     await act(async () => {
-      fireEvent.keyDown(items[0] as Element, { key: "ArrowDown" });
+      fireEvent.keyDown(first, { key: "ArrowDown" });
     });
-    expect(document.activeElement).toBe(items[1]);
+    expect(document.activeElement).toBe(items[(items.indexOf(first) + 1) % items.length]);
   });
 });
 
@@ -178,7 +193,7 @@ describe("clear formatting", () => {
     const api = await load();
     await selectAll(api);
     await open("textColor");
-    await pick("red");
+    await pick("#D64545");
     await act(async () => {
       fireEvent.click(button("bold") as Element);
     });
@@ -194,7 +209,7 @@ describe("clear formatting", () => {
     const api = await load();
     await selectAll(api);
     await open("textColor");
-    await pick("red");
+    await pick("#D64545");
     await act(async () => {
       fireEvent.keyDown(api.editorInstance.getRootElement() as Element, {
         code: "Backslash",

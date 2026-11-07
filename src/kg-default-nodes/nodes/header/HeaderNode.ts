@@ -10,6 +10,7 @@ const headerProperties = [
     {name: 'buttonEnabled', default: false},
     {name: 'buttonUrl', default: '', urlType: 'url'},
     {name: 'buttonText', default: ''},
+    {name: 'buttonEmoji', default: ''},
     {name: 'header', default: '', urlType: 'html', wordCount: true},
     {name: 'subheader', default: '', urlType: 'html', wordCount: true},
     {name: 'backgroundImageSrc', default: '', urlType: 'url'},

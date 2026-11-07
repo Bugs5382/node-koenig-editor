@@ -11,7 +11,7 @@ editor works alone.
 
 ## ✨ Highlights
 
-- 🧱 **Pick your cards** — image, gallery, header, file, video, audio, button, markdown, divider, callout, toggle and table, on by default, off one by one.
+- 🧱 **Pick your cards** — image, gallery, header, file, video, audio, button, markdown, divider, callout, toggle, toggle group and table, on by default, off one by one.
 - 🧩 **Bring your own nodes** — register custom nodes and cards, and add your own "+" and slash menu entries.
 - 🗣️ **Your wording** — every label, placeholder and menu text comes from a `strings` option with English defaults.
 - 🖼️ **Crop, rotate and emoji, offline** — an image editor before upload and an emoji picker, both switchable with `tools`.
@@ -73,7 +73,7 @@ the sources.
 
 | Prop                 | Type                              | Default         | What it does                                                                                                                                                                     |
 | -------------------- | --------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `file`, `video`, `audio`, `button`, `markdown`, `divider`, `callout`, `toggle`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
+| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `file`, `video`, `audio`, `button`, `markdown`, `divider`, `callout`, `toggle`, `toggleGroup`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
 | `cardRenderers`      | `KoenigCardRenderers`             | none            | Your own layout for the `gallery` and `header` cards; see [Gallery and header cards](#-gallery-and-header-cards). |
 | `gallery`            | `{ maxImages?: number }`          | `{ maxImages: 50 }` | Options for the gallery card. `maxImages` is the most photos a gallery takes, and the ceiling for each gallery's own setting. It limits adding photos, never cuts off photos a document already has. |
 | `customNodes`        | `EditorNodes`                     | none            | Your own node classes, registered after the shipped ones. A node with a static `kgMenu` (a `CardMenuItem` or a list) is listed in the menus.                                     |
@@ -81,7 +81,11 @@ the sources.
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
 | `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `textDirection`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
+| `colors`             | `Partial<Record<KoenigColorSlot, KoenigColorSetting>>` | the editor's palettes | Per colour slot: a `palette` of swatches, `picker: false` to switch the colour wheel off, `none: false` to take away the editor's own colour. See [Colours](#-colours). |
+| `fileIcons`          | `false \| { overrides? }`         | on              | The file card's type icons; `false` switches them off, `overrides` maps an extension to your own icon component; see [File, video and audio cards](#-file-video-and-audio-cards). |
+| `codeLanguages`      | `KoenigCodeLanguage[]`            | highlighter's  | The languages the code block's list offers, each a `label` and a Prism language `value`; see [Code blocks](#-code-blocks). |
 | `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
+| `toolbarRows`        | `1 \| 2`                          | `2`             | The rows the selection toolbar uses; see [Toolbar actions](#-toolbar-actions). |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
 | `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker`, `preview`, `shortcuts`, `findReplace` and `cleanPaste`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
 | `spellCheck`, `lang` | `boolean`, `string`               | on, none        | `spellCheck={false}` switches the browser's spell check off in the editing area; `lang` names the language of the text for it. |
@@ -296,6 +300,26 @@ nothing when that text has been edited or removed in the meantime. Set `hidden: 
 a button out for the person using it (permissions, a feature switch). An action with no `Card`
 calls `onSelect` with the same object. The button's `data-kg-toolbar-button` value is its `id`.
 
+### Rows and where a button goes
+
+The toolbar has two rows: the text formats and styles on the first (Bold to Clear formatting),
+blocks, lists, spacing, alignment and Link on the second. Pass `toolbarRows={1}` for a single row
+that wraps where the window is narrow. An action chooses its place with two optional fields:
+
+- `row`: the row, counted from 1. Without it the button ends the last built-in row. A number past
+  the built-in rows adds a row of your own.
+- `after`: a built-in button's name (`"italic"`, `"heading2"`, `"link"`, any value of the `toolbar`
+  option) or another action's `id`. The button goes right after it, in that button's row. A name
+  that is not known is ignored and `row` decides.
+
+```tsx
+const actions: KoenigToolbarAction[] = [
+  { id: "note", label: "Note", after: "highlight" }, // first row, next to Highlight
+  { id: "cite", label: "Cite", row: 2 }, // end of the second row
+  { id: "ai", label: "Rewrite", row: 3 }, // a third row
+];
+```
+
 ## 📋 Tables
 
 The `table` card (on by default, `cards` to leave it out) inserts a 3 by 3 table with a header
@@ -325,6 +349,14 @@ right-click menu with the same actions) edits it:
   palette, on the outer lines, the inner lines or all lines of a cell, selected range, row, column or
   the whole table. A line two cells share is written on both. They are saved on the cell and written
   into the saved HTML, and "Remove borders" goes back to the table's default lines.
+- **Style**: header row and header column switches (the header row is marked up as column headers
+  and the header column as row headers), banded rows and banded columns (every second row or column
+  in a band colour), and a brand colour on the header row and/or the first column. Each table has
+  its own settings. The band and brand colours use the editor's shared colour control: a palette per
+  slot, an optional colour wheel, and the host's choices through the composer's `colors` option
+  (`colors.tableBand` and `colors.tableBrand`: `palette`, `picker: false` to limit the choice to the
+  palette). The ink on each colour is chosen to read on it. The colours are written onto the cells in
+  the saved HTML, and a cell you shaded yourself keeps its own colour.
 - **Caption**: the figure entry (see below) for the table: a label such as "Table", an automatic
   number, a title, above or below. The text is the table's accessible name in the editor and a real
   `caption` element in the saved HTML.
@@ -427,8 +459,9 @@ as plain text, and a print rule puts the on-screen overlay under the photo too, 
 The wording is `strings.gallery`.
 
 **Header.** A section opener: title, subtitle, a background colour or image, and an optional
-button. Its settings are a colour, a background image, alignment (a left or centred choice, so
-there is no list to open) and the button; each label stays on one line. Its sizes are multiples of `--kg-rem` and its type uses `--kg-font-sans` and
+button. Its settings are the background and text colours (the shared [colour control](#-colours)),
+a background image, alignment (a left, centred or right choice, so there is no list to open) and the
+button (a label of text, an emoji or both, with its own two colours); each label stays on one line. Its sizes are multiples of `--kg-rem` and its type uses `--kg-font-sans` and
 `--kg-font-size-h1`, so it follows the [theme tokens](#-styles-and-theme-tokens). The title is
 not a heading node: the H1 to H5 limit and any outline numbering a host builds from headings do
 not see it. The background image goes through the host's `fileUploader`.
@@ -450,7 +483,7 @@ in the editor; the saved document and the HTML output are the same.
 | Callbacks | `addFiles(files)`, `removeImage(index)`, `moveImage(from, to)`, `replaceImages(list)` (the whole list, for your own drag and drop), `updateImage(index, { alt, title, caption })`, `setMaxImages(n)`, `clearError()` |
 
 **The header contract** (`KoenigHeaderRenderProps`) carries the card's values (`title`,
-`subtitle`, `backgroundColor`, `backgroundImageSrc`, `buttonText`, `buttonUrl`, `alignment`, the
+`subtitle`, `backgroundColor`, `backgroundImageSrc`, `buttonText`, `buttonEmoji`, `buttonUrl`, `alignment` (`left`, `center` or `right`), the
 colours, `layout`), `titleField` and `subtitleField` (their editors, ready to place), `isEditing`,
 `isSelected`, `readOnly`, `update(changes)`, `uploadBackgroundImage(file)` and `uploadError`.
 
@@ -528,7 +561,9 @@ browser does (leading spaces and control characters, tabs and line breaks inside
 ignored), so `JaVaScRiPt:`, `data:`, `vbscript:`, relative and protocol-relative links are all
 refused. The button's link field shows `strings.button.invalidUrl` and does not store the value.
 
-**Button.** A label, a link and left or centre alignment. A button with no valid link exports
+**Button.** A label, a link, left, centre or right alignment, an optional emoji before the label and
+its own background and text colours (the `buttonBackground` and `buttonText` colour slots, see
+[Colours](#-colours)). A picked colour is written as inline CSS on the link. A button with no valid link exports
 nothing. Upstream's email-specific markup is not included: every target gets the same link.
 
 **Markdown.** Write or paste Markdown into a text area; the card shows the rendered result.
@@ -538,6 +573,27 @@ follow the URL rule above (a link that fails stays plain text), and `######` bec
 match the [heading limit](#-headings). Rendering uses [`markdown-it`](https://github.com/markdown-it/markdown-it)
 (MIT), a regular dependency that stays external in the build. Upstream's CodeMirror editor and
 its Ghost image uploads are not included.
+
+## 💻 Code blocks
+
+A code block is Lexical's own (`@lexical/code`), highlighted with Prism through `@lexical/code-prism`
+(add it next to the other `@lexical/*` peers). Type three backticks and a language (` ```ts `) on an
+empty line, or pick **Code** from the "+" or slash menu (`/code`). Every block has line numbers (drawn
+by the stylesheet, so they are never selected or copied) and, on hover or with the cursor in it, a
+small bar with a language list and a **Copy** button. A reader (read-only or Preview) gets the copy
+button alone.
+
+- **Languages.** `codeLanguages={[{ label: 'TypeScript', value: 'typescript' }, ...]}` lists the
+  languages the bar offers; "Plain text" is always there. Without a list you get what the highlighter
+  ships with (C, C++, CSS, Go, HTML, Java, JavaScript, Markdown, Objective-C, PowerShell, Python, Rust,
+  SQL, Swift, TypeScript and XML). The value must be a language name Prism knows.
+- **Saved HTML.** `<pre class="language-ts" data-language="ts">` with the code as plain text: no token
+  spans and no line numbers, so your site can colour it again.
+- **Colours.** The token colours come from `--kg-code-*` custom properties on `.kg-code-block`
+  (`--kg-code-bg`, `--kg-code-fg`, `--kg-code-gutter`, `--kg-code-comment`, `--kg-code-keyword`,
+  `--kg-code-string`, `--kg-code-number`, `--kg-code-function`, `--kg-code-attr`, `--kg-code-builtin`);
+  set them to match your page. In forced-colours mode the block uses the system colours.
+- **Wording.** `strings.code` (copy, copied, copy failed, language list name, plain text).
 
 ## 🔢 Word count and reading time
 
@@ -579,7 +635,12 @@ plays from the url your uploader returned.
   chosen file against its `extensions`, `mimeTypes` and an optional `maxSize` in bytes *before*
   uploading, and names the file in the message (`strings.file.typeError`, `strings.file.sizeError`).
   A host with no `fileTypes` gets no pre-check; the uploader has the last word.
-- **File.** A title, a description, and the file name and size. It saves as a download link.
+- **File.** A title, a description, and the file name and size. It saves as a download link. The
+  card shows a picture for the file's type (react-file-icon, MIT: a PDF, a spreadsheet, an archive and
+  several hundred more; a type it does not know gets a plain page with the extension on it). The icon
+  is optional: `fileIcons={false}` switches it off for the whole editor, a card has its own "Show the
+  file type icon" box, and `fileIcons={{ overrides: { pdf: PdfIcon } }}` draws your own for a type
+  (the component gets `extension`). The icon is in the editor and Preview; the saved HTML is unchanged.
 - **Video and audio** play in the browser's own player, so play, seek, volume and mute work from the
   keyboard and show the browser's focus ring. Captions are required for accessibility: a card has a
   **transcript** field and a **WebVTT (`.vtt`) track upload**, saved as a
@@ -620,7 +681,9 @@ would flatten them. JPEG stays JPEG; everything else is saved as PNG.
 - Wording: `strings.imageEditor`. Use the dialog in your own UI with
   `<ImageEditorDialog file onApply onCancel />`.
 
-**Emoji picker.** The callout card's emoji button opens it. It is searchable by name, has the nine
+**Emoji picker.** The callout card's emoji button opens it, and so do the emoji field in the Button and
+Header cards' settings, the **Emoji** entry of the plus and slash menus, and typing `/emoji` anywhere
+in the text (also inside a callout or a table cell; Escape closes it and leaves what was typed). It is searchable by name, has the nine
 standard groups, and works fully offline: the emoji come from
 [`unicode-emoji-json`](https://www.npmjs.com/package/unicode-emoji-json) (MIT), a dependency of
 this package that is not part of `dist/index.js`. It is loaded with a dynamic `import()` the
@@ -715,10 +778,10 @@ Four buttons in the selection toolbar style the selected text, and a fifth takes
 
 - **Text size** (`fontSize`): smaller, small, normal, large, larger, set in `em` so the text follows
   the host's type scale.
-- **Text colour** (`textColor`): six colours that read on both a light and a dark page, or the
-  default colour.
-- **Highlight** (`highlight`): six light colours, saved together with dark ink so the text reads on
-  any page.
+- **Text colour** (`textColor`): six colours that read on both a light and a dark page, the
+  default colour, and a colour wheel for any colour (see [Colours](#-colours)).
+- **Highlight** (`highlight`): six light colours and the colour wheel, saved together with ink
+  (dark on a light highlight, light on a dark one) so the text reads on any page.
 - **Font** (`fontFamily`): the fonts the host gives, shown in their own face. With no `fonts` the
   button is not shown.
 - **Clear formatting** (`clearFormatting`, Ctrl or Cmd+**backslash**): takes every inline format and style off
@@ -738,6 +801,32 @@ The styling is the text's own style, so it is saved in the document, survives a 
 inline CSS in the saved HTML. The lists open under their button; the arrow keys move, Enter picks,
 Escape closes and returns to the text. Each button is marked while the selection has that style.
 The wording is `strings.textStyle` and `strings.toolbar`.
+
+## 🌈 Colours
+
+Every colour setting in the editor (text colour, highlight, the callout's background and text, the
+Button card's colours and the Header card's four colours) uses one control: a row of base swatches
+for that setting, the editor's own colour, and a colour wheel for any colour. The base palette is
+different for each setting; the `colors` option changes it per setting (a "slot"):
+
+```tsx
+<KoenigComposer
+  colors={{
+    textColor: { palette: [{ label: "Brand blue", value: "#1D4ED8" }] },
+    highlight: { picker: false },
+    calloutBackground: { palette: brand, picker: false, none: false },
+  }}
+/>
+```
+
+- `palette`: the swatches that setting shows, each a `label` and a `#rgb` or `#rrggbb` `value`.
+- `picker`: `false` takes the colour wheel away, so the person can only use the palette.
+- `none`: `false` takes away the editor's own colour, so a colour is always set.
+
+With `picker: false` and `none: false` the host forces the colours of that setting to its list.
+The slots are `textColor`, `highlight`, `calloutBackground`, `calloutText`, `buttonBackground`,
+`buttonText`, `headerBackground`, `headerText`, `headerButton`, `headerButtonText`, `tableBand` and
+`tableBrand`. Highlight writes dark or light text with the colour, whichever reads on it.
 
 ## 📃 Lists and spacing
 

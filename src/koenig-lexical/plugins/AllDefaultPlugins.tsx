@@ -17,10 +17,13 @@ import {ReadOnlyGuardPlugin} from '../../additions/preview/ReadOnlyGuardPlugin';
 import {AlignmentShortcutsPlugin} from '../../additions/alignment/AlignmentShortcutsPlugin';
 import {InlineFormatShortcutsPlugin} from '../../additions/inlineFormats/InlineFormatShortcutsPlugin';
 import {FindReplacePlugin} from '../../additions/find/FindReplacePlugin';
+import {CodePlugin} from '../../additions/code/CodePlugin';
 import {CleanPastePlugin} from '../../additions/paste/CleanPastePlugin';
 import {ShortcutsPlugin} from '../../additions/shortcuts/ShortcutsPlugin';
 import {SpacingPlugin} from '../../additions/spacing/SpacingPlugin';
 import {TablePlugin} from '../../additions/table/TablePlugin';
+import {EmojiCommandPlugin} from '../../additions/emojiPicker/EmojiCommandPlugin';
+import {ToggleGroupPlugin} from '../plugins/ToggleGroupPlugin';
 import {TogglePlugin} from '../plugins/TogglePlugin';
 import {useKoenigPreview} from '../../additions/preview/PreviewContext';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -51,6 +54,7 @@ export const AllDefaultPlugins = () => {
             {hasNode(editor, 'horizontalrule') && <HorizontalRulePlugin />}
             {hasNode(editor, 'callout') && <CalloutPlugin />}
             {hasNode(editor, 'toggle') && <TogglePlugin />}
+            {hasNode(editor, 'toggle-group') && <ToggleGroupPlugin />}
             {hasNode(editor, 'gallery') && <GalleryPlugin />}
             {hasNode(editor, 'header') && <HeaderPlugin />}
             {hasNode(editor, 'button') && <ButtonPlugin />}
@@ -58,6 +62,7 @@ export const AllDefaultPlugins = () => {
             {hasNode(editor, 'file') && <FilePlugin />}
             {hasNode(editor, 'video') && <VideoPlugin />}
             {hasNode(editor, 'audio') && <AudioPlugin />}
+            {hasNode(editor, 'code') && <CodePlugin />}
             <TablePlugin />
             <AlignmentShortcutsPlugin />
             <InlineFormatShortcutsPlugin />
@@ -65,6 +70,7 @@ export const AllDefaultPlugins = () => {
             <ShortcutsPlugin />
             <CleanPastePlugin />
             <FindReplacePlugin />
+            <EmojiCommandPlugin />
         </>
     );
 };

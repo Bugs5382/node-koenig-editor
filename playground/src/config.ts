@@ -78,6 +78,10 @@ export interface Settings {
   fonts: boolean;
   /** The browser's spell check in the editing area. */
   spellCheck: boolean;
+  /** The colour wheel (any colour) in every colour setting. */
+  colorPicker: boolean;
+  /** A sample brand palette in every colour setting, with the editor's own colour not offered. */
+  brandColors: boolean;
   comments: boolean;
   wordCount: boolean;
   readOnly: boolean;
@@ -107,6 +111,8 @@ export function defaultSettings(catalog: Catalog): Settings {
     toolbar: [...(catalog.toolbar ?? [])],
     fonts: false,
     spellCheck: true,
+    colorPicker: true,
+    brandColors: false,
     comments: true,
     wordCount: true,
     readOnly: false,
@@ -129,6 +135,8 @@ const FLAGS = [
   "preview",
   "fonts",
   "spellCheck",
+  "colorPicker",
+  "brandColors",
 ] as const;
 
 const sameList = (a: readonly string[], b: readonly string[]) =>
@@ -209,6 +217,7 @@ export function buildSnippet(settings: Settings, catalog: Catalog): string {
   }
   if (settings.fonts) props.push("fonts={fonts}");
   if (!settings.spellCheck) props.push("spellCheck={false}");
+  if (settings.brandColors || !settings.colorPicker) props.push("colors={colors}");
   if (settings.comments) props.push("comments={comments}");
   if (settings.readOnly) props.push("editable={false}");
   props.push("fileUploader={fileUploader}");

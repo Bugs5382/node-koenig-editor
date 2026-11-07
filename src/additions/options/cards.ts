@@ -31,6 +31,7 @@ export const KOENIG_CARD_NAMES: readonly KoenigCardName[] = [
   "divider",
   "callout",
   "toggle",
+  "toggleGroup",
   "table",
   "button",
   "gallery",
@@ -55,6 +56,7 @@ export const CARD_NODE_TYPES: Record<KoenigCardName, readonly string[]> = {
   image: ["image"],
   table: ["table", "tablerow", "tablecell"],
   toggle: ["toggle"],
+  toggleGroup: ["toggle-group"],
   video: ["video"],
 };
 

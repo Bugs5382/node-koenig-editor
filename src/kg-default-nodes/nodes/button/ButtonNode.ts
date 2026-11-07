@@ -5,6 +5,9 @@ import {toSafeUrl} from '../../utils/safe-url.js';
 
 const buttonProperties = [
     {name: 'buttonText', default: ''},
+    {name: 'buttonEmoji', default: ''},
+    {name: 'backgroundColor', default: ''},
+    {name: 'textColor', default: ''},
     {name: 'alignment', default: 'center'},
     {name: 'buttonUrl', default: '', urlType: 'url'}
 ] as const satisfies readonly DecoratorNodeProperty[];

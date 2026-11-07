@@ -11,7 +11,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
 const NODE_FIELDS = [
     'alignment', 'backgroundColor', 'backgroundImageSrc', 'backgroundImageWidth', 'backgroundImageHeight',
-    'buttonColor', 'buttonEnabled', 'buttonText', 'buttonTextColor', 'buttonUrl', 'layout', 'textColor'
+    'buttonColor', 'buttonEmoji', 'buttonEnabled', 'buttonText', 'buttonTextColor', 'buttonUrl', 'layout', 'textColor'
 ];
 
 const escapeHtml = value => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -23,6 +23,7 @@ function HeaderNodeComponent({
     backgroundImageSrc,
     buttonColor,
     buttonEnabled,
+    buttonEmoji,
     buttonText,
     buttonTextColor,
     buttonUrl,
@@ -97,6 +98,7 @@ function HeaderNodeComponent({
         backgroundImageSrc,
         buttonColor,
         buttonEnabled,
+        buttonEmoji,
         buttonText,
         buttonTextColor,
         buttonUrl,

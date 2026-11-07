@@ -14,6 +14,7 @@ import {ImageNode} from './ImageNode';
 import {LinkNode} from '@lexical/link';
 import {ListItemNode, ListNode} from '@lexical/list';
 import {TableCellNode, TableNode, TableRowNode} from '@lexical/table';
+import {ToggleGroupNode} from './ToggleGroupNode';
 import {ToggleNode} from './ToggleNode';
 
 // Stock Lexical nodes keep their stock type names (`text`, `heading`, `quote`, `code`, `table`
@@ -34,6 +35,7 @@ const DEFAULT_NODES = [
     ImageNode,
     CalloutNode,
     ToggleNode,
+    ToggleGroupNode,
     GalleryNode,
     HeaderNode,
     ButtonNode,

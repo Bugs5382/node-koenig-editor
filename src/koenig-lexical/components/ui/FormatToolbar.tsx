@@ -24,6 +24,7 @@ import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 import {
     ToolbarMenu,
     ToolbarMenuItem,
+    ToolbarMenuRow,
     ToolbarMenuSeparator
 } from './ToolbarMenu';
 import {altOrOption, ctrlOrCmdSymbol, ctrlOrSymbol, shiftOrSymbol} from '../../utils/shortcutSymbols';
@@ -54,9 +55,11 @@ const SCOPE_STRING = {cell: 'scopeCell', row: 'scopeRow', column: 'scopeColumn',
 import {getSelectedNode} from '../../utils/getSelectedNode';
 import {$getSelectionSpacing, $setSpacing, LINE_SPACINGS, PARAGRAPH_SPACINGS} from '../../../additions/spacing/spacing';
 import {$getSelectionDirection, $setDirection} from '../../../additions/direction/direction';
+import {useColorSetting} from '../../../additions/colors/ColorControl';
+import {ColorMenu} from '../../../additions/colors/ColorMenu';
 import {StyleMenu} from '../../../additions/textStyle/StyleMenu';
-import {$clearFormatting, $getTextStyle, $setHighlight, $setTextStyle, FONT_SIZES, HIGHLIGHTS, TEXT_COLORS} from '../../../additions/textStyle/textStyle';
-import {ALIGNMENT_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
+import {$clearFormatting, $getTextStyle, $setHighlight, $setTextStyle, FONT_SIZES} from '../../../additions/textStyle/textStyle';
+import {ALIGNMENT_ITEMS, KOENIG_TOOLBAR_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
 
 const blockTypeToBlockName = {
     bullet: 'Bulleted List',
@@ -93,6 +96,11 @@ function quoteIcon(blockType = '') {
     }
 }
 
+// the data-kg-toolbar-button value of a toolbar item (the headings are named by their tag)
+const buttonId = item => (/^heading\d$/.test(item) ? `h${item.slice(7)}` : item);
+// the first button of the second row
+const ROW_TWO_START = ['h1'];
+
 export default function FormatToolbar({
     editor,
     isSnippetsEnabled,
@@ -110,7 +118,9 @@ export default function FormatToolbar({
     const [alignment, setAlignment] = React.useState({direction: null, format: ''});
     const [cell, setCell] = React.useState(null);
     const [scope, setScope] = React.useState('cell');
-    const {cardConfig: {createSnippet}, toolbar, toolbarActions, fonts} = React.useContext(KoenigComposerContext);
+    const {cardConfig: {createSnippet}, toolbar, toolbarActions, toolbarRows, fonts} = React.useContext(KoenigComposerContext);
+    const textColorSetting = useColorSetting('textColor');
+    const highlightSetting = useColorSetting('highlight');
     // the style button whose list is open, and the button it hangs from
     const [styleMenu, setStyleMenu] = React.useState(null);
     const [styleNow, setStyleNow] = React.useState({});
@@ -301,19 +311,13 @@ export default function FormatToolbar({
         },
         textColor: {
             label: strings.toolbar.textColor,
-            options: [
-                {id: 'default', label: strings_.defaultColour, checked: !styleNow.color || styleNow.color === 'inherit'},
-                ...TEXT_COLORS.map(color => ({id: color.id, label: strings_.colours[color.id], swatch: color.value, checked: (styleNow.color || '').toLowerCase() === color.value.toLowerCase()}))
-            ],
-            apply: id => $setTextStyle($getSelection(), 'color', TEXT_COLORS.find(color => color.id === id)?.value || null)
+            colour: {slot: 'textColor', setting: textColorSetting, value: styleNow.color && styleNow.color !== 'inherit' ? styleNow.color : null},
+            apply: value => $setTextStyle($getSelection(), 'color', value)
         },
         highlight: {
             label: strings.toolbar.highlight,
-            options: [
-                {id: 'none', label: strings_.noHighlight, checked: !styleNow['background-color']},
-                ...HIGHLIGHTS.map(color => ({id: color.id, label: strings_.highlights[color.id], swatch: color.value, checked: (styleNow['background-color'] || '').toLowerCase() === color.value.toLowerCase()}))
-            ],
-            apply: id => $setHighlight($getSelection(), HIGHLIGHTS.find(color => color.id === id)?.value || null)
+            colour: {slot: 'highlight', setting: highlightSetting, value: styleNow['background-color'] || null},
+            apply: value => $setHighlight($getSelection(), value)
         },
         lineSpacing: {
             label: strings.toolbar.lineSpacing,
@@ -359,9 +363,31 @@ export default function FormatToolbar({
 
     const openMenu = styleMenu ? STYLE_MENUS[styleMenu.item] : null;
 
-    return (
+    // The toolbar is laid out in rows: the text formats and styles on the first, blocks, lists,
+    // spacing, alignment and link on the second (one row with `toolbarRows: 1`). A host's action
+    // names its row, and the default button it goes after.
+    const rowCount = toolbarRows === 1 ? 1 : 2;
+    const visibleActions = (toolbarActions || []).filter(action => !action.hidden);
+    const knownIds = new Set([...visibleActions.map(action => action.id), ...KOENIG_TOOLBAR_ITEMS.map(buttonId)]);
+    const lastRow = Math.max(rowCount, ...visibleActions.map(action => action.row || 1));
+    const anchored = action => !!action.after && knownIds.has(buttonId(action.after)) && action.after !== action.id;
+    const actionButton = action => (
+        <React.Fragment key={`host-${action.id}`}>
+            <ToolbarMenuItem
+                CustomIcon={action.Icon}
+                data-kg-toolbar-button={action.id}
+                icon={action.id}
+                isActive={false}
+                label={action.label}
+                onClick={() => onActionClick?.(action)}
+            />
+            {actionsAfter(action.id)}
+        </React.Fragment>
+    );
+    const actionsAfter = id => visibleActions.filter(action => anchored(action) && buttonId(action.after) === id).map(actionButton);
+    const actionsAtEndOf = row => visibleActions.filter(action => !anchored(action) && (action.row || rowCount) === row).map(actionButton);
+    const defaultButtons = React.Children.toArray((
         <>
-        <ToolbarMenu aria-label={strings.toolbar.group} data-kg-selection-toolbar role="toolbar" onKeyDown={onToolbarKeyDown}>
             <ToolbarMenuItem
                 data-kg-toolbar-button="bold"
                 hide={hideBold}
@@ -536,17 +562,6 @@ export default function FormatToolbar({
                 onClick={onLinkClick}
             />
 
-            {(toolbarActions || []).filter(action => !action.hidden).map(action => (
-                <ToolbarMenuItem
-                    key={action.id}
-                    CustomIcon={action.Icon}
-                    data-kg-toolbar-button={action.id}
-                    icon={action.id}
-                    isActive={false}
-                    label={action.label}
-                    onClick={() => onActionClick?.(action)}
-                />
-            ))}
 
             <ToolbarMenuSeparator hide={hideSnippets} />
             <ToolbarMenuItem
@@ -557,8 +572,45 @@ export default function FormatToolbar({
                 label={strings.toolbar.snippet}
                 onClick={onSnippetClick}
             />
+        </>
+    ).props.children);
+    const rows = [[]];
+    for (const element of defaultButtons) {
+        const id = element?.props?.['data-kg-toolbar-button'];
+        if (rowCount > 1 && rows.length === 1 && ROW_TWO_START.includes(id)) {
+            rows[0].push(...actionsAtEndOf(1));
+            rows.push([]);
+        }
+        const current = rows[rows.length - 1];
+        current.push(element);
+        if (id) {
+            current.push(...actionsAfter(id));
+        }
+    }
+    rows[rows.length - 1].push(...actionsAtEndOf(rows.length));
+    for (let extra = rows.length + 1; extra <= lastRow; extra++) {
+        rows.push(actionsAtEndOf(extra));
+    }
+
+    return (
+        <>
+        <ToolbarMenu aria-label={strings.toolbar.group} data-kg-selection-toolbar role="toolbar" rows onKeyDown={onToolbarKeyDown}>
+            {rows.map((items, index) => <ToolbarMenuRow key={index} row={index + 1}>{items}</ToolbarMenuRow>)}
         </ToolbarMenu>
-        {openMenu ? (
+        {openMenu?.colour ? (
+            <ColorMenu
+                anchor={styleMenu.anchor}
+                label={openMenu.label}
+                setting={openMenu.colour.setting}
+                slot={openMenu.colour.slot}
+                value={openMenu.colour.value}
+                onClose={closeStyleMenu}
+                onPick={(value) => {
+                    editor.update(() => openMenu.apply(value), {discrete: true});
+                    closeStyleMenu();
+                }}
+            />
+        ) : openMenu ? (
             <StyleMenu
                 anchor={styleMenu.anchor}
                 label={openMenu.label}

@@ -218,6 +218,24 @@ describe("card presets", () => {
   });
 });
 
+describe("the colour settings", () => {
+  it("start with the colour wheel on and no brand palette, and leave the address clean", () => {
+    const s = defaultSettings(catalog);
+    expect(s.colorPicker).toBe(true);
+    expect(s.brandColors).toBe(false);
+    expect(serializeSettings(s, catalog)).toBe("");
+    expect(buildSnippet(s, catalog)).not.toContain("colors=");
+  });
+
+  it("travel in the address and show in the snippet when they differ", () => {
+    const s = { ...defaultSettings(catalog), brandColors: true, colorPicker: false };
+    const query = serializeSettings(s, catalog);
+    expect(query).toContain("brandColors");
+    expect(parseSettings(`?${query}`, catalog)).toEqual(s);
+    expect(buildSnippet(s, catalog)).toContain("colors={colors}");
+  });
+});
+
 describe("the toolbar, fonts and spell check settings", () => {
   const withToolbar: Catalog = {
     ...catalog,
