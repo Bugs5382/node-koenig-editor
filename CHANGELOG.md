@@ -6,6 +6,7 @@
 
 #### 🚀 Features
 
+- feat(editor): gallery slideshow options: auto-advance, random order and a screen mode @Bugs5382 (#64)
 - feat(editor): shared colour control, code and toggle group cards, table banding, emoji, file icons and the rest of the owner's review @Bugs5382 (#60)
 - feat(editor): text styling and the word-processor gap list @Bugs5382 (#57)
 - feat(editor): table resize, borders, drag and drop, and a figure entry for tables, images and galleries @Bugs5382 (#55)
