@@ -6,7 +6,7 @@ import {placePlus} from '../../additions/placement/placePlus';
 import {CardMenu} from '../components/ui/CardMenu';
 import {PlusButton, PlusMenu} from '../components/ui/PlusMenu';
 import {buildCardMenu} from '../utils/buildCardMenu';
-import {getCardMenuNodes, useKoenigStrings} from '../../additions/options';
+import {getCardMenuNodes, useKoenigStrings, useKoenigTool} from '../../additions/options';
 import {getEditorCardNodes} from '../utils/getEditorCardNodes';
 import {getSelectedNode} from '../utils/getSelectedNode';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -35,6 +35,7 @@ function usePlusCardMenu(editor) {
     }, []);
     const {cardConfig, menuItems} = React.useContext(KoenigComposerContext);
     const strings = useKoenigStrings();
+    const emojiOn = useKoenigTool('emojiPicker');
 
     function getTopPosition(elem) {
         const elemRect = elem.getBoundingClientRect();
@@ -294,7 +295,7 @@ function usePlusCardMenu(editor) {
 
     // build up the card menu based on registered nodes and current search
     React.useEffect(() => {
-        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {menuItems, strings});
+        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {emoji: emojiOn, menuItems, strings});
         setCardMenu(buildCardMenu(cardNodes, {config: cardConfig}));
     }, [cardConfig, editor, setCardMenu, menuItems, strings]);
 

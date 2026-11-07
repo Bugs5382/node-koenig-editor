@@ -81,6 +81,7 @@ the sources.
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
 | `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `textDirection`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
+| `colors`             | `Partial<Record<KoenigColorSlot, KoenigColorSetting>>` | the editor's palettes | Per colour slot: a `palette` of swatches, `picker: false` to switch the colour wheel off, `none: false` to take away the editor's own colour. See [Colours](#-colours). |
 | `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
 | `toolbarRows`        | `1 \| 2`                          | `2`             | The rows the selection toolbar uses; see [Toolbar actions](#-toolbar-actions). |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
@@ -456,8 +457,9 @@ as plain text, and a print rule puts the on-screen overlay under the photo too, 
 The wording is `strings.gallery`.
 
 **Header.** A section opener: title, subtitle, a background colour or image, and an optional
-button. Its settings are a colour, a background image, alignment (a left or centred choice, so
-there is no list to open) and the button; each label stays on one line. Its sizes are multiples of `--kg-rem` and its type uses `--kg-font-sans` and
+button. Its settings are the background and text colours (the shared [colour control](#-colours)),
+a background image, alignment (a left, centred or right choice, so there is no list to open) and the
+button (a label of text, an emoji or both, with its own two colours); each label stays on one line. Its sizes are multiples of `--kg-rem` and its type uses `--kg-font-sans` and
 `--kg-font-size-h1`, so it follows the [theme tokens](#-styles-and-theme-tokens). The title is
 not a heading node: the H1 to H5 limit and any outline numbering a host builds from headings do
 not see it. The background image goes through the host's `fileUploader`.
@@ -479,7 +481,7 @@ in the editor; the saved document and the HTML output are the same.
 | Callbacks | `addFiles(files)`, `removeImage(index)`, `moveImage(from, to)`, `replaceImages(list)` (the whole list, for your own drag and drop), `updateImage(index, { alt, title, caption })`, `setMaxImages(n)`, `clearError()` |
 
 **The header contract** (`KoenigHeaderRenderProps`) carries the card's values (`title`,
-`subtitle`, `backgroundColor`, `backgroundImageSrc`, `buttonText`, `buttonUrl`, `alignment`, the
+`subtitle`, `backgroundColor`, `backgroundImageSrc`, `buttonText`, `buttonEmoji`, `buttonUrl`, `alignment` (`left`, `center` or `right`), the
 colours, `layout`), `titleField` and `subtitleField` (their editors, ready to place), `isEditing`,
 `isSelected`, `readOnly`, `update(changes)`, `uploadBackgroundImage(file)` and `uploadError`.
 
@@ -557,7 +559,9 @@ browser does (leading spaces and control characters, tabs and line breaks inside
 ignored), so `JaVaScRiPt:`, `data:`, `vbscript:`, relative and protocol-relative links are all
 refused. The button's link field shows `strings.button.invalidUrl` and does not store the value.
 
-**Button.** A label, a link and left or centre alignment. A button with no valid link exports
+**Button.** A label, a link, left, centre or right alignment, an optional emoji before the label and
+its own background and text colours (the `buttonBackground` and `buttonText` colour slots, see
+[Colours](#-colours)). A picked colour is written as inline CSS on the link. A button with no valid link exports
 nothing. Upstream's email-specific markup is not included: every target gets the same link.
 
 **Markdown.** Write or paste Markdown into a text area; the card shows the rendered result.
@@ -649,7 +653,9 @@ would flatten them. JPEG stays JPEG; everything else is saved as PNG.
 - Wording: `strings.imageEditor`. Use the dialog in your own UI with
   `<ImageEditorDialog file onApply onCancel />`.
 
-**Emoji picker.** The callout card's emoji button opens it. It is searchable by name, has the nine
+**Emoji picker.** The callout card's emoji button opens it, and so do the emoji field in the Button and
+Header cards' settings, the **Emoji** entry of the plus and slash menus, and typing `/emoji` anywhere
+in the text (also inside a callout or a table cell; Escape closes it and leaves what was typed). It is searchable by name, has the nine
 standard groups, and works fully offline: the emoji come from
 [`unicode-emoji-json`](https://www.npmjs.com/package/unicode-emoji-json) (MIT), a dependency of
 this package that is not part of `dist/index.js`. It is loaded with a dynamic `import()` the
@@ -745,7 +751,7 @@ Four buttons in the selection toolbar style the selected text, and a fifth takes
 - **Text size** (`fontSize`): smaller, small, normal, large, larger, set in `em` so the text follows
   the host's type scale.
 - **Text colour** (`textColor`): six colours that read on both a light and a dark page, the
-  default colour, and a colour wheel for any colour (see [Colours](#colours)).
+  default colour, and a colour wheel for any colour (see [Colours](#-colours)).
 - **Highlight** (`highlight`): six light colours and the colour wheel, saved together with ink
   (dark on a light highlight, light on a dark one) so the text reads on any page.
 - **Font** (`fontFamily`): the fonts the host gives, shown in their own face. With no `fonts` the
@@ -768,41 +774,31 @@ inline CSS in the saved HTML. The lists open under their button; the arrow keys 
 Escape closes and returns to the text. Each button is marked while the selection has that style.
 The wording is `strings.textStyle` and `strings.toolbar`.
 
-### Colours
+## 🌈 Colours
 
-Every colour setting in the editor uses one control: the setting's own base palette, the editor's
-default colour, and a colour wheel for any colour. The `colors` option sets each one by its slot:
-
-| Slot | Where |
-| --- | --- |
-| `textColor`, `highlight` | the selection toolbar |
-| `tableBand`, `tableBrand` | a table's Style popover |
-| `calloutBackground`, `calloutText` | the Callout card |
-| `buttonBackground`, `buttonText` | the Button card |
-| `headerBackground`, `headerText`, `headerButton`, `headerButtonText` | the Header card |
-
-Each slot takes `palette` (swatches, each a `label` and a hex `value`, replacing the editor's),
-`picker` (`false` switches the colour wheel off, so only the palette is offered) and `none` (`false`
-takes away the default colour). A host forces its brand colours by setting a palette, `picker:
-false` and `none: false`:
+Every colour setting in the editor (text colour, highlight, the callout's background and text, the
+Button card's colours and the Header card's four colours) uses one control: a row of base swatches
+for that setting, the editor's own colour, and a colour wheel for any colour. The base palette is
+different for each setting; the `colors` option changes it per setting (a "slot"):
 
 ```tsx
 <KoenigComposer
   colors={{
-    textColor: {
-      palette: [
-        { label: "Brand", value: "#B45309" },
-        { label: "Ink", value: "#1C1917" },
-      ],
-      picker: false,
-      none: false,
-    },
-    highlight: { picker: false }, // the editor's highlights only, no wheel
+    textColor: { palette: [{ label: "Brand blue", value: "#1D4ED8" }] },
+    highlight: { picker: false },
+    calloutBackground: { palette: brand, picker: false, none: false },
   }}
 />
 ```
 
-A colour the setting does not allow is never applied. The wording is `strings.colors`.
+- `palette`: the swatches that setting shows, each a `label` and a `#rgb` or `#rrggbb` `value`.
+- `picker`: `false` takes the colour wheel away, so the person can only use the palette.
+- `none`: `false` takes away the editor's own colour, so a colour is always set.
+
+With `picker: false` and `none: false` the host forces the colours of that setting to its list.
+The slots are `textColor`, `highlight`, `calloutBackground`, `calloutText`, `buttonBackground`,
+`buttonText`, `headerBackground`, `headerText`, `headerButton`, `headerButtonText`, `tableBand` and
+`tableBrand`. Highlight writes dark or light text with the colour, whichever reads on it.
 
 ## 📃 Lists and spacing
 

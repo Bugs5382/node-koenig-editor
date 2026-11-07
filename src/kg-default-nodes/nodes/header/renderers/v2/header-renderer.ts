@@ -7,6 +7,7 @@ import {getSrcsetAttribute, type ImageRenderOptions} from '../../../../utils/src
 interface HeaderV2NodeData {
     alignment: string;
     buttonText: string;
+    buttonEmoji?: string;
     buttonEnabled: boolean;
     buttonUrl: string;
     header: string;
@@ -27,6 +28,7 @@ interface HeaderV2NodeData {
 interface HeaderV2DatasetNode {
     __alignment: string;
     __buttonText: string;
+    __buttonEmoji?: string;
     __buttonEnabled: boolean;
     __buttonUrl: string;
     __header: string;
@@ -48,13 +50,16 @@ interface HeaderV2RenderOptions extends ExportDOMOptions {
     design?: { buttonStyle?: string };
 }
 
+const buttonLabel = (nodeData: {buttonEmoji?: string; buttonText: string}) =>
+    [nodeData.buttonEmoji, nodeData.buttonText].filter(Boolean).join(' ');
+
 function cardTemplate(nodeData: HeaderV2NodeData, options: HeaderV2RenderOptions = {}) {
     const cardClasses = getCardClasses(nodeData).join(' ');
 
     const backgroundAccent = nodeData.backgroundColor === 'accent' ? 'kg-style-accent' : '';
     const buttonAccent = nodeData.buttonColor === 'accent' ? 'kg-style-accent' : '';
     const buttonStyle = nodeData.buttonColor !== 'accent' ? `background-color: ${nodeData.buttonColor};` : ``;
-    const alignment = nodeData.alignment === 'center' ? 'kg-align-center' : '';
+    const alignment = nodeData.alignment === 'center' ? 'kg-align-center' : nodeData.alignment === 'right' ? 'kg-align-right' : '';
     const backgroundImageStyle = nodeData.backgroundColor !== 'accent' && (!nodeData.backgroundImageSrc || nodeData.layout === 'split') ? `background-color: ${nodeData.backgroundColor}` : '';
 
     let imgTemplate = '';
@@ -95,7 +100,7 @@ function cardTemplate(nodeData: HeaderV2NodeData, options: HeaderV2RenderOptions
 
     const button = () => {
         if (nodeData.buttonEnabled && nodeData.buttonUrl && nodeData.buttonUrl.trim() !== '') {
-            return `<a href="${nodeData.buttonUrl}" class="kg-header-card-button ${buttonAccent}" style="${buttonStyle}color: ${nodeData.buttonTextColor};" data-button-color="${nodeData.buttonColor}" data-button-text-color="${nodeData.buttonTextColor}">${nodeData.buttonText}</a>`;
+            return `<a href="${nodeData.buttonUrl}" class="kg-header-card-button ${buttonAccent}" style="${buttonStyle}color: ${nodeData.buttonTextColor};" data-button-color="${nodeData.buttonColor}" data-button-text-color="${nodeData.buttonTextColor}"${nodeData.buttonEmoji ? ` data-button-emoji="${nodeData.buttonEmoji}"` : ''}>${buttonLabel(nodeData)}</a>`;
         }
         return '';
     };
@@ -122,7 +127,7 @@ function emailTemplate(nodeData: HeaderV2NodeData, options: HeaderV2RenderOption
     let buttonAccent = nodeData.buttonColor === 'accent' ? `background-color: ${nodeData.accentColor};` : nodeData.buttonColor;
     let buttonStyle = nodeData.buttonColor !== 'accent' ? `background-color: ${nodeData.buttonColor};` : '';
     let buttonTextColor = nodeData.buttonTextColor;
-    const alignment = nodeData.alignment === 'center' ? 'text-align: center;' : '';
+    const alignment = nodeData.alignment === 'center' ? 'text-align: center;' : nodeData.alignment === 'right' ? 'text-align: right;' : '';
     const backgroundImageStyle = nodeData.backgroundImageSrc ? (nodeData.layout !== 'split' ? `background-image: url(${nodeData.backgroundImageSrc}); background-size: cover; background-position: center center;` : `background-color: ${nodeData.backgroundColor};`) : `background-color: ${nodeData.backgroundColor};`;
     const splitImageStyle = `background-image: url(${nodeData.backgroundImageSrc}); background-size: ${nodeData.backgroundSize !== 'contain' ? 'cover' : '50%'}; background-position: center`;
 
@@ -179,7 +184,7 @@ function emailTemplate(nodeData: HeaderV2NodeData, options: HeaderV2RenderOption
                                             <table class="btn" border="0" cellspacing="0" cellpadding="0" align="${nodeData.alignment}">
                                                 <tr>
                                                     <td align="center" style="${buttonStyle} ${buttonAccent}">
-                                                        <a href="${nodeData.buttonUrl}" style="color: ${buttonTextColor};">${nodeData.buttonText}</a>
+                                                        <a href="${nodeData.buttonUrl}" style="color: ${buttonTextColor};">${buttonLabel(nodeData)}</a>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -205,7 +210,7 @@ function emailTemplate(nodeData: HeaderV2NodeData, options: HeaderV2RenderOption
                 <h2 class="kg-header-card-heading" style="color:${nodeData.textColor};">${nodeData.header}</h2>
                 <p class="kg-header-card-subheading" style="color:${nodeData.textColor};">${nodeData.subheader}</p>
                 ${nodeData.buttonEnabled && nodeData.buttonUrl && nodeData.buttonUrl.trim() !== '' ? `
-                    <a class="kg-header-card-button" href="${nodeData.buttonUrl}" style="color: ${nodeData.buttonTextColor}; ${buttonStyle} ${buttonAccent}">${nodeData.buttonText}</a>
+                    <a class="kg-header-card-button" href="${nodeData.buttonUrl}" style="color: ${nodeData.buttonTextColor}; ${buttonStyle} ${buttonAccent}">${buttonLabel(nodeData)}</a>
                 ` : ''}
             </div>
         </div>
@@ -220,6 +225,7 @@ export function renderHeaderNodeV2(dataset: HeaderV2DatasetNode, options: Header
     const node = {
         alignment: dataset.__alignment,
         buttonText: dataset.__buttonText,
+        buttonEmoji: dataset.__buttonEmoji,
         buttonEnabled: dataset.__buttonEnabled,
         buttonUrl: dataset.__buttonUrl,
         header: dataset.__header,

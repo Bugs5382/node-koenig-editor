@@ -99,13 +99,14 @@ describe("the header card's settings", () => {
     await waitFor(() => expect(document.querySelector("[data-kg-settings-panel]")).not.toBeNull());
     const panel = document.querySelector("[data-kg-settings-panel]") as HTMLElement;
     expect(panel.querySelector("select")).toBeNull();
-    const group = panel.querySelector('[role="radiogroup"]') as HTMLElement;
+    const group = panel.querySelector('[role="radiogroup"][aria-label="Alignment"]') as HTMLElement;
     expect(group, "the alignment radio group").not.toBeNull();
     expect(group.getAttribute("aria-label")).toBe("Alignment");
     const radios = [...group.querySelectorAll<HTMLInputElement>('input[type="radio"]')];
     expect(radios.map((radio) => radio.closest("label")?.textContent?.trim())).toEqual([
       "Left",
       "Centered",
+      "Right",
     ]);
     expect(radios.find((radio) => radio.checked)?.value).toBe("center");
     await act(async () => {
@@ -115,7 +116,7 @@ describe("the header card's settings", () => {
     expect(
       (
         document.querySelectorAll(
-          '[data-kg-settings-panel] [role="radiogroup"] input',
+          '[data-kg-settings-panel] [role="radiogroup"][aria-label="Alignment"] input',
         )[0] as HTMLInputElement
       ).checked,
     ).toBe(true);

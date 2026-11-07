@@ -10,7 +10,7 @@ import {isSafeUrl} from '#kg-default-nodes';
 import {useKoenigStrings} from '../../additions/options';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
-export function ButtonNodeComponent({alignment, buttonText, buttonUrl, nodeKey}) {
+export function ButtonNodeComponent({alignment, backgroundColor, buttonEmoji, buttonText, buttonUrl, nodeKey, textColor}) {
     const strings = useKoenigStrings();
     const [editor] = useLexicalComposerContext();
     const {isEditing, isSelected, setEditing} = React.useContext(CardContext);
@@ -41,6 +41,27 @@ export function ButtonNodeComponent({alignment, buttonText, buttonUrl, nodeKey})
         });
     };
 
+    const handleButtonEmojiChange = (emoji) => {
+        editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            node.buttonEmoji = emoji;
+        });
+    };
+
+    const handleBackgroundColorChange = (color) => {
+        editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            node.backgroundColor = color || '';
+        });
+    };
+
+    const handleTextColorChange = (color) => {
+        editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            node.textColor = color || '';
+        });
+    };
+
     const handleAlignmentChange = (value) => {
         editor.update(() => {
             const node = $getNodeByKey(nodeKey);
@@ -52,10 +73,16 @@ export function ButtonNodeComponent({alignment, buttonText, buttonUrl, nodeKey})
         <>
             <ButtonCard
                 alignment={alignment}
+                backgroundColor={backgroundColor}
+                buttonEmoji={buttonEmoji}
                 buttonPlaceholder={strings.button.textPlaceholder}
                 buttonText={buttonText}
                 buttonUrl={buttonUrl}
                 handleAlignmentChange={handleAlignmentChange}
+                handleBackgroundColorChange={handleBackgroundColorChange}
+                handleButtonEmojiChange={handleButtonEmojiChange}
+                handleTextColorChange={handleTextColorChange}
+                textColor={textColor}
                 handleButtonTextChange={handleButtonTextChange}
                 handleButtonUrlChange={handleButtonUrlChange}
                 isEditing={isEditing}

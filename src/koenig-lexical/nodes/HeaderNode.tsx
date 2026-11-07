@@ -110,6 +110,7 @@ export class HeaderNode extends BaseHeaderNode {
                     backgroundImageSrc={this.backgroundImageSrc}
                     buttonColor={this.buttonColor}
                     buttonEnabled={this.buttonEnabled}
+                    buttonEmoji={this.buttonEmoji}
                     buttonText={this.buttonText}
                     buttonTextColor={this.buttonTextColor}
                     buttonUrl={this.buttonUrl}
@@ -130,7 +131,7 @@ export class HeaderNode extends BaseHeaderNode {
     isEmpty() {
         const isHtmlEmpty = this.__headerTextEditor.getEditorState().read($canShowPlaceholderCurry(false));
         const isSubHtmlEmpty = this.__subheaderTextEditor.getEditorState().read($canShowPlaceholderCurry(false));
-        return isHtmlEmpty && isSubHtmlEmpty && (!this.buttonEnabled || (!this.buttonText && !this.buttonUrl)) && !this.backgroundImageSrc;
+        return isHtmlEmpty && isSubHtmlEmpty && (!this.buttonEnabled || (!this.buttonText && !this.buttonEmoji && !this.buttonUrl)) && !this.backgroundImageSrc;
     }
 }
 

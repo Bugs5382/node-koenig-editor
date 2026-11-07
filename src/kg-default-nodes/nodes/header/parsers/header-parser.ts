@@ -51,7 +51,7 @@ export function parseHeaderNode(HeaderNode: new (data: Record<string, unknown>) 
                         const headerElement = div.querySelector('.kg-header-card-heading');
                         const subheaderElement = div.querySelector('.kg-header-card-subheading');
                         const buttonElement = div.querySelector('.kg-header-card-button');
-                        const alignment = div.classList.contains('kg-align-center') ? 'center' : '';
+                        const alignment = div.querySelector('.kg-align-right') ? 'right' : (div.querySelector('.kg-align-center') || div.classList.contains('kg-align-center')) ? 'center' : '';
                         const backgroundImageSrc = div.querySelector('.kg-header-card-image')?.getAttribute('src');
                         const layout = backgroundImageSrc ? 'split' : '';
                         const backgroundColor = div.classList.contains('kg-style-accent') ? 'accent' : div.getAttribute('data-background-color');
@@ -62,9 +62,12 @@ export function parseHeaderNode(HeaderNode: new (data: Record<string, unknown>) 
                         const subheader = subheaderElement?.textContent || '';
                         const buttonEnabled = !!buttonElement;
                         const buttonUrl = buttonEnabled ? buttonElement.getAttribute('href') : '';
-                        const buttonText = buttonEnabled ? buttonElement.textContent : '';
+                        const buttonEmoji = buttonElement?.getAttribute('data-button-emoji') || '';
+                        const rawButtonText = buttonEnabled ? buttonElement.textContent : '';
+                        const buttonText = buttonEmoji && rawButtonText.startsWith(buttonEmoji) ? rawButtonText.slice(buttonEmoji.length).trim() : rawButtonText;
 
                         const payload: Record<string, unknown> = {
+                            buttonEmoji,
                             backgroundColor,
                             buttonColor,
                             alignment,

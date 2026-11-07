@@ -20,6 +20,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
+import { INSERT_EMOJI_COMMAND } from "../emojiPicker/EmojiCommandPlugin";
+import { EmojiMenuIcon } from "../emojiPicker/EmojiMenuIcon";
 import { cardForNodeType } from "./cards";
 import type { KoenigStrings } from "node-koenig-editor";
 
@@ -32,6 +34,8 @@ interface MenuEntry {
 type CardMenuNode = [string, { kgMenu: MenuEntry | MenuEntry[] }];
 
 interface MenuContext {
+  /** Adds the Emoji entry, which opens the emoji picker at the caret. */
+  emoji?: boolean;
   menuItems?: readonly MenuEntry[];
   strings: KoenigStrings;
 }
@@ -47,7 +51,7 @@ const reword = (entry: MenuEntry, strings: KoenigStrings, nodeType: string): Men
  */
 export const getCardMenuNodes = (
   cardNodes: readonly CardMenuNode[],
-  { menuItems, strings }: MenuContext,
+  { emoji, menuItems, strings }: MenuContext,
 ): CardMenuNode[] => {
   const nodes = cardNodes.map(([nodeType, klass]): CardMenuNode => {
     const menu = klass.kgMenu;
@@ -60,6 +64,21 @@ export const getCardMenuNodes = (
       },
     ];
   });
+  if (emoji) {
+    nodes.push([
+      "koenig-emoji",
+      {
+        kgMenu: {
+          ...strings.emoji,
+          Icon: EmojiMenuIcon,
+          insertCommand: INSERT_EMOJI_COMMAND,
+          matches: ["emoji", "smiley"],
+          priority: 12,
+          shortcut: "/emoji",
+        },
+      },
+    ]);
+  }
   (menuItems ?? []).forEach((entry, index) => {
     nodes.push([`host-menu-item-${index}`, { kgMenu: entry }]);
   });

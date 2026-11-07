@@ -90,9 +90,9 @@ replaces how it looks while the editor keeps the pictures, uploads and limits.
 **Add it:** the plus button or `/header`.
 **What it can do:**
 - A title and a subtitle.
-- A background colour or a background picture.
-- Left or centred writing.
-- An optional button with a label and a link.
+- A background colour or a background picture, and the text colour, from the shared colour control.
+- Left, centred or right writing.
+- An optional button with a label (text, an emoji or both), a link, and its own colours.
 
 **Accessibility:** the title is a styled block, not a heading, so it does not appear in a page
 outline. Use a heading for the real structure of the page.
@@ -103,14 +103,17 @@ outline. Use a heading for the real structure of the page.
 **For:** a note, a tip or a warning that should not be missed.
 **Add it:** the plus button or `/callout`.
 **What it can do:**
-- Text inside a coloured box: white, grey, blue, green, yellow, red, pink, purple or the site's
-  accent colour.
+- Text inside a coloured box. The background and the text colour each come from the shared colour
+  control: a row of base colours and, unless the host switched it off, a colour wheel for any
+  colour. Saved as a named class when a base colour of the old set is kept, and as inline CSS when a
+  colour is picked.
 - An optional emoji at the start, picked from the **emoji picker** (searchable, works offline).
 
 **Keyboard (emoji picker):** Down from the search box enters the grid; arrows, Home and End move;
 Enter picks; Escape closes.
 **Accessibility:** do not rely on the colour alone to say what the note means; say it in words.
-**Developer:** `cards` leaves it out; `tools` without `emojiPicker` removes the emoji button.
+**Developer:** `cards` leaves it out; `tools` without `emojiPicker` removes the emoji button; the
+`colors` option sets the palettes (`calloutBackground`, `calloutText`) or limits them.
 
 ## Toggle
 
@@ -189,7 +192,8 @@ transcript or a `.vtt` file.
 
 **For:** one clear link that you want people to follow.
 **Add it:** the plus button or `/button` (typing `cta` or `link` finds it too).
-**What it can do:** a label, a link, and left or centred placement.
+**What it can do:** a label, a link, left, centre or right placement, an optional emoji before the
+label (an emoji alone is fine), and the button and text colours from the shared colour control.
 **Limits:** only absolute `http`, `https` and `mailto` links are kept. Others (`javascript:`,
 `data:`, relative links) are refused and the field says so. A button with no valid link is left
 out of the saved HTML.
@@ -219,8 +223,10 @@ Shift with the arrows resizes it.
 
 ## Emoji picker
 
-**For:** adding an emoji to a callout.
-**It opens:** from the emoji button in the callout card.
+**For:** adding an emoji to a callout, to a Button or Header card's label, or to any text.
+**It opens:** from the emoji button in the callout card, from the emoji field in a Button or Header
+card's settings, from the **Emoji** entry of the plus and slash menus, or by typing `/emoji` anywhere
+in the text (inside a sentence, in a callout, in a table cell). Escape closes it and leaves the text.
 **What it can do:** search by name and browse the nine standard groups, fully offline.
 **Developer:** `tools` leaves it out (`tools={["imageEditor"]}` keeps only the image editor,
 `tools={[]}` turns both off).
