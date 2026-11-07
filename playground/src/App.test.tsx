@@ -69,7 +69,8 @@ describe("playground", () => {
 
   it("Reset brings back the quick brown fox text and Clear leaves an empty document", () => {
     render(<App />);
-    const text = () => (document.querySelector('[contenteditable="true"]') as HTMLElement).textContent;
+    const text = () =>
+      (document.querySelector('[contenteditable="true"]') as HTMLElement).textContent;
     fireEvent.click(screen.getByRole("button", { name: "Clear" }));
     fireEvent.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Clear" }));
     expect(text()).toBe("");
