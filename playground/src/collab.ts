@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 // A demo-only transport for the package's `collaboration` option: tabs and windows of the same
 // browser and address share one room through a BroadcastChannel, so two windows edit the same
 // document live with no server. A real host plugs in its own provider (websocket, WebRTC, ...).
+import { useSyncExternalStore } from "react";
 import { applyUpdate, Doc, encodeStateAsUpdate, encodeStateVector } from "yjs";
 
 type State = Record<string, unknown>;
@@ -45,6 +46,33 @@ export const broadcastChannel: ChannelFactory = (name) =>
   new BroadcastChannel(name) as unknown as Channel;
 
 const SYNC_WAIT_MS = 150;
+
+/** What each window shows about the session: the room and how many windows are in it. */
+export interface CollabStatus {
+  room: string;
+  windows: number;
+}
+let status: CollabStatus = { room: "demo", windows: 0 };
+const statusListeners = new Set<() => void>();
+export const collabStatus = {
+  set(next: Partial<CollabStatus>) {
+    const merged = { ...status, ...next };
+    if (merged.room === status.room && merged.windows === status.windows) return;
+    status = merged;
+    for (const listener of statusListeners) listener();
+  },
+  snapshot: () => status,
+  subscribe(listener: () => void) {
+    statusListeners.add(listener);
+    return () => void statusListeners.delete(listener);
+  },
+};
+export const useCollabStatus = () =>
+  useSyncExternalStore(collabStatus.subscribe, collabStatus.snapshot);
+
+/** The room named by ?room= in the address; "demo" without it. */
+export const roomFromAddress = (search: string) =>
+  new URLSearchParams(search).get("room") || "demo";
 
 class Awareness {
   private readonly listeners = new Set<() => void>();
@@ -96,11 +124,20 @@ class BroadcastProvider {
     private readonly name: string,
     private readonly doc: Doc,
     private readonly open: ChannelFactory,
+    private readonly main = false,
   ) {
     this.awareness = new Awareness(doc.clientID, (state) =>
       this.post({ clientId: doc.clientID, state, type: "awareness" }),
     );
+    this.awareness.on("update", this.report);
   }
+
+  // the main document's provider reports how many windows are in the room
+  private readonly report = () => {
+    if (this.main && this.channel) {
+      collabStatus.set({ windows: Math.max(1, this.awareness.getStates().size) });
+    }
+  };
 
   private readonly onDocUpdate = (update: Uint8Array, origin: unknown) => {
     if (origin !== this) this.post({ type: "update", update });
@@ -115,6 +152,7 @@ class BroadcastProvider {
   }
 
   private readonly onMessage = ({ data }: { data: Message }) => {
+    console.debug(`[collab ${this.name}] got ${data.type}`);
     switch (data.type) {
       case "sync-request": {
         // a newcomer sends what it has; answer with what it lacks, and ask for the same back
@@ -153,6 +191,7 @@ class BroadcastProvider {
 
   connect = () => {
     if (this.channel) return;
+    console.debug(`[collab ${this.name}] connect (client ${this.doc.clientID})`);
     this.channel = this.open(this.name);
     this.channel.onmessage = this.onMessage;
     this.doc.on("update", this.onDocUpdate);
@@ -163,6 +202,8 @@ class BroadcastProvider {
     if (local) this.post({ clientId: this.doc.clientID, state: local, type: "awareness" });
     // alone in the room: nobody answers, so the document is synced after a short wait
     this.timer = setTimeout(() => this.markSynced(), SYNC_WAIT_MS);
+    window.addEventListener?.("pagehide", this.disconnect);
+    this.report();
   };
 
   disconnect = () => {
@@ -170,8 +211,10 @@ class BroadcastProvider {
     clearTimeout(this.timer);
     this.post({ clientId: this.doc.clientID, state: null, type: "awareness" });
     this.doc.off("update", this.onDocUpdate);
+    window.removeEventListener?.("pagehide", this.disconnect);
     this.channel.close();
     this.channel = null;
+    if (this.main) collabStatus.set({ windows: 0 });
     this.synced = false;
     this.emit("status", { status: "disconnected" });
   };
@@ -193,6 +236,7 @@ export function broadcastProviderFactory(room: string, open: ChannelFactory = br
       doc = new Doc();
       documents.set(id, doc);
     }
-    return new BroadcastProvider(`koenig-demo:${room}:${id}`, doc, open);
+    if (id === "main") collabStatus.set({ room });
+    return new BroadcastProvider(`koenig-demo:${room}:${id}`, doc, open, id === "main");
   };
 }

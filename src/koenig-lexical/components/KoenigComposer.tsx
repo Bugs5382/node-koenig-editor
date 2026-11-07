@@ -16,6 +16,7 @@ import {withFigureEntry} from '../../additions/figure/figureExport';
 import {CommentsPlugin, KoenigCommentsContext, useCommentsStoreFor} from '../../additions/comments';
 import {KoenigStringsContext, KoenigToolsContext, resolveStrings, resolveTools, selectEditorNodes} from '../../additions/options';
 import {KoenigPreviewBridge} from './KoenigPreviewBridge';
+import {withCardProperties} from '../utils/collabCardProperties';
 import {MarkNode} from '@lexical/mark';
 
 // Catch any errors that occur during Lexical updates and log them
@@ -125,6 +126,10 @@ const KoenigComposer = ({
 
     const editorContainerRef = React.useRef(null);
 
+    // the same Map on every render, so the collaboration binding is not rebuilt
+    const hostExcluded = collaboration?.excludedProperties;
+    const excludedProperties = React.useMemo(() => withCardProperties(hostExcluded), [hostExcluded]);
+
     // `fileUploader` and its `fileTypes` are optional (Bugs5382/node-koenig-editor#10): without
     // them the cards still render and edit, and only an upload attempt fails, with the reason
     // logged.
@@ -186,7 +191,7 @@ const KoenigComposer = ({
                                 <CollaborationPlugin
                                     cursorColor={collaboration.cursorColor}
                                     cursorsContainerRef={collaboration.cursorsContainerRef}
-                                    excludedProperties={collaboration.excludedProperties}
+                                    excludedProperties={excludedProperties}
                                     id="main"
                                     initialEditorState={initialEditorState}
                                     providerFactory={collaboration.providerFactory}

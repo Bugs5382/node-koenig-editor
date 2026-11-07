@@ -23,7 +23,12 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 import { describe, expect, it } from "vitest";
 import { Doc } from "yjs";
 
-import { type Channel, type ChannelFactory, broadcastProviderFactory } from "./collab";
+import {
+  type Channel,
+  type ChannelFactory,
+  broadcastProviderFactory,
+  collabStatus,
+} from "./collab";
 
 // A room of in-memory channels: a message posted on one reaches every other open channel by name.
 const hub = (): ChannelFactory => {
@@ -115,5 +120,31 @@ describe("the demo's collaboration transport", () => {
     b.provider.disconnect();
     await settle();
     expect(a.provider.awareness.getStates().size).toBe(0);
+  });
+
+  it("counts the windows in the room and names the room, for the status in each window", async () => {
+    const open = hub();
+    const state = {
+      anchorPos: null,
+      awarenessData: {},
+      color: "#00f",
+      focusPos: null,
+      focusing: false,
+      name: "x",
+    };
+    const a = peer("kitchen", open);
+    a.provider.connect();
+    a.provider.awareness.setLocalState(state);
+    expect(collabStatus.snapshot()).toEqual({ room: "kitchen", windows: 1 });
+    const b = peer("kitchen", open);
+    b.provider.connect();
+    b.provider.awareness.setLocalState(state);
+    await settle();
+    expect(collabStatus.snapshot().windows).toBe(2);
+    b.provider.disconnect();
+    await settle();
+    expect(collabStatus.snapshot().windows).toBe(1);
+    a.provider.disconnect();
+    expect(collabStatus.snapshot().windows).toBe(0);
   });
 });
