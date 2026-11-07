@@ -602,3 +602,60 @@ describe("the demo's kitchen sink between two windows", () => {
     expect(snapshot(c.api)).toEqual(snapshot(a.api));
   });
 });
+
+// What the second window shows, not only what its card holds: a gallery keeps its pictures in the
+// screen's own state, which a change from another window has to refresh.
+describe.each([
+  ["a synchronous provider", room],
+  ["the demo transport", demoRoom],
+])("%s: a gallery on screen", (_label, makeRoom) => {
+  const picture = (name: string, row: number) => ({
+    alt: name,
+    caption: "",
+    fileName: `${name}.png`,
+    height: 3,
+    row,
+    src: `https://example.com/${name}.png`,
+    title: "",
+    width: 4,
+  });
+  const order = (view: { container: HTMLElement }) =>
+    [...view.container.querySelectorAll('[data-kg-card="gallery"] img')].map((img) =>
+      (img.getAttribute("src") ?? "").replace(/.*\/(\w+)\.png.*/, "$1"),
+    );
+
+  it("follows pictures that another window moves, adds and removes", async () => {
+    const r = makeRoom();
+    const seed = {
+      caption: "",
+      images: [picture("one", 0), picture("two", 0), picture("three", 0)],
+      type: "gallery",
+      version: 1,
+    };
+    const a = await mountPeer(r.join(), state(seed));
+    await settle();
+    const b = await mountPeer(r.join());
+    await settle();
+    expect(order(b.view)).toEqual(["one", "two", "three"]);
+
+    const set = async (names: string[]) => {
+      await act(async () => {
+        a.api.editorInstance.update(() => {
+          const card = $getRoot()
+            .getChildren()
+            .find((child) => child.getType() === "gallery") as unknown as {
+            images: unknown[];
+          };
+          card.images = names.map((name, i) => picture(name, i));
+        });
+      });
+      await settle();
+    };
+    await set(["three", "one", "two"]);
+    expect(order(b.view)).toEqual(["three", "one", "two"]);
+    await set(["three", "four", "one", "two"]);
+    expect(order(b.view)).toEqual(["three", "four", "one", "two"]);
+    await set(["four"]);
+    expect(order(b.view)).toEqual(["four"]);
+  });
+});
