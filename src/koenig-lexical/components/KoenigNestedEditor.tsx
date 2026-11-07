@@ -1,5 +1,5 @@
 import KoenigNestedEditorPlugin from '../plugins/KoenigNestedEditorPlugin.jsx';
-import {BASIC_NODES, BASIC_TRANSFORMERS, KoenigComposableEditor, KoenigNestedComposer, MINIMAL_NODES, MINIMAL_TRANSFORMERS} from '../index.js';
+import {BASIC_TRANSFORMERS, KoenigComposableEditor, KoenigNestedComposer, MINIMAL_TRANSFORMERS} from '../index.js';
 import {EmojiCommandPlugin} from '../../additions/emojiPicker/EmojiCommandPlugin';
 import {RestrictContentPlugin} from '../plugins/RestrictContentPlugin';
 import {useKoenigStrings} from '../../additions/options';
@@ -33,14 +33,12 @@ const KoenigNestedEditor = ({
     skipCollabChecks,
     children
 }) => {
-    const initialNodes = nodes === 'minimal' ? MINIMAL_NODES : BASIC_NODES;
     const markdownTransformers = nodes === 'minimal' ? MINIMAL_TRANSFORMERS : BASIC_TRANSFORMERS;
 
     return (
         <KoenigNestedComposer
             initialEditor={initialEditor}
             initialEditorState={initialEditorState}
-            initialNodes={initialNodes}
             initialTheme={initialTheme}
             skipCollabChecks={skipCollabChecks}
         >

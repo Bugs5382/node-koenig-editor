@@ -1,6 +1,6 @@
 import generateEditorState from './generateEditorState';
 import {MINIMAL_NODES} from '../index.js';
-import {createEditor} from 'lexical';
+import {$getEditor, createEditor} from 'lexical';
 
 const BLANK_EDITOR_STATE = JSON.stringify({
     root: {
@@ -22,11 +22,21 @@ const BLANK_EDITOR_STATE = JSON.stringify({
     }
 });
 
+// The namespace of the editor this node is being created in, so the nested editor starts with the
+// parent's (as Lexical would otherwise copy it, and warn). Outside an active editor there is none.
+function parentNamespace(): string | undefined {
+    try {
+        return $getEditor()._config.namespace;
+    } catch {
+        return undefined;
+    }
+}
+
 export function setupNestedEditor(node, editorProperty, {editor, initialEditorState = BLANK_EDITOR_STATE, nodes = MINIMAL_NODES} = {}) {
     if (editor) {
         node[editorProperty] = editor;
     } else {
-        node[editorProperty] = createEditor({nodes});
+        node[editorProperty] = createEditor({namespace: parentNamespace(), nodes});
 
         // set up a blank document with a paragraph otherwise the editor won't receive focus
         const editorState = node[editorProperty].parseEditorState(initialEditorState);
