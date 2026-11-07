@@ -124,7 +124,7 @@ describe("pasting spreadsheet text into a table", () => {
     const api = await load();
     await caret(api, 1, 0);
     await paste(api, {
-      "text/html": "<table><tr><td>x</td><td>y</td></tr></table>",
+      "text/html": "<table><tr><td>zzz</td><td>yyy</td></tr></table>",
       "text/plain": "x\ty",
     });
     expect(text(api)[1]).toBe("x|y|3");

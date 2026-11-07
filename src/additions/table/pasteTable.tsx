@@ -38,7 +38,7 @@ import {
   $createTextNode,
   $getSelection,
   $isRangeSelection,
-  COMMAND_PRIORITY_HIGH,
+  COMMAND_PRIORITY_CRITICAL,
   PASTE_COMMAND,
 } from "lexical";
 import { useEffect } from "react";
@@ -94,9 +94,53 @@ export const parseSpreadsheetText = (source: string): string[][] | null => {
   return rows;
 };
 
-// Pasting spreadsheet text into a table fills the cells from the cursor's cell, adding rows and
-// columns when the data is bigger than what is left. The text is used even when the clipboard also
-// carries an HTML table (spreadsheets send both), so a table is never nested inside a cell.
+// Fills the table around the cursor's cell with the pasted rows, from that cell, adding the rows and
+// columns the data needs. Runs inside an editor update. False when the cursor is not in a table.
+const $fillFromCursor = (rows: string[][]): boolean => {
+  const selection = $getSelection();
+  const node = $isTableSelection(selection)
+    ? selection.getNodes().find($isTableCellNode)
+    : $isRangeSelection(selection)
+      ? $findMatchingParent(selection.anchor.getNode(), $isTableCellNode)
+      : null;
+  const start = $isTableCellNode(node) ? node : null;
+  const table = start ? $findTableNode(start) : null;
+  if (!start || !table) return false;
+  const row0 = $getTableRowIndexFromTableCellNode(start);
+  const column0 = $getTableColumnIndexFromTableCellNode(start);
+  const needRows = row0 + rows.length;
+  const needColumns = column0 + Math.max(...rows.map((cells) => cells.length));
+  const map = () => $computeTableMapSkipCellCheck(table, null, null)[0];
+  for (let guard = 0; guard < 500 && map().length < needRows; guard += 1) {
+    const last = map().at(-1)?.[0]?.cell;
+    if (!last) break;
+    $insertTableRowAtNode(last, true);
+  }
+  for (let guard = 0; guard < 500 && (map()[0]?.length ?? 0) < needColumns; guard += 1) {
+    const last = map()[0]?.at(-1)?.cell;
+    if (!last) break;
+    $insertTableColumnAtNode(last, true, false);
+  }
+  const grid = map();
+  rows.forEach((cells, i) => {
+    cells.forEach((value, j) => {
+      const cell = grid[row0 + i]?.[column0 + j]?.cell;
+      if (!cell) return;
+      cell.clear();
+      const paragraph = $createParagraphNode();
+      if (value) paragraph.append($createTextNode(value));
+      cell.append(paragraph);
+    });
+  });
+  // the cell the cursor was in has new content, so the cursor goes to its end
+  start.selectEnd();
+  return true;
+};
+
+// Pasting spreadsheet text into a table fills the cells from the cursor's cell. The text is used even
+// when the clipboard also carries an HTML table (spreadsheets send both), so a table is never nested
+// in a cell. A command handler already runs inside an editor update, so the work is done in it
+// directly: a nested update would be deferred and the handler would answer before it had run.
 export const TablePastePlugin = () => {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
@@ -106,55 +150,14 @@ export const TablePastePlugin = () => {
       (event) => {
         if (!editor.isEditable() || !("clipboardData" in event)) return false;
         const rows = parseSpreadsheetText(event.clipboardData?.getData("text/plain") ?? "");
-        if (!rows || rows.length === 0) return false;
-        let done = false;
-        editor.update(
-          () => {
-            const selection = $getSelection();
-            const node = $isTableSelection(selection)
-              ? selection.getNodes().find($isTableCellNode)
-              : $isRangeSelection(selection)
-                ? $findMatchingParent(selection.anchor.getNode(), $isTableCellNode)
-                : null;
-            const start = $isTableCellNode(node) ? node : null;
-            const table = start ? $findTableNode(start) : null;
-            if (!start || !table) return;
-            done = true;
-            const row0 = $getTableRowIndexFromTableCellNode(start);
-            const column0 = $getTableColumnIndexFromTableCellNode(start);
-            const need = {
-              columns: column0 + Math.max(...rows.map((cells) => cells.length)),
-              rows: row0 + rows.length,
-            };
-            const map = () => $computeTableMapSkipCellCheck(table, null, null)[0];
-            for (let guard = 0; guard < 500 && map().length < need.rows; guard += 1) {
-              const last = map().at(-1)?.[0]?.cell;
-              if (!last) break;
-              $insertTableRowAtNode(last, true);
-            }
-            for (let guard = 0; guard < 500 && (map()[0]?.length ?? 0) < need.columns; guard += 1) {
-              const last = map()[0]?.at(-1)?.cell;
-              if (!last) break;
-              $insertTableColumnAtNode(last, true, false);
-            }
-            const grid = map();
-            rows.forEach((cells, i) => {
-              cells.forEach((value, j) => {
-                const cell = grid[row0 + i]?.[column0 + j]?.cell;
-                if (!cell) return;
-                cell.clear();
-                const paragraph = $createParagraphNode();
-                if (value) paragraph.append($createTextNode(value));
-                cell.append(paragraph);
-              });
-            });
-          },
-          { discrete: true },
-        );
-        if (done) event.preventDefault();
-        return done;
+        if (!rows || rows.length === 0 || !$fillFromCursor(rows)) return false;
+        // nothing else (the table plugin's own HTML paste, say) gets to act on this paste
+        event.preventDefault();
+        event.stopPropagation?.();
+        event.stopImmediatePropagation?.();
+        return true;
       },
-      COMMAND_PRIORITY_HIGH,
+      COMMAND_PRIORITY_CRITICAL,
     );
   }, [editor]);
   return null;
