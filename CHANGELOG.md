@@ -19,6 +19,7 @@
 
 #### 🐛 Bug Fixes
 
+- fix(editor): Random order needs auto-advance, and Next and Previous follow the random pass (#71) @Bugs5382 (#72)
 - fix(editor): random order only picks the auto-advance's next photo, and one exit notice (#69) @Bugs5382 (#70)
 - fix(editor): the gallery viewer goes round at the ends and the slideshow options use button toggles (#67) @Bugs5382 (#68)
 - fix(editor): a composer whose cards leave out the divider mounts instead of throwing @Bugs5382 (#66)
