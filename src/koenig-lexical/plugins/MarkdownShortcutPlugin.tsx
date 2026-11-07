@@ -8,6 +8,7 @@ import {
     TEXT_MATCH_TRANSFORMERS,
     UNORDERED_LIST
 } from '@lexical/markdown';
+import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {MarkdownShortcutPlugin as LexicalMarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
 
 export const HR = {
@@ -80,5 +81,9 @@ export const BASIC_TRANSFORMERS = [
 ];
 
 export default function MarkdownShortcutPlugin({transformers = DEFAULT_TRANSFORMERS} = {}) {
-    return LexicalMarkdownShortcutPlugin({transformers});
+    const [editor] = useLexicalComposerContext();
+    // a transformer whose node the editor was built without (the divider card is left out) is not
+    // used; Lexical throws for one whose node is missing
+    const usable = transformers.filter(transformer => !('dependencies' in transformer) || editor.hasNodes(transformer.dependencies));
+    return LexicalMarkdownShortcutPlugin({transformers: usable});
 }
