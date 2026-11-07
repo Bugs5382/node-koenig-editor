@@ -14,6 +14,8 @@ cards.
 | Header | A big title at the top of a section | `/header` | Colour or picture background, optional button |
 | Callout | A box that stands out | `/callout` | Nine colours, optional emoji |
 | Toggle | Text that opens and closes | `/toggle` | A header and hidden content |
+| Toggle group | A stack of toggles with no gap | `/toggle-group` | Any number of items; add and remove them |
+| Code | Code with line numbers | `/code` or three backticks | Language list, Copy button, highlighting |
 | Divider | A line between sections | `/hr` or type `---` | No settings |
 | Table | Rows and columns | `/table` | Merge cells, shading, alignment, caption; dashed grid while editing |
 | File | A download | `/file` | Title, description, name and size |
@@ -124,6 +126,31 @@ you press the header's arrow.
 **Accessibility:** keep the header a clear question or label, because it is what people see before they open it.
 **Developer:** `cards` leaves it out.
 
+## Toggle group
+
+**For:** a list of questions and answers, or any set of sections that open and close one by one.
+**Add it:** the plus button or `/toggle-group`.
+**What it can do:** a stack of toggles that touch, in one outline, with a line between them. A new group
+has two items; "Add a toggle" adds another and the cross on an item removes it. There is no limit on
+how many it holds. Each item has a header and a body, and a reader opens and closes each one on its own.
+**Accessibility:** each item's arrow is a button that says whether it is open; keep every header a clear
+question or label.
+**Developer:** `cards` leaves it out (`toggleGroup`); `strings.toggleGroup` is the wording for adding
+and removing, and the item placeholders and the open/close labels are the single toggle's. Saved as
+`<div class="kg-card kg-toggle-group-card">` holding one `kg-toggle-card` per item.
+
+## Code
+
+**For:** snippets, commands and configuration that should keep their spacing.
+**Add it:** the plus button, `/code`, or three backticks and a language on an empty line.
+**What it can do:** line numbers, syntax highlighting for the chosen language, a language list and a
+Copy button on the block (hover it, or put the cursor in it). The copied text has no line numbers.
+A reader gets the Copy button only.
+**Accessibility:** the language list and the Copy button are real controls with labels; the copy
+result is announced.
+**Developer:** `codeLanguages` lists the languages; `strings.code` is the wording. The block is part of
+the base node set and cannot be left out with `cards`.
+
 ## Divider
 
 **For:** a line that separates two parts of the writing.
@@ -162,10 +189,13 @@ are tokens (`--kg-table-edit-border-style` for the dashed editing line, `--kg-ta
 **For:** a document people can download, such as a PDF.
 **Add it:** the plus button, `/file`, or dragging a file in.
 **What it can do:** a title, a description, and the file's name and size. It is saved as a
-download link.
+download link. A picture for the file's type sits beside the text (a PDF, a spreadsheet, an archive
+and many more; an unknown type gets a plain page with its extension). Select the card and untick
+"Show the file type icon" to hide it on that card.
 **Limits:** if the developer sets `fileTypes.file`, the card checks the type and size (`maxSize`)
 before uploading and names the file in its message.
-**Developer:** `cards` leaves it out.
+**Developer:** `cards` leaves it out; `fileIcons={false}` removes the icons everywhere and
+`fileIcons={{ overrides: { pdf: MyIcon } }}` draws your own for a type.
 
 ## Video
 

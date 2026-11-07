@@ -30,7 +30,7 @@ const childrenOf = (json: string): Node[] => JSON.parse(json).root.children;
 const typesOf = (json: string) => [...new Set(childrenOf(json).map((n) => n.type))];
 
 const MAIN = ["image", "gallery", "header", "divider", "callout", "toggle", "table"];
-const ALL = [...MAIN, "file", "video", "audio", "button", "markdown"];
+const ALL = [...MAIN, "toggleGroup", "file", "video", "audio", "button", "markdown"];
 
 describe("kitchen sink document", () => {
   it("shows every card the package has, once each", () => {

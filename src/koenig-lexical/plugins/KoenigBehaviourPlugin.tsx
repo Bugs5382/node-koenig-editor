@@ -1,6 +1,6 @@
 import React from 'react';
 import {$createAsideNode, $isAsideNode} from '../nodes/AsideNode';
-import {$createCodeNode} from '@lexical/code';
+import {$createCodeNode, CodeNode} from '@lexical/code';
 import {$createHeadingNode, $createQuoteNode, $isQuoteNode, DRAG_DROP_PASTE} from '@lexical/rich-text';
 import {$createLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND} from '@lexical/link';
 import {
@@ -496,7 +496,7 @@ function useKoenigBehaviour({editor, containerElem, cursorDidExitAtTop, isNested
                         const currentNode = selection?.getNodes()[0];
                         if ($isTextNode(currentNode)) {
                             const textContent = currentNode.getTextContent();
-                            if (textContent.match(/^```(\w{1,10})?/)) {
+                            if (editor.hasNodes([CodeNode]) && textContent.match(/^```(\w{1,10})?/)) {
                                 event.preventDefault();
                                 const language = textContent.replace(/^```/,'');
                                 // a stock Lexical code block, the node type older documents already use
@@ -1261,7 +1261,7 @@ function useKoenigBehaviour({editor, containerElem, cursorDidExitAtTop, isNested
                         const currentNode = selection.getNodes()[0];
                         if ($isTextNode(currentNode)) {
                             const textContent = currentNode.getTextContent();
-                            if (textContent.match(/^```(\w{1,10})?/)) {
+                            if (editor.hasNodes([CodeNode]) && textContent.match(/^```(\w{1,10})?/)) {
                                 event.preventDefault();
                                 const language = textContent.replace(/^```/,'');
                                 // a stock Lexical code block, the node type older documents already use

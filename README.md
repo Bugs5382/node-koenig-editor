@@ -11,7 +11,7 @@ editor works alone.
 
 ## ✨ Highlights
 
-- 🧱 **Pick your cards** — image, gallery, header, file, video, audio, button, markdown, divider, callout, toggle and table, on by default, off one by one.
+- 🧱 **Pick your cards** — image, gallery, header, file, video, audio, button, markdown, divider, callout, toggle, toggle group and table, on by default, off one by one.
 - 🧩 **Bring your own nodes** — register custom nodes and cards, and add your own "+" and slash menu entries.
 - 🗣️ **Your wording** — every label, placeholder and menu text comes from a `strings` option with English defaults.
 - 🖼️ **Crop, rotate and emoji, offline** — an image editor before upload and an emoji picker, both switchable with `tools`.
@@ -73,7 +73,7 @@ the sources.
 
 | Prop                 | Type                              | Default         | What it does                                                                                                                                                                     |
 | -------------------- | --------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `file`, `video`, `audio`, `button`, `markdown`, `divider`, `callout`, `toggle`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
+| `cards`              | `KoenigCardName[]`                | all             | The shipped cards to register: `image`, `gallery`, `header`, `file`, `video`, `audio`, `button`, `markdown`, `divider`, `callout`, `toggle`, `toggleGroup`, `table`. A card left out is not registered, so it is missing from the menus and its commands do nothing. |
 | `cardRenderers`      | `KoenigCardRenderers`             | none            | Your own layout for the `gallery` and `header` cards; see [Gallery and header cards](#-gallery-and-header-cards). |
 | `gallery`            | `{ maxImages?: number }`          | `{ maxImages: 50 }` | Options for the gallery card. `maxImages` is the most photos a gallery takes, and the ceiling for each gallery's own setting. It limits adding photos, never cuts off photos a document already has. |
 | `customNodes`        | `EditorNodes`                     | none            | Your own node classes, registered after the shipped ones. A node with a static `kgMenu` (a `CardMenuItem` or a list) is listed in the menus.                                     |
@@ -82,6 +82,8 @@ the sources.
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
 | `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `fontSize`, `textColor`, `highlight`, `fontFamily`, `clearFormatting`, `bulletList`, `numberList`, `checkList`, `indent`, `outdent`, `lineSpacing`, `paragraphSpacing`, `textDirection`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
 | `colors`             | `Partial<Record<KoenigColorSlot, KoenigColorSetting>>` | the editor's palettes | Per colour slot: a `palette` of swatches, `picker: false` to switch the colour wheel off, `none: false` to take away the editor's own colour. See [Colours](#-colours). |
+| `fileIcons`          | `false \| { overrides? }`         | on              | The file card's type icons; `false` switches them off, `overrides` maps an extension to your own icon component; see [File, video and audio cards](#-file-video-and-audio-cards). |
+| `codeLanguages`      | `KoenigCodeLanguage[]`            | highlighter's  | The languages the code block's list offers, each a `label` and a Prism language `value`; see [Code blocks](#-code-blocks). |
 | `fonts`              | `KoenigFont[]`                    | none            | The fonts the font button offers, each a `label` and a CSS `font-family` `value`; with none the button is not shown.                                                           |
 | `toolbarRows`        | `1 \| 2`                          | `2`             | The rows the selection toolbar uses; see [Toolbar actions](#-toolbar-actions). |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
@@ -572,6 +574,27 @@ match the [heading limit](#-headings). Rendering uses [`markdown-it`](https://gi
 (MIT), a regular dependency that stays external in the build. Upstream's CodeMirror editor and
 its Ghost image uploads are not included.
 
+## 💻 Code blocks
+
+A code block is Lexical's own (`@lexical/code`), highlighted with Prism through `@lexical/code-prism`
+(add it next to the other `@lexical/*` peers). Type three backticks and a language (` ```ts `) on an
+empty line, or pick **Code** from the "+" or slash menu (`/code`). Every block has line numbers (drawn
+by the stylesheet, so they are never selected or copied) and, on hover or with the cursor in it, a
+small bar with a language list and a **Copy** button. A reader (read-only or Preview) gets the copy
+button alone.
+
+- **Languages.** `codeLanguages={[{ label: 'TypeScript', value: 'typescript' }, ...]}` lists the
+  languages the bar offers; "Plain text" is always there. Without a list you get what the highlighter
+  ships with (C, C++, CSS, Go, HTML, Java, JavaScript, Markdown, Objective-C, PowerShell, Python, Rust,
+  SQL, Swift, TypeScript and XML). The value must be a language name Prism knows.
+- **Saved HTML.** `<pre class="language-ts" data-language="ts">` with the code as plain text: no token
+  spans and no line numbers, so your site can colour it again.
+- **Colours.** The token colours come from `--kg-code-*` custom properties on `.kg-code-block`
+  (`--kg-code-bg`, `--kg-code-fg`, `--kg-code-gutter`, `--kg-code-comment`, `--kg-code-keyword`,
+  `--kg-code-string`, `--kg-code-number`, `--kg-code-function`, `--kg-code-attr`, `--kg-code-builtin`);
+  set them to match your page. In forced-colours mode the block uses the system colours.
+- **Wording.** `strings.code` (copy, copied, copy failed, language list name, plain text).
+
 ## 🔢 Word count and reading time
 
 `useKoenigWordCount()` returns `{ words, minutes, wordsLabel, readingTimeLabel }` for the editor it
@@ -612,7 +635,12 @@ plays from the url your uploader returned.
   chosen file against its `extensions`, `mimeTypes` and an optional `maxSize` in bytes *before*
   uploading, and names the file in the message (`strings.file.typeError`, `strings.file.sizeError`).
   A host with no `fileTypes` gets no pre-check; the uploader has the last word.
-- **File.** A title, a description, and the file name and size. It saves as a download link.
+- **File.** A title, a description, and the file name and size. It saves as a download link. The
+  card shows a picture for the file's type (react-file-icon, MIT: a PDF, a spreadsheet, an archive and
+  several hundred more; a type it does not know gets a plain page with the extension on it). The icon
+  is optional: `fileIcons={false}` switches it off for the whole editor, a card has its own "Show the
+  file type icon" box, and `fileIcons={{ overrides: { pdf: PdfIcon } }}` draws your own for a type
+  (the component gets `extension`). The icon is in the editor and Preview; the saved HTML is unchanged.
 - **Video and audio** play in the browser's own player, so play, seek, volume and mute work from the
   keyboard and show the browser's focus ring. Captions are required for accessibility: a card has a
   **transcript** field and a **WebVTT (`.vtt`) track upload**, saved as a

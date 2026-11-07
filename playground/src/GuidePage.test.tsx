@@ -141,7 +141,7 @@ describe("Try it", () => {
     start("/#/guide");
     render(<App />);
     const main = screen.getByRole("main");
-    expect(main.querySelectorAll("a.try-link")).toHaveLength(15);
+    expect(main.querySelectorAll("a.try-link")).toHaveLength(16);
     expect(main.querySelector('a.try-link[href="#/try/gallery"]')).not.toBeNull();
   });
 

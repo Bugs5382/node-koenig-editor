@@ -9,7 +9,9 @@ const fileProperties = [
     {name: 'fileTitle', default: '', wordCount: true},
     {name: 'fileCaption', default: '', wordCount: true},
     {name: 'fileName', default: ''},
-    {name: 'fileSize', default: 0}
+    {name: 'fileSize', default: 0},
+    // whether the card shows a picture for the file's type
+    {name: 'showIcon', default: true}
 ] as const satisfies readonly DecoratorNodeProperty[];
 
 export type FileData = DecoratorNodeData<typeof fileProperties>;
@@ -23,7 +25,7 @@ export class FileNode extends generateDecoratorNode({
 }) {
     /* @override */
     exportJSON() {
-        const {fileTitle, fileCaption, fileName, fileSize} = this;
+        const {fileTitle, fileCaption, fileName, fileSize, showIcon} = this;
         // a data: url is a pending upload, never saved; anything unsafe is dropped
         const src = safeMediaUrl(this.src);
 
@@ -34,7 +36,8 @@ export class FileNode extends generateDecoratorNode({
             fileTitle,
             fileCaption,
             fileName,
-            fileSize
+            fileSize,
+            showIcon
         };
     }
 

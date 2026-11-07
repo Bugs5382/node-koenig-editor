@@ -67,6 +67,7 @@ export class FileNode extends BaseFileNode {
                     fileSize={this.formattedFileSize}
                     fileSrc={this.src}
                     fileTitle={this.fileTitle}
+                    showIcon={this.showIcon}
                     initialFile={this.__initialFile}
                     nodeKey={this.getKey()}
                     triggerFileDialog={this.__triggerFileDialog}

@@ -83,13 +83,18 @@ export default defineConfig({
     include: ["src/**/*.test.{ts,tsx}"],
     // The package's own dependencies live in the repo root; run them through Vite so they share
     // the demo's one copy of React instead of loading the root's.
-    server: { deps: { inline: [/react-error-boundary/, /react-colorful/] } },
+    server: { deps: { inline: [/react-error-boundary/, /react-colorful/, /react-file-icon/] } },
     alias: [
       // Its package.json has no exports map, so the test runner would pick the CommonJS build,
       // which loads the repo root's React; the module build goes through the aliases below.
       {
         find: /^react-error-boundary$/,
         replacement: fromRepo("node_modules/react-error-boundary/dist/react-error-boundary.js"),
+      },
+      // The same for react-file-icon: its CommonJS build would load the repo root's React.
+      {
+        find: /^react-file-icon$/,
+        replacement: fromRepo("node_modules/react-file-icon/dist/react-file-icon.esm.js"),
       },
       { find: /^react-dom(\/.*)?$/, replacement: `${demo("node_modules/react-dom")}$1` },
       { find: /^react(\/.*)?$/, replacement: `${demo("node_modules/react")}$1` },

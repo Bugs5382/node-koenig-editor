@@ -44,6 +44,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     image: { desc: "Upload, or embed with /image [url]", label: "Image" },
     table: { desc: "Insert a table", label: "Table" },
     toggle: { desc: "Add collapsible content", label: "Toggle" },
+    toggleGroup: { desc: "Add a stack of collapsible items", label: "Toggle group" },
     video: { desc: "Upload a video file", label: "Video" },
   },
   emoji: { desc: "Insert an emoji, or type /emoji anywhere", label: "Emoji" },
@@ -117,6 +118,13 @@ export const DEFAULT_STRINGS: KoenigStrings = {
       text: "Text",
     },
     title: "Keyboard shortcuts",
+  },
+  code: {
+    copied: "Copied",
+    copy: "Copy",
+    copyFailed: "Copy failed",
+    language: "Code language",
+    plainText: "Plain text",
   },
   colors: {
     custom: "Custom colour",
@@ -414,6 +422,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
   file: {
     descriptionPlaceholder: "Enter a description",
     select: "Click to upload a file",
+    showIcon: "Show the file type icon",
     sizeError: "The file {name} is larger than the {limit} limit",
     titlePlaceholder: "Enter a title",
     typeError: "The file {name} is not an allowed type",
@@ -462,6 +471,10 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     back: "Back to editing",
     toggle: "Preview",
     width: "Width",
+  },
+  toggleGroup: {
+    addItem: "Add a toggle",
+    removeItem: "Remove toggle {number}",
   },
   toggle: {
     collapse: "Hide content",

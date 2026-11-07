@@ -49,6 +49,7 @@ export type KoenigCardName =
   | "markdown"
   | "table"
   | "toggle"
+  | "toggleGroup"
   | "video";
 
 /** Features that are not cards. Pass a list as the composer's `tools` to keep only those. */
@@ -135,6 +136,26 @@ export interface KoenigColorSetting {
   /** Whether the person can pick any colour with the colour wheel. Default: true. `false` limits
    *  the slot to its palette. */
   picker?: boolean;
+}
+
+/** A file-type icon a host draws itself: the extension (lower case, no dot) is passed in. */
+export type KoenigFileIconOverrides = Record<string, FC<{ extension: string }>>;
+
+/** The file card's type icons. `false` switches them off. Without a setting they are on. */
+export type KoenigFileIcons =
+  | false
+  | {
+      /** Your own icon per extension, for example `{ pdf: PdfIcon }`; any other type keeps the
+       *  default picture. */
+      overrides?: KoenigFileIconOverrides;
+    };
+
+/** A language the code card offers. */
+export interface KoenigCodeLanguage {
+  /** What the list shows. */
+  label: string;
+  /** The language name the highlighter knows, for example `typescript`. */
+  value: string;
 }
 
 /** A font the host offers in the selection toolbar. */
@@ -253,6 +274,13 @@ export interface KoenigStrings {
     close: string;
     groups: Record<"align" | "blocks" | "general" | "text", string>;
     title: string;
+  };
+  code: {
+    copied: string;
+    copy: string;
+    copyFailed: string;
+    language: string;
+    plainText: string;
   };
   colors: {
     custom: string;
@@ -519,6 +547,7 @@ export interface KoenigStrings {
   file: {
     descriptionPlaceholder: string;
     select: string;
+    showIcon: string;
     /** `{name}` is replaced with the file name and `{limit}` with the size limit. */
     sizeError: string;
     titlePlaceholder: string;
@@ -535,6 +564,12 @@ export interface KoenigStrings {
     /** The reader's button when the toggle is closed. */
     expand: string;
     headingPlaceholder: string;
+  };
+  /** The toggle group card: the single toggle's wording is used for the items themselves. */
+  toggleGroup: {
+    addItem: string;
+    /** `{number}` is the item's place in the stack, starting at 1. */
+    removeItem: string;
   };
   snippet: { namePlaceholder: string; replaceExisting: string };
   imageEditor: {
@@ -871,6 +906,12 @@ export interface KoenigComposerProps {
    *  whether the editor's own colour is a choice. With `picker: false` and `none: false` the host
    *  forces the person to a colour from its list. */
   colors?: Partial<Record<KoenigColorSlot, KoenigColorSetting>>;
+  /** The icons the file card shows for a file's type; `false` switches them off. */
+  fileIcons?: KoenigFileIcons;
+  /** The languages the code card's list offers. Default: the ones the highlighter ships with
+   *  (JavaScript, TypeScript, CSS, HTML, Python, Java, Go, Rust, SQL and a few more). "Plain text"
+   *  is always offered. */
+  codeLanguages?: readonly KoenigCodeLanguage[];
   /** The fonts the font button offers: a label and a CSS `font-family` value each. With none, the
    *  button is not shown. */
   fonts?: readonly KoenigFont[];
