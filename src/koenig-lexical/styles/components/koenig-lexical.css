@@ -535,6 +535,20 @@ em-emoji-picker {
 .koenig-lexical .kg-token-operator,
 .koenig-lexical .kg-token-punctuation { color: var(--kg-code-fg); opacity: 0.8; }
 
+/* Read only (the preview): there is no language bar, so the block names its language itself. */
+.koenig-lexical [contenteditable="false"] code.kg-code-block[data-language]::after {
+    color: var(--kg-code-gutter);
+    content: attr(data-language);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 1.1rem;
+    line-height: 1;
+    pointer-events: none;
+    position: absolute;
+    right: 0.8rem;
+    top: 0.6rem;
+    user-select: none;
+}
+
 @media (forced-colors: active) {
     .koenig-lexical code.kg-code-block {
         border: 1px solid CanvasText;

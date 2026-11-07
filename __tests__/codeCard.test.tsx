@@ -106,6 +106,28 @@ describe("the code bar", () => {
     await waitFor(() => expect(document.querySelector("[data-kg-code-bar]")).not.toBeNull());
   };
 
+  it("sits centred above the block, not over the code", async () => {
+    const { api } = await mount({ composer: { initialEditorState: documentOf("Hi") } });
+    await addCode(api);
+    vi.spyOn(block(), "getBoundingClientRect").mockReturnValue({
+      bottom: 260,
+      height: 60,
+      left: 100,
+      right: 300,
+      top: 200,
+      width: 200,
+      x: 100,
+      y: 200,
+      toJSON: () => ({}),
+    });
+    await hover();
+    const bar = document.querySelector("[data-kg-code-bar]") as HTMLElement;
+    expect(bar.style.left).toBe("200px");
+    expect(bar.style.top).toBe("200px");
+    expect(bar.className).toContain("-translate-x-1/2");
+    expect(bar.className).toContain("-translate-y-full");
+  });
+
   it("copies the code without the line numbers", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
