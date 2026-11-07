@@ -57,6 +57,7 @@ import {
 import { SettingsPanel } from "./SettingsPanel";
 import { TopBar } from "./TopBar";
 import { ThreadList } from "./ThreadList";
+import { broadcastProviderFactory } from "./collab";
 import { fileUploader, setSampleUploads } from "./uploader";
 
 // Everything but the text size changes what the composer is built with, so it rebuilds.
@@ -138,6 +139,21 @@ export function App() {
   );
   const [threadsInit, setThreadsInit] = useState<KoenigCommentThread[]>([]);
   const docRef = useRef<string | undefined>(initial); // the document as it is now
+  // Live collaboration: windows of this browser at this address share the room named by ?room=
+  // (default "demo"); each window is a person with a name and a caret colour of its own.
+  const cursorsRef = useRef<HTMLDivElement | null>(null);
+  const collaboration = useMemo(() => {
+    const room = new URLSearchParams(window.location.search).get("room") || "demo";
+    const number = Math.floor(Math.random() * 90) + 10;
+    const hue = Math.floor(Math.random() * 360);
+    return {
+      cursorColor: `hsl(${hue} 70% 45%)`,
+      cursorsContainerRef: cursorsRef,
+      providerFactory: broadcastProviderFactory(room),
+      shouldBootstrap: true,
+      username: `Window ${number}`,
+    };
+  }, []);
   const threadsRef = useRef<KoenigCommentThread[]>([]); // the in-memory comment store
 
   useEffect(() => {
@@ -291,6 +307,7 @@ export function App() {
   if (catalog.toolbar?.length) optionalProps.toolbar = settings.toolbar;
   if (settings.fonts) optionalProps.fonts = SAMPLE_FONTS;
   if (!settings.spellCheck) optionalProps.spellCheck = false;
+  if (settings.collaboration) optionalProps.collaboration = collaboration;
   if (settings.brandColors || !settings.colorPicker) optionalProps.colors = colorOptions(settings);
   if (previewAvailable) {
     // The bar's switch and width presets drive the editor, and the editor's own Preview button
@@ -366,7 +383,7 @@ export function App() {
           {previewAvailable && usePreview && <PreviewWidthBridge width={settings.previewWidth} />}
           <div className="page" hidden={route.page === "guide"}>
             <main>
-              <div className="editor-box" style={editorStyle}>
+              <div ref={cursorsRef} className="editor-box" style={editorStyle}>
                 <KoenigEditor readOnly={settings.readOnly} onChange={onChange} />
               </div>
               {catalog.wordCount && settings.wordCount && <WordCount />}

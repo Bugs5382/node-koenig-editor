@@ -166,6 +166,14 @@ export function SettingsPanel({ catalog, onChange, settings }: Props) {
             />{" "}
             spell check
           </label>
+          <label title="Open this page in a second window and edit the same document live">
+            <input
+              type="checkbox"
+              checked={settings.collaboration}
+              onChange={(e) => onChange({ collaboration: e.target.checked })}
+            />{" "}
+            live collaboration (two windows)
+          </label>
           <label>
             <input
               type="checkbox"
