@@ -3339,9 +3339,9 @@ em-emoji-picker {
     padding: 0 calc(2.8 * var(--kg-rem, 0.625rem)) 0 0;
 }
 
-/* Code block. Line numbers are generated content from the block's data-gutter, so they are never
+/* Code block (the element selector keeps these above the prose rule for `code`). Line numbers are generated content from the block's data-gutter, so they are never
    selected or copied. Token colours are set with --kg-code-* tokens a host can override. */
-.koenig-lexical .kg-code-block {
+.koenig-lexical code.kg-code-block {
     --kg-code-fg: var(--kg-color-grey-900, #15171a);
     --kg-code-bg: var(--kg-color-grey-100, #f1f3f4);
     --kg-code-gutter: var(--kg-color-grey-600, #626d79);
@@ -3369,8 +3369,8 @@ em-emoji-picker {
     white-space: pre;
 }
 
-.dark .koenig-lexical .kg-code-block,
-.koenig-lexical .dark .kg-code-block {
+.dark .koenig-lexical code.kg-code-block,
+.koenig-lexical .dark code.kg-code-block {
     --kg-code-fg: var(--kg-color-grey-100, #f1f3f4);
     --kg-code-bg: var(--kg-color-grey-950, #0b0c0d);
     --kg-code-gutter: var(--kg-color-grey-500, #7c8b9a);
@@ -3385,7 +3385,7 @@ em-emoji-picker {
     --kg-code-inserted: #7fd6a0;
 }
 
-.koenig-lexical .kg-code-block::before {
+.koenig-lexical code.kg-code-block::before {
     color: var(--kg-code-gutter);
     content: attr(data-gutter);
     left: 0;
@@ -3412,12 +3412,12 @@ em-emoji-picker {
 .koenig-lexical .kg-token-punctuation { color: var(--kg-code-fg); opacity: 0.8; }
 
 @media (forced-colors: active) {
-    .koenig-lexical .kg-code-block {
+    .koenig-lexical code.kg-code-block {
         border: 1px solid CanvasText;
         color: CanvasText;
         background: Canvas;
     }
-    .koenig-lexical .kg-code-block::before { color: GrayText; }
+    .koenig-lexical code.kg-code-block::before { color: GrayText; }
     .koenig-lexical [class*="kg-token-"] { color: CanvasText; }
 }
 

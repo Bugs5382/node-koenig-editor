@@ -92,4 +92,8 @@ describe("theme tokens", () => {
   it("draws a checklist box only on an item that is a checkbox, not on a nested list's wrapper", () => {
     expect(css).toContain('.kg-check-item:not([role="checkbox"])::before');
   });
+
+  it("styles the code block above the prose rule for code, so its padding and line height win", () => {
+    expect(css).toContain(".koenig-lexical code.kg-code-block");
+  });
 });
