@@ -166,6 +166,12 @@ export interface KoenigStrings {
     addRowAbove: string;
     addRowBelow: string;
     alignBottom: string;
+    alignJustify: string;
+    alignScope: string;
+    scopeCell: string;
+    scopeColumn: string;
+    scopeRow: string;
+    scopeTable: string;
     alignCenter: string;
     alignLeft: string;
     alignMenu: string;

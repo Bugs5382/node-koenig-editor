@@ -61,6 +61,7 @@ import {
 
 export type TableActionId =
   | "alignCenter"
+  | "alignJustify"
   | "alignLeft"
   | "alignRight"
   | "columnLeft"
@@ -123,6 +124,7 @@ export const TABLE_GROUPS: readonly { actions: readonly TableActionId[]; id: Tab
       "alignLeft",
       "alignCenter",
       "alignRight",
+      "alignJustify",
       "valignTop",
       "valignMiddle",
       "valignBottom",
@@ -154,7 +156,7 @@ const COLUMN_WIDTH = 75;
 
 const WIDTHS = { widthMedium: 160, widthNarrow: 80, widthWide: 260 } as const;
 
-type Align = "center" | "left" | "right";
+type Align = "center" | "justify" | "left" | "right";
 type VerticalAlign = "bottom" | "middle" | "top";
 
 export interface TableState {
@@ -193,7 +195,7 @@ const same = <T>(values: T[]): T | "mixed" =>
 // (The paragraphs inside a cell are not used: the editor strips paragraph alignment.)
 const $alignOf = (cell: TableCellNode): Align => {
   const format = cell.getFormatType();
-  return format === "center" || format === "right" ? format : "left";
+  return format === "center" || format === "right" || format === "justify" ? format : "left";
 };
 
 /** The table the cursor is in, with the cell or cells it covers, or null outside a table. */
@@ -366,6 +368,9 @@ export const $runTableAction = (id: TableActionId): void => {
     case "alignRight":
       $setAlign(state.cells, "right");
       return;
+    case "alignJustify":
+      $setAlign(state.cells, "justify");
+      return;
     case "valignTop":
     case "valignMiddle":
     case "valignBottom": {
@@ -382,4 +387,36 @@ export const $runTableAction = (id: TableActionId): void => {
       $setWidth(state, WIDTHS[id]);
       return;
   }
+};
+
+/** Which cells an alignment from the selection toolbar applies to, for text selected in one cell. */
+export type TableScope = "cell" | "column" | "row" | "table";
+
+export const TABLE_SCOPES: readonly TableScope[] = ["cell", "row", "column", "table"];
+
+const $cellsInScope = (state: TableState, scope: TableScope): TableCellNode[] => {
+  if (scope === "cell") return state.cells;
+  const map = $computeTableMapSkipCellCheck(state.table, null, null)[0];
+  const picked =
+    scope === "row"
+      ? (map[state.row] ?? [])
+      : scope === "column"
+        ? map.map((line) => line[state.column])
+        : map.flat();
+  const cells = new Set<TableCellNode>();
+  for (const entry of picked) if (entry) cells.add(entry.cell);
+  return [...cells];
+};
+
+/** Aligns the cells in a scope: across (`across`) or down (`down`). Inside an editor update. */
+export const $alignInScope = (
+  kind: "across" | "down",
+  value: Align | VerticalAlign,
+  scope: TableScope,
+): void => {
+  const state = $readTableState();
+  if (!state) return;
+  const cells = $cellsInScope(state, scope);
+  if (kind === "across") $setAlign(cells, value as Align);
+  else for (const cell of cells) cell.setVerticalAlign(value === "top" ? null : value);
 };

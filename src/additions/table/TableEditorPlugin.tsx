@@ -113,6 +113,7 @@ type Strings = ReturnType<typeof useKoenigStrings>["table"];
 const labelOf = (id: TableActionId, t: Strings): string =>
   ({
     alignCenter: t.alignCenter,
+    alignJustify: t.alignJustify,
     alignLeft: t.alignLeft,
     alignRight: t.alignRight,
     columnLeft: t.addColumnLeft,
@@ -440,13 +441,15 @@ export const TableEditorPlugin = () => {
                   ? snapshot.align === "center"
                   : id === "alignRight"
                     ? snapshot.align === "right"
-                    : id === "valignTop"
-                      ? snapshot.verticalAlign === "top"
-                      : id === "valignMiddle"
-                        ? snapshot.verticalAlign === "middle"
-                        : id === "valignBottom"
-                          ? snapshot.verticalAlign === "bottom"
-                          : undefined;
+                    : id === "alignJustify"
+                      ? snapshot.align === "justify"
+                      : id === "valignTop"
+                        ? snapshot.verticalAlign === "top"
+                        : id === "valignMiddle"
+                          ? snapshot.verticalAlign === "middle"
+                          : id === "valignBottom"
+                            ? snapshot.verticalAlign === "bottom"
+                            : undefined;
         const toItem = (id: TableActionId) => ({
           checked: checkedOf(id),
           disabled: snapshot.enabled[id] === false,
@@ -456,8 +459,8 @@ export const TableEditorPlugin = () => {
           onSelect: () => run(() => $runTableAction(id)),
         });
         if (group === "align") {
-          sections.push({ items: def.actions.slice(0, 3).map(toItem), label: t.alignMenu });
-          sections.push({ items: def.actions.slice(3).map(toItem) });
+          sections.push({ items: def.actions.slice(0, 4).map(toItem), label: t.alignMenu });
+          sections.push({ items: def.actions.slice(4).map(toItem) });
         } else {
           sections.push({ items: def.actions.map(toItem) });
         }

@@ -307,7 +307,9 @@ right-click menu with the same actions) edits it:
   palette of eight (or no shading). The text in a shaded cell is always dark, so it reads in light
   and dark. Colours are saved on the cell as real colours, not the editor's own variables, so they
   show on a reader's page.
-- **Align**: left, center or right, and top, middle or bottom, for the cell or the selected range.
+- **Align**: left, center, right or justify, and top, middle or bottom, for the cell or the selected
+  range. The selection toolbar offers the same for text selected in a cell, applied to this cell, the
+  row, the column or the table.
 - **Width**: automatic, narrow, medium or wide for the cell's column.
 - **Caption**: a line under the table. It is stored on the table, moves with it, is the table's
   accessible name in the editor, and is a real `caption` element in the saved HTML.
@@ -683,6 +685,10 @@ headings and quotes.
 
 In a read-only editor (and the reader's view) the selection toolbar does not show, so nothing in
 it can change the document.
+
+In a table cell the same buttons align the cell (not the paragraph in it), the toolbar adds Align
+top, middle and bottom, and a small "apply to" button cycles between this cell, the row, the column
+and the table. The shortcuts act on the cell too.
 
 ## 💬 Inline comments
 
