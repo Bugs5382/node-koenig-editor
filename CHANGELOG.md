@@ -18,6 +18,7 @@
 
 #### 🐛 Bug Fixes
 
+- fix(editor): the selection toolbar's lists open in the toolbar's own layer, on top of its rows @Bugs5382 (#62)
 - fix(editor): the preview's scroll restore is cancelled when the editor goes away @Bugs5382 (#51)
 - fix(editor): the emoji picker has room for a full row and never scrolls sideways @Bugs5382 (#43)
 - fix(editor): headings take the white text token in dark mode @Bugs5382 (#47)
