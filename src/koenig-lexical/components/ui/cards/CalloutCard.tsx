@@ -1,9 +1,14 @@
 import KoenigComposerContext from '../../../context/KoenigComposerContext.jsx';
 import KoenigNestedEditor from '../../KoenigNestedEditor';
 import React from 'react';
-import {ColorOptionSetting, SettingsPanel, ToggleSetting} from '../SettingsPanel';
+import {ColorSetting} from '../../../../additions/colors/ColorSetting';
+import {SettingsPanel, ToggleSetting} from '../SettingsPanel';
+import {isHexColor} from '../../../../additions/colors/colors';
 import {ReadOnlyOverlay} from '../ReadOnlyOverlay';
-import {useKoenigStrings} from '../../../../additions/options';
+import {AnchoredMenu} from '../../../../additions/placement/AnchoredMenu';
+import {EmojiPicker} from '../../../../additions/emojiPicker/EmojiPicker';
+import {useKoenigEditable} from '../../../../additions/preview/PreviewContext';
+import {useKoenigStrings, useKoenigTool} from '../../../../additions/options';
 
 export const CALLOUT_COLORS = {
     white: 'bg-transparent border-grey/30',
@@ -88,6 +93,8 @@ export function CalloutCard({
     toggleEmoji,
     hasEmoji = true,
     handleColorChange,
+    handleTextColorChange,
+    textColor,
     changeEmoji,
     calloutEmoji = '\u{1F4A1}',
     textEditor,
@@ -98,6 +105,9 @@ export function CalloutCard({
 }) {
     const strings = useKoenigStrings();
     const emojiButtonRef = React.useRef(null);
+    const emojiPickerRef = React.useRef(null);
+    const emojiPickerOn = useKoenigTool('emojiPicker');
+    const editable = useKoenigEditable();
     const {darkMode} = React.useContext(KoenigComposerContext);
 
     React.useEffect(() => {
@@ -106,21 +116,40 @@ export function CalloutCard({
         }
     }, [isEditing, setShowEmojiPicker]);
 
+    const customBackground = isHexColor(color);
+    const customText = isHexColor(textColor);
+
     return (
         <>
-            <div className={`flex rounded-md border px-7 py-5 ${CALLOUT_COLORS[color]} `} data-testid={`callout-bg-${color}`}>
-                <div>
+            <div
+                className={`flex rounded-md border px-7 py-5 ${customBackground ? 'border-transparent' : CALLOUT_COLORS[color]} `}
+                data-testid={`callout-bg-${customBackground ? 'custom' : color}`}
+                style={{...(customBackground ? {backgroundColor: color} : {}), ...(customText ? {color: textColor} : {})}}
+            >
+                <div className="relative">
                     {hasEmoji &&
                     <>
-                        <button
-                            ref={emojiButtonRef}
-                            className={`mr-2 cursor-pointer rounded-md px-2 text-xl ${isEditing ? 'hover:bg-grey-500/20' : ''} ` }
-                            data-testid="emoji-picker-button"
-                            type="button"
-                            onClick={toggleEmojiPicker}
-                        >
-                            {calloutEmoji}
-                        </button>
+                        {editable ? (
+                            <button
+                                ref={emojiButtonRef}
+                                className={`mr-2 cursor-pointer rounded-md px-2 text-xl ${isEditing ? 'hover:bg-grey-500/20' : ''} ` }
+                                data-testid="emoji-picker-button"
+                                type="button"
+                                onClick={toggleEmojiPicker}
+                            >
+                                {calloutEmoji}
+                            </button>
+                        ) : (
+                            // a reader sees the emoji, not a button that opens a picker
+                            <span className="mr-2 px-2 text-xl" data-testid="callout-emoji">{calloutEmoji}</span>
+                        )}
+                        {emojiPickerOn && showEmojiPicker && isEditing && (
+                            // In the editor's floating layer, placed inside the window and clear of a
+                            // host's clipping box; it flips above the button when there is no room below.
+                            <AnchoredMenu anchor={emojiButtonRef.current} containerRef={emojiPickerRef} measure="whole">
+                                <EmojiPicker onClose={toggleEmojiPicker} onSelect={changeEmoji} />
+                            </AnchoredMenu>
+                        )}
                     </>}
                 </div>
                 <KoenigNestedEditor
@@ -132,7 +161,7 @@ export function CalloutCard({
                     placeholderClassName={`font-serif text-xl font-normal tracking-wide text-grey-500 !dark:text-white opacity-30`}
                     placeholderText={strings.callout.placeholder}
                     singleParagraph={true}
-                    textClassName={`!my-0 w-full whitespace-normal bg-transparent font-serif text-xl font-normal ${CALLOUT_TEXT_COLORS[color]}`}
+                    textClassName={`!my-0 w-full whitespace-normal bg-transparent font-serif text-xl font-normal ${customText ? 'caret-current' : (customBackground ? TEXT_BLACK : CALLOUT_TEXT_COLORS[color])}`}
                 />
             </div>
             {
@@ -146,12 +175,19 @@ export function CalloutCard({
                             label={strings.callout.emoji}
                             onChange={toggleEmoji}
                         />
-                        <ColorOptionSetting
-                            buttons={calloutColorPicker}
+                        <ColorSetting
                             dataTestId='callout-color-picker'
                             label={strings.callout.background}
-                            selectedName={color}
-                            onClick={handleColorChange}
+                            slot='calloutBackground'
+                            value={color}
+                            onChange={handleColorChange}
+                        />
+                        <ColorSetting
+                            dataTestId='callout-text-color-picker'
+                            label={strings.callout.textColor}
+                            slot='calloutText'
+                            value={textColor}
+                            onChange={handleTextColorChange}
                         />
                     </SettingsPanel>
                 ) : (

@@ -5,6 +5,7 @@ import ImgPlaceholderIcon from '../../assets/icons/kg-img-placeholder.svg?react'
 import ProductPlaceholderIcon from '../../assets/icons/kg-product-placeholder.svg?react';
 import VideoPlaceholderIcon from '../../assets/icons/kg-video-placeholder.svg?react';
 import clsx from 'clsx';
+import {useKoenigEditable} from '../../../additions/preview/PreviewContext';
 import {useKoenigStrings} from '../../../additions/options';
 
 export const PLACEHOLDER_ICONS = {
@@ -79,6 +80,8 @@ export function MediaPlaceholder({
     ...props
 }) {
     const strings = useKoenigStrings();
+    // an empty upload slot is for the person editing; the saved HTML writes nothing for it
+    const editable = useKoenigEditable();
     const containerClasses = clsx(
         'relative flex h-full items-center justify-center',
         type === 'button' ? 'rounded-lg bg-grey-100' : 'border bg-grey-50',
@@ -89,9 +92,10 @@ export function MediaPlaceholder({
     );
 
     const buttonClasses = clsx(
-        'group flex cursor-pointer select-none items-center justify-center',
+        'group flex max-w-full cursor-pointer select-none items-center justify-center',
         type === 'button' && 'px-3 py-1',
-        type !== 'button' && (size === 'xsmall' ? 'p-4' : 'flex-col p-20')
+        // the padding follows the card's width, so a narrow card or a big text size does not push the button out of it
+        type !== 'button' && (size === 'xsmall' ? 'p-4' : 'flex-col p-[clamp(1.6rem,8%,5rem)]')
     );
 
     const errorClasses = clsx(
@@ -108,6 +112,10 @@ export function MediaPlaceholder({
             {error.message}
         </span>
     ));
+
+    if (!editable) {
+        return null;
+    }
 
     return (
         <div

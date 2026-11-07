@@ -42,10 +42,29 @@ const output = path.join(root, "src/generated/koenig.css");
 // Tailwind resolves the config's content globs against the working directory.
 process.chdir(root);
 
+// Upstream sizes everything in rem and expects a 10px root (html { font-size: 62.5% }). A host
+// on the browser's 16px root saw the whole editor 60% too large. Every rem length becomes a
+// multiple of --kg-rem (default: 0.625rem, i.e. 10px at a 16px root), so it follows the host's
+// text size setting and a host with its own scale sets --kg-rem once.
+const REM = /(-?\d*\.?\d+)rem\b/g;
+const scaleRem = () => ({
+  postcssPlugin: "kg-scale-rem",
+  // One pass at the end: a per-declaration visitor would see its own output again.
+  OnceExit(root) {
+    root.walkDecls((declaration) => {
+      declaration.value = declaration.value.replace(REM, (_, amount) =>
+        Number(amount) === 0 ? "0" : `calc(${amount} * var(--kg-rem, 0.625rem))`,
+      );
+    });
+  },
+});
+scaleRem.postcss = true;
+
 const result = await postcss([
   postcssImport(),
   tailwindNesting(),
   tailwindcss({ config: path.join(root, "tailwind.config.cjs") }),
+  scaleRem(),
 ]).process(readFileSync(input, "utf8"), { from: input, to: output });
 
 mkdirSync(path.dirname(output), { recursive: true });

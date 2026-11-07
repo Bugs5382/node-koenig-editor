@@ -1,5 +1,6 @@
 import KoenigNestedEditorPlugin from '../plugins/KoenigNestedEditorPlugin.jsx';
 import {BASIC_NODES, BASIC_TRANSFORMERS, KoenigComposableEditor, KoenigNestedComposer, MINIMAL_NODES, MINIMAL_TRANSFORMERS} from '../index.js';
+import {EmojiCommandPlugin} from '../../additions/emojiPicker/EmojiCommandPlugin';
 import {RestrictContentPlugin} from '../plugins/RestrictContentPlugin';
 import {useKoenigStrings} from '../../additions/options';
 
@@ -54,6 +55,8 @@ const KoenigNestedEditor = ({
                 {singleParagraph && <RestrictContentPlugin paragraphs={1} />}
 
                 {children}
+
+                <EmojiCommandPlugin />
 
                 <KoenigNestedEditorPlugin
                     autoFocus={autoFocus}

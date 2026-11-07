@@ -1,6 +1,6 @@
 import React from 'react';
 import {$createAsideNode, $isAsideNode} from '../nodes/AsideNode';
-import {$createCodeNode} from '@lexical/code';
+import {$createCodeNode, CodeNode} from '@lexical/code';
 import {$createHeadingNode, $createQuoteNode, $isQuoteNode, DRAG_DROP_PASTE} from '@lexical/rich-text';
 import {$createLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND} from '@lexical/link';
 import {
@@ -53,6 +53,8 @@ import {$isListItemNode, $isListNode, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDE
 import {$setBlocksType} from '@lexical/selection';
 import {MIME_TEXT_HTML, MIME_TEXT_PLAIN, PASTE_MARKDOWN_COMMAND} from './MarkdownPastePlugin.jsx';
 import {mergeRegister} from '@lexical/utils';
+import KoenigComposerContext from '../context/KoenigComposerContext';
+import {ALIGNMENT_ITEMS, isToolbarItemHidden} from '../../additions/options';
 import {registerDefaultTransforms} from '#kg-default-transforms';
 import {shouldIgnoreEvent} from '../utils/shouldIgnoreEvent';
 import {useKoenigSelectedCardContext} from '../context/KoenigSelectedCardContext';
@@ -494,7 +496,7 @@ function useKoenigBehaviour({editor, containerElem, cursorDidExitAtTop, isNested
                         const currentNode = selection?.getNodes()[0];
                         if ($isTextNode(currentNode)) {
                             const textContent = currentNode.getTextContent();
-                            if (textContent.match(/^```(\w{1,10})?/)) {
+                            if (editor.hasNodes([CodeNode]) && textContent.match(/^```(\w{1,10})?/)) {
                                 event.preventDefault();
                                 const language = textContent.replace(/^```/,'');
                                 // a stock Lexical code block, the node type older documents already use
@@ -1259,7 +1261,7 @@ function useKoenigBehaviour({editor, containerElem, cursorDidExitAtTop, isNested
                         const currentNode = selection.getNodes()[0];
                         if ($isTextNode(currentNode)) {
                             const textContent = currentNode.getTextContent();
-                            if (textContent.match(/^```(\w{1,10})?/)) {
+                            if (editor.hasNodes([CodeNode]) && textContent.match(/^```(\w{1,10})?/)) {
                                 event.preventDefault();
                                 const language = textContent.replace(/^```/,'');
                                 // a stock Lexical code block, the node type older documents already use
@@ -1489,9 +1491,12 @@ function useKoenigBehaviour({editor, containerElem, cursorDidExitAtTop, isNested
     // remove alignment formats,
     // denest invalid node nesting,
     // merge list nodes of same type
+    // (alignment stays when the toolbar offers it; the main editor only, nested card text has none)
+    const {toolbar} = React.useContext(KoenigComposerContext);
+    const keepAlignment = !isNested && ALIGNMENT_ITEMS.some(item => !isToolbarItemHidden(toolbar, item));
     React.useEffect(() => {
-        return registerDefaultTransforms(editor);
-    }, [editor]);
+        return registerDefaultTransforms(editor, {keepAlignment});
+    }, [editor, keepAlignment]);
 
     return null;
 }

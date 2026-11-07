@@ -21,6 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 export { getCardMenuNodes } from "./cardMenu";
-export { CARD_NODE_TYPES, KOENIG_CARD_NAMES, selectEditorNodes } from "./cards";
-export { DEFAULT_STRINGS, KoenigStringsContext, resolveStrings, useKoenigStrings } from "./strings";
-export { isToolbarItemHidden, KOENIG_TOOLBAR_ITEMS } from "./toolbar";
+export { CARD_NODE_TYPES, cardForNodeType, KOENIG_CARD_NAMES, selectEditorNodes } from "./cards";
+export {
+  DEFAULT_STRINGS,
+  describeFailedCard,
+  KoenigStringsContext,
+  resolveStrings,
+  useKoenigStrings,
+} from "./strings";
+export { KOENIG_TOOLS, KoenigToolsContext, resolveTools, useKoenigTool } from "./tools";
+export { ALIGNMENT_ITEMS, isToolbarItemHidden, KOENIG_TOOLBAR_ITEMS } from "./toolbar";

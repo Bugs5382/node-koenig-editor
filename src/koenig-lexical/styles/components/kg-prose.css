@@ -52,32 +52,32 @@
 
         /* H1 should be almost the same size as the post title to suggest avoid using it */
         :where(h1):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 4.4rem;
+            font-size: var(--kg-font-size-h1, 4.4rem);
             line-height: 1.15em;
             letter-spacing: -0.015em;
         }
 
         :where(h2):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 3.2rem;
+            font-size: var(--kg-font-size-h2, 3.2rem);
             line-height: 1.2em;
             letter-spacing: -0.014em;
         }
 
         :where(h3):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 2.5rem;
+            font-size: var(--kg-font-size-h3, 2.5rem);
             line-height: 1.3em;
             letter-spacing: -0.013em;
         }
 
         /* H4 is almost the same size as H3 to discourage using it */
         :where(h4):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 2.2rem;
+            font-size: var(--kg-font-size-h4, 2.2rem);
             line-height: 1.35em;
             letter-spacing: -0.011em;
         }
 
         :where(h5):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-size: 2.0rem;
+            font-size: var(--kg-font-size-h5, 2.0rem);
             line-height: 1.35em;
             font-weight: 700;
             letter-spacing: -0.011em;
@@ -309,10 +309,10 @@
             ul,
             ol
         ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            font-family: georgia,Times,serif;
+            font-family: var(--kg-font-body, georgia,Times,serif);
             font-weight: 400;
-            line-height: 1.6em;
-            font-size: 2.0rem;
+            line-height: var(--kg-line-height, 1.6em);
+            font-size: var(--kg-font-size, 2.0rem);
         }
 
         :where(
@@ -766,25 +766,31 @@
     /* Dark mode
     /* -------------------------------------------------------------------- */
 
+    /* `dark` can sit on the editor itself (the composer's darkMode), on an ancestor (a host's
+       page), or on a descendant, so all three are matched. */
+    &.dark,
+    .dark &,
     .dark {
-        :where(
-                h1,
-                h2,
-                h3,
-                h4,
-                h5,
-                h6
-            ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-                color: var(--white);
-            }
+        .kg-prose {
+            :where(
+                    h1,
+                    h2,
+                    h3,
+                    h4,
+                    h5,
+                    h6
+                ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
+                    color: var(--white);
+                }
 
-        :where(
-            code
-        ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
-            background: var(--grey-900);
-            border: 1px solid var(--grey-900);
-            border-radius: 2px;
-            color: var(--grey-300);
+            :where(
+                code
+            ):not(:where(.not-kg-prose, [class~='not-kg-prose'] *)) {
+                background: var(--grey-900);
+                border: 1px solid var(--grey-900);
+                border-radius: 2px;
+                color: var(--grey-300);
+            }
         }
     }
 }

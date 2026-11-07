@@ -1,0 +1,148 @@
+/*
+MIT License
+
+Copyright (c) 2026 Shane
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $isTableCellNode, $isTableNode, TableNode } from "@lexical/table";
+import { $getNodeByKey, $nodesOfType } from "lexical";
+import { useEffect } from "react";
+
+import { $figureNumbers, $figureTextWith, $getFigure } from "../figure/figure";
+import { $getTableCaption, $getTableFigure } from "./tableActions";
+import { $syncCellBorders, $syncOneCellBorders } from "./tableBorders";
+import { $getTableLook } from "./tableLook";
+import { $getTableWidthMode } from "./tableResize";
+import { inkFor } from "../textStyle/textStyle";
+import { DEFAULT_BAND_COLOR, DEFAULT_BRAND_COLOR } from "./tableLook";
+
+// A table's caption is node state (see tableActions). In the editor it is drawn from attributes on
+// the table element, not from a child element: Lexical removes DOM nodes it did not put there, and
+// re-adding one would never settle. `data-kg-caption` carries the text for a CSS caption box
+// (`table::after`), and `aria-label` gives the table its accessible name. The exported HTML has a
+// real `caption` element.
+// The table's width mode and sizing, as attributes the stylesheet reads and a width where one is
+// needed (a fixed table is as wide as its columns).
+const syncSize = (table: TableNode, element: Element) => {
+  const mode = $getTableWidthMode(table);
+  const widths = table.getColWidths();
+  const total = widths?.reduce((sum, width) => sum + width, 0) ?? 0;
+  const html = element as HTMLElement;
+  if (element.getAttribute("data-kg-table-width") !== mode)
+    element.setAttribute("data-kg-table-width", mode);
+  if (widths?.length) {
+    if (!element.hasAttribute("data-kg-sized")) element.setAttribute("data-kg-sized", "");
+  } else if (element.hasAttribute("data-kg-sized")) {
+    element.removeAttribute("data-kg-sized");
+  }
+  const width = mode === "fit" ? "auto" : mode === "fixed" && total > 0 ? `${total}px` : "";
+  if (html.style.width !== width) html.style.width = width;
+};
+
+// The table's look (stripes and brand colour) as attributes the stylesheet reads, with the two
+// colours and their ink as custom properties. Written only when they changed.
+const syncLook = (table: TableNode, element: Element) => {
+  const look = $getTableLook(table);
+  const html = element as HTMLElement;
+  const flag = (name: string, on: boolean) => {
+    if (on !== element.hasAttribute(name)) {
+      if (on) element.setAttribute(name, "");
+      else element.removeAttribute(name);
+    }
+  };
+  flag("data-kg-band-rows", look.bandRows);
+  flag("data-kg-band-columns", look.bandColumns);
+  flag("data-kg-brand-rows", look.brandRows);
+  flag("data-kg-brand-columns", look.brandColumns);
+  const set = (name: string, value: string) => {
+    if (html.style.getPropertyValue(name) !== value) {
+      if (value) html.style.setProperty(name, value);
+      else html.style.removeProperty(name);
+    }
+  };
+  const band = look.bandRows || look.bandColumns ? (look.bandColor ?? DEFAULT_BAND_COLOR) : "";
+  const brand = look.brandRows || look.brandColumns ? (look.brandColor ?? DEFAULT_BRAND_COLOR) : "";
+  set("--kg-table-band", band);
+  set("--kg-table-band-ink", band ? inkFor(band) : "");
+  set("--kg-table-brand", brand);
+  set("--kg-table-brand-ink", brand ? inkFor(brand) : "");
+};
+
+export const useTableCaptions = (): void => {
+  const [editor] = useLexicalComposerContext();
+  useEffect(() => {
+    if (!editor.hasNodes([TableNode])) return undefined;
+    const elementOf = (table: TableNode) => {
+      const found = editor.getElementByKey(table.getKey());
+      return found?.tagName === "TABLE" ? found : found?.querySelector("table");
+    };
+    // the table-wide attributes: size, and the caption (which depends on the numbers across the document)
+    const syncTable = (table: TableNode, numbers: Map<string, number>) => {
+      const element = elementOf(table);
+      if (!element) return;
+      syncSize(table, element);
+      syncLook(table, element);
+      const text = $getFigure(table) ? $figureTextWith(table, numbers) : $getTableCaption(table);
+      if (!text) {
+        element.removeAttribute("data-kg-caption");
+        element.removeAttribute("data-kg-caption-above");
+        if (element.hasAttribute("data-kg-captioned")) {
+          element.removeAttribute("aria-label");
+          element.removeAttribute("data-kg-captioned");
+        }
+        return;
+      }
+      if (element.getAttribute("data-kg-caption") !== text)
+        element.setAttribute("data-kg-caption", text);
+      if (element.getAttribute("aria-label") !== text) element.setAttribute("aria-label", text);
+      element.setAttribute("data-kg-captioned", "");
+      if ($getTableFigure(table)?.above) element.setAttribute("data-kg-caption-above", "");
+      else element.removeAttribute("data-kg-caption-above");
+    };
+    const syncAll = () => {
+      editor.getEditorState().read(() => {
+        const numbers = $figureNumbers();
+        for (const table of $nodesOfType(TableNode)) {
+          syncTable(table, numbers);
+          $syncCellBorders(editor, table);
+        }
+      });
+    };
+    syncAll();
+    // after that, work only on what the update changed: the table-wide attributes of every table
+    // (cheap, and a new or removed table renumbers the others), and the borders of the cells that
+    // were themselves changed
+    return editor.registerUpdateListener(({ dirtyElements, editorState }) => {
+      if (dirtyElements.size === 0) return;
+      editorState.read(() => {
+        const numbers = $figureNumbers();
+        for (const table of $nodesOfType(TableNode)) syncTable(table, numbers);
+        for (const [key, intentional] of dirtyElements) {
+          if (!intentional) continue;
+          const node = $getNodeByKey(key);
+          if ($isTableCellNode(node)) $syncOneCellBorders(editor, node);
+          else if ($isTableNode(node)) $syncCellBorders(editor, node);
+        }
+      });
+    });
+  }, [editor]);
+};
+
+export default useTableCaptions;

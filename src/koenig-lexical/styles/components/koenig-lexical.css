@@ -58,8 +58,8 @@
     }
 
     em-emoji-picker {
-        /* --green */
-        --rgb-accent: 48, 207, 67;
+        /* --black */
+        --rgb-accent: 21, 23, 26;
         /* --grey-950 */
         --rgb-background: 35, 41, 47;
         /* --grey-300 */
@@ -164,10 +164,14 @@ em-emoji-picker {
     display: none;
 }
 
-/* Table */
+/* Table. Every colour and the line style come from a token, so a host sets them once:
+   --kg-table-border-color, --kg-table-border-style (solid), --kg-table-edit-border-style (dashed,
+   only while the editor is editable), --kg-table-header-bg and --kg-table-selected-bg. */
 .koenig-lexical table {
+    border-collapse: collapse;
     font-size: 1.75rem;
     margin: 0;
+    width: 100%;
     font-family: georgia,Times,serif;
     letter-spacing: .02rem;
     line-height: 1.6em;
@@ -176,12 +180,367 @@ em-emoji-picker {
 .koenig-lexical table tr td,
 .koenig-lexical table tr th {
     vertical-align: top;
-    border-bottom: 1px solid var(--grey-200);
+    min-width: 6rem;
+    padding: 0.8rem 1.2rem;
+    border: 1px var(--kg-table-border-style, solid) var(--kg-table-border-color, var(--grey-700));
 }
 
-.koenig-lexical > .dark, .koenig-lexical.dark, .dark .koenig-lexical {
-    table tr td,
-    table tr th {
-        border-bottom: 1px solid var(--grey-900);
+/* A table wider than its column scrolls sideways inside this box, not the page. */
+.koenig-lexical .kg-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Size. A table the author has resized lets its columns go down to the smallest size the editor
+   allows; the width mode is fill the column (default), as narrow as the content, or the columns'
+   total width. A table wider than its column scrolls inside its own box. */
+.koenig-lexical table[data-kg-sized] tr td,
+.koenig-lexical table[data-kg-sized] tr th {
+    min-width: 40px;
+    overflow-wrap: anywhere;
+}
+
+.koenig-lexical table[data-kg-table-width="fixed"] {
+    max-width: none;
+    table-layout: fixed;
+}
+
+.koenig-lexical table[data-kg-table-width="fit"] {
+    width: auto;
+}
+
+/* While editing, the grid is drawn dashed so an empty table reads as a place to write. */
+.koenig-lexical [contenteditable="true"] table tr td,
+.koenig-lexical [contenteditable="true"] table tr th {
+    border-style: var(--kg-table-edit-border-style, dashed);
+}
+
+/* The header row reads as a header by its bold text. It has no shade of its own: a host can set
+   --kg-table-header-bg, and an author shades cells (or the whole row) from the palette. */
+.koenig-lexical table tr th {
+    background: var(--kg-table-header-bg, transparent);
+    font-weight: 700;
+    text-align: start;
+}
+
+/* A table's look. Stripes (every second row or column) take the band colour, the header row and
+   the first column take the brand colour; the table's own attributes and custom properties are
+   set by the editor from the table's state. A cell the author shaded keeps its own colour, and the
+   ink is chosen to read on each colour. Only rows are counted by type, because the column group
+   sits among the rows. */
+.koenig-lexical table[data-kg-band-rows] tr:nth-of-type(even) :is(td, th):not([style*="background-color"]),
+.koenig-lexical table[data-kg-band-columns] tr :is(td, th):nth-child(even):not([style*="background-color"]) {
+    background: var(--kg-table-band);
+    color: var(--kg-table-band-ink);
+}
+
+.koenig-lexical table[data-kg-brand-rows] tr:nth-of-type(1) :is(td, th):not([style*="background-color"]),
+.koenig-lexical table[data-kg-brand-columns] tr :is(td, th):nth-child(1):not([style*="background-color"]) {
+    background: var(--kg-table-brand);
+    color: var(--kg-table-brand-ink);
+}
+
+/* A cell the author shaded keeps dark ink, so its text reads on the shade in light and dark. */
+.koenig-lexical table tr td[style*="background-color"],
+.koenig-lexical table tr th[style*="background-color"] {
+    color: var(--black);
+}
+
+/* The caption is the table's own text, drawn under it from an attribute (the editor cannot add a
+   child element to the table; the exported HTML has a real caption element). */
+.koenig-lexical table[data-kg-caption][data-kg-caption-above]::after {
+    caption-side: top;
+}
+
+.koenig-lexical table[data-kg-caption]::after {
+    content: attr(data-kg-caption);
+    display: table-caption;
+    caption-side: bottom;
+    padding: 0.8rem 1.2rem;
+    font-family: var(--kg-font-sans, Inter, sans-serif);
+    font-size: 1.4rem;
+    text-align: center;
+    color: var(--grey-700);
+}
+
+/* The cell the cursor is in, and the cells of a selected range. */
+.koenig-lexical table tr td[data-kg-active-cell],
+.koenig-lexical table tr th[data-kg-active-cell] {
+    outline: 2px solid var(--kg-selection);
+    outline-offset: -2px;
+}
+
+.koenig-lexical table .kg-table-cell-selected {
+    box-shadow: inset 0 0 0 9999px var(--kg-table-selected-bg, color-mix(in srgb, var(--kg-selection) 14%, transparent));
+}
+
+/* On paper the grid is solid, the header keeps its shade and nothing is lost to the editing look. */
+@media print {
+    .koenig-lexical table tr td,
+    .koenig-lexical table tr th {
+        border-style: solid !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
+}
+
+/* Forced colours: system colours for the grid, a heavier line under the header, and the selection
+   in the system highlight. */
+@media (forced-colors: active) {
+    .koenig-lexical table tr td,
+    .koenig-lexical table tr th {
+        border-color: CanvasText;
+        background: Canvas;
+    }
+
+    .koenig-lexical table tr th {
+        border-bottom-width: 3px;
+    }
+
+    .koenig-lexical table[data-kg-band-rows] tr:nth-of-type(even) :is(td, th),
+    .koenig-lexical table[data-kg-band-columns] tr :is(td, th):nth-child(even) {
+        border-style: dotted;
+    }
+
+    .koenig-lexical .kg-table-cell-selected {
+        background: Highlight;
+        color: HighlightText;
+    }
+}
+
+/* A gallery photo's title and caption sit over the bottom of the photo on screen. On paper they
+   print under the photo, in the text's own colour, whether or not they were collapsed. */
+@media print {
+    .koenig-lexical [data-gallery-image-text-wrap] {
+        position: static !important;
+    }
+
+    .koenig-lexical [data-gallery-image-text] {
+        background: transparent !important;
+        clip: auto !important;
+        clip-path: none !important;
+        color: inherit !important;
+        height: auto !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        padding: 0.4em 0 0 !important;
+        position: static !important;
+        white-space: normal !important;
+        width: auto !important;
+    }
+
+    .koenig-lexical [data-gallery-image-text-toggle],
+    .koenig-lexical [data-gallery-text-toggle-all],
+    .koenig-lexical [data-gallery-image-text-edit] {
+        display: none !important;
+    }
+}
+
+/* The header card's title and subtitle are nested editors, and the wrappers and prose styles around
+   them set a grey of their own. Under the card's text colour that was 2.7:1 on a dark background;
+   they take the card's colour instead, so contrast is whatever the colours the person chose give.
+   Links keep their own colour. */
+.koenig-lexical [data-header-title],
+.koenig-lexical [data-header-title] *:not(a),
+.koenig-lexical [data-header-subtitle],
+.koenig-lexical [data-header-subtitle] *:not(a) {
+    color: inherit;
+}
+
+/* Check list. Each item draws its own box before the text (click it, or press Space with the
+   cursor in the item, to tick it); a ticked item has a filled box with a tick and softer text.
+   Both follow the selection colour token and the system colours in forced-colours mode. */
+.koenig-lexical .kg-checklist {
+    list-style: none;
+    padding-inline-start: 0;
+}
+
+.koenig-lexical .kg-checklist .kg-check-item {
+    list-style: none;
+    padding-inline-start: 2.8rem;
+    position: relative;
+}
+
+.koenig-lexical .kg-checklist .kg-check-item::before {
+    border: 2px solid var(--grey-700);
+    border-radius: 0.4rem;
+    content: "";
+    cursor: pointer;
+    height: 1.6rem;
+    inset-inline-start: 0;
+    position: absolute;
+    top: 0.55em;
+    width: 1.6rem;
+}
+
+/* A nested list sits in a wrapper item that Lexical gives the same class; only an item that is a
+   checkbox draws one, or Tab would put a second box on the same line. */
+.koenig-lexical .kg-checklist .kg-check-item:not([role="checkbox"])::before,
+.koenig-lexical .kg-checklist .kg-check-item:not([role="checkbox"])::after {
+    content: none;
+    display: none;
+}
+
+.koenig-lexical .kg-checklist .kg-check-item-checked::before {
+    background-color: var(--kg-selection);
+    border-color: var(--kg-selection);
+}
+
+.koenig-lexical .kg-checklist .kg-check-item-checked::after {
+    border: solid var(--white);
+    border-width: 0 0.2rem 0.2rem 0;
+    content: "";
+    height: 0.9rem;
+    inset-inline-start: 0.55rem;
+    pointer-events: none;
+    position: absolute;
+    top: calc(0.55em + 0.15rem);
+    transform: rotate(45deg);
+    width: 0.5rem;
+}
+
+.koenig-lexical .kg-checklist .kg-check-item-checked {
+    opacity: 0.75;
+}
+
+@media (forced-colors: active) {
+    .koenig-lexical .kg-checklist .kg-check-item::before {
+        border-color: ButtonText;
+    }
+
+    .koenig-lexical .kg-checklist .kg-check-item-checked::before {
+        background-color: Highlight;
+        border-color: Highlight;
+    }
+
+    .koenig-lexical .kg-checklist .kg-check-item-checked::after {
+        border-color: HighlightText;
+    }
+}
+
+/* Find and replace: every match, and the current one, drawn with the CSS Custom Highlight API where
+   the browser has it. They follow the selection colour token. */
+.koenig-lexical ::highlight(kg-find) {
+    background-color: color-mix(in srgb, var(--kg-selection) 35%, transparent);
+}
+
+.koenig-lexical ::highlight(kg-find-current) {
+    background-color: var(--kg-selection);
+    color: var(--white);
+}
+
+@media (forced-colors: active) {
+    .koenig-lexical ::highlight(kg-find) {
+        background-color: Highlight;
+        color: HighlightText;
+    }
+
+    .koenig-lexical ::highlight(kg-find-current) {
+        background-color: ButtonText;
+        color: ButtonFace;
+    }
+}
+
+/* Right to left. A block set to (or reading as) right to left turns its list indent and quote
+   bar around, since the prose styles pad lists and quotes on the physical left. */
+.koenig-lexical ul[dir="rtl"] {
+    padding: 0 0.6rem 0 0;
+}
+
+.koenig-lexical ol[dir="rtl"] {
+    padding: 0 0.8rem 0 0;
+}
+
+.koenig-lexical blockquote[dir="rtl"] {
+    border-left: 0;
+    border-right: 0.25rem solid var(--kg-accent-color, #ff0095);
+    padding-left: 0;
+    padding-right: 2rem;
+}
+
+.koenig-lexical ul[dir="rtl"].kg-checklist .kg-check-item {
+    margin: 1rem 2.4rem 0 0;
+    padding: 0 2.8rem 0 0;
+}
+
+/* Code block (the element selector keeps these above the prose rule for `code`). Line numbers are generated content from the block's data-gutter, so they are never
+   selected or copied. Token colours are set with --kg-code-* tokens a host can override. */
+.koenig-lexical code.kg-code-block {
+    --kg-code-fg: var(--kg-color-grey-900, #15171a);
+    --kg-code-bg: var(--kg-color-grey-100, #f1f3f4);
+    --kg-code-gutter: var(--kg-color-grey-600, #626d79);
+    --kg-code-comment: #5f6b7a;
+    --kg-code-keyword: #a11d6f;
+    --kg-code-string: #0b6e3a;
+    --kg-code-number: #b3470b;
+    --kg-code-function: #1d4fd1;
+    --kg-code-attr: #7a4fc1;
+    --kg-code-builtin: #0a6f86;
+    --kg-code-deleted: #b3261e;
+    --kg-code-inserted: #0b6e3a;
+    background: var(--kg-code-bg);
+    border-radius: 0.6rem;
+    color: var(--kg-code-fg);
+    display: block;
+    font-family: var(--kg-font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+    font-size: 1.4rem;
+    line-height: 1.6;
+    margin: 0 0 1.5em;
+    overflow-x: auto;
+    padding: 1.2rem 1.6rem 1.2rem 5.2rem;
+    position: relative;
+    tab-size: 2;
+    white-space: pre;
+}
+
+.dark .koenig-lexical code.kg-code-block,
+.koenig-lexical .dark code.kg-code-block {
+    --kg-code-fg: var(--kg-color-grey-100, #f1f3f4);
+    --kg-code-bg: var(--kg-color-grey-950, #0b0c0d);
+    --kg-code-gutter: var(--kg-color-grey-500, #7c8b9a);
+    --kg-code-comment: #8b97a5;
+    --kg-code-keyword: #f08fcb;
+    --kg-code-string: #7fd6a0;
+    --kg-code-number: #f2a56b;
+    --kg-code-function: #8fb4ff;
+    --kg-code-attr: #c8a7ff;
+    --kg-code-builtin: #6fd3e6;
+    --kg-code-deleted: #ff8a80;
+    --kg-code-inserted: #7fd6a0;
+}
+
+.koenig-lexical code.kg-code-block::before {
+    color: var(--kg-code-gutter);
+    content: attr(data-gutter);
+    left: 0;
+    padding: 1.2rem 0 1.2rem 0;
+    pointer-events: none;
+    position: absolute;
+    text-align: right;
+    top: 0;
+    user-select: none;
+    white-space: pre;
+    width: 3.6rem;
+}
+
+.koenig-lexical .kg-token-comment { color: var(--kg-code-comment); font-style: italic; }
+.koenig-lexical .kg-token-keyword { color: var(--kg-code-keyword); }
+.koenig-lexical .kg-token-string { color: var(--kg-code-string); }
+.koenig-lexical .kg-token-number { color: var(--kg-code-number); }
+.koenig-lexical .kg-token-function { color: var(--kg-code-function); }
+.koenig-lexical .kg-token-attr { color: var(--kg-code-attr); }
+.koenig-lexical .kg-token-builtin { color: var(--kg-code-builtin); }
+.koenig-lexical .kg-token-deleted { color: var(--kg-code-deleted); }
+.koenig-lexical .kg-token-inserted { color: var(--kg-code-inserted); }
+.koenig-lexical .kg-token-operator,
+.koenig-lexical .kg-token-punctuation { color: var(--kg-code-fg); opacity: 0.8; }
+
+@media (forced-colors: active) {
+    .koenig-lexical code.kg-code-block {
+        border: 1px solid CanvasText;
+        color: CanvasText;
+        background: Canvas;
+    }
+    .koenig-lexical code.kg-code-block::before { color: GrayText; }
+    .koenig-lexical [class*="kg-token-"] { color: CanvasText; }
 }

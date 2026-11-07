@@ -7,7 +7,16 @@ import {DEFAULT_CONFIG} from '#kg-default-nodes';
 import {KoenigSelectedCardContext} from '../context/KoenigSelectedCardContext';
 import {LexicalCollaboration} from '@lexical/react/LexicalCollaborationContext';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
-import {KoenigStringsContext, resolveStrings, selectEditorNodes} from '../../additions/options';
+import {CODE_HTML_EXPORT} from '../../additions/code/codeExport';
+import {SPACING_HTML_EXPORT} from '../../additions/spacing/spacingExport';
+import {TABLE_HTML_EXPORT} from '../../additions/table/tableExport';
+import {GalleryNode} from '../nodes/GalleryNode';
+import {ImageNode} from '../nodes/ImageNode';
+import {withFigureEntry} from '../../additions/figure/figureExport';
+import {CommentsPlugin, KoenigCommentsContext, useCommentsStoreFor} from '../../additions/comments';
+import {KoenigStringsContext, KoenigToolsContext, resolveStrings, resolveTools, selectEditorNodes} from '../../additions/options';
+import {KoenigPreviewBridge} from './KoenigPreviewBridge';
+import {MarkNode} from '@lexical/mark';
 
 // Catch any errors that occur during Lexical updates and log them
 // or throw them as needed. If you don't throw them, Lexical will
@@ -41,21 +50,44 @@ const KoenigComposer = ({
     cards,
     customNodes,
     menuItems,
+    cardRenderers,
+    gallery,
     strings: hostStrings,
     toolbar,
+    toolbarRows,
+    fonts,
+    colors,
+    codeLanguages,
+    fileIcons,
+    spellCheck,
+    lang,
+    toolbarActions,
+    tools,
     onError = defaultOnError,
     fileUploader = {},
     cardConfig = {},
     darkMode = false,
     collaboration = null,
+    comments,
     editable = true,
+    preview,
+    defaultPreview,
+    onPreviewChange,
+    previewOptions,
+    onPreviewOptionsChange,
+    previewComments,
+    showPreviewToggle,
     children
 }) => {
-    const nodes = React.useMemo(
-        () => selectEditorNodes(baseNodes, cards, customNodes),
-        [baseNodes, cards, customNodes]
-    );
+    const hasComments = Boolean(comments);
+    const nodes = React.useMemo(() => {
+        const selected = selectEditorNodes(baseNodes, cards, customNodes);
+        // Comment anchors are mark nodes; they are registered only when comments are on.
+        return hasComments && !selected.includes(MarkNode) ? [...selected, MarkNode] : selected;
+    }, [baseNodes, cards, customNodes, hasComments]);
+    const commentStore = useCommentsStoreFor(comments);
     const strings = React.useMemo(() => resolveStrings(hostStrings), [hostStrings]);
+    const enabledTools = React.useMemo(() => resolveTools(tools), [tools]);
 
     const initialConfig = React.useMemo(() => {
         let editorState = initialEditorState;
@@ -84,6 +116,8 @@ const KoenigComposer = ({
             nodes,
             editable,
             editorState: collaboration ? null : editorState,
+            // the saved HTML of a table, of block spacing, and of the figure entry on pictures
+            html: {export: new Map([...CODE_HTML_EXPORT, ...TABLE_HTML_EXPORT, ...SPACING_HTML_EXPORT, [ImageNode, withFigureEntry], [GalleryNode, withFigureEntry]])},
             onError
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -121,10 +155,33 @@ const KoenigComposer = ({
                     darkMode,
                     collaboration,
                     menuItems,
-                    toolbar
+                    cardRenderers,
+                    gallery,
+                    toolbar,
+                    toolbarRows,
+                    fonts,
+                    colors,
+                    codeLanguages,
+                    fileIcons,
+                    spellCheck,
+                    lang,
+                    toolbarActions
                 }}>
                     <KoenigStringsContext.Provider value={strings}>
+                        <KoenigToolsContext.Provider value={enabledTools}>
+                        <KoenigCommentsContext.Provider value={commentStore}>
                         <KoenigSelectedCardContext>
+                        <KoenigPreviewBridge
+                            defaultPreview={defaultPreview}
+                            editable={editable}
+                            preview={preview}
+                            previewComments={previewComments}
+                            previewOptions={previewOptions}
+                            showPreviewToggle={showPreviewToggle}
+                            onPreviewChange={onPreviewChange}
+                            onPreviewOptionsChange={onPreviewOptionsChange}
+                        >
+                            {commentStore ? <CommentsPlugin store={commentStore} /> : null}
                             {collaboration ? (
                                 <CollaborationPlugin
                                     cursorColor={collaboration.cursorColor}
@@ -138,7 +195,10 @@ const KoenigComposer = ({
                                 />
                             ) : null}
                             {children}
+                        </KoenigPreviewBridge>
                         </KoenigSelectedCardContext>
+                        </KoenigCommentsContext.Provider>
+                        </KoenigToolsContext.Provider>
                     </KoenigStringsContext.Provider>
                 </KoenigComposerContext.Provider>
             </LexicalComposer>

@@ -1,29 +1,75 @@
 import KoenigComposerContext from '../context/KoenigComposerContext.jsx';
 import React from 'react';
 import {$getSelection, $isParagraphNode, $isRangeSelection, $setSelection} from 'lexical';
+import {AnchoredMenu} from '../../additions/placement/AnchoredMenu';
+import {placePlus} from '../../additions/placement/placePlus';
 import {CardMenu} from '../components/ui/CardMenu';
 import {PlusButton, PlusMenu} from '../components/ui/PlusMenu';
 import {buildCardMenu} from '../utils/buildCardMenu';
-import {getCardMenuNodes, useKoenigStrings} from '../../additions/options';
+import {getCardMenuNodes, useKoenigStrings, useKoenigTool} from '../../additions/options';
 import {getEditorCardNodes} from '../utils/getEditorCardNodes';
 import {getSelectedNode} from '../utils/getSelectedNode';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+
+// Used before the button has been measured (its size is a theme variable).
+const FALLBACK_PLUS_SIZE = 22;
 
 function usePlusCardMenu(editor) {
     const [isShowingButton, setIsShowingButton] = React.useState(false);
     const [isShowingMenu, setIsShowingMenu] = React.useState(false);
     const [topPosition, setTopPosition] = React.useState(0);
+    const [leftPosition, setLeftPosition] = React.useState(0);
     const [cachedRange, setCachedRange] = React.useState(null);
     const [cardMenu, setCardMenu] = React.useState({});
     const containerRef = React.useRef(null);
+    const lineRef = React.useRef(null);
+    const menuRef = React.useRef(null);
+    const buttonRef = React.useRef(null);
+    // The menu hangs from the button. Kept in state, not read from the ref during render: pressing
+    // the plus clears the selection, which remounts the button, and a ref read in that render is
+    // still null, so the menu would never be placed (issue 39).
+    const [buttonElement, setButtonElement] = React.useState(null);
+    const setButtonNode = React.useCallback((node) => {
+        buttonRef.current = node;
+        setButtonElement(node);
+    }, []);
     const {cardConfig, menuItems} = React.useContext(KoenigComposerContext);
     const strings = useKoenigStrings();
+    const emojiOn = useKoenigTool('emojiPicker');
 
     function getTopPosition(elem) {
         const elemRect = elem.getBoundingClientRect();
         const containerRect = elem.parentNode.getBoundingClientRect();
 
         return elemRect.top - containerRect.top;
+    }
+
+    // The button stays inside the box the person sees: the nearest ancestor of the editor that
+    // clips, has a background or has a left border (a host's padded card), else the editor itself,
+    // and never outside the window. It goes before the empty line when there is room (see placePlus).
+    function getVisibleBox(elem) {
+        const editorBox = elem.closest('.koenig-lexical') || elem.parentNode.parentNode || elem.parentNode;
+        let box = editorBox;
+        for (let ancestor = editorBox.parentElement; ancestor && ancestor !== document.body; ancestor = ancestor.parentElement) {
+            const style = window.getComputedStyle(ancestor);
+            const transparent = ['', 'rgba(0, 0, 0, 0)', 'transparent'].includes(style.backgroundColor);
+            if (style.overflowX !== 'visible' || !transparent || parseFloat(style.borderLeftWidth) > 0) {
+                box = ancestor;
+                break;
+            }
+        }
+        const rect = box.getBoundingClientRect();
+        const left = Math.max(rect.left, 0);
+        const right = Math.min(rect.right, document.documentElement.clientWidth || rect.right);
+        return {left, width: Math.max(right - left, 0)};
+    }
+
+    function getLeftPosition(elem) {
+        const box = getVisibleBox(elem);
+        const line = elem.getBoundingClientRect();
+        const measured = buttonRef.current?.firstElementChild?.firstElementChild?.getBoundingClientRect().width;
+        const origin = (containerRef.current?.offsetParent || elem.closest('.koenig-lexical'))?.getBoundingClientRect().left;
+        return placePlus(line, box, measured || FALLBACK_PLUS_SIZE, undefined, origin);
     }
 
     function getElementRange(elem) {
@@ -42,6 +88,7 @@ function usePlusCardMenu(editor) {
     }, [cachedRange]);
 
     const showButton = React.useCallback((elem) => {
+        lineRef.current = elem;
         const range = getElementRange(elem);
         setCachedRange(range);
         setIsShowingButton(true);
@@ -104,9 +151,21 @@ function usePlusCardMenu(editor) {
             }
 
             setTopPosition(getTopPosition(p));
+            setLeftPosition(getLeftPosition(p));
             showButton(p);
         });
     }, [editor, showButton, hideButton]);
+
+    // The first placement uses the button's size from before it rendered (or from the previous text
+    // size); measure again once it is on screen so the gap before the line is right.
+    React.useLayoutEffect(() => {
+        if (isShowingButton && lineRef.current?.isConnected) {
+            const left = getLeftPosition(lineRef.current);
+            if (Math.abs(left - leftPosition) > 0.5) {
+                setLeftPosition(left);
+            }
+        }
+    });
 
     const insert = React.useCallback((insertCommand, {insertParams = {}} = {}) => {
         const commandParams = {...insertParams};
@@ -129,7 +188,7 @@ function usePlusCardMenu(editor) {
 
             // clicking inside the menu changes native selection, we don't want
             // to close the menu when that occurs
-            if (isShowingMenu && containerRef.current?.contains(nativeSelection.anchorNode)) {
+            if (isShowingMenu && (containerRef.current?.contains(nativeSelection.anchorNode) || menuRef.current?.contains(nativeSelection.anchorNode))) {
                 return;
             }
 
@@ -179,6 +238,7 @@ function usePlusCardMenu(editor) {
             if (hoveredElem?.tagName === 'P' && hoveredElem.textContent === '') {
                 // place cursor next to the hovered paragraph
                 setTopPosition(getTopPosition(hoveredElem));
+                setLeftPosition(getLeftPosition(hoveredElem));
                 showButton(hoveredElem);
             } else {
                 // reset button based on cursor position
@@ -198,7 +258,7 @@ function usePlusCardMenu(editor) {
     // close it when we detect a click outside
     const closeMenuOnClickOutside = React.useCallback((event) => {
         if (isShowingMenu) {
-            if (!containerRef.current?.contains(event.target)) {
+            if (!containerRef.current?.contains(event.target) && !menuRef.current?.contains(event.target)) {
                 return closeMenu();
             }
         }
@@ -235,11 +295,12 @@ function usePlusCardMenu(editor) {
 
     // build up the card menu based on registered nodes and current search
     React.useEffect(() => {
-        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {menuItems, strings});
+        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {emoji: emojiOn, menuItems, strings});
         setCardMenu(buildCardMenu(cardNodes, {config: cardConfig}));
     }, [cardConfig, editor, setCardMenu, menuItems, strings]);
 
     const style = {
+        left: `${leftPosition}px`,
         top: `${topPosition}px`
     };
 
@@ -250,11 +311,13 @@ function usePlusCardMenu(editor) {
     if (isShowingButton) {
         return (
             <div ref={containerRef} className="absolute z-50" style={style} data-kg-plus-container>
-                {isShowingButton && <PlusButton onClick={openMenu} />}
+                {isShowingButton && <div ref={setButtonNode}><PlusButton onClick={openMenu} /></div>}
                 {isShowingMenu && (
-                    <PlusMenu>
-                        <CardMenu closeMenu={closeMenu} insert={insert} menu={cardMenu.menu} />
-                    </PlusMenu>
+                    <AnchoredMenu anchor={buttonElement} containerRef={menuRef}>
+                        <PlusMenu>
+                            <CardMenu closeMenu={closeMenu} insert={insert} menu={cardMenu.menu} />
+                        </PlusMenu>
+                    </AnchoredMenu>
                 )}
             </div>
         );

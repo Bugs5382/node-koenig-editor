@@ -1,0 +1,296 @@
+/*
+MIT License
+
+Copyright (c) 2026 Shane
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+import { $isTableCellNode, $isTableNode, $isTableRowNode, TableNode } from "@lexical/table";
+import { act, cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import {
+  type ElementNode,
+  $getNodeByKey,
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  KEY_TAB_COMMAND,
+} from "lexical";
+import type { KoenigEditorAPI } from "node-koenig-editor";
+import { afterEach, describe, expect, it } from "vitest";
+
+import { mount, openSlashMenu } from "./__utils__/mount";
+
+afterEach(() => cleanup());
+
+const insertTable = async (api: KoenigEditorAPI) => {
+  await openSlashMenu(api);
+  await act(async () => {
+    fireEvent.click(document.querySelector('[data-kg-card-menu-item="Table"]') as Element);
+  });
+};
+
+/** Rows of cell text-free shape: the header state of each cell. */
+const shape = (api: KoenigEditorAPI) =>
+  api.editorInstance.getEditorState().read(() => {
+    const table = $getRoot().getChildren().find($isTableNode) as TableNode;
+    return table
+      .getChildren()
+      .map((row) =>
+        $isTableRowNode(row)
+          ? row.getChildren().map((cell) => ($isTableCellNode(cell) ? cell.getHeaderStyles() : -1))
+          : [],
+      );
+  });
+
+/** Puts the cursor in the cell at (row, column). */
+const focusCell = async (api: KoenigEditorAPI, row: number, column: number) => {
+  await act(async () => {
+    api.editorInstance.update(() => {
+      const table = $getRoot().getChildren().find($isTableNode) as TableNode;
+      const cell = (table.getChildAtIndex(row) as ElementNode | null)?.getChildAtIndex(column);
+      (cell as ElementNode | undefined)?.selectStart();
+    });
+  });
+  await act(async () => {
+    document.dispatchEvent(new Event("selectionchange"));
+  });
+};
+
+/** The (row, column) the cursor is in. */
+const cursorCell = (api: KoenigEditorAPI) =>
+  api.editorInstance.getEditorState().read(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) return null;
+    const cell = selection.anchor.getNode().getParents().find($isTableCellNode);
+    const row = cell?.getParent();
+    if (!cell || !row) return null;
+    return [row.getIndexWithinParent(), cell.getIndexWithinParent()];
+  });
+
+// The toolbar's buttons open menus; an action is a group button, then an item in its menu.
+const MENU_ITEM: Record<string, [string, string]> = {
+  "add-column-left": ["column", "columnLeft"],
+  "add-column-right": ["column", "columnRight"],
+  "add-row-above": ["row", "rowAbove"],
+  "add-row-below": ["row", "rowBelow"],
+  "delete-column": ["column", "deleteColumn"],
+  "delete-row": ["row", "deleteRow"],
+  "toggle-header-row": ["row", "headerRow"],
+};
+
+const press = async (name: string) => {
+  if (name === "delete-table") {
+    await act(async () => {
+      fireEvent.click(document.querySelector('[data-kg-table-action="delete-table"]') as Element);
+    });
+    return;
+  }
+  const [group, item] = MENU_ITEM[name] as [string, string];
+  await act(async () => {
+    fireEvent.click(document.querySelector(`[data-kg-table-group="${group}"]`) as Element);
+  });
+  await act(async () => {
+    fireEvent.click(document.querySelector(`[data-kg-table-menu-item="${item}"]`) as Element);
+  });
+};
+
+describe("the cell the cursor is in", () => {
+  const active = () => [...document.querySelectorAll("[data-kg-active-cell]")];
+
+  it("is marked, one cell at a time, and the mark follows the cursor", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 1);
+    expect(active()).toHaveLength(1);
+    const first = active()[0] as HTMLTableCellElement;
+    expect(first.tagName).toBe("TD");
+    expect((first.parentElement as HTMLTableRowElement).rowIndex).toBe(1);
+    expect(first.cellIndex).toBe(1);
+    await focusCell(api, 0, 0);
+    expect(active()).toHaveLength(1);
+    expect((active()[0] as HTMLElement).tagName).toBe("TH");
+  });
+
+  it("is not marked when the cursor is outside a table or the editor is read-only", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 1);
+    await act(async () => {
+      api.editorInstance.setEditable(false);
+    });
+    expect(active()).toHaveLength(0);
+  });
+});
+
+describe("table class hooks", () => {
+  it("puts stable classes on the table, its cells and the header cells", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    const table = document.querySelector("[contenteditable] table") as HTMLElement;
+    expect(table.classList.contains("kg-table")).toBe(true);
+    expect(table.querySelector("th")?.classList.contains("kg-table-cell-header")).toBe(true);
+    expect(table.querySelector("td")?.classList.contains("kg-table-cell")).toBe(true);
+  });
+});
+
+describe("table card", () => {
+  it("inserts a 3 by 3 table with a header row", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    expect(shape(api).map((row) => row.length)).toEqual([3, 3, 3]);
+    expect(shape(api)[0]!.every((state) => state !== 0)).toBe(true);
+    expect(shape(api)[1]!.every((state) => state === 0)).toBe(true);
+  });
+
+  it("shows an accessible toolbar only while the cursor is in the table", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 1);
+    const bar = await screen.findByRole("toolbar", { name: /table/i });
+    expect(bar).toBeTruthy();
+    for (const group of ["row", "column", "cell", "colour", "align", "width", "caption"]) {
+      const button = document.querySelector(`[data-kg-table-group="${group}"]`) as HTMLElement;
+      expect(button, group).toBeTruthy();
+      expect(button.getAttribute("aria-label"), group).toBeTruthy();
+      expect(button.getAttribute("aria-haspopup"), group).toBeTruthy();
+      expect(button.getAttribute("type")).toBe("button");
+    }
+    expect(document.querySelector('[data-kg-table-action="delete-table"]')).toBeTruthy();
+    await act(async () => {
+      api.editorInstance.update(() => {
+        $getRoot().selectEnd();
+      });
+    });
+    await act(async () => {
+      document.dispatchEvent(new Event("selectionchange"));
+    });
+    await waitFor(() => expect(screen.queryByRole("toolbar", { name: /table/i })).toBeNull());
+  });
+
+  it("adds a row below and above the cursor's row", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 0);
+    await press("add-row-below");
+    expect(shape(api).length).toBe(4);
+    await press("add-row-above");
+    expect(shape(api).length).toBe(5);
+    expect(shape(api)[0]!.every((state) => state !== 0)).toBe(true);
+  });
+
+  it("adds a column to the right and the left of the cursor's column", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 1);
+    await press("add-column-right");
+    expect(shape(api).map((row) => row.length)).toEqual([4, 4, 4]);
+    await press("add-column-left");
+    expect(shape(api).map((row) => row.length)).toEqual([5, 5, 5]);
+  });
+
+  it("removes the cursor's row and column", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 2, 2);
+    await press("delete-row");
+    expect(shape(api).length).toBe(2);
+    await focusCell(api, 1, 1);
+    await press("delete-column");
+    expect(shape(api).map((row) => row.length)).toEqual([2, 2]);
+  });
+
+  it("turns the header row off and on", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 1);
+    await press("toggle-header-row");
+    expect(shape(api)[0]!.every((state) => state === 0)).toBe(true);
+    await press("toggle-header-row");
+    expect(shape(api)[0]!.every((state) => state !== 0)).toBe(true);
+    expect(shape(api)[1]!.every((state) => state === 0)).toBe(true);
+  });
+
+  it("deletes the table and leaves a paragraph to type in", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 1);
+    await press("delete-table");
+    const types = api.editorInstance.getEditorState().read(() =>
+      $getRoot()
+        .getChildren()
+        .map((child) => child.getType()),
+    );
+    expect(types).not.toContain("table");
+    expect(types.length).toBeGreaterThan(0);
+  });
+
+  it("moves between cells with Tab and Shift+Tab", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 0, 0);
+    await act(async () => {
+      api.editorInstance.dispatchCommand(
+        KEY_TAB_COMMAND,
+        new KeyboardEvent("keydown", { cancelable: true, key: "Tab" }),
+      );
+    });
+    expect(cursorCell(api)).toEqual([0, 1]);
+    await act(async () => {
+      api.editorInstance.dispatchCommand(
+        KEY_TAB_COMMAND,
+        new KeyboardEvent("keydown", { cancelable: true, key: "Tab", shiftKey: true }),
+      );
+    });
+    expect(cursorCell(api)).toEqual([0, 0]);
+  });
+
+  it("marks header cells with a scope and body cells without one", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await waitFor(() => expect(document.querySelectorAll("th").length).toBe(3));
+    for (const th of document.querySelectorAll("th")) {
+      expect(th.getAttribute("scope")).toBe("col");
+    }
+    expect(document.querySelectorAll("td").length).toBe(6);
+    expect(document.querySelectorAll("td[scope]").length).toBe(0);
+  });
+
+  it("keeps the scope when the header row is toggled off", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 1);
+    await press("toggle-header-row");
+    await waitFor(() => expect(document.querySelectorAll("th").length).toBe(0));
+    expect(document.querySelectorAll("[scope]").length).toBe(0);
+  });
+
+  it("round-trips through the document model, header row and added rows included", async () => {
+    const { api } = await mount();
+    await insertTable(api);
+    await focusCell(api, 1, 1);
+    await press("add-row-below");
+    await press("add-column-right");
+    const before = shape(api);
+    const saved = JSON.stringify(api.editorInstance.getEditorState().toJSON());
+    cleanup();
+    const { api: reopened } = await mount({ composer: { initialEditorState: saved } });
+    expect(shape(reopened)).toEqual(before);
+    await waitFor(() => expect(document.querySelectorAll("th[scope='col']").length).toBe(4));
+    void $getNodeByKey;
+  });
+});

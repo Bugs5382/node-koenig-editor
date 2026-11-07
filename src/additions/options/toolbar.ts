@@ -26,11 +26,44 @@ import type { KoenigToolbarItem } from "node-koenig-editor";
 export const KOENIG_TOOLBAR_ITEMS: readonly KoenigToolbarItem[] = [
   "bold",
   "italic",
+  "underline",
+  "strikethrough",
+  "subscript",
+  "superscript",
+  "code",
+  "fontSize",
+  "textColor",
+  "highlight",
+  "fontFamily",
+  "clearFormatting",
+  "heading1",
   "heading2",
   "heading3",
+  "heading4",
+  "heading5",
   "quote",
+  "bulletList",
+  "numberList",
+  "checkList",
+  "indent",
+  "outdent",
+  "lineSpacing",
+  "paragraphSpacing",
+  "textDirection",
+  "alignLeft",
+  "alignCenter",
+  "alignRight",
+  "alignJustify",
   "link",
   "snippet",
+];
+
+/** The four alignment buttons. */
+export const ALIGNMENT_ITEMS: readonly KoenigToolbarItem[] = [
+  "alignLeft",
+  "alignCenter",
+  "alignRight",
+  "alignJustify",
 ];
 
 /** True when the host's toolbar choice leaves this button out. No choice shows them all. */

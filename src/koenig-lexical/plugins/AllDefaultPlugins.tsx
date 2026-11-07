@@ -1,12 +1,31 @@
+import AudioPlugin from '../plugins/AudioPlugin';
 import EmEnDashPlugin from '../plugins/EmEnDashPlugin';
+import FilePlugin from '../plugins/FilePlugin';
+import VideoPlugin from '../plugins/VideoPlugin';
+import GalleryPlugin from '../plugins/GalleryPlugin';
+import HeaderPlugin from '../plugins/HeaderPlugin';
+import ButtonPlugin from '../plugins/ButtonPlugin';
+import MarkdownCardPlugin from '../plugins/MarkdownCardPlugin';
 import HorizontalRulePlugin from '../plugins/HorizontalRulePlugin';
 import ImagePlugin from '../plugins/ImagePlugin';
 import {CalloutPlugin} from '../plugins/CalloutPlugin';
 import {CardMenuPlugin} from '../plugins/CardMenuPlugin';
 import {KoenigSnippetPlugin} from '../plugins/KoenigSnippetPlugin';
+import {CheckListPlugin} from '@lexical/react/LexicalCheckListPlugin';
 import {ListPlugin} from '@lexical/react/LexicalListPlugin';
+import {ReadOnlyGuardPlugin} from '../../additions/preview/ReadOnlyGuardPlugin';
+import {AlignmentShortcutsPlugin} from '../../additions/alignment/AlignmentShortcutsPlugin';
+import {InlineFormatShortcutsPlugin} from '../../additions/inlineFormats/InlineFormatShortcutsPlugin';
+import {FindReplacePlugin} from '../../additions/find/FindReplacePlugin';
+import {CodePlugin} from '../../additions/code/CodePlugin';
+import {CleanPastePlugin} from '../../additions/paste/CleanPastePlugin';
+import {ShortcutsPlugin} from '../../additions/shortcuts/ShortcutsPlugin';
+import {SpacingPlugin} from '../../additions/spacing/SpacingPlugin';
 import {TablePlugin} from '../../additions/table/TablePlugin';
+import {EmojiCommandPlugin} from '../../additions/emojiPicker/EmojiCommandPlugin';
+import {ToggleGroupPlugin} from '../plugins/ToggleGroupPlugin';
 import {TogglePlugin} from '../plugins/TogglePlugin';
+import {useKoenigPreview} from '../../additions/preview/PreviewContext';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
 // A card's plugin runs only when the composer registered its node: a host that leaves a card
@@ -15,15 +34,19 @@ const hasNode = (editor, type) => editor._nodes.has(type);
 
 export const AllDefaultPlugins = () => {
     const [editor] = useLexicalComposerContext();
+    const {preview} = useKoenigPreview();
     return (
         <>
             {/* Lexical Plugins */}
             <ListPlugin /> {/* adds indent/outdent/remove etc support */}
+            <CheckListPlugin /> {/* click or Space toggles a check list item */}
             {/* <TabIndentationPlugin /> tab/shift+tab triggers indent/outdent */}
 
             {/* Koenig Plugins */}
-            <CardMenuPlugin />
+            {/* the "+" and "/" menus are editing chrome: not in the reader's view */}
+            {!preview && <CardMenuPlugin />}
             <KoenigSnippetPlugin />
+            <ReadOnlyGuardPlugin />
 
             {/* Card Plugins */}
             {hasNode(editor, 'image') && <ImagePlugin />}
@@ -31,7 +54,23 @@ export const AllDefaultPlugins = () => {
             {hasNode(editor, 'horizontalrule') && <HorizontalRulePlugin />}
             {hasNode(editor, 'callout') && <CalloutPlugin />}
             {hasNode(editor, 'toggle') && <TogglePlugin />}
+            {hasNode(editor, 'toggle-group') && <ToggleGroupPlugin />}
+            {hasNode(editor, 'gallery') && <GalleryPlugin />}
+            {hasNode(editor, 'header') && <HeaderPlugin />}
+            {hasNode(editor, 'button') && <ButtonPlugin />}
+            {hasNode(editor, 'markdown') && <MarkdownCardPlugin />}
+            {hasNode(editor, 'file') && <FilePlugin />}
+            {hasNode(editor, 'video') && <VideoPlugin />}
+            {hasNode(editor, 'audio') && <AudioPlugin />}
+            {hasNode(editor, 'code') && <CodePlugin />}
             <TablePlugin />
+            <AlignmentShortcutsPlugin />
+            <InlineFormatShortcutsPlugin />
+            <SpacingPlugin />
+            <ShortcutsPlugin />
+            <CleanPastePlugin />
+            <FindReplacePlugin />
+            <EmojiCommandPlugin />
         </>
     );
 };

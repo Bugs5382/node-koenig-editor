@@ -3,12 +3,18 @@ import {$canShowPlaceholder} from '@lexical/text';
 import {$createParagraphNode, $getRoot, $isDecoratorNode} from 'lexical';
 import {$selectDecoratorNode} from '../utils/$selectDecoratorNode';
 import {DRAG_DROP_PASTE} from '@lexical/rich-text';
+import {useCommentStore} from '../../additions/comments';
+import {useKoenigPreview} from '../../additions/preview/PreviewContext';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
 // used to register a minimal API for controlling the editor from the consuming app
 // designed to allow typical behaviours without the consuming app needing to bundle the lexical library
 export const ExternalControlPlugin = ({registerAPI}) => {
     const [editor] = useLexicalComposerContext();
+    const comments = useCommentStore();
+    // the API object is made once; it reads the latest preview state from here
+    const previewRef = React.useRef(null);
+    previewRef.current = useKoenigPreview();
 
     React.useEffect(() => {
         if (!registerAPI) {
@@ -18,6 +24,15 @@ export const ExternalControlPlugin = ({registerAPI}) => {
         const API = {
             // give access to the editor instance so the Lexical API can be used directly if needed
             editorInstance: editor,
+            // the inline comment controller, null unless the composer was given `comments`
+            comments,
+            // whether the reader's view is showing, and a way to turn it on or off
+            isPreview() {
+                return previewRef.current.preview;
+            },
+            setPreview(on) {
+                previewRef.current.setPreview(Boolean(on));
+            },
             // simplified API methods for typical consumer app actions
             serialize() {
                 return JSON.stringify(editor.getEditorState());
@@ -113,7 +128,7 @@ export const ExternalControlPlugin = ({registerAPI}) => {
         return () => {
             registerAPI?.(null);
         };
-    }, [editor, registerAPI]);
+    }, [comments, editor, registerAPI]);
 };
 
 export default ExternalControlPlugin;

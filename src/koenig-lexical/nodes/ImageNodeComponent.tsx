@@ -18,7 +18,8 @@ import {imageUploadHandler} from '../utils/imageUploadHandler';
 import {isGif} from '../utils/isGif';
 import {openFileSelection} from '../utils/openFileSelection';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {useKoenigStrings} from '../../additions/options';
+import {useKoenigStrings, useKoenigTool} from '../../additions/options';
+import {ImageEditorDialog} from '../../additions/imageEditor/ImageEditorDialog';
 
 export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionEditor, captionEditorInitialState, triggerFileDialog, previewSrc, href}) {
     const strings = useKoenigStrings();
@@ -29,6 +30,11 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
     const fileInputRef = React.useRef();
     const toolbarFileInputRef = React.useRef();
     const [showSnippetToolbar, setShowSnippetToolbar] = React.useState(false);
+    // A picked file waits here while the crop and rotate editor is open (the composer's
+    // `tools` can turn the editor off). Animated and vector images skip it: a canvas flattens them.
+    const imageEditorOn = useKoenigTool('imageEditor');
+    const [pendingFile, setPendingFile] = React.useState(null);
+    const canEdit = (file) => imageEditorOn && file && /^image\//.test(file.type) && !['image/gif', 'image/svg+xml'].includes(file.type);
 
     const imageUploader = fileUploader.useFileUpload('image');
     const imageFileDragHandler = useFileDragAndDrop({handleDrop: handleImageDrop});
@@ -79,6 +85,10 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
         // If an initial file is provided, upload it
         const uploadInitialFile = async (file) => {
             if (file && !src) {
+                if (canEdit(file)) {
+                    setPendingFile(file);
+                    return;
+                }
                 await imageUploadHandler([file], nodeKey, editor, imageUploader.upload);
             }
         };
@@ -117,6 +127,16 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
 
     const onFileChange = async (e) => {
         const files = e.target.files;
+
+        if (files?.length === 1 && canEdit(files[0])) {
+            setPendingFile(files[0]);
+            try {
+                e.target.value = '';
+            } catch {
+                // some inputs refuse to be reset; the editor still has the file
+            }
+            return;
+        }
 
         // reset original src so it can be replaced with preview and upload progress
         editor.update(() => {
@@ -196,11 +216,31 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
     };
 
     async function handleImageDrop(files) {
+        if (files?.length === 1 && canEdit(files[0])) {
+            setPendingFile(files[0]);
+            return;
+        }
         await imageUploadHandler(files, nodeKey, editor, imageUploader.upload);
     }
 
+    const uploadEdited = (file) => {
+        setPendingFile(null);
+        editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            node.src = '';
+        });
+        return imageUploadHandler([file], nodeKey, editor, imageUploader.upload);
+    };
+
     return (
         <>
+            {pendingFile && (
+                <ImageEditorDialog
+                    file={pendingFile}
+                    onApply={uploadEdited}
+                    onCancel={() => setPendingFile(null)}
+                />
+            )}
             <ImageCard
                 altText={altText}
                 captionEditor={captionEditor}
@@ -246,7 +286,7 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
             >
                 <ImageUploadForm
                     fileInputRef={toolbarFileInputRef}
-                    mimeTypes={fileUploader.fileTypes.image?.mimeTypes}
+                    mimeTypes={fileUploader.fileTypes?.image?.mimeTypes}
                     onFileChange={onFileChange}
                 />
                 <ToolbarMenu>

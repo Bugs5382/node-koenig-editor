@@ -33,18 +33,27 @@ or off, adds its own nodes, wording and theme. Two things to know before changin
 - `index.d.ts` - the public declarations, copied into `dist/` by the build
 - `src/index.ts` - the runtime entry: re-exports only
 - `src/additions/options/` - the host options (cards, strings, toolbar, menu entries)
-- `src/additions/table/` - Lexical's table nodes as a card
+- `src/additions/table/` - Lexical's table nodes as a card, plus its editing toolbar (rows, columns, header row)
+- `src/additions/placement/` - `placeFloating` (viewport-safe menu placement) and the portal the "+" and slash menus use
+- `src/additions/toolbarActions/` - saving and restoring the selection for host toolbar actions
+- `src/koenig-lexical/nodes/GalleryNode*.tsx`, `HeaderNode*.tsx` - the gallery and header cards (ported from upstream); the composer's `cardRenderers` option swaps their layout
+- `src/additions/headings/` - the H1 to H5 limit
+- `src/additions/wordCount/` - `getWordCount`, `countWords`, `getReadingTime` and the `useKoenigWordCount` hook
+- `src/additions/comments/` - inline comment threads on mark nodes: store, plugin, hook (opt-in through the composer's `comments`)
 - `src/koenig-lexical/`, `src/kg-default-nodes/`, `src/kg-default-transforms/` - upstream Koenig
 - `src/generated/koenig.css` - the stylesheet, built by `npm run build:css` and committed
 - `tailwind.config.cjs` - upstream's Tailwind 3 theme, with the palette and fonts on CSS tokens
 - `__tests__/` - vitest + jsdom tests, helpers in `__tests__/__utils__/`
 - `scripts/` - `build-css.mjs` and the pack checks
+- `guides/cards.md` - the one-page guide to the default cards (plain words, printable). The playground's Guide page renders this same file (contents, anchors, Try it links), so edit it here. Update it when a card or tool is added, removed or changes its limits
+- `playground/` - the demo app (own `package.json`, lint and tests; not published). It runs against `src/` by default; `npm run playground:published` uses the npm build. Keep its settings (`playground/src/config.ts`) in step with the composer's options; its sample pictures are drawn by `playground/scripts/samples.mjs` into `playground/public/samples/`
 
 ## Build, test, lint
 
 - Build: `npm run build` (Vite library build to `dist/index.js`, plus `index.d.ts` and `styles.css`)
 - Stylesheet: `npm run build:css` after changing a class name or `tailwind.config.cjs`
 - Test: `npm test` (jsdom; no services needed)
+- Demo app: `npm run playground` (checks: `npm run playground:check`)
 - Lint: `npm run lint`; types: `npm run typecheck` (both skip the upstream folders)
 - Package checks (npm packages), after a build: `npm run check:pack` (contents and ceiling),
   `npm run check:pack:growth` (growth against the last release), `npm run check:install`

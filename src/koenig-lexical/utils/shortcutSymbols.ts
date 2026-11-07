@@ -13,3 +13,6 @@ export function ctrlOrSymbol() {
 export function altOrOption() {
     return isMac() ? '⌥' : 'Alt';
 }
+export function shiftOrSymbol() {
+    return isMac() ? '⇧' : 'Shift';
+}

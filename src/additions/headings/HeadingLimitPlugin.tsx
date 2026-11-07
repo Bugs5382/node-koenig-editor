@@ -20,33 +20,26 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import js from "@eslint/js";
-import tseslint from "typescript-eslint";
-import prettier from "eslint-plugin-prettier";
-import prettierConfig from "eslint-config-prettier";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { HeadingNode } from "@lexical/rich-text";
+import { useEffect } from "react";
 
-export default tseslint.config(
-  {
-    ignores: [
-      "dist",
-      "coverage",
-      "docs",
-      "node_modules",
-      // Upstream Koenig code keeps upstream's style; it is carried over, not linted.
-      "src/koenig-lexical",
-      "src/kg-default-nodes",
-      "src/kg-default-transforms",
-      "src/generated",
-      "tailwind.config.cjs",
-    ],
-  },
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
-  prettierConfig,
-  {
-    plugins: { prettier },
-    rules: {
-      "prettier/prettier": "error",
-    },
-  },
-);
+/** The deepest heading the editor allows. */
+export const MAX_HEADING_TAG = "h5";
+
+// Headings run H1 to H5. A deeper one can arrive from a stored document, a paste, a markdown
+// shortcut or a collaborator; this keeps the content, lowers the tag to H5 and leaves the rest.
+export const HeadingLimitPlugin = () => {
+  const [editor] = useLexicalComposerContext();
+  useEffect(() => {
+    if (!editor.hasNodes([HeadingNode])) return undefined;
+    return editor.registerNodeTransform(HeadingNode, (node) => {
+      if (node.getTag() === "h6") {
+        node.setTag(MAX_HEADING_TAG);
+      }
+    });
+  }, [editor]);
+  return null;
+};
+
+export default HeadingLimitPlugin;

@@ -1,10 +1,11 @@
 import KoenigComposerContext from '../context/KoenigComposerContext.jsx';
 import React from 'react';
 import {$createParagraphNode, $getSelection, $isParagraphNode, $isRangeSelection, COMMAND_PRIORITY_HIGH, KEY_ARROW_DOWN_COMMAND, KEY_ARROW_LEFT_COMMAND, KEY_ARROW_RIGHT_COMMAND, KEY_ARROW_UP_COMMAND, KEY_ENTER_COMMAND} from 'lexical';
+import {AnchoredMenu} from '../../additions/placement/AnchoredMenu';
 import {CardMenu} from '../components/ui/CardMenu';
 import {SlashMenu} from '../components/ui/SlashMenu';
 import {buildCardMenu} from '../utils/buildCardMenu';
-import {getCardMenuNodes, useKoenigStrings} from '../../additions/options';
+import {getCardMenuNodes, useKoenigStrings, useKoenigTool} from '../../additions/options';
 import {getEditorCardNodes} from '../utils/getEditorCardNodes';
 import {getSelectedNode} from '../utils/getSelectedNode';
 import {mergeRegister} from '@lexical/utils';
@@ -12,7 +13,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
 function useSlashCardMenu(editor) {
     const [isShowingMenu, setIsShowingMenu] = React.useState(false);
-    const [position, setPosition] = React.useState({});
+    const [anchor, setAnchor] = React.useState(null);
     const [query, setQuery] = React.useState('');
     const [commandParams, setCommandParams] = React.useState([]);
     const [cardMenu, setCardMenu] = React.useState({});
@@ -22,22 +23,11 @@ function useSlashCardMenu(editor) {
     const containerRef = React.useRef(null);
     const {cardConfig, menuItems} = React.useContext(KoenigComposerContext);
     const strings = useKoenigStrings();
+    const emojiOn = useKoenigTool('emojiPicker');
 
+    // the menu hangs from the line the slash was typed on (see AnchoredMenu)
     function setMenuPosition(elem) {
-        const elemRect = elem.getBoundingClientRect();
-        const containerRect = elem.parentNode.getBoundingClientRect();
-        const menuRect = containerRef.current.getBoundingClientRect();
-
-        const wouldBeOffscreenBottom = elemRect.bottom - containerRect.top + menuRect.height > window.innerHeight;
-        const wouldBeOffscreenTop = elemRect.top - menuRect.height < 0;
-
-        if (wouldBeOffscreenBottom && !wouldBeOffscreenTop) {
-            const bottom = containerRect.height - elem.offsetTop;
-            setPosition({top: null, left: 0, bottom});
-        } else {
-            const top = elem.offsetTop + elemRect.height;
-            setPosition({top, left: 0, bottom: null});
-        }
+        setAnchor(elem);
     }
 
     function getSelectionElement() {
@@ -319,7 +309,7 @@ function useSlashCardMenu(editor) {
 
     // build up the card menu based on registered nodes and current search
     React.useEffect(() => {
-        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {menuItems, strings});
+        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {emoji: emojiOn, menuItems, strings});
         setCardMenu(buildCardMenu(cardNodes, {insert, query, config: cardConfig}));
         setSelectedItemIndex(0);
     }, [editor, query, insert, setCardMenu, setSelectedItemIndex, cardConfig, menuItems, strings]);
@@ -359,7 +349,7 @@ function useSlashCardMenu(editor) {
 
     if (isShowingMenu) {
         return (
-            <div ref={containerRef} className="absolute -left-2 z-50 mt-2" style={position} data-kg-slash-container>
+            <AnchoredMenu anchor={anchor} containerRef={containerRef}>
                 <SlashMenu>
                     <CardMenu
                         closeMenu={closeMenu}
@@ -369,7 +359,7 @@ function useSlashCardMenu(editor) {
                         selectedItemIndex={selectedItemIndex}
                     />
                 </SlashMenu>
-            </div>
+            </AnchoredMenu>
         );
     }
 

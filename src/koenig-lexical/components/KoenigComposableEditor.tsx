@@ -9,6 +9,9 @@ import MarkdownShortcutPlugin from '../plugins/MarkdownShortcutPlugin';
 import React from 'react';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {EditorPlaceholder} from './ui/EditorPlaceholder';
+import {CardSpacePlugin} from '../../additions/cardSpace/CardSpacePlugin';
+import {HeadingLimitPlugin} from '../../additions/headings/HeadingLimitPlugin';
+import {useKoenigPreview} from '../../additions/preview/PreviewContext';
 import {ExternalControlPlugin} from '../plugins/ExternalControlPlugin';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {KoenigBlurPlugin} from '../plugins/KoenigBlurPlugin';
@@ -46,10 +49,12 @@ const KoenigComposableEditor = ({
     const {historyState} = useSharedHistoryContext();
     const [editor] = useLexicalComposerContext();
     const {isCollabActive} = useCollaborationContext();
-    const {editorContainerRef, darkMode} = React.useContext(KoenigComposerContext);
+    const {editorContainerRef, darkMode, spellCheck, lang} = React.useContext(KoenigComposerContext);
 
     const isNested = !!editor._parentEditor;
-    const isDragReorderEnabled = isDragEnabled && !readOnly && !isNested;
+    // the reader's view has no editing chrome: no placeholder, toolbar or drag handles
+    const {preview, previewComments} = useKoenigPreview();
+    const isDragReorderEnabled = isDragEnabled && !readOnly && !isNested && !preview;
 
     const {onChange: sharedOnChange} = useSharedOnChangeContext();
     const _onChange = React.useCallback((editorState) => {
@@ -89,24 +94,26 @@ const KoenigComposableEditor = ({
         <div
             ref={onWrapperRef}
             className={`${useDefaultClasses ? 'koenig-lexical' : ''} ${inheritStyles ? 'kg-inherit-styles' : ''} ${darkMode ? 'dark' : ''} ${className}`}
+            data-kg-preview={preview ? 'true' : undefined}
+            data-kg-preview-comments={preview && previewComments ? 'true' : undefined}
             data-koenig-dnd-disabled={!isDragEnabled}
             data-testid={dataTestId}
         >
             <RichTextPlugin
                 contentEditable={
                     <div ref={onContentEditableRef} data-kg="editor">
-                        <ContentEditable className={useDefaultClasses ? 'kg-prose' : ''} readOnly={readOnly} />
+                        <ContentEditable className={useDefaultClasses ? 'kg-prose' : ''} lang={lang} readOnly={readOnly} spellCheck={spellCheck} />
                     </div>
                 }
                 ErrorBoundary={KoenigErrorBoundary}
-                placeholder={placeholder || <EditorPlaceholder className={placeholderClassName} text={placeholderText} />}
+                placeholder={preview ? null : (placeholder || <EditorPlaceholder className={placeholderClassName} text={placeholderText} />)}
             />
             <LinkPlugin />
             <OnChangePlugin ignoreHistoryMergeTagChange={false} ignoreSelectionChange={true} onChange={_onChange} />
             {!isCollabActive && <HistoryPlugin externalHistoryState={historyState} />} {/* adds undo/redo, in multiplayer that's handled by yjs */}
             <KoenigBehaviourPlugin containerElem={editorContainerRef} cursorDidExitAtTop={cursorDidExitAtTop} isNested={isNested} />
             <MarkdownShortcutPlugin transformers={markdownTransformers} />
-            {floatingAnchorElem && (<FloatingToolbarPlugin anchorElem={floatingAnchorElem} hiddenFormats={hiddenFormats} isSnippetsEnabled={isSnippetsEnabled} />)}
+            {floatingAnchorElem && !preview && (<FloatingToolbarPlugin anchorElem={floatingAnchorElem} hiddenFormats={hiddenFormats} isSnippetsEnabled={isSnippetsEnabled} />)}
             <DragDropPastePlugin />
             {registerAPI ? <ExternalControlPlugin registerAPI={registerAPI} /> : null}
             {isDragReorderEnabled && <DragDropReorderPlugin containerElem={editorContainerRef} />}
@@ -114,6 +121,8 @@ const KoenigComposableEditor = ({
             {onBlur && <KoenigBlurPlugin onBlur={onBlur} />}
             {onFocus && <KoenigFocusPlugin onFocus={onFocus} />}
             <MarkdownPastePlugin />
+            <HeadingLimitPlugin />
+            {!readOnly && <CardSpacePlugin />}
             {children}
         </div>
     );

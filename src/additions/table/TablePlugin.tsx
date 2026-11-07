@@ -24,15 +24,34 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { TablePlugin as LexicalTablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 
+import { TableActionsPlugin } from "./TableActionsPlugin";
+import { TableDragPlugin } from "./TableDragPlugin";
+import { TableEditorPlugin } from "./TableEditorPlugin";
+import { TableResizePlugin } from "./TableResizePlugin";
+import { TablePastePlugin } from "./pasteTable";
+
 // Mounts Lexical's own table behaviour (cell selection, tab navigation, the insert command)
-// when the editor registers the table nodes. Nested editors that leave them out render nothing.
+// when the editor registers the table nodes. A table wider than its column (a phone, a narrow host
+// box, wide columns) scrolls sideways inside its own box, not the page. Nested editors that leave them out render nothing.
 export const TablePlugin = () => {
   const [editor] = useLexicalComposerContext();
   if (!editor.hasNodes([TableNode, TableRowNode, TableCellNode])) {
     return null;
   }
   return (
-    <LexicalTablePlugin hasCellBackgroundColor={true} hasCellMerge={true} hasTabHandler={true} />
+    <>
+      <LexicalTablePlugin
+        hasCellBackgroundColor={true}
+        hasCellMerge={true}
+        hasHorizontalScroll={true}
+        hasTabHandler={true}
+      />
+      <TableActionsPlugin />
+      <TableEditorPlugin />
+      <TableResizePlugin />
+      <TableDragPlugin />
+      <TablePastePlugin />
+    </>
   );
 };
 

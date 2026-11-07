@@ -15,12 +15,14 @@ export * from './transforms/remove-alignment.js';
 /* c8 ignore stop */
 
 /* c8 ignore next */
-export function registerDefaultTransforms(editor: LexicalEditor) {
+export function registerDefaultTransforms(editor: LexicalEditor, options: {keepAlignment?: boolean} = {}) {
     return mergeRegister(
-        // strip unwanted alignment formats
-        registerRemoveAlignmentTransform(editor, ParagraphNode),
-        registerRemoveAlignmentTransform(editor, HeadingNode),
-        registerRemoveAlignmentTransform(editor, QuoteNode),
+        // strip alignment formats, unless the editor offers alignment
+        ...(options.keepAlignment ? [] : [
+            registerRemoveAlignmentTransform(editor, ParagraphNode),
+            registerRemoveAlignmentTransform(editor, HeadingNode),
+            registerRemoveAlignmentTransform(editor, QuoteNode)
+        ]),
 
         // fix invalid nesting of nodes
         registerDenestTransform(editor, ParagraphNode, () => ($createParagraphNode())),

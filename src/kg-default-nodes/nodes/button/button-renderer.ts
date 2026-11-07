@@ -1,0 +1,65 @@
+import {addCreateDocumentOption} from '../../utils/add-create-document-option.js';
+import type {ExportDOMOptions} from '../../export-dom.js';
+import {renderEmptyContainer} from '../../utils/render-empty-container.js';
+import {toSafeUrl} from '../../utils/safe-url.js';
+
+interface ButtonNodeData {
+    buttonUrl: string;
+    buttonText: string;
+    alignment: string;
+    buttonEmoji?: string;
+    backgroundColor?: string;
+    textColor?: string;
+}
+
+interface RenderOptions extends ExportDOMOptions {}
+
+// The email templates of upstream need Ghost's email styles and are left out: the card
+// renders the same link for every target.
+export function renderButtonNode(node: ButtonNodeData, options: RenderOptions = {}) {
+    addCreateDocumentOption(options);
+    const document = options.createDocument!();
+
+    const href = toSafeUrl(node.buttonUrl);
+    if (!href) {
+        return renderEmptyContainer(document);
+    }
+
+    const cardDiv = document.createElement('div');
+    cardDiv.setAttribute('class', getCardClasses(node));
+
+    const button = document.createElement('a');
+    button.setAttribute('href', href);
+    button.setAttribute('class', 'kg-btn kg-btn-accent');
+    const label = [node.buttonEmoji, node.buttonText || (node.buttonEmoji ? '' : 'Button Title')].filter(Boolean).join(' ');
+    button.textContent = label;
+    if (node.buttonEmoji) {
+        button.setAttribute('data-button-emoji', node.buttonEmoji);
+    }
+
+    // colours picked by the person are hex values and go on the link as inline style
+    const isHex = (value?: string) => !!value && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value);
+    const styles: string[] = [];
+    if (isHex(node.backgroundColor)) {
+        styles.push(`background-color: ${node.backgroundColor}`);
+    }
+    if (isHex(node.textColor)) {
+        styles.push(`color: ${node.textColor}`);
+    }
+    if (styles.length) {
+        button.setAttribute('style', styles.join('; '));
+    }
+
+    cardDiv.appendChild(button);
+    return {element: cardDiv, type: 'outer' as const};
+}
+
+function getCardClasses(node: ButtonNodeData) {
+    const cardClasses = ['kg-card kg-button-card'];
+
+    if (node.alignment === 'left' || node.alignment === 'center' || node.alignment === 'right') {
+        cardClasses.push(`kg-align-${node.alignment}`);
+    }
+
+    return cardClasses.join(' ');
+}

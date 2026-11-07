@@ -14,10 +14,10 @@ export const CardMenuSection = ({label, children, ...props}) => {
             <span
                 className="flex items-center justify-between px-4 pb-2 pt-3 uppercase"
                 data-card-menu-section="label"
-                style={{minWidth: 'calc(100% - 3.2rem)'}}
+                style={{minWidth: 'calc(100% - 3.2 * var(--kg-rem, 0.625rem))'}}
             >{strings.menu.sections[label] ?? label}
                 {helpLink && <a href={helpLink} rel="noreferrer" target='_blank'>
-                    <ExternalLinkIcon className="-m-1 size-6 cursor-pointer p-1 transition-all hover:text-green-600" />
+                    <ExternalLinkIcon className="-m-1 size-6 cursor-pointer p-1 transition-all hover:text-selection" />
                 </a>}
             </span>
             <ul className="md:grid md:gap-y-[.2rem] md:px-2" role="menu">
@@ -47,7 +47,7 @@ export const CardMenuItem = ({label, shortcut, desc, isSelected, scrollToItem, o
         <li className="mb-0" role="presentation">
             <button
                 ref={buttonRef}
-                className={`group flex w-full cursor-pointer flex-row items-center gap-3 border border-transparent px-2 py-[.6rem] text-left text-grey-800 hover:bg-grey-100 dark:hover:bg-grey-900 md:rounded-md  ${isSelected ? 'bg-grey-100 dark:bg-grey-900' : ''}`}
+                className={`group flex w-full cursor-pointer flex-row items-center gap-3 border border-transparent px-2 py-[.3rem] text-left text-grey-800 hover:bg-grey-100 dark:hover:bg-grey-900 md:rounded-md  ${isSelected ? 'bg-grey-100 dark:bg-grey-900' : ''}`}
                 data-kg-card-menu-item={label}
                 data-kg-cardmenu-selected={isSelected}
                 role="menuitem"
@@ -56,12 +56,12 @@ export const CardMenuItem = ({label, shortcut, desc, isSelected, scrollToItem, o
                 onMouseDown={preventMouseDown}
                 {...props}
             >
-                <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white text-grey-900 dark:bg-transparent dark:text-grey-500">
-                    {Icon ? <Icon className="size-[1.8rem]" /> : null}
+                <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-white text-grey-900 dark:bg-transparent dark:text-grey-500">
+                    {Icon ? <Icon className="size-[1.6rem]" /> : null}
                 </div>
                 <div className="flex w-full justify-between">
-                    <div className="m-0 truncate text-[1.35rem] font-medium leading-snug tracking-[.02rem] text-grey-900 dark:text-grey-200">{label}</div>
-                    <div className="invisible m-0 truncate text-[1.35rem] font-medium leading-snug tracking-[.02rem] text-grey-500 group-hover:visible dark:text-grey-200">{shortcut}</div>
+                    <div className="m-0 truncate text-[1.25rem] font-medium leading-snug tracking-[.02rem] text-grey-900 dark:text-grey-200">{label}</div>
+                    <div className="invisible m-0 truncate text-[1.25rem] font-medium leading-snug tracking-[.02rem] text-grey-500 group-hover:visible dark:text-grey-200">{shortcut}</div>
                 </div>
             </button>
         </li>
@@ -103,7 +103,7 @@ export const CardSnippetItem = ({label, isSelected, scrollToItem, Icon, onRemove
                 <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-white text-grey-900 dark:bg-transparent dark:text-grey-500">
                     <Icon className="size-[1.8rem] stroke-2" />
                 </div>
-                <div className="m-0 ml-4 min-w-0 flex-1 truncate text-[1.35rem] font-medium leading-snug tracking-[.02rem] text-grey-900 dark:text-grey-200">{label}</div>
+                <div className="m-0 ml-4 min-w-0 flex-1 truncate text-[1.25rem] font-medium leading-snug tracking-[.02rem] text-grey-900 dark:text-grey-200">{label}</div>
                 {
                     !!onRemove && (
                         <button className="ml-auto shrink-0 cursor-pointer rounded-md p-[4px] hover:bg-grey-200 group-hover:block dark:hover:bg-grey-950" title={strings.menu.removeSnippet} type="button" onClick={handleSnippetRemove}>
@@ -171,7 +171,7 @@ export const CardMenu = ({menu = new Map(), insert = () => {}, selectedItemIndex
     }
 
     return (
-        <ul className="not-kg-prose z-[9999999] m-0 mb-3 max-h-[420px] w-[312px] scroll-p-2 flex-col overflow-y-auto overflow-x-hidden rounded-lg bg-white bg-clip-padding p-0 font-sans text-sm shadow-md after:block after:pb-1 dark:bg-grey-950 md:w-[348px]" role="menu">
+        <ul className="not-kg-prose z-[9999999] m-0 mb-3 max-h-[min(var(--kg-menu-max-height,32rem),var(--kg-menu-fit,100vh))] w-[var(--kg-menu-width,28rem)] max-w-[calc(100vw-16px)] scroll-p-2 flex-col overflow-y-auto overflow-x-hidden rounded-lg bg-white bg-clip-padding p-0 font-sans text-sm shadow-md after:block after:pb-1 dark:bg-grey-950 md:w-[var(--kg-menu-width,28rem)]" role="menu">
             {CardMenuSections}
         </ul>
     );

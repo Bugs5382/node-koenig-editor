@@ -6,6 +6,7 @@ interface CalloutNodeData {
     backgroundColor: string;
     calloutEmoji: string;
     calloutText: string;
+    textColor?: string;
 }
 
 interface RenderOptions extends ExportDOMOptions {}
@@ -18,11 +19,26 @@ export function renderCalloutNode(node: CalloutNodeData, options: RenderOptions 
     // backgroundColor can end up with `rgba(0, 0, 0, 0)` from old mobiledoc copy/paste
     // that is invalid when used in a class name so fall back to `white` when we don't have
     // something that looks like a valid class
-    if (!node.backgroundColor || !node.backgroundColor.match(/^[a-zA-Z\d-]+$/)) {
+    // A colour picked by the person is a hex value: the card gets the `custom` class and the
+    // colour as inline style, so it shows without any stylesheet.
+    const isHex = (value?: string) => !!value && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value);
+    const customBackground = isHex(node.backgroundColor) ? node.backgroundColor : null;
+    const backgroundName = customBackground ? 'custom' : node.backgroundColor;
+    if (!customBackground && (!backgroundName || !backgroundName.match(/^[a-zA-Z\d-]+$/))) {
         node.backgroundColor = 'white';
     }
 
-    element.classList.add('kg-card', 'kg-callout-card', `kg-callout-card-${node.backgroundColor}`);
+    element.classList.add('kg-card', 'kg-callout-card', `kg-callout-card-${customBackground ? 'custom' : node.backgroundColor}`);
+    const styles: string[] = [];
+    if (customBackground) {
+        styles.push(`background-color: ${customBackground}`);
+    }
+    if (isHex(node.textColor)) {
+        styles.push(`color: ${node.textColor}`);
+    }
+    if (styles.length) {
+        element.setAttribute('style', styles.join('; '));
+    }
 
     if (node.calloutEmoji) {
         const emojiElement = document.createElement('div');
