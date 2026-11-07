@@ -14,6 +14,7 @@ import {
     FORMAT_TEXT_COMMAND
 } from 'lexical';
 import {$getNearestNodeOfType} from '@lexical/utils';
+import {$alignInScope, $readTableState, TABLE_SCOPES} from '../../../additions/table/tableActions';
 import {$alignmentOfSelection, ALIGN_OF_ITEM, isAlignActive} from '../../../additions/alignment/alignment';
 import {$isListNode, ListNode} from '@lexical/list';
 import {$setBlocksType} from '@lexical/selection';
@@ -26,8 +27,21 @@ import {
 import {altOrOption, ctrlOrCmdSymbol, ctrlOrSymbol, shiftOrSymbol} from '../../utils/shortcutSymbols';
 
 const ALIGN_KEY = {left: 'L', center: 'E', right: 'R', justify: 'J'};
+
+// Text selected in a table cell aligns the cell, down as well as across, for the cell, its row, its
+// column or the whole table. The "apply to" button cycles the choice and shows it in a few letters.
+const VERTICAL_ALIGNS = [
+    {item: 'alignTop', value: 'top'},
+    {item: 'alignMiddle', value: 'middle'},
+    {item: 'alignBottom', value: 'bottom'}
+];
+const scopeIcon = text => function ScopeIcon({className}) {
+    return <span aria-hidden="true" className={className} style={{fontSize: '1.1rem', fontWeight: 700, lineHeight: 1}}>{text}</span>;
+};
+const SCOPE_ICONS = {cell: scopeIcon('Cell'), row: scopeIcon('Row'), column: scopeIcon('Col'), table: scopeIcon('All')};
+const SCOPE_STRING = {cell: 'scopeCell', row: 'scopeRow', column: 'scopeColumn', table: 'scopeTable'};
 import {getSelectedNode} from '../../utils/getSelectedNode';
-import {isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
+import {ALIGNMENT_ITEMS, isToolbarItemHidden, useKoenigStrings} from '../../../additions/options';
 
 const blockTypeToBlockName = {
     bullet: 'Bulleted List',
@@ -78,6 +92,8 @@ export default function FormatToolbar({
     const [isItalic, setIsItalic] = React.useState(false);
     const [blockType, setBlockType] = React.useState('paragraph');
     const [alignment, setAlignment] = React.useState({direction: null, format: ''});
+    const [cell, setCell] = React.useState(null);
+    const [scope, setScope] = React.useState('cell');
     const {cardConfig: {createSnippet}, toolbar, toolbarActions} = React.useContext(KoenigComposerContext);
     // the host's `toolbar` option names the buttons to show; leaving it out shows them all
     const isHidden = item => isToolbarItemHidden(toolbar, item);
@@ -99,6 +115,7 @@ export default function FormatToolbar({
 
     // alignment is for the main editor's blocks; nested card text has none
     const hideAlignment = !!editor._parentEditor;
+    const hideCellControls = hideAlignment || !cell || ALIGNMENT_ITEMS.every(item => isHidden(item));
 
     let hideBold = isHidden('bold');
     if (hiddenFormats.includes('bold')) {
@@ -118,6 +135,9 @@ export default function FormatToolbar({
             }
             // update text format
             setIsBold(selection.hasFormat('bold'));
+            const tableState = $readTableState();
+            const nextCell = tableState ? {align: tableState.align, vertical: tableState.verticalAlign} : null;
+            setCell(current => (JSON.stringify(current) === JSON.stringify(nextCell) ? current : nextCell));
             const blockAlignment = $alignmentOfSelection();
             if (blockAlignment) {
                 setAlignment(current => (current.format === blockAlignment.format && current.direction === blockAlignment.direction ? current : blockAlignment));
@@ -249,12 +269,33 @@ export default function FormatToolbar({
                     data-kg-toolbar-button={item}
                     hide={hideAlignment || isHidden(item)}
                     icon={item}
-                    isActive={isAlignActive(align, alignment)}
+                    isActive={cell ? cell.align === align : isAlignActive(align, alignment)}
                     label={strings.toolbar[item]}
                     shortcutKeys={[ctrlOrCmdSymbol(), shiftOrSymbol(), ALIGN_KEY[align]]}
-                    onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, align)}
+                    onClick={() => (cell
+                        ? editor.update(() => $alignInScope('across', align, scope), {discrete: true})
+                        : editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, align))}
                 />
             ))}
+            {VERTICAL_ALIGNS.map(({item, value}) => (
+                <ToolbarMenuItem
+                    key={item}
+                    data-kg-toolbar-button={item}
+                    hide={hideCellControls}
+                    icon={item}
+                    isActive={cell?.vertical === value}
+                    label={strings.table[item]}
+                    onClick={() => editor.update(() => $alignInScope('down', value, scope), {discrete: true})}
+                />
+            ))}
+            <ToolbarMenuItem
+                CustomIcon={SCOPE_ICONS[scope]}
+                data-kg-toolbar-button="alignScope"
+                hide={hideCellControls}
+                isActive={false}
+                label={`${strings.table.alignScope} ${strings.table[SCOPE_STRING[scope]]}`}
+                onClick={() => setScope(current => TABLE_SCOPES[(TABLE_SCOPES.indexOf(current) + 1) % TABLE_SCOPES.length])}
+            />
 
             <ToolbarMenuItem
                 data-kg-toolbar-button="link"

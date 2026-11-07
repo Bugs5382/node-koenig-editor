@@ -61,8 +61,37 @@ describe("table borders and backgrounds are visible, and set by tokens", () => {
     expect(css).toContain("var(--kg-table-edit-border-style, dashed)");
   });
 
-  it("gives the header row, the selected cells and the focused cell their own look", () => {
-    expect(css).toContain("var(--kg-table-header-bg,");
+  it("has no automatic shade on the header row: it reads as a header by its bold text", () => {
+    const at = css.indexOf("var(--kg-table-header-bg");
+    const header = css.slice(css.lastIndexOf("{", at), css.indexOf("}", at));
+    expect(header).toContain("var(--kg-table-header-bg, transparent)");
+    expect(header).toContain("font-weight: 700");
+    // no grey fallback, and no dark-mode shade either
+    expect(header).not.toContain("--grey-200");
+    expect(css).not.toContain("var(--kg-table-header-bg, var(--grey");
+  });
+
+  it("keeps dark ink on a cell the author shaded, so the text reads on the shade in light and dark", () => {
+    expect(css).toContain('table tr td[style*="background-color"]');
+    expect(
+      rule(
+        '.koenig-lexical table tr td[style*="background-color"],\n.koenig-lexical table tr th[style*="background-color"]',
+      ),
+    ).toContain("color: var(--black)");
+  });
+
+  it("draws the caption from the table's own attribute, under the table", () => {
+    const caption = rule(".koenig-lexical table[data-kg-caption]::after");
+    expect(caption).toContain("content: attr(data-kg-caption)");
+    expect(caption).toContain("display: table-caption");
+    expect(caption).toContain("caption-side: bottom");
+  });
+
+  it("shows selected cells over a shade too, with an inset shadow instead of a background", () => {
+    expect(rule(".koenig-lexical table .kg-table-cell-selected")).toContain("box-shadow: inset");
+  });
+
+  it("gives the selected cells and the focused cell their own look", () => {
     expect(css).toContain("var(--kg-table-selected-bg,");
     expect(css).toContain("td[data-kg-active-cell]");
   });

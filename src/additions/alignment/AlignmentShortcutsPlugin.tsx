@@ -26,6 +26,7 @@ import { useContext, useEffect } from "react";
 
 import KoenigComposerContext from "../../koenig-lexical/context/KoenigComposerContext";
 import { isToolbarItemHidden } from "../options";
+import { $alignInScope, $readTableState } from "../table/tableActions";
 import { ALIGN_OF_KEY } from "./alignment";
 
 const ITEM_OF_ALIGN = {
@@ -54,6 +55,11 @@ export const AlignmentShortcutsPlugin = () => {
         if (!align) return false;
         if (isToolbarItemHidden(toolbar as never, ITEM_OF_ALIGN[align])) return false;
         event.preventDefault();
+        // in a table cell the shortcut aligns the cell, as the toolbar buttons do
+        if ($readTableState()) {
+          $alignInScope("across", align, "cell");
+          return true;
+        }
         return editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, align);
       },
       COMMAND_PRIORITY_LOW,

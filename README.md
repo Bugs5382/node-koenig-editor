@@ -297,19 +297,44 @@ calls `onSelect` with the same object. The button's `data-kg-toolbar-button` val
 ## 📋 Tables
 
 The `table` card (on by default, `cards` to leave it out) inserts a 3 by 3 table with a header
-row from the "+" and slash menus. While the cursor is in a table, a toolbar above it adds and
-removes rows and columns, switches the header row on and off, and deletes the table. Tables are
-simple: no merged cells and no cell colours.
+row from the "+" and slash menus. While the cursor is in a table, a toolbar above it (and a
+right-click menu with the same actions) edits it:
+
+- **Row** and **Column**: insert above, below, left or right; move; delete; switch the header row or
+  header column; select the whole row or column.
+- **Cell**: merge a selected range, split a merged cell, select the whole table.
+- **Colour**: shade the cell, or every cell of a selected range, row, column or table, from a fixed
+  palette of eight (or no shading). The text in a shaded cell is always dark, so it reads in light
+  and dark. Colours are saved on the cell as real colours, not the editor's own variables, so they
+  show on a reader's page.
+- **Align**: left, center, right or justify, and top, middle or bottom, for the cell or the selected
+  range. The selection toolbar offers the same for text selected in a cell, applied to this cell, the
+  row, the column or the table.
+- **Width**: automatic, narrow, medium or wide for the cell's column.
+- **Caption**: a line under the table. It is stored on the table, moves with it, is the table's
+  accessible name in the editor, and is a real `caption` element in the saved HTML.
+- Drag across cells, or use Shift with the arrow keys, to select a range; pasting text from a
+  spreadsheet (tabs and line breaks) fills the cells from the cursor and adds the rows and columns it
+  needs. A table in the pasted HTML is ignored, so one is never nested in a cell.
+- The toolbar and menus show only while the editor is editable, so the reader's view (Preview) has
+  none of them. A live region says the row and column of the cell the cursor moves to, and what a
+  merged cell spans.
 
 - Keyboard: Tab and Shift+Tab move between cells, the arrow keys move within and between them,
-  and Alt+F10 moves focus to the table toolbar (Escape returns to the cell).
-- Markup: a real `table` with `th scope="col"` header cells and `td` body cells; the controls are
-  buttons in a labelled `role="toolbar"`. The wording is `strings.table`.
-- Document: a table is stock `@lexical/table` nodes, so it saves and loads with the rest of the
-  document, header row included.
+  and Alt+F10 moves focus to the table toolbar (Escape closes a menu, then returns to the cell). In
+  a menu the arrow keys, Home and End move, Enter or Space picks and Escape closes.
+- Markup: a real `table` with `th scope="col"` (or `scope="row"` for a header column) header cells
+  and `td` body cells; the controls are buttons in a labelled `role="toolbar"` that open
+  `role="menu"` lists. The wording is `strings.table`.
+- Document: a table is stock `@lexical/table` nodes (merged cells, shading, vertical alignment and
+  column widths are fields they already save; the cell's alignment is its format; the caption is
+  node state on the table), so it saves and loads with the rest of the document, and a table saved
+  by an earlier version loads unchanged. The saved HTML carries the merged cells, the shading (with
+  dark ink), the alignment, the vertical alignment and the caption.
 
 **How it looks.** A new table shows its grid: 1px cell borders that stay at least 3:1 against the
-editor in light and dark (`--grey-700`), a shaded header row, a minimum cell size so an empty table
+editor in light and dark (`--grey-700`), a header row that reads as one by its bold text (no
+shade of its own), a minimum cell size so an empty table
 is a visible grid, an outline on the cell the cursor is in, and a soft highlight on the cells of a
 selected range. While the editor is editable the borders are **dashed**, so an empty grid reads as
 a place to write; in the reader's view (Preview), in print, and wherever the editor is read-only
@@ -321,7 +346,7 @@ the header. Set the tokens on any ancestor of the editor:
 | `--kg-table-border-color`      | `--grey-700`                        | Cell border colour                               |
 | `--kg-table-border-style`      | `solid`                             | Cell border style in the reader's view and print |
 | `--kg-table-edit-border-style` | `dashed`                            | Cell border style while the editor is editable   |
-| `--kg-table-header-bg`         | `--grey-200` (`--grey-900` in dark) | Header row background                            |
+| `--kg-table-header-bg`         | none (transparent)                  | Header row background                            |
 | `--kg-table-selected-bg`       | selection colour at 14%             | Background of the selected cells                 |
 
 The table, its rows and cells carry the classes `kg-table`, `kg-table-row`, `kg-table-cell`,
@@ -660,6 +685,10 @@ headings and quotes.
 
 In a read-only editor (and the reader's view) the selection toolbar does not show, so nothing in
 it can change the document.
+
+In a table cell the same buttons align the cell (not the paragraph in it), the toolbar adds Align
+top, middle and bottom, and a small "apply to" button cycles between this cell, the row, the column
+and the table. The shortcuts act on the cell too.
 
 ## 💬 Inline comments
 

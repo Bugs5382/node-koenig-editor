@@ -3,6 +3,9 @@ import AlignCenterIcon from '../../assets/icons/kg-align-center.svg?react';
 import AlignJustifyIcon from '../../assets/icons/kg-align-justify.svg?react';
 import AlignLeftIcon from '../../assets/icons/kg-align-left.svg?react';
 import AlignRightIcon from '../../assets/icons/kg-align-right.svg?react';
+import VAlignBottomIcon from '../../assets/icons/kg-valign-bottom.svg?react';
+import VAlignMiddleIcon from '../../assets/icons/kg-valign-middle.svg?react';
+import VAlignTopIcon from '../../assets/icons/kg-valign-top.svg?react';
 import BoldIcon from '../../assets/icons/kg-bold.svg?react';
 import EditIcon from '../../assets/icons/kg-edit.svg?react';
 import EyeIcon from '../../assets/icons/kg-eye.svg?react';
@@ -41,6 +44,9 @@ export const TOOLBAR_ICONS = {
     alignCenter: AlignCenterIcon,
     alignRight: AlignRightIcon,
     alignJustify: AlignJustifyIcon,
+    alignTop: VAlignTopIcon,
+    alignMiddle: VAlignMiddleIcon,
+    alignBottom: VAlignBottomIcon,
     imgRegular: ImgRegularIcon,
     imgWide: ImgWideIcon,
     imgFull: ImgFullIcon,

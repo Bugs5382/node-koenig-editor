@@ -82,12 +82,30 @@ const cursorCell = (api: KoenigEditorAPI) =>
     return [row.getIndexWithinParent(), cell.getIndexWithinParent()];
   });
 
-const action = (name: string) =>
-  document.querySelector(`[data-kg-table-action="${name}"]`) as HTMLElement;
+// The toolbar's buttons open menus; an action is a group button, then an item in its menu.
+const MENU_ITEM: Record<string, [string, string]> = {
+  "add-column-left": ["column", "columnLeft"],
+  "add-column-right": ["column", "columnRight"],
+  "add-row-above": ["row", "rowAbove"],
+  "add-row-below": ["row", "rowBelow"],
+  "delete-column": ["column", "deleteColumn"],
+  "delete-row": ["row", "deleteRow"],
+  "toggle-header-row": ["row", "headerRow"],
+};
 
 const press = async (name: string) => {
+  if (name === "delete-table") {
+    await act(async () => {
+      fireEvent.click(document.querySelector('[data-kg-table-action="delete-table"]') as Element);
+    });
+    return;
+  }
+  const [group, item] = MENU_ITEM[name] as [string, string];
   await act(async () => {
-    fireEvent.click(action(name));
+    fireEvent.click(document.querySelector(`[data-kg-table-group="${group}"]`) as Element);
+  });
+  await act(async () => {
+    fireEvent.click(document.querySelector(`[data-kg-table-menu-item="${item}"]`) as Element);
   });
 };
 
@@ -145,20 +163,14 @@ describe("table card", () => {
     await focusCell(api, 1, 1);
     const bar = await screen.findByRole("toolbar", { name: /table/i });
     expect(bar).toBeTruthy();
-    for (const name of [
-      "add-row-above",
-      "add-row-below",
-      "add-column-left",
-      "add-column-right",
-      "delete-row",
-      "delete-column",
-      "toggle-header-row",
-      "delete-table",
-    ]) {
-      expect(action(name), name).toBeTruthy();
-      expect(action(name).getAttribute("aria-label"), name).toBeTruthy();
-      expect(action(name).getAttribute("type")).toBe("button");
+    for (const group of ["row", "column", "cell", "colour", "align", "width", "caption"]) {
+      const button = document.querySelector(`[data-kg-table-group="${group}"]`) as HTMLElement;
+      expect(button, group).toBeTruthy();
+      expect(button.getAttribute("aria-label"), group).toBeTruthy();
+      expect(button.getAttribute("aria-haspopup"), group).toBeTruthy();
+      expect(button.getAttribute("type")).toBe("button");
     }
+    expect(document.querySelector('[data-kg-table-action="delete-table"]')).toBeTruthy();
     await act(async () => {
       api.editorInstance.update(() => {
         $getRoot().selectEnd();
@@ -265,14 +277,6 @@ describe("table card", () => {
     await press("toggle-header-row");
     await waitFor(() => expect(document.querySelectorAll("th").length).toBe(0));
     expect(document.querySelectorAll("[scope]").length).toBe(0);
-  });
-
-  it("offers no merge or colour controls: tables stay simple", async () => {
-    const { api } = await mount();
-    await insertTable(api);
-    await focusCell(api, 1, 1);
-    expect(document.querySelector("[data-kg-table-action*='merge']")).toBeNull();
-    expect(document.querySelector("[data-kg-table-action*='color']")).toBeNull();
   });
 
   it("round-trips through the document model, header row and added rows included", async () => {

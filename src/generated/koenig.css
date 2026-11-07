@@ -1061,6 +1061,11 @@
     height: calc(3.6 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .size-\[0\.8rem\] {
+    width: calc(0.8 * var(--kg-rem, 0.625rem));
+    height: calc(0.8 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .size-\[1\.4rem\] {
     width: calc(1.4 * var(--kg-rem, 0.625rem));
     height: calc(1.4 * var(--kg-rem, 0.625rem));
@@ -1164,6 +1169,10 @@
     max-height: min(calc(22.4 * var(--kg-rem, 0.625rem)), 40vh);
 }
 
+.koenig-lexical .max-h-\[min\(40rem\2c 70vh\)\] {
+    max-height: min(calc(40 * var(--kg-rem, 0.625rem)), 70vh);
+}
+
 .koenig-lexical .max-h-\[min\(var\(--kg-menu-max-height\2c 32rem\)\2c var\(--kg-menu-fit\2c 100vh\)\)\] {
     max-height: min(var(--kg-menu-max-height,calc(32 * var(--kg-rem, 0.625rem))), var(--kg-menu-fit,100vh));
 }
@@ -1240,6 +1249,10 @@
     width: 136%;
 }
 
+.koenig-lexical .w-\[28rem\] {
+    width: calc(28 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .w-\[320px\] {
     width: 320px;
 }
@@ -1284,6 +1297,10 @@
     min-width: calc(4.4 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .min-w-\[18rem\] {
+    min-width: calc(18 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .min-w-\[296px\] {
     min-width: 296px;
 }
@@ -1322,6 +1339,14 @@
 
 .koenig-lexical .max-w-\[65\%\] {
     max-width: 65%;
+}
+
+.koenig-lexical .max-w-\[92vw\] {
+    max-width: 92vw;
+}
+
+.koenig-lexical .max-w-\[96vw\] {
+    max-width: 96vw;
 }
 
 .koenig-lexical .max-w-\[calc\(100vw-16px\)\] {
@@ -1689,6 +1714,11 @@
     border-color: color-mix(in srgb, var(--kg-color-grey-300, #DDE1E5) calc(var(--tw-border-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .border-grey-500 {
+    --tw-border-opacity: 1;
+    border-color: color-mix(in srgb, var(--kg-color-grey-500, #AEB7C1) calc(var(--tw-border-opacity, 1) * 100%), transparent);
+}
+
 .koenig-lexical .border-grey\/20 {
     border-color: color-mix(in srgb, var(--kg-color-grey, #ABB4BE) calc(0.2 * 100%), transparent);
 }
@@ -1773,6 +1803,10 @@
 
 .koenig-lexical .bg-blue\/20 {
     background-color: color-mix(in srgb, var(--kg-color-blue, #14B8FF) calc(0.2 * 100%), transparent);
+}
+
+.koenig-lexical .bg-current {
+    background-color: currentColor;
 }
 
 .koenig-lexical .bg-green\/10 {
@@ -2125,6 +2159,11 @@
 .koenig-lexical .py-\[\.3rem\] {
     padding-top: calc(.3 * var(--kg-rem, 0.625rem));
     padding-bottom: calc(.3 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .py-\[0\.7rem\] {
+    padding-top: calc(0.7 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(0.7 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-\[1rem\] {
@@ -2889,16 +2928,31 @@ em-emoji-picker {
     border-style: var(--kg-table-edit-border-style, dashed);
 }
 
+/* The header row reads as a header by its bold text. It has no shade of its own: a host can set
+   --kg-table-header-bg, and an author shades cells (or the whole row) from the palette. */
 .koenig-lexical table tr th {
-    background: var(--kg-table-header-bg, var(--grey-200));
+    background: var(--kg-table-header-bg, transparent);
     font-weight: 700;
-    text-align: left;
+    text-align: start;
 }
 
-.koenig-lexical > .dark table tr th,
-.koenig-lexical.dark table tr th,
-.dark .koenig-lexical table tr th {
-    background: var(--kg-table-header-bg, var(--grey-900));
+/* A cell the author shaded keeps dark ink, so its text reads on the shade in light and dark. */
+.koenig-lexical table tr td[style*="background-color"],
+.koenig-lexical table tr th[style*="background-color"] {
+    color: var(--black);
+}
+
+/* The caption is the table's own text, drawn under it from an attribute (the editor cannot add a
+   child element to the table; the exported HTML has a real caption element). */
+.koenig-lexical table[data-kg-caption]::after {
+    content: attr(data-kg-caption);
+    display: table-caption;
+    caption-side: bottom;
+    padding: calc(0.8 * var(--kg-rem, 0.625rem)) calc(1.2 * var(--kg-rem, 0.625rem));
+    font-family: var(--kg-font-sans, Inter, sans-serif);
+    font-size: calc(1.4 * var(--kg-rem, 0.625rem));
+    text-align: center;
+    color: var(--grey-700);
 }
 
 /* The cell the cursor is in, and the cells of a selected range. */
@@ -2908,8 +2962,8 @@ em-emoji-picker {
     outline-offset: -2px;
 }
 
-.koenig-lexical .kg-table-cell-selected {
-    background: var(--kg-table-selected-bg, color-mix(in srgb, var(--kg-selection) 14%, transparent));
+.koenig-lexical table .kg-table-cell-selected {
+    box-shadow: inset 0 0 0 9999px var(--kg-table-selected-bg, color-mix(in srgb, var(--kg-selection) 14%, transparent));
 }
 
 /* On paper the grid is solid, the header keeps its shade and nothing is lost to the editing look. */
@@ -4528,6 +4582,14 @@ em-emoji-picker {
     --tw-ring-color: color-mix(in srgb, var(--kg-color-grey-500, #AEB7C1) calc(var(--tw-ring-opacity, 1) * 100%), transparent);
 }
 
+.koenig-lexical .aria-disabled\:cursor-default[aria-disabled="true"] {
+    cursor: default;
+}
+
+.koenig-lexical .aria-disabled\:opacity-40[aria-disabled="true"] {
+    opacity: 0.4;
+}
+
 .koenig-lexical .aria-pressed\:bg-grey-100[aria-pressed="true"] {
     --tw-bg-opacity: 1;
     background-color: color-mix(in srgb, var(--kg-color-grey-100, #F4F5F6) calc(var(--tw-bg-opacity, 1) * 100%), transparent);
@@ -4925,5 +4987,21 @@ em-emoji-picker {
 
     .koenig-lexical .forced-colors\:text-\[HighlightText\] {
         color: HighlightText;
+    }
+
+    .koenig-lexical .forced-colors\:focus\:outline:focus {
+        outline-style: solid;
+    }
+
+    .koenig-lexical .forced-colors\:focus\:outline-2:focus {
+        outline-width: 2px;
+    }
+
+    .koenig-lexical .forced-colors\:focus-visible\:outline:focus-visible {
+        outline-style: solid;
+    }
+
+    .koenig-lexical .forced-colors\:focus-visible\:outline-2:focus-visible {
+        outline-width: 2px;
     }
 }
