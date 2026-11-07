@@ -28,6 +28,15 @@ import {altOrOption, ctrlOrCmdSymbol, ctrlOrSymbol, shiftOrSymbol} from '../../u
 
 const ALIGN_KEY = {left: 'L', center: 'E', right: 'R', justify: 'J'};
 
+// the inline formats after bold and italic, each with the keys that toggle it
+const INLINE_FORMATS = [
+    {item: 'underline', keys: () => [ctrlOrCmdSymbol(), 'U']},
+    {item: 'strikethrough', keys: () => [ctrlOrCmdSymbol(), shiftOrSymbol(), 'X']},
+    {item: 'subscript', keys: () => [ctrlOrCmdSymbol(), ',']},
+    {item: 'superscript', keys: () => [ctrlOrCmdSymbol(), '.']},
+    {item: 'code', keys: () => undefined}
+];
+
 // Text selected in a table cell aligns the cell, down as well as across, for the cell, its row, its
 // column or the whole table. The "apply to" button cycles the choice and shows it in a few letters.
 const VERTICAL_ALIGNS = [
@@ -90,6 +99,7 @@ export default function FormatToolbar({
     const strings = useKoenigStrings();
     const [isBold, setIsBold] = React.useState(false);
     const [isItalic, setIsItalic] = React.useState(false);
+    const [inlineOn, setInlineOn] = React.useState({});
     const [blockType, setBlockType] = React.useState('paragraph');
     const [alignment, setAlignment] = React.useState({direction: null, format: ''});
     const [cell, setCell] = React.useState(null);
@@ -143,6 +153,11 @@ export default function FormatToolbar({
                 setAlignment(current => (current.format === blockAlignment.format && current.direction === blockAlignment.direction ? current : blockAlignment));
             }
             setIsItalic(selection.hasFormat('italic'));
+            const nextInline = {};
+            for (const {item} of INLINE_FORMATS) {
+                nextInline[item] = selection.hasFormat(item);
+            }
+            setInlineOn(current => (JSON.stringify(current) === JSON.stringify(nextInline) ? current : nextInline));
 
             const anchorNode = getSelectedNode(selection);
             const element = anchorNode.getKey() === 'root'
@@ -219,8 +234,29 @@ export default function FormatToolbar({
         });
     };
 
+    // Alt+F10 (see FloatingToolbarPlugin) puts focus on the first button. In the toolbar the arrow
+    // keys, Home and End move between buttons, and Escape goes back to the text.
+    const onToolbarKeyDown = (event) => {
+        const buttons = [...event.currentTarget.querySelectorAll('button')];
+        const index = buttons.indexOf(document.activeElement);
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            event.stopPropagation();
+            // restores the text selection and, since focus is on a button, the editing area itself
+            editor.focus();
+            editor.getRootElement()?.focus({preventScroll: true});
+            return;
+        }
+        if (index === -1 || !['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) {
+            return;
+        }
+        event.preventDefault();
+        const to = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : index + (event.key === 'ArrowRight' ? 1 : -1);
+        buttons[(to + buttons.length) % buttons.length]?.focus();
+    };
+
     return (
-        <ToolbarMenu>
+        <ToolbarMenu aria-label={strings.toolbar.group} data-kg-selection-toolbar role="toolbar" onKeyDown={onToolbarKeyDown}>
             <ToolbarMenuItem
                 data-kg-toolbar-button="bold"
                 hide={hideBold}
@@ -239,6 +275,18 @@ export default function FormatToolbar({
                 shortcutKeys={[ctrlOrCmdSymbol(), 'I']}
                 onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
             />
+            {INLINE_FORMATS.map(({item, keys}) => (
+                <ToolbarMenuItem
+                    key={item}
+                    data-kg-toolbar-button={item}
+                    hide={isHidden(item)}
+                    icon={item}
+                    isActive={!!inlineOn[item]}
+                    label={strings.toolbar[item]}
+                    shortcutKeys={keys()}
+                    onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, item)}
+                />
+            ))}
             {HEADING_LEVELS.map(({tag, item, icon, key}) => (
                 <ToolbarMenuItem
                     key={tag}

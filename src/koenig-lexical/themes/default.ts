@@ -26,8 +26,10 @@ const defaultTheme = {
         hashtag: undefined,
         underline: 'underline',
         strikethrough: 'line-through',
-        underlinestrikethrough: undefined,
-        code: undefined
+        underlineStrikethrough: '[text-decoration-line:underline_line-through]',
+        subscript: undefined,
+        superscript: undefined,
+        code: 'rounded bg-grey-200/70 px-[.4rem] py-[.1rem] font-mono text-[.9em] dark:bg-grey-900'
     },
     code: undefined,
     table: 'kg-table',

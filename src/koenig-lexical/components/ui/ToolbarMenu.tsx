@@ -18,7 +18,12 @@ import ImgFullIcon from '../../assets/icons/kg-img-full.svg?react';
 import ImgRegularIcon from '../../assets/icons/kg-img-regular.svg?react';
 import ImgReplaceIcon from '../../assets/icons/kg-replace.svg?react';
 import ImgWideIcon from '../../assets/icons/kg-img-wide.svg?react';
+import CodeIcon from '../../assets/icons/kg-code.svg?react';
 import ItalicIcon from '../../assets/icons/kg-italic.svg?react';
+import StrikethroughIcon from '../../assets/icons/kg-strikethrough.svg?react';
+import SubscriptIcon from '../../assets/icons/kg-subscript.svg?react';
+import SuperscriptIcon from '../../assets/icons/kg-superscript.svg?react';
+import UnderlineIcon from '../../assets/icons/kg-underline.svg?react';
 import LinkIcon from '../../assets/icons/kg-link.svg?react';
 import QuoteIcon from '../../assets/icons/kg-quote.svg?react';
 import QuoteOneIcon from '../../assets/icons/kg-quote-1.svg?react';
@@ -31,6 +36,11 @@ import {Tooltip} from './Tooltip';
 export const TOOLBAR_ICONS = {
     bold: BoldIcon,
     italic: ItalicIcon,
+    underline: UnderlineIcon,
+    strikethrough: StrikethroughIcon,
+    subscript: SubscriptIcon,
+    superscript: SuperscriptIcon,
+    code: CodeIcon,
     headingOne: HeadingOneIcon,
     headingTwo: HeadingTwoIcon,
     headingThree: HeadingThreeIcon,

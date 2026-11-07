@@ -80,7 +80,7 @@ the sources.
 | `comments`           | `KoenigCommentsOptions`           | off             | Turns on inline comment threads; see [Inline comments](#-inline-comments).                                                                                                       |
 | `menuItems`          | `CardMenuItem[]`                  | none            | Extra "+" and slash menu entries. Each dispatches its `insertCommand` with `insertParams`; your plugin handles it.                                                               |
 | `strings`            | `KoenigStringsInput`              | English         | Your wording, laid over `DEFAULT_STRINGS`. Pass only what you change.                                                                                                            |
-| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
+| `toolbar`            | `KoenigToolbarItem[]`             | all             | The format buttons to show: `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`, `code`, `heading1` to `heading5` (headings stop at H5), `quote`, `alignLeft`, `alignCenter`, `alignRight`, `alignJustify`, `link`, `snippet`.        |
 | `toolbarActions`     | `KoenigToolbarAction[]`           | none            | Your own buttons and cards on the selection toolbar; see [Toolbar actions](#-toolbar-actions).                                                                                   |
 | `tools`              | `KoenigTool[]`                    | all             | The features that are not cards: `imageEditor`, `emojiPicker` and `preview`. Pass a list to keep only those; see [Image editor and emoji picker](#-image-editor-and-emoji-picker) and [Preview](#-preview). |
 | `collaboration`      | `KoenigCollaboration \| null`     | `null`          | The Yjs provider factory. Without it the editor works alone and asks for no provider.                                                                                            |
@@ -666,6 +666,20 @@ padding leaves room, at the box's left edge otherwise, and never outside it.
 Headings run from H1 to H5 and no deeper. The toolbar has a button for each level (hide any with
 `toolbar`), and a Heading 6 that arrives from a stored document, a paste, a markdown shortcut or
 a collaborator is set to Heading 5.
+
+## 🔤 Inline formats and the keyboard
+
+The selection toolbar has buttons for **underline**, **strikethrough**, **subscript**,
+**superscript** and **inline code** after bold and italic, each marked when the selection has the
+format. Shortcuts: Ctrl or Cmd with **U** (underline), with Shift and **X** (strikethrough), with
+**,** (subscript) and with **.** (superscript). Subscript and superscript exclude each other, and a
+format whose button the host's `toolbar` option leaves out has no shortcut either. Inline code is
+drawn with a light background and a monospace face; style it with the `.koenig-lexical code` rule.
+
+**Alt+F10** moves focus from the selected text to the first button of the selection toolbar. The
+arrow keys, Home and End move between its buttons, Enter or Space applies one, and Escape goes
+back to the text with the selection kept. The toolbar is a labelled `role="toolbar"`
+(`strings.toolbar.group`).
 
 ## ↔️ Text alignment
 

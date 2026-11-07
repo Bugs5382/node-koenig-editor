@@ -1,5 +1,5 @@
 import React from 'react';
-import {$getSelection, $isParagraphNode, $isRangeSelection, $isTextNode, COMMAND_PRIORITY_LOW, KEY_MODIFIER_COMMAND} from 'lexical';
+import {$getSelection, $isParagraphNode, $isRangeSelection, $isTextNode, COMMAND_PRIORITY_LOW, KEY_DOWN_COMMAND, KEY_MODIFIER_COMMAND} from 'lexical';
 import {$isLinkNode} from '@lexical/link';
 import {FloatingFormatToolbar, toolbarItemTypes} from '../components/ui/FloatingFormatToolbar';
 import {FloatingLinkToolbar} from '../components/ui/FloatingLinkToolbar';
@@ -19,6 +19,12 @@ function useFloatingFormatToolbar(editor, anchorElem, isSnippetsEnabled, hiddenF
         editor.getEditorState().read(() => {
             // Should not to pop up the floating toolbar when using IME input
             if (editor.isComposing()) {
+                return;
+            }
+
+            // focus is on one of the toolbar's own buttons (Alt+F10, then the arrow keys): the person
+            // is using the toolbar, so it stays, whatever the page's selection did when focus moved
+            if (document.activeElement?.closest?.('[data-kg-selection-toolbar]')) {
                 return;
             }
 
@@ -99,6 +105,28 @@ function useFloatingFormatToolbar(editor, anchorElem, isSnippetsEnabled, hiddenF
                     }
                 }
                 return false;
+            },
+            COMMAND_PRIORITY_LOW
+        );
+    }, [editor]);
+
+    // Alt+F10 moves focus from the text into the selection toolbar (arrow keys move between its
+    // buttons, Escape returns to the text with the selection kept)
+    React.useEffect(() => {
+        return editor.registerCommand(
+            KEY_DOWN_COMMAND,
+            (event) => {
+                if (!event.altKey || event.key !== 'F10' || event.ctrlKey || event.metaKey) {
+                    return false;
+                }
+                const scope = editor.getRootElement()?.closest('.koenig-lexical') || document;
+                const first = scope.querySelector('[data-kg-selection-toolbar] button') || document.querySelector('[data-kg-selection-toolbar] button');
+                if (!first) {
+                    return false;
+                }
+                event.preventDefault();
+                first.focus();
+                return true;
             },
             COMMAND_PRIORITY_LOW
         );

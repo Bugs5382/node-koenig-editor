@@ -73,6 +73,7 @@ export type KoenigToolbarItem =
   | "alignLeft"
   | "alignRight"
   | "bold"
+  | "code"
   | "heading1"
   | "heading2"
   | "heading3"
@@ -81,7 +82,11 @@ export type KoenigToolbarItem =
   | "italic"
   | "link"
   | "quote"
-  | "snippet";
+  | "snippet"
+  | "strikethrough"
+  | "subscript"
+  | "superscript"
+  | "underline";
 
 /** What a host's toolbar button or card gets when the person uses it on a text selection. */
 export interface KoenigToolbarSelection {
@@ -157,7 +162,10 @@ export interface KoenigStrings {
     width: string;
   };
   menu: { addCard: string; removeSnippet: string; sections: Record<string, string> };
-  toolbar: Record<KoenigToolbarItem, string>;
+  toolbar: Record<KoenigToolbarItem, string> & {
+    /** Names the selection toolbar for screen readers. */
+    group: string;
+  };
   /** The table card's controls; `toolbar` names the group for screen readers. The two announcements
    *  take `{row}`, `{rows}`, `{column}`, `{columns}`, `{rowSpan}` and `{colSpan}`. */
   table: {

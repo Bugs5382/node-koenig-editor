@@ -2121,6 +2121,11 @@
     padding-right: calc(3.6 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .px-\[\.4rem\] {
+    padding-left: calc(.4 * var(--kg-rem, 0.625rem));
+    padding-right: calc(.4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .px-\[1rem\] {
     padding-left: calc(1 * var(--kg-rem, 0.625rem));
     padding-right: calc(1 * var(--kg-rem, 0.625rem));
@@ -2154,6 +2159,11 @@
 .koenig-lexical .py-5 {
     padding-top: calc(2 * var(--kg-rem, 0.625rem));
     padding-bottom: calc(2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .py-\[\.1rem\] {
+    padding-top: calc(.1 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(.1 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-\[\.3rem\] {
@@ -2302,6 +2312,10 @@
 
 .koenig-lexical .text-2xs {
     font-size: calc(1.2 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .text-\[\.9em\] {
+    font-size: .9em;
 }
 
 .koenig-lexical .text-\[0\.7rem\] {
@@ -2746,6 +2760,10 @@
 
 .koenig-lexical .\[--kg-card-w\:min\(calc\(100vw\+2px\)\2c calc\(100\%\+2\*var\(--kg-breakout-room-with-fallback\)\)\)\] {
     --kg-card-w: min(calc(100vw + 2px), calc(100% + 2 * var(--kg-breakout-room-with-fallback)));
+}
+
+.koenig-lexical .\[text-decoration-line\:underline_line-through\] {
+    text-decoration-line: underline line-through;
 }
 
 .koenig-lexical {
