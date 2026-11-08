@@ -18,6 +18,12 @@ its own background and text colours (the `buttonBackground` and `buttonText` col
 [Colours](./writing-and-text.md#-colours)). A picked colour is written as inline CSS on the link. A button with no valid link exports
 nothing. Upstream's email-specific markup is not included: every target gets the same link.
 
+**Button options** (the composer's `buttonCard`). `colors: false` hides the colour and text colour
+controls and `emoji: false` hides the emoji field, for a host that sets the button's look itself.
+`required: true` marks the label and the link as required (`required` and `aria-required` on the
+inputs); the editor does not stop a save, so the host reads an incomplete button from the saved
+document. Everything is shown and nothing is required by default.
+
 **Markdown.** Write or paste Markdown into a text area; the card shows the rendered result.
 `renderMarkdown(source)` does the rendering for both the preview and the exported HTML, so they
 cannot differ. Raw HTML in the source is escaped, never passed through. Links and image sources
@@ -92,6 +98,9 @@ const uploader = {
   useFileUpload: (type) => useMyUploader(type), // returns { upload, isLoading, progress, errors }
 };
 ```
+
+**Upload refusals.** A refusal is written as an element with the `data-kg-upload-error` attribute and
+`role="alert"`, so a host can style or find it without depending on the editor's own class names.
 
 ## 🖼️ Image editor and emoji picker
 
