@@ -1,5 +1,21 @@
 # node-koenig-editor
 
+## v1.4.0 - 2026-11-08
+
+### What Changed 👀
+
+#### 🚀 Features
+
+- feat(options): table cell and border colour slots and replaceThreadText @Bugs5382 (#105)
+
+#### 📄 Documentation
+
+- docs: move the 1.3.0 option detail from the README into guides @Bugs5382 (#103)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.3.0...v1.4.0
+
 ## v1.3.1 - 2026-11-08
 
 ### What Changed 👀
