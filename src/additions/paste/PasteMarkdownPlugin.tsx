@@ -52,6 +52,9 @@ export const PasteMarkdownPlugin = () => {
       (event: ClipboardEvent | InputEvent | KeyboardEvent) => {
         const data = (event as ClipboardEvent).clipboardData;
         if (!data || !editor.isEditable()) return false;
+        // a paste into a card's own field (a Markdown card, a caption) is not the document's
+        if (document.activeElement && document.activeElement !== editor.getRootElement())
+          return false;
         if (data.types && [...data.types].includes("application/x-lexical-editor")) return false;
         if (data.getData("text/html")) return false;
         const text = data.getData("text/plain");
