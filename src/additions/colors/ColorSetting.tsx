@@ -24,7 +24,7 @@ import type { KoenigColorSlot } from "node-koenig-editor";
 import type { FC } from "react";
 
 import { ColorControl, useColorSetting } from "./ColorControl";
-import { isHexColor } from "./colors";
+import { isColorValue } from "./colors";
 
 interface ColorSettingProps {
   dataTestId?: string;
@@ -53,7 +53,7 @@ export const ColorSetting: FC<ColorSettingProps> = ({
         label={label}
         setting={setting}
         slot={slot}
-        value={isHexColor(value) ? value : null}
+        value={isColorValue(value) ? value : null}
         onChange={onChange}
       />
     </div>

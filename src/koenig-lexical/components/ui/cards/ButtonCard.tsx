@@ -5,7 +5,7 @@ import React from 'react';
 import {Button} from '../Button';
 import {ColorSetting} from '../../../../additions/colors/ColorSetting';
 import {EmojiField} from '../../../../additions/emojiPicker/EmojiField';
-import {isHexColor} from '../../../../additions/colors/colors';
+import {isColorValue} from '../../../../additions/colors/colors';
 import {ButtonGroupSetting, InputSetting, SettingsPanel} from '../SettingsPanel';
 import {ReadOnlyOverlay} from '../ReadOnlyOverlay';
 import {isSafeUrl} from '#kg-default-nodes';
@@ -70,8 +70,8 @@ export function ButtonCard({
 
     const label = [buttonEmoji, buttonText].filter(Boolean).join(' ');
     const colours = {
-        ...(isHexColor(backgroundColor) ? {backgroundColor} : {}),
-        ...(isHexColor(textColor) ? {color: textColor} : {})
+        ...(isColorValue(backgroundColor) ? {backgroundColor} : {}),
+        ...(isColorValue(textColor) ? {color: textColor} : {})
     };
 
     return (

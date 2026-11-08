@@ -3,7 +3,7 @@ import KoenigNestedEditor from '../../KoenigNestedEditor';
 import React from 'react';
 import {ColorSetting} from '../../../../additions/colors/ColorSetting';
 import {SettingsPanel, ToggleSetting} from '../SettingsPanel';
-import {isHexColor} from '../../../../additions/colors/colors';
+import {isColorValue} from '../../../../additions/colors/colors';
 import {ReadOnlyOverlay} from '../ReadOnlyOverlay';
 import {AnchoredMenu} from '../../../../additions/placement/AnchoredMenu';
 import {EmojiPicker} from '../../../../additions/emojiPicker/EmojiPicker';
@@ -94,6 +94,7 @@ export function CalloutCard({
     hasEmoji = true,
     handleColorChange,
     handleTextColorChange,
+    pairedText = false,
     textColor,
     changeEmoji,
     calloutEmoji = '\u{1F4A1}',
@@ -116,8 +117,8 @@ export function CalloutCard({
         }
     }, [isEditing, setShowEmojiPicker]);
 
-    const customBackground = isHexColor(color);
-    const customText = isHexColor(textColor);
+    const customBackground = isColorValue(color);
+    const customText = isColorValue(textColor);
 
     return (
         <>
@@ -182,13 +183,15 @@ export function CalloutCard({
                             value={color}
                             onChange={handleColorChange}
                         />
-                        <ColorSetting
-                            dataTestId='callout-text-color-picker'
-                            label={strings.callout.textColor}
-                            slot='calloutText'
-                            value={textColor}
-                            onChange={handleTextColorChange}
-                        />
+                        {pairedText ? null : (
+                            <ColorSetting
+                                dataTestId='callout-text-color-picker'
+                                label={strings.callout.textColor}
+                                slot='calloutText'
+                                value={textColor}
+                                onChange={handleTextColorChange}
+                            />
+                        )}
                     </SettingsPanel>
                 ) : (
                     <ReadOnlyOverlay />

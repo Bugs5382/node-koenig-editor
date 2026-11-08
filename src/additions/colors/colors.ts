@@ -99,10 +99,17 @@ export const DEFAULT_PALETTES: Record<KoenigColorSlot, readonly KoenigColorSwatc
 };
 
 const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
+// A CSS variable and nothing more: letters, digits and hyphens after `--`, no fallback, no other
+// CSS, so a stored value can never carry anything but a colour the host defined.
+const CSS_VARIABLE = /^var\(--[a-z0-9]+(?:-[a-z0-9]+)*\)$/i;
 
 /** True for a #rgb or #rrggbb colour. */
 export const isHexColor = (value: unknown): value is string =>
   typeof value === "string" && HEX.test(value);
+
+/** A hex colour, or a plain CSS variable (`var(--name)`) the host defines. */
+export const isColorValue = (value: unknown): value is string =>
+  typeof value === "string" && (HEX.test(value) || CSS_VARIABLE.test(value));
 
 /** `#abc` becomes `#aabbcc`, anything else is lower-cased; used to compare colours. */
 export const normalizeColor = (value: string): string => {
@@ -122,7 +129,12 @@ export const resolveColorSetting = (
   colors?: KoenigColors | null,
 ): ResolvedColorSetting => {
   const host = colors?.[slot];
-  const valid = (host?.palette ?? []).filter((swatch) => isHexColor(swatch?.value));
+  const valid = (host?.palette ?? [])
+    .filter((swatch) => isColorValue(swatch?.value))
+    .map((swatch) => {
+      const { ink, ...rest } = swatch;
+      return isColorValue(ink) ? { ...rest, ink } : rest;
+    });
   return {
     none: host?.none !== false,
     palette: valid.length ? valid : DEFAULT_PALETTES[slot],
@@ -137,9 +149,17 @@ export const isColorAllowed = (
   value: null | string | undefined,
 ): boolean => {
   if (!value) return setting.none;
-  if (!isHexColor(value)) return false;
+  if (!isColorValue(value)) return false;
   return setting.picker || setting.palette.some((swatch) => sameColor(swatch.value, value));
 };
+
+/** The palette swatch that matches `value`, if any. */
+export const swatchFor = (setting: ResolvedColorSetting, value: null | string | undefined) =>
+  setting.palette.find((swatch) => sameColor(swatch.value, value));
+
+/** True when every swatch carries its own text colour, so the slot is a pair control. */
+export const isPairPalette = (setting: ResolvedColorSetting): boolean =>
+  setting.palette.length > 0 && setting.palette.every((swatch) => isColorValue(swatch.ink));
 
 /** The label of the palette colour that matches `value`, if any. */
 export const colorLabel = (setting: ResolvedColorSetting, value: null | string | undefined) =>

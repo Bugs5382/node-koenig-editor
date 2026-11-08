@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 import type { TableCellNode, TableNode } from "@lexical/table";
 import { $getState, $setState, createState } from "lexical";
 
-import { isHexColor } from "../colors/colors";
+import { isColorValue } from "../colors/colors";
 import { inkFor } from "../textStyle/textStyle";
 
 // A table's look: stripes on every second row and/or column (the band colour), and a brand colour
@@ -55,7 +55,7 @@ const NO_LOOK: TableLook = {
 const parseLook = (value: unknown): TableLook => {
   if (!value || typeof value !== "object") return NO_LOOK;
   const raw = value as Record<string, unknown>;
-  const color = (key: string) => (isHexColor(raw[key]) ? (raw[key] as string) : null);
+  const color = (key: string) => (isColorValue(raw[key]) ? (raw[key] as string) : null);
   return {
     bandColor: color("bandColor"),
     bandColumns: raw.bandColumns === true,
