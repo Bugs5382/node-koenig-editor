@@ -199,6 +199,12 @@ export interface KoenigToolbarAction {
    *  spacing, alignment, link); a higher number adds a row of the host's own. Default: the last
    *  row of the built-ins. */
   row?: number;
+  /**
+   * True when the action works on the selection and changes no text. In a read-only editor the
+   * selection toolbar then shows it (and only such actions, with no format buttons); a card's
+   * `replaceSelection` answers false there. Default: false, and a read-only editor shows no toolbar.
+   */
+  readOnly?: boolean;
   /** The button's icon; without one the first letters of `label` show. */
   Icon?: FC<{ className?: string }>;
   /** Names the button: it becomes the `data-kg-toolbar-button` value. */

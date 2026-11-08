@@ -55,6 +55,10 @@ export function FloatingFormatToolbar({
             text: saved.text,
             close: closeAction,
             replaceSelection: (text) => {
+                // a read-only editor takes no edit, whatever the host's card asks
+                if (!editor.isEditable()) {
+                    return false;
+                }
                 const replaced = replaceSavedSelection(editor, saved, text);
                 if (replaced) {
                     closeAction();
