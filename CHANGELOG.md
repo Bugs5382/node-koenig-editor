@@ -1,5 +1,17 @@
 # node-koenig-editor
 
+## v1.3.1 - 2026-11-08
+
+### What Changed 👀
+
+#### 📄 Documentation
+
+- docs: move the 1.3.0 option detail from the README into guides @Bugs5382 (#103)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.3.0...v1.3.1
+
 ## v1.3.0 - 2026-11-08
 
 ### What Changed 👀
