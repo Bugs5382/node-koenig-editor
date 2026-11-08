@@ -1,6 +1,6 @@
 {
   "name": "node-koenig-editor",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Ghost's Koenig editor on Lexical 0.52 and React 19, packaged for reuse, with optional Yjs collaboration.",
   "author": "Shane",
   "license": "MIT",

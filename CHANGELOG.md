@@ -1,5 +1,17 @@
 # node-koenig-editor
 
+## v1.3.0 - 2026-11-08
+
+### What Changed 👀
+
+#### 🚀 Features
+
+- feat(options): host options for menus, colour pairs, the button card and Markdown paste @Bugs5382 (#101)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.2.1...v1.3.0
+
 ## v1.2.1 - 2026-11-07
 
 ### What Changed 👀
