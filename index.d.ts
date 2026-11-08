@@ -936,6 +936,11 @@ export interface KoenigComposerProps {
   /** Cards left off the "+" and slash menus, by node type (for example `["code"]`). Their nodes stay
    *  registered, so a stored document that holds one still loads and shows it. */
   menuHidden?: readonly string[];
+  /** The button card's controls. `colors: false` hides its colour and text colour controls and
+   *  `emoji: false` its emoji field, for a host that sets the look itself; `required: true` marks the
+   *  label and the link as required (the field is required and `aria-required`), and the host reads
+   *  an incomplete button from the saved document. Default: everything shown, nothing required. */
+  buttonCard?: { colors?: boolean; emoji?: boolean; required?: boolean };
   /** The base node set the `cards` choice filters. Default: `DEFAULT_NODES`. */
   nodes?: EditorNodes;
   onError?: (error: Error) => void;

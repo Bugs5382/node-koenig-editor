@@ -61,11 +61,11 @@ export function ToggleSetting({label, description, isChecked, onChange, dataTest
     );
 }
 
-export function InputSetting({label, hideLabel, description, onChange, value, placeholder, dataTestId, onBlur}) {
+export function InputSetting({label, hideLabel, description, onChange, value, placeholder, dataTestId, onBlur, required = false}) {
     return (
         <div className="flex w-full flex-col justify-between">
             <div className={hideLabel ? 'sr-only' : 'mb-1.5 text-sm font-medium tracking-normal text-grey-900 dark:text-grey-300'}>{label}</div>
-            <Input dataTestId={dataTestId} placeholder={placeholder} value={value} onBlur={onBlur} onChange={onChange} />
+            <Input aria-required={required || undefined} dataTestId={dataTestId} placeholder={placeholder} required={required} value={value} onBlur={onBlur} onChange={onChange} />
             {description &&
                 <p className="text-xs font-normal leading-snug text-grey-700 dark:text-grey-600">{description}</p>
             }
