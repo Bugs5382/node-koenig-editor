@@ -101,6 +101,23 @@ const openCallout = async (api: KoenigEditorAPI) => {
 const calloutOf = (api: KoenigEditorAPI) =>
   JSON.parse(api.serialize()).root.children.find((node: { type: string }) => node.type === "callout");
 
+describe("a new callout starts on the host's first swatch (#97)", () => {
+  it("uses the first swatch and its ink when the host gives a palette", async () => {
+    const { api } = await mount({
+      composer: { colors: { calloutBackground: { none: false, palette: PAIRS, picker: false } } },
+    });
+    await openCallout(api);
+    expect(calloutOf(api).backgroundColor).toBe("var(--host-info-soft)");
+    expect(calloutOf(api).textColor).toBe("var(--host-ink)");
+  });
+
+  it("keeps the editor's own default when the host gives no palette", async () => {
+    const { api } = await mount();
+    await openCallout(api);
+    expect(calloutOf(api).backgroundColor).toBe("blue");
+  });
+});
+
 describe("the callout takes a pair from one control (#97)", () => {
   const colors = { calloutBackground: { none: false, palette: PAIRS, picker: false } };
 
