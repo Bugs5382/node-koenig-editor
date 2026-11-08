@@ -107,8 +107,13 @@ export type KoenigToolbarItem =
 export interface KoenigColorSwatch {
   /** What the swatch is called (its tooltip and screen reader name). */
   label: string;
-  /** A hex colour, `#rgb` or `#rrggbb`. */
+  /** A hex colour (`#rgb` or `#rrggbb`) or a CSS variable written `var(--name)`. A variable lets one
+   *  choice follow the host's light and dark themes. Anything else is ignored. */
   value: string;
+  /** The text colour that goes with this swatch, in the same forms as `value`. Choosing the swatch
+   *  sets both, so the person picks one pair that is readable. The callout shows no separate text
+   *  colour control when every swatch of its background has one. */
+  ink?: string;
 }
 
 /** Where the editor asks for a colour. Each has its own palette. */
@@ -928,6 +933,18 @@ export interface KoenigComposerProps {
   initialEditorState?: null | SerializedEditorState | string;
   /** The host's own entries for the "+" and slash menus; it handles their commands. */
   menuItems?: readonly CardMenuItem[];
+  /** Cards left off the "+" and slash menus, by node type (for example `["code"]`). Their nodes stay
+   *  registered, so a stored document that holds one still loads and shows it. */
+  menuHidden?: readonly string[];
+  /** The button card's controls. `colors: false` hides its colour and text colour controls and
+   *  `emoji: false` its emoji field, for a host that sets the look itself; `required: true` marks the
+   *  label and the link as required (the field is required and `aria-required`), and the host reads
+   *  an incomplete button from the saved document. Default: everything shown, nothing required. */
+  /** Turn plain text that is written in Markdown (a heading, a list, bold, a link, a fence) into the
+   *  editor's own headings, lists and formats when it is pasted. Off by default; a paste that also
+   *  carries HTML, a paste into a code block, and a single link are left alone. */
+  pasteMarkdown?: boolean;
+  buttonCard?: { colors?: boolean; emoji?: boolean; required?: boolean };
   /** The base node set the `cards` choice filters. Default: `DEFAULT_NODES`. */
   nodes?: EditorNodes;
   onError?: (error: Error) => void;

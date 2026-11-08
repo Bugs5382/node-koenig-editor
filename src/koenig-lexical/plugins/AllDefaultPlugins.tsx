@@ -19,6 +19,7 @@ import {InlineFormatShortcutsPlugin} from '../../additions/inlineFormats/InlineF
 import {FindReplacePlugin} from '../../additions/find/FindReplacePlugin';
 import {CodePlugin} from '../../additions/code/CodePlugin';
 import {CleanPastePlugin} from '../../additions/paste/CleanPastePlugin';
+import {PasteMarkdownPlugin} from '../../additions/paste/PasteMarkdownPlugin';
 import {ShortcutsPlugin} from '../../additions/shortcuts/ShortcutsPlugin';
 import {SpacingPlugin} from '../../additions/spacing/SpacingPlugin';
 import {TablePlugin} from '../../additions/table/TablePlugin';
@@ -69,6 +70,7 @@ export const AllDefaultPlugins = () => {
             <SpacingPlugin />
             <ShortcutsPlugin />
             <CleanPastePlugin />
+            <PasteMarkdownPlugin />
             <FindReplacePlugin />
             <EmojiCommandPlugin />
         </>

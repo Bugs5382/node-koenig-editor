@@ -28,7 +28,7 @@ import { useKoenigStrings } from "../options/strings";
 import {
   type KoenigColors,
   type ResolvedColorSetting,
-  isHexColor,
+  isColorValue,
   isColorAllowed,
   normalizeColor,
   resolveColorSetting,
@@ -77,7 +77,7 @@ export const ColorControl: FC<ColorControlProps> = ({
   value,
 }) => {
   const strings = useKoenigStrings().colors;
-  const current = value && isHexColor(value) ? value : null;
+  const current = value && isColorValue(value) ? value : null;
   const choose = (next: null | string) => {
     if (isColorAllowed(setting, next)) onChange(next);
   };

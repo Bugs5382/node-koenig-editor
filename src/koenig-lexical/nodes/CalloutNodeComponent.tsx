@@ -6,6 +6,8 @@ import {ActionToolbar} from '../components/ui/ActionToolbar.jsx';
 import {CalloutCard} from '../components/ui/cards/CalloutCard';
 import {EDIT_CARD_COMMAND} from '../plugins/KoenigBehaviourPlugin';
 import {SnippetActionToolbar} from '../components/ui/SnippetActionToolbar.jsx';
+import {isPairPalette, swatchFor} from '../../additions/colors/colors';
+import {useColorSetting} from '../../additions/colors/ColorControl';
 import {ToolbarMenu, ToolbarMenuItem, ToolbarMenuSeparator} from '../components/ui/ToolbarMenu.jsx';
 import {sanitizeHtml} from '../utils/sanitize-html';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -36,10 +38,19 @@ export function CalloutNodeComponent({nodeKey, textEditor, textEditorInitialStat
         });
     };
 
+    // A swatch can carry its own text colour: choosing it sets both, and the separate text colour
+    // control goes away when every swatch does (see KoenigColorSwatch.ink).
+    const backgroundSetting = useColorSetting('calloutBackground');
+    const pairedText = isPairPalette(backgroundSetting);
+
     const handleColorChange = (color) => {
         editor.update(() => {
             const node = $getNodeByKey(nodeKey);
             node.backgroundColor = color || 'white';
+            const ink = color ? swatchFor(backgroundSetting, color)?.ink : undefined;
+            if (ink) {
+                node.textColor = ink;
+            }
         });
     };
 
@@ -87,6 +98,7 @@ export function CalloutNodeComponent({nodeKey, textEditor, textEditorInitialStat
                 changeEmoji={handleEmojiChange}
                 color={backgroundColor}
                 handleTextColorChange={handleTextColorChange}
+                pairedText={pairedText}
                 textColor={textColor}
                 handleColorChange={handleColorChange}
                 hasEmoji={hasEmoji}
