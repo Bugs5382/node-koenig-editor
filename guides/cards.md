@@ -337,3 +337,7 @@ A card left out of `cards` is missing from the menus and its commands do nothing
 tracked in the repository's issues).
 
 The full option list is in the README.
+
+**Leaving a card off the menus.** `menuHidden={["code"]}` takes the named cards off the "+" and slash
+menus. The card's node stays registered, so a stored document that holds one still opens, pastes and
+renders; it just cannot be inserted from a menu. Use `cards` to remove a card entirely.

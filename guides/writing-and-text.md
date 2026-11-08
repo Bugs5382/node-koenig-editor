@@ -91,6 +91,12 @@ The slots are `textColor`, `highlight`, `calloutBackground`, `calloutText`, `but
 `buttonText`, `headerBackground`, `headerText`, `headerButton`, `headerButtonText`, `tableBand`,
 `tableBrand`, `tableCell` and `tableBorder`. Highlight writes dark or light text with the colour, whichever reads on it.
 
+**Swatches that carry their own text colour.** A swatch may add `ink`, and its `value` and `ink` may
+be a CSS variable written `var(--name)`, so the colours follow the host's light and dark theme. When
+every swatch in the callout's background palette has an `ink`, choosing a swatch sets both colours
+and the separate text colour control goes away. A new callout starts on the first swatch of a host
+palette.
+
 ## 📃 Lists and spacing
 
 The selection toolbar has **Bulleted list** (`bulletList`), **Numbered list** (`numberList`) and
@@ -115,6 +121,11 @@ bulleted and numbered lists, Docs' `b` wrapper no longer makes the paste bold, a
 underline, strikethrough, superscript and subscript written as styles become the editor's own
 formats. Headings, links (safe ones only), tables and images stay. Copying inside the editor, a
 pasted link, and a picture with its file are left to the editor's own handling.
+
+**Markdown paste** (the composer's `pasteMarkdown`, off by default). Plain text written in Markdown (a
+heading, a list item, a quote, a fence, bold or a link) becomes headings, lists and formats when it is
+pasted. A paste that also carries HTML is left to clean paste, a paste into a code block or into a
+card's own field (a Markdown card, a caption) stays as typed, and so does a single link.
 
 **Spell check.** The browser's own spell check works in the editing area unless the composer says
 `spellCheck={false}`; `lang="de"` (any BCP 47 tag) tells the browser which language to check in and
