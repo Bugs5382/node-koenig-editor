@@ -1,5 +1,17 @@
 # node-koenig-editor
 
+## v1.5.0 - 2026-11-08
+
+### What Changed 👀
+
+#### 🚀 Features
+
+- feat(toolbar): selection actions in a read-only editor, and every edit input blocked @Bugs5382 (#107)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.4.0...v1.5.0
+
 ## v1.4.0 - 2026-11-08
 
 ### What Changed 👀
