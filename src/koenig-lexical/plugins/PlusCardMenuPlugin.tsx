@@ -33,7 +33,7 @@ function usePlusCardMenu(editor) {
         buttonRef.current = node;
         setButtonElement(node);
     }, []);
-    const {cardConfig, menuItems} = React.useContext(KoenigComposerContext);
+    const {cardConfig, menuItems, menuHidden} = React.useContext(KoenigComposerContext);
     const strings = useKoenigStrings();
     const emojiOn = useKoenigTool('emojiPicker');
 
@@ -295,9 +295,9 @@ function usePlusCardMenu(editor) {
 
     // build up the card menu based on registered nodes and current search
     React.useEffect(() => {
-        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {emoji: emojiOn, menuItems, strings});
+        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {emoji: emojiOn, menuHidden, menuItems, strings});
         setCardMenu(buildCardMenu(cardNodes, {config: cardConfig}));
-    }, [cardConfig, editor, setCardMenu, menuItems, strings]);
+    }, [cardConfig, editor, setCardMenu, menuHidden, menuItems, strings]);
 
     const style = {
         left: `${leftPosition}px`,

@@ -36,6 +36,8 @@ type CardMenuNode = [string, { kgMenu: MenuEntry | MenuEntry[] }];
 interface MenuContext {
   /** Adds the Emoji entry, which opens the emoji picker at the caret. */
   emoji?: boolean;
+  /** Node types left off the menus; the nodes themselves stay registered. */
+  menuHidden?: readonly string[];
   menuItems?: readonly MenuEntry[];
   strings: KoenigStrings;
 }
@@ -51,19 +53,21 @@ const reword = (entry: MenuEntry, strings: KoenigStrings, nodeType: string): Men
  */
 export const getCardMenuNodes = (
   cardNodes: readonly CardMenuNode[],
-  { emoji, menuItems, strings }: MenuContext,
+  { emoji, menuHidden, menuItems, strings }: MenuContext,
 ): CardMenuNode[] => {
-  const nodes = cardNodes.map(([nodeType, klass]): CardMenuNode => {
-    const menu = klass.kgMenu;
-    return [
-      nodeType,
-      {
-        kgMenu: Array.isArray(menu)
-          ? menu.map((entry, index) => (index === 0 ? reword(entry, strings, nodeType) : entry))
-          : reword(menu, strings, nodeType),
-      },
-    ];
-  });
+  const nodes = cardNodes
+    .filter(([nodeType]) => !menuHidden?.includes(nodeType))
+    .map(([nodeType, klass]): CardMenuNode => {
+      const menu = klass.kgMenu;
+      return [
+        nodeType,
+        {
+          kgMenu: Array.isArray(menu)
+            ? menu.map((entry, index) => (index === 0 ? reword(entry, strings, nodeType) : entry))
+            : reword(menu, strings, nodeType),
+        },
+      ];
+    });
   if (emoji) {
     nodes.push([
       "koenig-emoji",

@@ -928,6 +928,9 @@ export interface KoenigComposerProps {
   initialEditorState?: null | SerializedEditorState | string;
   /** The host's own entries for the "+" and slash menus; it handles their commands. */
   menuItems?: readonly CardMenuItem[];
+  /** Cards left off the "+" and slash menus, by node type (for example `["code"]`). Their nodes stay
+   *  registered, so a stored document that holds one still loads and shows it. */
+  menuHidden?: readonly string[];
   /** The base node set the `cards` choice filters. Default: `DEFAULT_NODES`. */
   nodes?: EditorNodes;
   onError?: (error: Error) => void;

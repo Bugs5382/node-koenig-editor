@@ -21,7 +21,7 @@ function useSlashCardMenu(editor) {
     const [scrollToSelectedItem, setScrollToSelectedItem] = React.useState(false);
     const cachedRange = React.useRef(null);
     const containerRef = React.useRef(null);
-    const {cardConfig, menuItems} = React.useContext(KoenigComposerContext);
+    const {cardConfig, menuItems, menuHidden} = React.useContext(KoenigComposerContext);
     const strings = useKoenigStrings();
     const emojiOn = useKoenigTool('emojiPicker');
 
@@ -309,10 +309,10 @@ function useSlashCardMenu(editor) {
 
     // build up the card menu based on registered nodes and current search
     React.useEffect(() => {
-        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {emoji: emojiOn, menuItems, strings});
+        const cardNodes = getCardMenuNodes(getEditorCardNodes(editor), {emoji: emojiOn, menuHidden, menuItems, strings});
         setCardMenu(buildCardMenu(cardNodes, {insert, query, config: cardConfig}));
         setSelectedItemIndex(0);
-    }, [editor, query, insert, setCardMenu, setSelectedItemIndex, cardConfig, menuItems, strings]);
+    }, [editor, query, insert, setCardMenu, setSelectedItemIndex, cardConfig, menuHidden, menuItems, strings]);
 
     // attach a resize observer to call setMenuPosition when the window resizes
     React.useEffect(() => {
