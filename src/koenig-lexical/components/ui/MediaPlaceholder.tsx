@@ -107,7 +107,9 @@ export function MediaPlaceholder({
         <span
             key={error.message}
             className={errorClasses}
+            data-kg-upload-error=""
             data-testid={errorDataTestId}
+            role="alert"
         >
             {error.message}
         </span>
