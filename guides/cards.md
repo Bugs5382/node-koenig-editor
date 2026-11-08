@@ -7,22 +7,22 @@ cards.
 
 ## Quick reference
 
-| Card | Use it for | Add it with | Good to know |
-| --- | --- | --- | --- |
-| Image | One picture | `/image` | Alt text and caption; regular, wide or full width |
-| Gallery | Several pictures in rows | `/gallery` | Up to 50 pictures by default; full-screen viewer |
-| Header | A big title at the top of a section | `/header` | Colour or picture background, optional button |
-| Callout | A box that stands out | `/callout` | Nine colours, optional emoji |
-| Toggle | Text that opens and closes | `/toggle` | A header and hidden content |
-| Toggle group | A stack of toggles with no gap | `/toggle-group` | Any number of items; add and remove them |
-| Code | Code with line numbers | `/code` or three backticks | Language list, Copy button, highlighting |
-| Divider | A line between sections | `/hr` or type `---` | No settings |
-| Table | Rows and columns | `/table` | Merge cells, shading, alignment, caption; dashed grid while editing |
-| File | A download | `/file` | Title, description, name and size |
-| Video | A video you upload | `/video` | Needs captions or a transcript |
-| Audio | A sound file you upload | `/audio` | Needs captions or a transcript |
-| Button | A call-to-action link | `/button` | Only `http`, `https` and `mailto` links |
-| Markdown | Text written in Markdown | `/md` | Raw HTML is shown as text, never run |
+| Card         | Use it for                          | Add it with                | Good to know                                                        |
+| ------------ | ----------------------------------- | -------------------------- | ------------------------------------------------------------------- |
+| Image        | One picture                         | `/image`                   | Alt text and caption; regular, wide or full width                   |
+| Gallery      | Several pictures in rows            | `/gallery`                 | Up to 50 pictures by default; full-screen viewer                    |
+| Header       | A big title at the top of a section | `/header`                  | Colour or picture background, optional button                       |
+| Callout      | A box that stands out               | `/callout`                 | Nine colours, optional emoji                                        |
+| Toggle       | Text that opens and closes          | `/toggle`                  | A header and hidden content                                         |
+| Toggle group | A stack of toggles with no gap      | `/toggle-group`            | Any number of items; add and remove them                            |
+| Code         | Code with line numbers              | `/code` or three backticks | Language list, Copy button, highlighting                            |
+| Divider      | A line between sections             | `/hr` or type `---`        | No settings                                                         |
+| Table        | Rows and columns                    | `/table`                   | Merge cells, shading, alignment, caption; dashed grid while editing |
+| File         | A download                          | `/file`                    | Title, description, name and size                                   |
+| Video        | A video you upload                  | `/video`                   | Needs captions or a transcript                                      |
+| Audio        | A sound file you upload             | `/audio`                   | Needs captions or a transcript                                      |
+| Button       | A call-to-action link               | `/button`                  | Only `http`, `https` and `mailto` links                             |
+| Markdown     | Text written in Markdown            | `/md`                      | Raw HTML is shown as text, never run                                |
 
 Not cards, but part of the editor: the **image editor** (crop and rotate before upload), the
 **emoji picker** (in the callout card) and the **word count** (a number and a reading time).
@@ -51,6 +51,7 @@ Moving around cards, for any card:
 **Add it:** the plus button, `/image`, dragging a picture in, or `/image` followed by a web address
 to embed a picture that is already online.
 **What it can do:**
+
 - Alt text (the description for people who cannot see the picture) and a caption.
 - A link on the picture.
 - Width: regular, wide or full. (Animated GIFs stay as they are and have no width choice.)
@@ -70,6 +71,7 @@ pictures that are pure decoration.
 **For:** several pictures shown together in tidy rows.
 **Add it:** the plus button, `/gallery`, or dragging pictures in.
 **What it can do:**
+
 - Up to **50 pictures** by default. The developer sets the ceiling (`gallery.maxImages`). Each
   gallery can have a lower limit of its own in its settings ("Maximum number of images"), never
   below the number of pictures it already holds. The card shows "9 of 50".
@@ -82,18 +84,19 @@ pictures that are pure decoration.
 - **Slideshow** settings under a selected gallery: **Auto-advance** (set the seconds), **Random
   order** and **Screen mode** (no thumbnails, controls hide until a key, tap or mouse move; Escape
   shows them first, then exits). The exit control of the normal viewer is always visible.
-**Keyboard:** Tab onto a picture, then **Alt+Left** or **Alt+Right** moves it one place. A
-spoken message says where it went. A picture text can be collapsed; screen readers still read it.
-**Accessibility:** alt text for every picture; the viewer is a dialog that keeps focus inside and
-gives focus back when it closes.
-**Developer:** `cards` leaves it out; `gallery.maxImages` sets the limit; `gallery.autoAdvance`, `gallery.shuffle` and `gallery.screenMode` (each `false` to switch off) control the slideshow settings; `cardRenderers.gallery`
-replaces how it looks while the editor keeps the pictures, uploads and limits.
+  **Keyboard:** Tab onto a picture, then **Alt+Left** or **Alt+Right** moves it one place. A
+  spoken message says where it went. A picture text can be collapsed; screen readers still read it.
+  **Accessibility:** alt text for every picture; the viewer is a dialog that keeps focus inside and
+  gives focus back when it closes.
+  **Developer:** `cards` leaves it out; `gallery.maxImages` sets the limit; `gallery.autoAdvance`, `gallery.shuffle` and `gallery.screenMode` (each `false` to switch off) control the slideshow settings; `cardRenderers.gallery`
+  replaces how it looks while the editor keeps the pictures, uploads and limits.
 
 ## Header
 
 **For:** a big title and subtitle that open a section.
 **Add it:** the plus button or `/header`.
 **What it can do:**
+
 - A title and a subtitle.
 - A background colour or a background picture, and the text colour, from the shared colour control.
 - Left, centred or right writing.
@@ -108,6 +111,7 @@ outline. Use a heading for the real structure of the page.
 **For:** a note, a tip or a warning that should not be missed.
 **Add it:** the plus button or `/callout`.
 **What it can do:**
+
 - Text inside a coloured box. The background and the text colour each come from the shared colour
   control: a row of base colours and, unless the host switched it off, a colour wheel for any
   colour. Saved as a named class when a base colour of the old set is kept, and as inline CSS when a
@@ -319,17 +323,21 @@ out also turns its shortcut off; `fonts` gives the font list; `tools` switches c
 
 ## For developers: switching things off or replacing them
 
-| You want to | Use | Example |
-| --- | --- | --- |
-| Keep only some cards | `cards` on `KoenigComposer` | `cards={["image", "divider"]}` |
-| Remove the image editor, the emoji picker or the preview | `tools` | `tools={[]}` |
-| Change how the gallery or header looks | `cardRenderers` | `cardRenderers={{ gallery: MyGallery }}` |
-| Change the gallery's picture limit | `gallery` | `gallery={{ maxImages: 12 }}` |
-| Add your own card | `customNodes` and `menuItems` | a node with a `kgMenu` entry |
-| Change any wording | `strings` | `strings={{ gallery: { ... } }}` |
+| You want to                                              | Use                           | Example                                  |
+| -------------------------------------------------------- | ----------------------------- | ---------------------------------------- |
+| Keep only some cards                                     | `cards` on `KoenigComposer`   | `cards={["image", "divider"]}`           |
+| Remove the image editor, the emoji picker or the preview | `tools`                       | `tools={[]}`                             |
+| Change how the gallery or header looks                   | `cardRenderers`               | `cardRenderers={{ gallery: MyGallery }}` |
+| Change the gallery's picture limit                       | `gallery`                     | `gallery={{ maxImages: 12 }}`            |
+| Add your own card                                        | `customNodes` and `menuItems` | a node with a `kgMenu` entry             |
+| Change any wording                                       | `strings`                     | `strings={{ gallery: { ... } }}`         |
 
 A card left out of `cards` is missing from the menus and its commands do nothing. Keep the
 **divider** in any list you pass: a composer built without it does not start (a known problem,
 tracked in the repository's issues).
 
 The full option list is in the README.
+
+**Leaving a card off the menus.** `menuHidden={["code"]}` takes the named cards off the "+" and slash
+menus. The card's node stays registered, so a stored document that holds one still opens, pastes and
+renders; it just cannot be inserted from a menu. Use `cards` to remove a card entirely.
