@@ -20,19 +20,31 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { cleanup } from "@testing-library/react";
+import { act, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { MediaPlaceholder } from "../src/koenig-lexical/components/ui/MediaPlaceholder";
-import { mount } from "./__utils__/mount";
+import { mount, openSlashMenu } from "./__utils__/mount";
 
 afterEach(() => cleanup());
 
+const refusing = {
+  useFileUpload: () => ({
+    errors: [{ message: "Too big" }],
+    isLoading: false,
+    progress: 0,
+    upload: async () => null,
+  }),
+};
+
 describe("an upload refusal can be styled and found by the host (#98)", () => {
   it("marks each refusal with a stable attribute and the alert role", async () => {
-    await mount({ extra: <MediaPlaceholder desc="Upload" icon="image" errors={[{ message: "Too big" }]} /> });
+    const { api } = await mount({ composer: { fileUploader: refusing } });
+    await openSlashMenu(api);
+    await act(async () => {
+      fireEvent.click(document.querySelector("[data-kg-card-menu-item='Image']") as Element);
+    });
+    await waitFor(() => expect(document.querySelector("[data-kg-upload-error]")).not.toBeNull());
     const error = document.querySelector("[data-kg-upload-error]") as HTMLElement;
-    expect(error).not.toBeNull();
     expect(error.textContent).toBe("Too big");
     expect(error.getAttribute("role")).toBe("alert");
   });

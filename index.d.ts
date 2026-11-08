@@ -940,6 +940,10 @@ export interface KoenigComposerProps {
    *  `emoji: false` its emoji field, for a host that sets the look itself; `required: true` marks the
    *  label and the link as required (the field is required and `aria-required`), and the host reads
    *  an incomplete button from the saved document. Default: everything shown, nothing required. */
+  /** Turn plain text that is written in Markdown (a heading, a list, bold, a link, a fence) into the
+   *  editor's own headings, lists and formats when it is pasted. Off by default; a paste that also
+   *  carries HTML, a paste into a code block, and a single link are left alone. */
+  pasteMarkdown?: boolean;
   buttonCard?: { colors?: boolean; emoji?: boolean; required?: boolean };
   /** The base node set the `cards` choice filters. Default: `DEFAULT_NODES`. */
   nodes?: EditorNodes;
