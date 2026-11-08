@@ -605,6 +605,23 @@ export default function FormatToolbar({
         rows.push(actionsAtEndOf(extra));
     }
 
+    // a read-only editor shows only the host's actions that change no text, in one row, and no
+    // format button
+    if (!editor.isEditable()) {
+        rows.length = 0;
+        rows.push(visibleActions.filter(action => action.readOnly).map(action => (
+            <ToolbarMenuItem
+                key={`host-${action.id}`}
+                CustomIcon={action.Icon}
+                data-kg-toolbar-button={action.id}
+                icon={action.id}
+                isActive={false}
+                label={action.label}
+                onClick={() => onActionClick?.(action)}
+            />
+        )));
+    }
+
     return (
         <>
         <ToolbarMenu aria-label={strings.toolbar.group} data-kg-selection-toolbar role="toolbar" rows onKeyDown={onToolbarKeyDown}>

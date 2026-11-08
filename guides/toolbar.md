@@ -30,6 +30,27 @@ nothing when that text has been edited or removed in the meantime. Set `hidden: 
 a button out for the person using it (permissions, a feature switch). An action with no `Card`
 calls `onSelect` with the same object. The button's `data-kg-toolbar-button` value is its `id`.
 
+### In a read-only editor
+
+A read-only editor (`editable={false}`) shows no selection toolbar. An action with `readOnly: true`
+works on the selection and changes no text (a comment, a suggestion, a look-up), and the toolbar
+then shows it, in one row, with no format button. Actions without it stay hidden, so a read-only
+editor with none still shows nothing. In a read-only editor a card's `replaceSelection` returns
+`false` and changes nothing, and typing, `beforeinput`, paste, cut, drop and the formatting
+shortcuts all leave the document as it was.
+
+```tsx
+const actions: KoenigToolbarAction[] = [
+  {
+    id: "comment",
+    label: "Comment",
+    readOnly: true,
+    onSelect: (selection) => open(selection.text),
+  },
+];
+<KoenigComposer editable={false} toolbarActions={actions} />;
+```
+
 ### Rows and where a button goes
 
 The toolbar has two rows: the text formats and styles on the first (Bold to Clear formatting),

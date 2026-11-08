@@ -2,6 +2,7 @@ import React from 'react';
 import {$getSelection, $isParagraphNode, $isRangeSelection, $isTextNode, COMMAND_PRIORITY_LOW, KEY_DOWN_COMMAND, KEY_MODIFIER_COMMAND} from 'lexical';
 import {$isLinkNode} from '@lexical/link';
 import {FloatingFormatToolbar, toolbarItemTypes} from '../components/ui/FloatingFormatToolbar';
+import KoenigComposerContext from '../context/KoenigComposerContext.jsx';
 import {FloatingLinkToolbar} from '../components/ui/FloatingLinkToolbar';
 import {getSelectedNode} from '../utils/getSelectedNode';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -14,6 +15,9 @@ export default function FloatingToolbarPlugin({anchorElem = document.body, isSni
 function useFloatingFormatToolbar(editor, anchorElem, isSnippetsEnabled, hiddenFormats = []) {
     const [toolbarItemType, setToolbarItemType] = React.useState(null);
     const [href, setHref] = React.useState(null);
+    // a read-only editor offers the host's actions that change no text, and nothing else
+    const {toolbarActions} = React.useContext(KoenigComposerContext);
+    const hasReadOnlyAction = (toolbarActions || []).some(action => action.readOnly && !action.hidden);
 
     const setToolbarType = React.useCallback(() => {
         editor.getEditorState().read(() => {
@@ -29,8 +33,9 @@ function useFloatingFormatToolbar(editor, anchorElem, isSnippetsEnabled, hiddenF
                 return;
             }
 
-            // a read-only editor (and the reader's view) has no formatting to offer
-            if (!editor.isEditable()) {
+            // a read-only editor (and the reader's view) has no formatting to offer; it shows the
+            // host's actions that work on the selection and change no text, when there are any
+            if (!editor.isEditable() && !hasReadOnlyAction) {
                 setToolbarItemType(null);
                 return;
             }
@@ -77,7 +82,7 @@ function useFloatingFormatToolbar(editor, anchorElem, isSnippetsEnabled, hiddenF
 
             setToolbarItemType(null);
         });
-    }, [editor, toolbarItemType]);
+    }, [editor, hasReadOnlyAction, toolbarItemType]);
 
     React.useEffect(() => {
         // Add a listener if the text toolbar is active. It helps to prevent events bubbling
@@ -97,7 +102,7 @@ function useFloatingFormatToolbar(editor, anchorElem, isSnippetsEnabled, hiddenF
             (event) => {
                 const {keyCode, ctrlKey, metaKey, shiftKey} = event;
                 // ctrl/cmd K with selected text should prompt for link insertion
-                if (!shiftKey && keyCode === 75 && (ctrlKey || metaKey)) {
+                if (!shiftKey && keyCode === 75 && (ctrlKey || metaKey) && editor.isEditable()) {
                     const selection = $getSelection();
                     if ($isRangeSelection(selection) && !selection.isCollapsed()) {
                         setToolbarItemType(toolbarItemTypes.link);
