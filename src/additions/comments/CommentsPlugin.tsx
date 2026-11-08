@@ -22,7 +22,13 @@ OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 import { $unwrapMarkNode, $wrapSelectionInMarkNode, MarkNode } from "@lexical/mark";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getNodeByKey, $getSelection, $isRangeSelection, $nodesOfType } from "lexical";
+import {
+  $getNodeByKey,
+  $getSelection,
+  $isRangeSelection,
+  $isTextNode,
+  $nodesOfType,
+} from "lexical";
 import { useEffect } from "react";
 import type { CommentStore } from "./CommentStore";
 
@@ -102,6 +108,30 @@ export const CommentsPlugin = ({ store }: { store: CommentStore }) => {
             }
           }
         });
+      },
+      replace: (id, text) => {
+        let done = false;
+        editor.update(() => {
+          let first = true;
+          for (const mark of $nodesOfType(MarkNode)) {
+            if (!mark.hasID(id)) continue;
+            const children = mark.getChildren();
+            if (first) {
+              const lead = children.find($isTextNode);
+              if (lead) {
+                lead.setTextContent(text);
+                for (const child of children) {
+                  if (child !== lead) child.remove();
+                }
+                done = true;
+              }
+              first = false;
+            } else {
+              for (const child of children) child.remove();
+            }
+          }
+        });
+        return done;
       },
       reveal: (id) => {
         for (const [key, ids] of idsByKey) {
