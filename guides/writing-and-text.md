@@ -88,8 +88,8 @@ different for each setting; the `colors` option changes it per setting (a "slot"
 
 With `picker: false` and `none: false` the host forces the colours of that setting to its list. If that list has one swatch, the toolbar button for a text colour or highlight applies it directly and takes it off again, with no menu.
 The slots are `textColor`, `highlight`, `calloutBackground`, `calloutText`, `buttonBackground`,
-`buttonText`, `headerBackground`, `headerText`, `headerButton`, `headerButtonText`, `tableBand` and
-`tableBrand`. Highlight writes dark or light text with the colour, whichever reads on it.
+`buttonText`, `headerBackground`, `headerText`, `headerButton`, `headerButtonText`, `tableBand`,
+`tableBrand`, `tableCell` and `tableBorder`. Highlight writes dark or light text with the colour, whichever reads on it.
 
 **Swatches that carry their own text colour.** A swatch may add `ink`, and its `value` and `ink` may
 be a CSS variable written `var(--name)`, so the colours follow the host's light and dark theme. When

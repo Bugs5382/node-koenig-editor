@@ -290,3 +290,35 @@ describe("inline comments", () => {
     expect(view.getByTestId("count").textContent).toBe("1");
   });
 });
+
+describe("replacing the text under a thread (#104)", () => {
+  it("swaps the highlighted text, keeps the highlight and the thread, and says so", async () => {
+    const events: KoenigCommentEvent[] = [];
+    const { api } = await mount(withComments(events));
+    await selectWord(api, 4, 9);
+    let thread: KoenigCommentThread | null = null;
+    await act(async () => {
+      thread = api.comments!.addThread({ body: "Faster?" });
+    });
+    let replaced = false;
+    await act(async () => {
+      replaced = api.comments!.replaceThreadText(thread!.id, "swift");
+    });
+    expect(replaced).toBe(true);
+    await waitFor(() => expect(marks()[0]?.textContent).toBe("swift"));
+    expect(api.editorInstance.getEditorState().read(() => $getRoot().getTextContent())).toBe(
+      "The swift brown fox",
+    );
+    expect(api.comments!.getThread(thread!.id)!.quote).toBe("swift");
+    expect(events.at(-1)?.type).toBe("thread-text-replaced");
+    expect(marks()).toHaveLength(1);
+  });
+
+  it("refuses an unknown thread and leaves the document alone", async () => {
+    const { api } = await mount(withComments());
+    expect(api.comments!.replaceThreadText("nope", "x")).toBe(false);
+    expect(api.editorInstance.getEditorState().read(() => $getRoot().getTextContent())).toBe(
+      "The quick brown fox",
+    );
+  });
+});

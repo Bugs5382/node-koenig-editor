@@ -38,7 +38,11 @@ right-click menu with the same actions) edits it:
   slot, an optional colour wheel, and the host's choices through the composer's `colors` option
   (`colors.tableBand` and `colors.tableBrand`: `palette`, `picker: false` to limit the choice to the
   palette). The ink on each colour is chosen to read on it. The colours are written onto the cells in
-  the saved HTML, and a cell you shaded yourself keeps its own colour.
+  the saved HTML, and a cell you shaded yourself keeps its own colour. The Colour menu's cell colours
+  and the Borders popover's line colour follow two more slots, `colors.tableCell` and
+  `colors.tableBorder`: a host `palette` replaces the editor's own list, and `none: false` takes away
+  the "No colour" and default entries. Both are saved as inline styles, so only real colours (not
+  `var(--name)`) are offered.
 - **Caption**: the figure entry (see below) for the table: a label such as "Table", an automatic
   number, a title, above or below. The text is the table's accessible name in the editor and a real
   `caption` element in the saved HTML.

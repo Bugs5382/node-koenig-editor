@@ -40,6 +40,8 @@ export interface CommentAnchors {
   add: (id: string) => null | string;
   /** Takes the anchor for `id` out of the document, keeping the text. */
   remove: (id: string) => void;
+  /** Puts `text` in place of the text under the anchor for `id`, keeping the anchor; false if there is none. */
+  replace: (id: string, text: string) => boolean;
   /** Scrolls the anchor for `id` into view. */
   reveal: (id: string) => void;
 }
@@ -118,6 +120,18 @@ export class CommentStore implements KoenigCommentsController {
     this.publish();
     this.emit({ thread, type: "thread-added" });
     return thread;
+  }
+
+  replaceThreadText(id: string, text: string): boolean {
+    const thread = this.threads.get(id);
+    if (!thread || !this.anchors?.replace(id, text)) {
+      return false;
+    }
+    const next = { ...thread, quote: text };
+    this.threads.set(id, next);
+    this.publish();
+    this.emit({ thread: next, type: "thread-text-replaced" });
+    return true;
   }
 
   removeThread(id: string): boolean {

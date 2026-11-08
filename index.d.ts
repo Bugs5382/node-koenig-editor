@@ -128,7 +128,9 @@ export type KoenigColorSlot =
   | "headerText"
   | "highlight"
   | "tableBand"
+  | "tableBorder"
   | "tableBrand"
+  | "tableCell"
   | "textColor";
 
 /** A host's choices for one colour slot. */
@@ -687,6 +689,7 @@ export type KoenigCommentEvent =
   | { thread: KoenigCommentThread; type: "thread-removed" }
   | { thread: KoenigCommentThread; type: "thread-resolved" }
   | { thread: KoenigCommentThread; type: "thread-reopened" }
+  | { thread: KoenigCommentThread; type: "thread-text-replaced" }
   | { message: KoenigCommentMessage; thread: KoenigCommentThread; type: "reply-added" }
   | { thread: KoenigCommentThread | null; type: "thread-focused" }
   | { thread: KoenigCommentThread; type: "anchor-lost" }
@@ -716,6 +719,9 @@ export interface KoenigCommentsController {
   getThreads: () => readonly KoenigCommentThread[];
   /** Whether the thread's highlight is currently in the document. */
   isAnchored: (id: string) => boolean;
+  /** Puts `text` in place of the text under the thread's highlight, keeping the highlight, and sets
+   *  the thread's `quote` to it. False if the thread is unknown or its text is not in the document. */
+  replaceThreadText: (id: string, text: string) => boolean;
   /** Removes the thread and its highlight, leaving the text. False if unknown. */
   removeThread: (id: string) => boolean;
   reply: (id: string, input: KoenigCommentInput) => KoenigCommentMessage | null;

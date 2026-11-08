@@ -62,6 +62,7 @@ import {
   type TableScope,
 } from "./tableActions";
 import { ColorControl, useColorSetting } from "../colors/ColorControl";
+import { DEFAULT_PALETTES, isHexColor } from "../colors/colors";
 import {
   $getTableLook,
   $setTableLook,
@@ -441,6 +442,27 @@ export const TableEditorPlugin = () => {
     return () => root.removeEventListener("contextmenu", onContextMenu);
   }, [editor]);
 
+  // the cell colours: the host's tableCell swatches, or the editor's own eight when it sets none
+  const cellSetting = useColorSetting("tableCell");
+  const cellColours = useMemo(
+    () =>
+      cellSetting.palette === DEFAULT_PALETTES.tableCell
+        ? TABLE_COLORS.map((colour) => ({
+            id: colour.name,
+            label: t.colours[colour.name as keyof Strings["colours"]],
+            value: colour.value,
+          }))
+        : // a cell colour is saved as an inline style on the cell, so only a real colour will do
+          cellSetting.palette
+            .filter((swatch) => isHexColor(swatch.value))
+            .map((swatch) => ({
+              id: swatch.label,
+              label: swatch.label,
+              value: swatch.value,
+            })),
+    [cellSetting.palette, t],
+  );
+
   const sectionsFor = useCallback(
     (groups: readonly MenuGroup[]): TableMenuSection[] => {
       if (!snapshot) return [];
@@ -449,21 +471,25 @@ export const TableEditorPlugin = () => {
         if (group === "colour") {
           sections.push({
             items: [
-              ...TABLE_COLORS.map((colour) => ({
+              ...cellColours.map((colour) => ({
                 checked: snapshot.color === colour.value,
-                id: `colour-${colour.name}`,
+                id: `colour-${colour.id}`,
                 kind: "radio" as const,
-                label: t.colours[colour.name as keyof Strings["colours"]],
+                label: colour.label,
                 onSelect: () => run(() => $setCellColor(colour.value)),
                 swatch: colour.value,
               })),
-              {
-                checked: snapshot.color === null,
-                id: "colour-none",
-                kind: "radio" as const,
-                label: t.noColour,
-                onSelect: () => run(() => $setCellColor(null)),
-              },
+              ...(cellSetting.none
+                ? [
+                    {
+                      checked: snapshot.color === null,
+                      id: "colour-none",
+                      kind: "radio" as const,
+                      label: t.noColour,
+                      onSelect: () => run(() => $setCellColor(null)),
+                    },
+                  ]
+                : []),
             ],
             label: t.colourMenu,
           });
@@ -1012,7 +1038,12 @@ const BorderFields = ({
   const [where, setWhere] = useState<BorderWhere>("all");
   const [style, setStyle] = useState<BorderStyle>("solid");
   const [width, setWidth] = useState<BorderWidth>("thin");
-  const [color, setColor] = useState("");
+  // the host's tableBorder swatches, or the editor's own list when it sets none
+  const borderSetting = useColorSetting("tableBorder");
+  const hostBorders = borderSetting.palette !== DEFAULT_PALETTES.tableBorder;
+  const [color, setColor] = useState(
+    hostBorders && !borderSetting.none ? (borderSetting.palette[0]?.value ?? "") : "",
+  );
   const first = useRef<HTMLSelectElement>(null);
   useEffect(() => first.current?.focus(), []);
   const field = "w-full rounded-md border border-grey-300 bg-white px-2 py-1 dark:bg-grey-900";
@@ -1113,14 +1144,29 @@ const BorderFields = ({
       <label className="flex flex-col gap-1">
         {t.bordersColour}
         <select className={field} value={color} onChange={(event) => setColor(event.target.value)}>
-          <option value="">{t.bordersColourDefault}</option>
-          <option value={TABLE_CELL_INK}>{t.bordersColourInk}</option>
-          <option value="#6B7280">{t.bordersColourGrey}</option>
-          {TABLE_COLORS.map((entry) => (
-            <option key={entry.name} value={entry.value}>
-              {t.colours[entry.name as keyof Strings["colours"]]}
-            </option>
-          ))}
+          {hostBorders ? (
+            <>
+              {borderSetting.none ? <option value="">{t.bordersColourDefault}</option> : null}
+              {borderSetting.palette
+                .filter((swatch) => isHexColor(swatch.value))
+                .map((swatch) => (
+                  <option key={swatch.value} value={swatch.value}>
+                    {swatch.label}
+                  </option>
+                ))}
+            </>
+          ) : (
+            <>
+              <option value="">{t.bordersColourDefault}</option>
+              <option value={TABLE_CELL_INK}>{t.bordersColourInk}</option>
+              <option value="#6B7280">{t.bordersColourGrey}</option>
+              {TABLE_COLORS.map((entry) => (
+                <option key={entry.name} value={entry.value}>
+                  {t.colours[entry.name as keyof Strings["colours"]]}
+                </option>
+              ))}
+            </>
+          )}
         </select>
       </label>
       <div className="flex justify-end gap-2">
