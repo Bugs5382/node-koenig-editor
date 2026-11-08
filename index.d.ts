@@ -128,7 +128,9 @@ export type KoenigColorSlot =
   | "headerText"
   | "highlight"
   | "tableBand"
+  | "tableBorder"
   | "tableBrand"
+  | "tableCell"
   | "textColor";
 
 /** A host's choices for one colour slot. */

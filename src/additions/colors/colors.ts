@@ -20,6 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
+import { TABLE_COLORS } from "../table/tableActions";
 import type { KoenigColorSetting, KoenigColorSlot, KoenigColorSwatch } from "node-koenig-editor";
 
 // One colour model for every colour setting in the editor (text colour, highlight, the callout,
@@ -87,6 +88,8 @@ export const DEFAULT_PALETTES: Record<KoenigColorSlot, readonly KoenigColorSwatc
     ["Orange", "#FDEBD0"],
   ]),
   tableBand: SOFT,
+  tableBorder: swatches([["Dark", "#15171A"], ["Grey", "#6B7280"]]),
+  tableCell: swatches(TABLE_COLORS.map((entry) => [entry.name.charAt(0).toUpperCase() + entry.name.slice(1), entry.value])),
   tableBrand: BOLD,
   textColor: swatches([
     ["Red", "#D64545"],
