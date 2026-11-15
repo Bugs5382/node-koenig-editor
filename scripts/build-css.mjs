@@ -60,11 +60,35 @@ const scaleRem = () => ({
 });
 scaleRem.postcss = true;
 
+// Tailwind 3 writes its --tw-* defaults (translate, rotate, scale, ring, ...) as the unlayered
+// rules `*, ::before, ::after` and `::backdrop`. An unlayered rule beats every layered one, so
+// on a host with Tailwind 4 (whose utilities live in `@layer utilities`) it reset the host's
+// `-translate-x-1/2` to 0. Moving the defaults into `@layer base` lets the host's utilities win.
+// `base` is the host's own layer name, so the order is the host's; a host without layers sees
+// plain unlayered rules for everything else and the editor's own utilities still set every
+// variable they read.
+const RESETS = new Set(["::backdrop", "*, ::before, ::after"]);
+const layerResets = () => ({
+  postcssPlugin: "kg-layer-resets",
+  OnceExit(root) {
+    const resets = [];
+    root.each((node) => {
+      if (node.type === "rule" && RESETS.has(node.selector.replace(/\s+/g, " "))) resets.push(node);
+    });
+    if (resets.length === 0) throw new Error("kg-layer-resets: no Tailwind reset found to layer");
+    const layer = postcss.atRule({ name: "layer", params: "base" });
+    resets[0].before(layer);
+    for (const rule of resets) layer.append(rule);
+  },
+});
+layerResets.postcss = true;
+
 const result = await postcss([
   postcssImport(),
   tailwindNesting(),
   tailwindcss({ config: path.join(root, "tailwind.config.cjs") }),
   scaleRem(),
+  layerResets(),
 ]).process(readFileSync(input, "utf8"), { from: input, to: output });
 
 mkdirSync(path.dirname(output), { recursive: true });
