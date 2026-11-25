@@ -16,18 +16,6 @@
 
 **Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.5.0...v1.6.0
 
-## v1.5.1 - 2026-11-25
-
-### What Changed 👀
-
-#### 🐛 Bug Fixes
-
-- fix(styles): put the Tailwind reset in a cascade layer @Bugs5382 (#111)
-
-### Extra
-
-**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.5.0...v1.5.1
-
 ## v1.5.0 - 2026-11-08
 
 ### What Changed 👀
