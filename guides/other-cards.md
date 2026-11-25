@@ -108,6 +108,46 @@ const uploader = {
 **Upload refusals.** A refusal is written as an element with the `data-kg-upload-error` attribute and
 `role="alert"`, so a host can style or find it without depending on the editor's own class names.
 
+## ▶️ Embed card (linked video)
+
+An opt-in card for a video that stays on YouTube, Vimeo or Twitch. Turn it on by naming it:
+`cards={["image", "embed"]}` (a `cards` list is the only switch: with no list the card is off, and a
+document that already holds one still opens, plays nothing and loads nothing).
+
+```tsx
+<KoenigComposer
+  cards={["image", "embed"]}
+  embedParent="blog.example.com" // the page's domain, which Twitch needs
+/>
+```
+
+- **Click to load.** The card saves the address and an optional title, nothing else, and fetches
+  nothing at edit time (no oEmbed call, no thumbnail). It shows a placeholder: the title (or the
+  site's name), the site's name, a play button and a privacy line. The player frame is created only
+  when the play button is pressed, so no request goes to the video site, and no cookie is set,
+  before that. A reader sees the same placeholder; the editor adds a link field and a title field.
+- **The player.** YouTube loads from `www.youtube-nocookie.com`, Vimeo with `dnt=1`, Twitch with
+  `parent` set to `embedParent` (default: the current page's hostname; a Twitch link is refused
+  when there is none). The frame has `sandbox="allow-scripts allow-same-origin allow-presentation"`
+  (no top navigation, forms or popups), `referrerpolicy="no-referrer"`, `loading="lazy"` and
+  `allow="autoplay; fullscreen"`.
+- **Allow-list.** `embedHosts` is the list of sites and how a link on each is read. Default
+  `DEFAULT_EMBED_HOSTS`: YouTube (`watch`, `youtu.be`, `embed`, `shorts`, and the nocookie
+  domain), Vimeo (`vimeo.com/<id>`, `player.vimeo.com/video/<id>`, a privacy hash kept) and Twitch
+  (a channel, a video, a clip). A link must be `https`, with no user name or password, on a hostname
+  the list names exactly; `javascript:`, `data:`, `http:`, lookalike hosts and other sites get a plain
+  error that names the allowed sites. A saved link the list no longer allows plays nothing.
+- **Your own sites.** Pass `embedHosts` with entries of `{ id, label, hostnames, parse }`:
+  `parse(url, { parent })` returns the https address of the site's player, or `null` when the link
+  is not a video. It is plain string work. `parseEmbedUrl(text, hosts, { parent })` is exported so a
+  host can check a link itself; it returns `{ ok: true, source }` or `{ ok: false, reason }`.
+- **Saved and exported.** `{ "type": "embed", "url": "...", "title": "..." }` with a block id like
+  any block. The exported HTML is `<figure class="kg-card kg-embed-card"><a href>` with the title: a
+  plain link and nothing that loads. A host that wants the player in its pages builds it with the
+  same rules (and its own click to load).
+- **Wording.** `strings.cards.embed` (menu) and `strings.embed` (the field labels, the privacy line
+  and the refusals).
+
 ## 🖼️ Image editor and emoji picker
 
 Neither is a card, so the composer's `cards` option does not list them. Both are on by default;

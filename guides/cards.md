@@ -7,22 +7,23 @@ cards.
 
 ## Quick reference
 
-| Card          | Use it for                          | Add it with                | Good to know                                                        |
-| ------------- | ----------------------------------- | -------------------------- | ------------------------------------------------------------------- |
-| Image         | One picture                         | `/image`                   | Alt text and caption; regular, wide or full width                   |
-| Gallery       | Several pictures in rows            | `/gallery`                 | Up to 50 pictures by default; full-screen viewer                    |
-| Header        | A big title at the top of a section | `/header`                  | Colour or picture background, optional button                       |
-| Callout       | A box that stands out               | `/callout`                 | Nine colours, optional emoji                                        |
-| Toggle        | Text that opens and closes          | `/toggle`                  | A header and hidden content                                         |
-| Toggle group  | A stack of toggles with no gap      | `/toggle-group`            | Any number of items; add and remove them                            |
-| Code          | Code with line numbers              | `/code` or three backticks | Language list, Copy button, highlighting                            |
-| Section break | Three dots between two parts        | `/hr` or type `---`        | Dots by default; `/line` adds a plain line                          |
-| Table         | Rows and columns                    | `/table`                   | Merge cells, shading, alignment, caption; dashed grid while editing |
-| File          | A download                          | `/file`                    | Title, description, name and size                                   |
-| Video         | A video you upload                  | `/video`                   | Needs captions or a transcript                                      |
-| Audio         | A sound file you upload             | `/audio`                   | Needs captions or a transcript                                      |
-| Button        | A call-to-action link               | `/button`                  | Only `http`, `https` and `mailto` links                             |
-| Markdown      | Text written in Markdown            | `/md`                      | Raw HTML is shown as text, never run                                |
+| Card          | Use it for                              | Add it with                | Good to know                                                        |
+| ------------- | --------------------------------------- | -------------------------- | ------------------------------------------------------------------- |
+| Image         | One picture                             | `/image`                   | Alt text and caption; regular, wide or full width                   |
+| Gallery       | Several pictures in rows                | `/gallery`                 | Up to 50 pictures by default; full-screen viewer                    |
+| Header        | A big title at the top of a section     | `/header`                  | Colour or picture background, optional button                       |
+| Callout       | A box that stands out                   | `/callout`                 | Nine colours, optional emoji                                        |
+| Toggle        | Text that opens and closes              | `/toggle`                  | A header and hidden content                                         |
+| Toggle group  | A stack of toggles with no gap          | `/toggle-group`            | Any number of items; add and remove them                            |
+| Code          | Code with line numbers                  | `/code` or three backticks | Language list, Copy button, highlighting                            |
+| Section break | Three dots between two parts            | `/hr` or type `---`        | Dots by default; `/line` adds a plain line                          |
+| Table         | Rows and columns                        | `/table`                   | Merge cells, shading, alignment, caption; dashed grid while editing |
+| File          | A download                              | `/file`                    | Title, description, name and size                                   |
+| Video         | A video you upload                      | `/video`                   | Needs captions or a transcript                                      |
+| Audio         | A sound file you upload                 | `/audio`                   | Needs captions or a transcript                                      |
+| Embed         | A linked YouTube, Vimeo or Twitch video | `/embed`                   | Off by default; loads nothing until the reader presses play         |
+| Button        | A call-to-action link                   | `/button`                  | Only `http`, `https` and `mailto` links                             |
+| Markdown      | Text written in Markdown                | `/md`                      | Raw HTML is shown as text, never run                                |
 
 Not cards, but part of the editor: the **image editor** (crop and rotate before upload), the
 **emoji picker** (in the callout card) and the **word count** (a number and a reading time).
@@ -237,6 +238,24 @@ through the file uploader, which must allow `.vtt`.
 transcript or a `.vtt` file.
 **Limits:** `fileTypes.audio` sets the allowed types and size.
 **Developer:** `cards` leaves it out.
+
+## Embed
+
+**For:** a video that lives on YouTube, Vimeo or Twitch, linked by its address. Off by default: the
+developer turns it on.
+**Add it:** the plus button or `/embed`, then paste the link. A title is optional (select the card to
+type one); without it the card shows the site's name.
+**What it can do:** shows a placeholder with the title, the site's name, a play button and a line
+saying nothing is loaded from the site until play. **Nothing from the video site is loaded, and no
+cookies are set, until the reader presses play.** Then the placeholder is replaced by the site's
+player (YouTube through its privacy-enhanced domain, Vimeo with do-not-track on).
+**Limits:** only `https` links from the sites the developer allows. Anything else is refused with a
+plain message that names the allowed sites.
+**Keyboard and screen reader:** the play button is a real button in the tab order, named "Play video:
+title". The link field takes Enter. The player frame is titled with the video's name.
+**Developer:** add `"embed"` to `cards`. `embedHosts` is the allow-list and the link reader (default
+YouTube, Vimeo and Twitch), `embedParent` the page's domain Twitch needs. See
+[Other cards](./other-cards.md#-embed-card-linked-video).
 
 ## Button
 

@@ -22,6 +22,7 @@ import {CleanPastePlugin} from '../../additions/paste/CleanPastePlugin';
 import {PasteMarkdownPlugin} from '../../additions/paste/PasteMarkdownPlugin';
 import {ShortcutsPlugin} from '../../additions/shortcuts/ShortcutsPlugin';
 import {SpacingPlugin} from '../../additions/spacing/SpacingPlugin';
+import {EmbedPlugin} from './EmbedPlugin';
 import {TablePlugin} from '../../additions/table/TablePlugin';
 import {EmojiCommandPlugin} from '../../additions/emojiPicker/EmojiCommandPlugin';
 import {ToggleGroupPlugin} from '../plugins/ToggleGroupPlugin';
@@ -63,6 +64,7 @@ export const AllDefaultPlugins = () => {
             {hasNode(editor, 'file') && <FilePlugin />}
             {hasNode(editor, 'video') && <VideoPlugin />}
             {hasNode(editor, 'audio') && <AudioPlugin />}
+            {hasNode(editor, 'embed') && <EmbedPlugin />}
             {hasNode(editor, 'code') && <CodePlugin />}
             <TablePlugin />
             <AlignmentShortcutsPlugin />

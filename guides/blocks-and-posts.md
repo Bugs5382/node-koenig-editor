@@ -159,5 +159,5 @@ Saving a document used to drop every card's id, and `aside` lost it on load, so 
 identity in the saved document. Cards now write their node state, `aside` reads it back, and the
 round trip of every block type is tested.
 
-An embed card is not part of the package: nothing is embedded or fetched from outside (see
-[Upstream and what changed](upstream.md)).
+The embed card for linked video is opt-in and loads nothing until the reader presses play (see
+[Other cards](./other-cards.md#-embed-card-linked-video)).

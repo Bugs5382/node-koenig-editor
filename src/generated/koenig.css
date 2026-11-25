@@ -2280,6 +2280,11 @@
     padding-bottom: calc(0.6 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .py-10 {
+    padding-top: calc(4 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(4 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .py-2 {
     padding-top: calc(0.8 * var(--kg-rem, 0.625rem));
     padding-bottom: calc(0.8 * var(--kg-rem, 0.625rem));

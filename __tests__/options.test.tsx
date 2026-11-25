@@ -88,12 +88,13 @@ class BadgeNode extends DecoratorNode<JSX.Element> {
 }
 
 describe("cards", () => {
-  it("lists every shipped card when the host picks none", async () => {
+  it("lists every shipped card when the host picks none, except the opt-in embed card", async () => {
     const { api } = await mount();
     const labels = await openSlashMenu(api);
-    for (const card of KOENIG_CARD_NAMES) {
+    for (const card of KOENIG_CARD_NAMES.filter((name) => name !== "embed")) {
       expect(labels).toContain(DEFAULT_STRINGS.cards[card].label);
     }
+    expect(labels).not.toContain(DEFAULT_STRINGS.cards.embed.label);
   });
 
   it("leaves a card the host did not pick out of the menus and the editor", async () => {

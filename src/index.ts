@@ -33,6 +33,7 @@ export {
   useKoenigTool,
 } from "./additions/options";
 export { useKoenigComments } from "./additions/comments";
+export { DEFAULT_EMBED_HOSTS, parseEmbedUrl } from "./additions/embed/embedHosts";
 export { isSafeUrl, renderMarkdown, toSafeUrl } from "#kg-default-nodes";
 export {
   DEFAULT_WORDS_PER_MINUTE,

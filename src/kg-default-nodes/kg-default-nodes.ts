@@ -33,6 +33,7 @@ export {isSafeUrl, toSafeUrl} from './utils/safe-url.js';
 export {renderMarkdown} from './utils/render-markdown.js';
 export * from './nodes/file/FileNode.js';
 export * from './nodes/video/VideoNode.js';
+export * from './nodes/embed/EmbedNode.js';
 export * from './nodes/audio/AudioNode.js';
 
 // export utility functions that are useful in other packages or tests

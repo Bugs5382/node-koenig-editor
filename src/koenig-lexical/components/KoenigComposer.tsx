@@ -18,6 +18,8 @@ import {KoenigStringsContext, KoenigToolsContext, resolveStrings, resolveTools, 
 import {KoenigPreviewBridge} from './KoenigPreviewBridge';
 import {withCardProperties} from '../utils/collabCardProperties';
 import {MarkNode} from '@lexical/mark';
+import {DEFAULT_EMBED_HOSTS} from '../../additions/embed/embedHosts';
+import {EmbedNode} from '../nodes/EmbedNode';
 import {SubtitleNode} from '../../additions/title/SubtitleNode';
 import {TitleNode} from '../../additions/title/TitleNode';
 
@@ -73,6 +75,8 @@ const KoenigComposer = ({
     tools,
     onError = defaultOnError,
     onUploadError,
+    embedHosts,
+    embedParent,
     fileUploader = {},
     cardConfig = {},
     darkMode = false,
@@ -94,9 +98,17 @@ const KoenigComposer = ({
         // The title node is always known, so a document saved with a title opens in a host with the option off.
         if (!selected.includes(TitleNode)) selected.push(TitleNode);
         if (!selected.includes(SubtitleNode)) selected.push(SubtitleNode);
+        // The embed node is always known too; the card is off unless `cards` names it (see `embedOn`).
+        if (!selected.includes(EmbedNode)) selected.push(EmbedNode);
         // Comment anchors are mark nodes; they are registered only when comments are on.
         return hasComments && !selected.includes(MarkNode) ? [...selected, MarkNode] : selected;
     }, [baseNodes, cards, customNodes, hasComments]);
+    // The embed card is opt-in: only a `cards` list that names it turns it on. Off, it is out of the
+    // menus and plays nothing (an empty allow-list), but a saved embed card still opens.
+    const embedOn = Array.isArray(cards) && cards.includes('embed');
+    const effectiveEmbedHosts = React.useMemo(() => (embedOn ? (embedHosts ?? DEFAULT_EMBED_HOSTS) : []), [embedOn, embedHosts]);
+    const effectiveEmbedParent = embedParent ?? (typeof window !== 'undefined' ? window.location.hostname : '');
+    const effectiveMenuHidden = React.useMemo(() => (embedOn ? menuHidden : [...(menuHidden ?? []), 'embed']), [embedOn, menuHidden]);
     const commentStore = useCommentsStoreFor(comments);
     const strings = React.useMemo(() => resolveStrings(hostStrings), [hostStrings]);
     const enabledTools = React.useMemo(() => resolveTools(tools), [tools]);
@@ -172,7 +184,9 @@ const KoenigComposer = ({
                     darkMode,
                     collaboration,
                     menuItems,
-                    menuHidden,
+                    menuHidden: effectiveMenuHidden,
+                    embedHosts: effectiveEmbedHosts,
+                    embedParent: effectiveEmbedParent,
                     buttonCard,
                     pasteMarkdown,
                     cardRenderers,

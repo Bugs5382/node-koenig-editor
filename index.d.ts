@@ -42,6 +42,7 @@ export type KoenigCardName =
   | "button"
   | "callout"
   | "divider"
+  | "embed"
   | "file"
   | "gallery"
   | "header"
@@ -599,6 +600,23 @@ export interface KoenigStrings {
     posterUpload: string;
   };
   audio: KoenigMediaStrings & { titlePlaceholder: string };
+  /** The embed card for linked video (opt-in). `{hosts}` is the names of the sites on the list, `{host}`
+   *  one site's name, `{title}` the title (or the site's name). */
+  embed: {
+    embedButton: string;
+    invalid: string;
+    needsParent: string;
+    notAllowed: string;
+    notVideo: string;
+    play: string;
+    privacy: string;
+    refusedSaved: string;
+    titleLabel: string;
+    titlePlaceholder: string;
+    unsafe: string;
+    urlLabel: string;
+    urlPlaceholder: string;
+  };
   callout: { background: string; emoji: string; placeholder: string; textColor: string };
   toggle: {
     /** The reader's button when the toggle is open. */
@@ -675,6 +693,53 @@ export interface FileUploader {
     upload: (files: File[] | FileList) => Promise<{ fileName?: string; url: string }[] | null>;
   };
 }
+
+/** One video site the embed card may play; the host app supplies the list as `embedHosts`. */
+export interface KoenigEmbedHost {
+  /** A short id: `youtube`. */
+  id: string;
+  /** The name people see: `YouTube`. */
+  label: string;
+  /** The hostnames a link to this site may have, lowercase, no port. Matched exactly. */
+  hostnames: readonly string[];
+  /** Set when the player refuses to load without the page's domain (Twitch): a link is refused until
+   *  the host app gives `embedParent`. */
+  needsParent?: boolean;
+  /** Turns a link on one of `hostnames` into the https address of the site's player, or `null` when
+   *  it is not a video. Plain string work: it must not touch the network. */
+  parse: (url: URL, context: { parent: string }) => string | null;
+}
+
+/** What a good link becomes. */
+export interface KoenigEmbedSource {
+  host: string;
+  label: string;
+  /** The address the iframe loads, only after the reader presses play. */
+  embedUrl: string;
+}
+
+export type KoenigEmbedRefusal =
+  | "empty"
+  | "invalid"
+  | "unsafe"
+  | "not-allowed"
+  | "not-a-video"
+  | "needs-parent";
+
+export type KoenigEmbedResult =
+  | { ok: true; source: KoenigEmbedSource }
+  | { ok: false; reason: KoenigEmbedRefusal };
+
+/** YouTube (through the privacy-enhanced youtube-nocookie.com domain), Vimeo (with dnt=1) and Twitch. */
+export declare const DEFAULT_EMBED_HOSTS: readonly KoenigEmbedHost[];
+
+/** Checks a link against a list of hosts and returns the player address or the reason it was refused.
+ *  No network call; `parent` is the page's domain for hosts that need it. */
+export declare const parseEmbedUrl: (
+  input: string,
+  hosts?: readonly KoenigEmbedHost[],
+  options?: { parent?: string },
+) => KoenigEmbedResult;
 
 /** What `onUploadError` receives. */
 export interface KoenigUploadError {
@@ -960,7 +1025,7 @@ export interface KoenigComposerProps {
   /** Options for the gallery card. */
   gallery?: KoenigGalleryOptions;
   cardConfig?: Record<string, unknown>;
-  /** The shipped cards to register, and so list in the menus. Default: all of them. */
+  /** The shipped cards to register, and so list in the menus. Default: all of them except `"embed"`, which is off unless named here. */
   cards?: readonly KoenigCardName[];
   children?: ReactNode;
   /** Inline comment threads anchored on selected text. Off unless given. */
@@ -994,6 +1059,12 @@ export interface KoenigComposerProps {
   /** Called when a card refuses a file it was given, after the card has shown its own error: today a
    *  file chosen for an image card that is not a picture (`reason: "not-a-picture"`). */
   onUploadError?: (error: KoenigUploadError) => void;
+  /** The sites the embed card (opt-in: name `"embed"` in `cards`) may play, and how each link is read.
+   *  Anything else is refused with a plain error. Default: `DEFAULT_EMBED_HOSTS` (YouTube, Vimeo, Twitch). */
+  embedHosts?: readonly KoenigEmbedHost[];
+  /** The domain of the page that shows the player, for hosts that need it (Twitch). Default: the
+   *  current page's hostname. */
+  embedParent?: string;
   /** The host's wording, laid over the English defaults. */
   strings?: KoenigStringsInput;
   /** An optional title as the document's first block: plain text on one line, always first, saved as
