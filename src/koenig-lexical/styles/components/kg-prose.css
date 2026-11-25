@@ -1010,3 +1010,19 @@
     color: var(--grey-500);
     font-weight: 700;
 }
+
+/* Subtitle block (the composer's `title: { subtitle: true }` option), under the title */
+.koenig-lexical h2.kg-subtitle {
+    margin-top: 0;
+    position: relative;
+    font-weight: 400;
+    color: var(--grey-700);
+}
+
+.koenig-lexical h2.kg-subtitle[data-kg-empty]::before {
+    content: attr(data-kg-placeholder);
+    position: absolute;
+    pointer-events: none;
+    color: var(--grey-500);
+    font-weight: 400;
+}

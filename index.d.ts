@@ -246,6 +246,8 @@ export interface KoenigStrings {
   nestedPlaceholder: string;
   /** The title block's placeholder, when the composer's `title` option is on. */
   titlePlaceholder: string;
+  /** The subtitle block's placeholder, when `title: { subtitle: true }` is on. */
+  subtitlePlaceholder: string;
   errorFallback: string;
   close: string;
   searching: string;
@@ -974,8 +976,12 @@ export interface KoenigComposerProps {
   /** An optional title as the document's first block: plain text on one line, always first, saved as
    *  `{ type: "title" }` with a block id like any other block. Off by default. `true` turns it on;
    *  an object also sets the placeholder (default: `strings.titlePlaceholder`). A document saved
-   *  with a title opens in a host that leaves this off, where it shows as a heading. */
-  title?: boolean | { placeholder?: string };
+   *  with a title opens in a host that leaves this off, where it shows as a heading.
+   *  `subtitle` adds an optional one-line subtitle block right under the title, saved as
+   *  `{ type: "subtitle" }` with a block id (off by default; `true`, or `{ placeholder }`, default
+   *  `strings.subtitlePlaceholder`). Enter in the title goes to the subtitle, Enter in the subtitle
+   *  goes to the body. */
+  title?: boolean | { placeholder?: string; subtitle?: boolean | { placeholder?: string } };
   /** Where the editor keeps an empty paragraph so the cursor can always reach a card. `"ends"` (the
    *  default): above a first card and below a last one. `"every"`: also after every card, the code
    *  block and the table, the way Medium does, so no two cards ever touch. */

@@ -30,6 +30,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
   placeholder: "Begin writing...",
   nestedPlaceholder: "Type here",
   titlePlaceholder: "Title",
+  subtitlePlaceholder: "Subtitle",
   errorFallback: "The {card} card could not be shown. Remove it and try again.",
   close: "Close",
   searching: "Searching...",

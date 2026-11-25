@@ -18,6 +18,7 @@ import {KoenigStringsContext, KoenigToolsContext, resolveStrings, resolveTools, 
 import {KoenigPreviewBridge} from './KoenigPreviewBridge';
 import {withCardProperties} from '../utils/collabCardProperties';
 import {MarkNode} from '@lexical/mark';
+import {SubtitleNode} from '../../additions/title/SubtitleNode';
 import {TitleNode} from '../../additions/title/TitleNode';
 
 // Catch any errors that occur during Lexical updates and log them
@@ -91,6 +92,7 @@ const KoenigComposer = ({
         const selected = selectEditorNodes(baseNodes, cards, customNodes);
         // The title node is always known, so a document saved with a title opens in a host with the option off.
         if (!selected.includes(TitleNode)) selected.push(TitleNode);
+        if (!selected.includes(SubtitleNode)) selected.push(SubtitleNode);
         // Comment anchors are mark nodes; they are registered only when comments are on.
         return hasComments && !selected.includes(MarkNode) ? [...selected, MarkNode] : selected;
     }, [baseNodes, cards, customNodes, hasComments]);

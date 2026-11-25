@@ -5,7 +5,7 @@ Every text the editor shows, and everything the package exports.
 ### Wording
 
 `DEFAULT_STRINGS` holds every piece of text the editor shows, grouped as `placeholder`,
-`nestedPlaceholder`, `titlePlaceholder`, `errorFallback` (the message a failed card shows; `{card}` is replaced with the card's name), `cards` (each card's menu `label` and `desc`), `menu`, `toolbar`, `table` (the table card's controls), `card`
+`nestedPlaceholder`, `titlePlaceholder`, `subtitlePlaceholder`, `errorFallback` (the message a failed card shows; `{card}` is replaced with the card's name), `cards` (each card's menu `label` and `desc`), `menu`, `toolbar`, `table` (the table card's controls), `card`
 (card toolbar buttons), `link`, `image`, `button`, `markdown`, `wordCount`, `file`, `video`, `audio`, `callout`, `toggle`, `snippet`, `imageEditor` and `emojiPicker`. Plug your i18n in by
 building the `strings` object from your translations. Your own cards read the wording in effect
 with `useKoenigStrings()`.

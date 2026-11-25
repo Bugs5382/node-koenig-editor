@@ -29,14 +29,18 @@ import {
   $isRangeSelection,
   $isElementNode,
   COMMAND_PRIORITY_HIGH,
+  KEY_BACKSPACE_COMMAND,
+  KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
   LineBreakNode,
   RootNode,
   TextNode,
   type EditorState,
+  type RangeSelection,
 } from "lexical";
 import { useEffect } from "react";
 
+import { $createSubtitleNode, $isSubtitleNode, SubtitleNode } from "./SubtitleNode";
 import { $createTitleNode, $isTitleNode, TitleNode } from "./TitleNode";
 
 /**
@@ -62,63 +66,123 @@ export const $ensureTitle = (): void => {
   }
 };
 
+/**
+ * Keeps one subtitle, right under the title: a missing one is added, a second one becomes a
+ * paragraph, and one that was moved goes back under the title. Run it after `$ensureTitle`.
+ */
+export const $ensureSubtitle = (): void => {
+  const title = $getRoot().getFirstChild();
+  if (!$isTitleNode(title)) return;
+  const [keep, ...extra] = $getRoot().getChildren().filter($isSubtitleNode);
+  for (const spare of extra) {
+    const paragraph = $createParagraphNode();
+    spare.replace(paragraph);
+    paragraph.append(...spare.getChildren());
+  }
+  if (keep) {
+    if (title.getNextSibling() !== keep) title.insertAfter(keep);
+  } else {
+    title.insertAfter($createSubtitleNode());
+  }
+};
+
+const isAtEnd = (selection: RangeSelection): boolean => {
+  const { anchor } = selection;
+  const node = anchor.getNode();
+  return anchor.type === "text"
+    ? anchor.offset === node.getTextContentSize() && node.getNextSibling() === null
+    : $isElementNode(node) && anchor.offset === node.getChildrenSize();
+};
+
+const isAtStart = (selection: RangeSelection): boolean => {
+  const { anchor } = selection;
+  const node = anchor.getNode();
+  return anchor.type === "text"
+    ? anchor.offset === 0 && node.getPreviousSibling() === null
+    : $isElementNode(node) && anchor.offset === 0;
+};
+
+const inLine = (node: { getParent: () => unknown }) => {
+  const parent = node.getParent();
+  return $isTitleNode(parent as never) || $isSubtitleNode(parent as never);
+};
+
 const markEmpty = (
   editor: ReturnType<typeof useLexicalComposerContext>[0],
   state: EditorState,
   placeholder: string,
+  subtitlePlaceholder: string | null,
 ) => {
-  const info = state.read(() => {
-    const first = $getRoot().getFirstChild();
-    return $isTitleNode(first)
-      ? { key: first.getKey(), empty: first.getTextContent() === "" }
-      : null;
+  const marks = state.read(() => {
+    const [first, second] = $getRoot().getChildren();
+    const list: { key: string; empty: boolean; text: string }[] = [];
+    if ($isTitleNode(first)) {
+      list.push({ key: first.getKey(), empty: first.getTextContent() === "", text: placeholder });
+    }
+    if (subtitlePlaceholder !== null && $isSubtitleNode(second)) {
+      list.push({
+        key: second.getKey(),
+        empty: second.getTextContent() === "",
+        text: subtitlePlaceholder,
+      });
+    }
+    return list;
   });
-  if (!info) return;
-  const element = editor.getElementByKey(info.key);
-  if (!element) return;
-  element.setAttribute("data-kg-placeholder", placeholder);
-  if (info.empty) element.setAttribute("data-kg-empty", "true");
-  else element.removeAttribute("data-kg-empty");
+  for (const info of marks) {
+    const element = editor.getElementByKey(info.key);
+    if (!element) continue;
+    element.setAttribute("data-kg-placeholder", info.text);
+    if (info.empty) element.setAttribute("data-kg-empty", "true");
+    else element.removeAttribute("data-kg-empty");
+  }
 };
 
 /**
  * The optional title block. Mount it (through the composer's `title` option) and the document's
  * first block is the title field: plain text, one line, always first, with a placeholder.
  */
-export const TitlePlugin = ({ placeholder = "Title" }: { placeholder?: string }) => {
+export const TitlePlugin = ({
+  placeholder = "Title",
+  subtitle = null,
+}: {
+  placeholder?: string;
+  /** The subtitle's placeholder when the subtitle is on; `null` when it is off. */
+  subtitle?: string | null;
+}) => {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     if (editor._parentEditor || !editor.hasNodes([TitleNode])) return undefined;
+    const withSubtitle = subtitle !== null && editor.hasNodes([SubtitleNode]);
     const editable = () => editor.isEditable();
+    const ensure = () => {
+      $ensureTitle();
+      if (withSubtitle) $ensureSubtitle();
+    };
     const stopRoot = editor.registerNodeTransform(RootNode, () => {
-      if (editable()) $ensureTitle();
+      if (editable()) ensure();
     });
-    // the title is plain: no bold, italic or other format, and no line break
+    // the title and the subtitle are plain: no bold, italic or other format, and no line break
     const stopText = editor.registerNodeTransform(TextNode, (node) => {
-      if ($isTitleNode(node.getParent()) && node.getFormat() !== 0) node.setFormat(0);
+      if (inLine(node) && node.getFormat() !== 0) node.setFormat(0);
     });
     const stopBreaks = editor.registerNodeTransform(LineBreakNode, (node) => {
-      if ($isTitleNode(node.getParent())) node.remove();
+      if (inLine(node)) node.remove();
     });
-    // Enter in the title goes to the body: the next line when there is a paragraph, or a new one.
+    // Enter in the title goes to the subtitle when there is one, then to the body: the next line
+    // when there is a paragraph, or a new one.
     const stopEnter = editor.registerCommand(
       KEY_ENTER_COMMAND,
       (event) => {
         const selection = $getSelection();
         if (!$isRangeSelection(selection) || !selection.isCollapsed()) return false;
         const title = selection.anchor.getNode().getTopLevelElement();
-        if (!$isTitleNode(title)) return false;
-        const { anchor } = selection;
-        const node = anchor.getNode();
-        const atEnd =
-          anchor.type === "text"
-            ? anchor.offset === node.getTextContentSize() && node.getNextSibling() === null
-            : $isElementNode(node) && anchor.offset === node.getChildrenSize();
-        if (!atEnd) return false;
+        if (!$isTitleNode(title) && !$isSubtitleNode(title)) return false;
+        if (!isAtEnd(selection)) return false;
         event?.preventDefault?.();
         const next = title.getNextSibling();
-        if ($isParagraphNode(next)) next.selectStart();
-        else {
+        if ($isParagraphNode(next) || ($isTitleNode(title) && $isSubtitleNode(next))) {
+          next.selectStart();
+        } else {
           const paragraph = $createParagraphNode();
           title.insertAfter(paragraph);
           paragraph.selectStart();
@@ -127,26 +191,58 @@ export const TitlePlugin = ({ placeholder = "Title" }: { placeholder?: string })
       },
       COMMAND_PRIORITY_HIGH,
     );
+    // Backspace at the start of the subtitle, or Delete at the end of the title, would join the two
+    // lines: the title and the subtitle are never merged.
+    const stopJoin = withSubtitle
+      ? [
+          editor.registerCommand(
+            KEY_BACKSPACE_COMMAND,
+            (event) => {
+              const selection = $getSelection();
+              if (!$isRangeSelection(selection) || !selection.isCollapsed()) return false;
+              const block = selection.anchor.getNode().getTopLevelElement();
+              if (!$isSubtitleNode(block) || !isAtStart(selection)) return false;
+              event?.preventDefault?.();
+              return true;
+            },
+            COMMAND_PRIORITY_HIGH,
+          ),
+          editor.registerCommand(
+            KEY_DELETE_COMMAND,
+            (event) => {
+              const selection = $getSelection();
+              if (!$isRangeSelection(selection) || !selection.isCollapsed()) return false;
+              const block = selection.anchor.getNode().getTopLevelElement();
+              if (!$isTitleNode(block) || !$isSubtitleNode(block.getNextSibling())) return false;
+              if (!isAtEnd(selection)) return false;
+              event?.preventDefault?.();
+              return true;
+            },
+            COMMAND_PRIORITY_HIGH,
+          ),
+        ]
+      : [];
     const stopMarks = editor.registerUpdateListener(({ editorState }) =>
-      markEmpty(editor, editorState, placeholder),
+      markEmpty(editor, editorState, placeholder, withSubtitle ? subtitle : null),
     );
     if (editable()) {
       editor.update(
         () => {
-          $ensureTitle();
+          ensure();
         },
         { tag: "history-merge" },
       );
     }
-    markEmpty(editor, editor.getEditorState(), placeholder);
+    markEmpty(editor, editor.getEditorState(), placeholder, withSubtitle ? subtitle : null);
     return () => {
       stopRoot();
       stopText();
       stopBreaks();
       stopEnter();
+      stopJoin.forEach((stop) => stop());
       stopMarks();
     };
-  }, [editor, placeholder]);
+  }, [editor, placeholder, subtitle]);
   return null;
 };
 

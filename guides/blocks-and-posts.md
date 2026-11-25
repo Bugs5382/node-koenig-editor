@@ -55,6 +55,25 @@ block. The placeholder is `strings.titlePlaceholder` ("Title").
   the option off, where it shows as a heading (`h1.kg-title`).
 - It exports as `<h1 class="kg-title">`.
 
+### The subtitle
+
+```tsx
+<KoenigComposer title={{ subtitle: true }}>   {/* or subtitle: { placeholder: "A deck line" } */}
+```
+
+Off by default. With `title: { subtitle: true }` the block right under the title is a subtitle:
+plain text on one line, saved as `{ "type": "subtitle" }` in the flat block list after the title,
+with a stable id like the others. `getBlocks` lists it with `type: "subtitle"`. The placeholder is
+`strings.subtitlePlaceholder` ("Subtitle"), or the option's own.
+
+- Enter at the end of the title goes to the subtitle; Enter at the end of the subtitle goes to the
+  body (a new line if a card is next).
+- Backspace at the start of the subtitle and Delete at the end of the title do not join them. A
+  second subtitle becomes a paragraph, and a subtitle that is moved goes back under the title.
+- A document saved before the option opens with an empty subtitle added under its title.
+- The subtitle node is always registered, so a document saved with one opens in a host that has the
+  option off, where it shows as a heading (`h2.kg-subtitle`). It exports as `<h2 class="kg-subtitle">`.
+
 ## ➕ A line after every card
 
 ```tsx
