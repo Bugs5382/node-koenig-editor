@@ -57,6 +57,9 @@ to embed a picture that is already online.
 - A link on the picture.
 - Width: regular, wide or full. (Animated GIFs stay as they are and have no width choice.)
 - Before upload, the **image editor** opens to crop and rotate a single picture you add.
+- A file that is not a picture (a text file renamed `.png`, a broken file) is never dropped silently:
+  the card shows a plain error naming the file, nothing is uploaded, and a picture the card already
+  had stays.
 - A **figure label**: select the card and choose "Figure label" to add a label such as "Figure", an
   automatic number, a title and a position above or below the picture ("Figure 2: Sunrise"). Numbers
   follow the reading order. In the saved HTML it is the figure's `figcaption`.
@@ -65,7 +68,8 @@ to embed a picture that is already online.
 **Accessibility:** write alt text for every picture that carries meaning. Leave it empty only for
 pictures that are pure decoration.
 **Developer:** `cards` leaves it out; the file types and sizes allowed come from the uploader's
-`fileTypes.image`.
+`fileTypes.image`. The composer's `onUploadError({ card, file, message, reason })` is called when the
+card refuses a file this way (`reason: "not-a-picture"`); the wording is `strings.image.decodeError`.
 
 ## Gallery
 

@@ -14,7 +14,7 @@ import {dataSrcToFile} from '../utils/dataSrcToFile.js';
 import {getAllowedImageCardWidths, getDefaultImageCardWidth} from '../utils/image-card-widths';
 import {getImageDimensions} from '../utils/getImageDimensions.js';
 import {getImageFilenameFromSrc} from '../utils/getImageFilenameFromSrc';
-import {imageUploadHandler} from '../utils/imageUploadHandler';
+import {ImageDecodeError, imageUploadHandler} from '../utils/imageUploadHandler';
 import {isGif} from '../utils/isGif';
 import {openFileSelection} from '../utils/openFileSelection';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -25,7 +25,7 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
     const strings = useKoenigStrings();
     const [editor] = useLexicalComposerContext();
     const [showLink, setShowLink] = React.useState(false);
-    const {fileUploader, cardConfig} = React.useContext(KoenigComposerContext);
+    const {fileUploader, cardConfig, onUploadError} = React.useContext(KoenigComposerContext);
     const {isSelected, cardWidth, setCardWidth} = React.useContext(CardContext);
     const fileInputRef = React.useRef();
     const toolbarFileInputRef = React.useRef();
@@ -37,6 +37,30 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
     const canEdit = (file) => imageEditorOn && file && /^image\//.test(file.type) && !['image/gif', 'image/svg+xml'].includes(file.type);
 
     const imageUploader = fileUploader.useFileUpload('image');
+
+    // A file that is not a picture is never dropped silently: the card says so, the host's
+    // `onUploadError` hears about it, and a card that already had a picture keeps it.
+    const [decodeProblem, setDecodeProblem] = React.useState('');
+    const decodeText = strings.image.decodeError;
+    const uploadImage = React.useCallback(async (files, restoreSrc = '') => {
+        setDecodeProblem('');
+        try {
+            return await imageUploadHandler(files, nodeKey, editor, imageUploader.upload);
+        } catch (error) {
+            if (!(error instanceof ImageDecodeError)) {
+                throw error;
+            }
+            const message = decodeText.replace('{name}', error.file?.name ?? '');
+            setDecodeProblem(message);
+            if (restoreSrc) {
+                editor.update(() => {
+                    const node = $getNodeByKey(nodeKey);
+                    node.src = restoreSrc;
+                });
+            }
+            onUploadError?.({card: 'image', file: error.file, message, reason: 'not-a-picture'});
+        }
+    }, [decodeText, editor, imageUploader.upload, nodeKey, onUploadError]);
     const imageFileDragHandler = useFileDragAndDrop({handleDrop: handleImageDrop});
 
     // stable fn refs to avoid excessive re-inits of the drag/drop handler effects
@@ -72,14 +96,14 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
         const uploadFile = async () => {
             const file = await dataSrcToFile(src);
             if (isMounted) {
-                await imageUploadHandler([file], nodeKey, editor, imageUploader.upload);
+                await uploadImage([file]);
             }
         };
 
         uploadFile();
 
         return () => isMounted = false;
-    }, [editor, imageUploader.isLoading, imageUploader.upload, nodeKey, src]);
+    }, [uploadImage, imageUploader.isLoading, nodeKey, src]);
 
     React.useEffect(() => {
         // If an initial file is provided, upload it
@@ -89,7 +113,7 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
                     setPendingFile(file);
                     return;
                 }
-                await imageUploadHandler([file], nodeKey, editor, imageUploader.upload);
+                await uploadImage([file]);
             }
         };
 
@@ -144,7 +168,7 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
             node.src = '';
         });
 
-        return await imageUploadHandler(files, nodeKey, editor, imageUploader.upload);
+        return await uploadImage(files, src);
     };
 
     const setHref = (newHref) => {
@@ -220,7 +244,7 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
             setPendingFile(files[0]);
             return;
         }
-        await imageUploadHandler(files, nodeKey, editor, imageUploader.upload);
+        await uploadImage(files, src);
     }
 
     const uploadEdited = (file) => {
@@ -229,7 +253,7 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
             const node = $getNodeByKey(nodeKey);
             node.src = '';
         });
-        return imageUploadHandler([file], nodeKey, editor, imageUploader.upload);
+        return uploadImage([file], src);
     };
 
     return (
@@ -240,6 +264,11 @@ export function ImageNodeComponent({nodeKey, initialFile, src, altText, captionE
                     onApply={uploadEdited}
                     onCancel={() => setPendingFile(null)}
                 />
+            )}
+            {decodeProblem && (
+                <p className="mb-2 font-sans text-sm font-semibold text-red" data-kg-image-error="" role="alert">
+                    {decodeProblem}
+                </p>
             )}
             <ImageCard
                 altText={altText}

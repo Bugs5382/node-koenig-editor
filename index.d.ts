@@ -466,6 +466,8 @@ export interface KoenigStrings {
   image: {
     altPlaceholder: string;
     captionPlaceholder: string;
+    /** Shown on the card when a chosen file is not a picture. `{name}` is the file's name. */
+    decodeError: string;
     dropHere: string;
     dropManyHere: string;
     dropToGallery: string;
@@ -672,6 +674,16 @@ export interface FileUploader {
     progress: number;
     upload: (files: File[] | FileList) => Promise<{ fileName?: string; url: string }[] | null>;
   };
+}
+
+/** What `onUploadError` receives. */
+export interface KoenigUploadError {
+  /** The card that refused the file. */
+  card: "image";
+  file: File | null;
+  /** The plain sentence the card shows, in the host's wording. */
+  message: string;
+  reason: "not-a-picture";
 }
 
 /** How the host wires collaboration: the provider for the main document and every nested
@@ -979,6 +991,9 @@ export interface KoenigComposerProps {
   /** The base node set the `cards` choice filters. Default: `DEFAULT_NODES`. */
   nodes?: EditorNodes;
   onError?: (error: Error) => void;
+  /** Called when a card refuses a file it was given, after the card has shown its own error: today a
+   *  file chosen for an image card that is not a picture (`reason: "not-a-picture"`). */
+  onUploadError?: (error: KoenigUploadError) => void;
   /** The host's wording, laid over the English defaults. */
   strings?: KoenigStringsInput;
   /** An optional title as the document's first block: plain text on one line, always first, saved as
