@@ -1,5 +1,21 @@
 # node-koenig-editor
 
+## v1.6.0 - 2026-11-25
+
+### What Changed 👀
+
+#### 🚀 Features
+
+- feat(editor): blocks with stable ids, an optional title block and the post settings card @Bugs5382 (#114)
+
+#### 🐛 Bug Fixes
+
+- fix(styles): put the Tailwind reset in a cascade layer @Bugs5382 (#111)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.5.0...v1.6.0
+
 ## v1.5.1 - 2026-11-25
 
 ### What Changed 👀
