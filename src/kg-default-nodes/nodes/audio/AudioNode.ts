@@ -2,6 +2,7 @@ import {generateDecoratorNode, type DecoratorNodeData, type DecoratorNodePropert
 import {parseAudioNode} from './audio-parser.js';
 import {renderAudioNode} from './audio-renderer.js';
 import {safeMediaUrl} from '../../../additions/media/safeMediaUrl';
+import {exportNodeState} from '../../../additions/blocks/exportNodeState';
 
 // Audio is an uploaded file played from the host's own storage. `trackSrc` is a WebVTT file;
 // `transcript` is the same words in the page.
@@ -40,7 +41,8 @@ export class AudioNode extends generateDecoratorNode({
             duration,
             trackSrc: safeMediaUrl(this.trackSrc),
             trackLang,
-            trackLabel
+            trackLabel,
+            ...exportNodeState(this)
         };
     }
 

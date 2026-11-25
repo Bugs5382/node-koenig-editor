@@ -3,6 +3,7 @@ import {renderFileNode} from './file-renderer.js';
 import {parseFileNode} from './file-parser.js';
 import {bytesToSize} from '../../utils/size-byte-converter.js';
 import {safeMediaUrl} from '../../../additions/media/safeMediaUrl';
+import {exportNodeState} from '../../../additions/blocks/exportNodeState';
 
 const fileProperties = [
     {name: 'src', default: '', urlType: 'url'},
@@ -37,7 +38,8 @@ export class FileNode extends generateDecoratorNode({
             fileCaption,
             fileName,
             fileSize,
-            showIcon
+            showIcon,
+            ...exportNodeState(this)
         };
     }
 

@@ -18,6 +18,7 @@ import {KoenigStringsContext, KoenigToolsContext, resolveStrings, resolveTools, 
 import {KoenigPreviewBridge} from './KoenigPreviewBridge';
 import {withCardProperties} from '../utils/collabCardProperties';
 import {MarkNode} from '@lexical/mark';
+import {TitleNode} from '../../additions/title/TitleNode';
 
 // Catch any errors that occur during Lexical updates and log them
 // or throw them as needed. If you don't throw them, Lexical will
@@ -64,6 +65,8 @@ const KoenigComposer = ({
     codeLanguages,
     fileIcons,
     spellCheck,
+    cardGaps,
+    title,
     lang,
     toolbarActions,
     tools,
@@ -86,6 +89,8 @@ const KoenigComposer = ({
     const hasComments = Boolean(comments);
     const nodes = React.useMemo(() => {
         const selected = selectEditorNodes(baseNodes, cards, customNodes);
+        // The title node is always known, so a document saved with a title opens in a host with the option off.
+        if (!selected.includes(TitleNode)) selected.push(TitleNode);
         // Comment anchors are mark nodes; they are registered only when comments are on.
         return hasComments && !selected.includes(MarkNode) ? [...selected, MarkNode] : selected;
     }, [baseNodes, cards, customNodes, hasComments]);
@@ -175,6 +180,8 @@ const KoenigComposer = ({
                     codeLanguages,
                     fileIcons,
                     spellCheck,
+                    cardGaps,
+                    title,
                     lang,
                     toolbarActions
                 }}>

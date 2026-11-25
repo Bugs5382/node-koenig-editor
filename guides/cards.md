@@ -43,7 +43,8 @@ Moving around cards, for any card:
 - Press **Enter** on a selected card to add a paragraph after it and start typing there.
 - Press **Ctrl+Enter** (**Cmd+Enter** on a Mac) to open or close a selected card's settings.
 - The editor keeps an empty line above the first card and below the last one, so there is always
-  somewhere to put the cursor.
+  somewhere to put the cursor. A host can turn on a line after every card (`cardGaps="every"`).
+  See [Blocks, the title and post settings](https://github.com/Bugs5382/node-koenig-editor/blob/main/guides/blocks-and-posts.md#-a-line-after-every-card).
 
 ## Image
 

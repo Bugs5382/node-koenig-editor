@@ -795,6 +795,11 @@
     margin-right: calc(-0.4 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .-mx-4 {
+    margin-left: calc(-1.6 * var(--kg-rem, 0.625rem));
+    margin-right: calc(-1.6 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .-mx-6 {
     margin-left: calc(-2.4 * var(--kg-rem, 0.625rem));
     margin-right: calc(-2.4 * var(--kg-rem, 0.625rem));
@@ -859,6 +864,10 @@
 
 .koenig-lexical .\!mt-\[-1px\] {
     margin-top: -1px !important;
+}
+
+.koenig-lexical .-mb-4 {
+    margin-bottom: calc(-1.6 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .-mb-px {
@@ -1014,6 +1023,10 @@
 
 .koenig-lexical .hidden {
     display: none;
+}
+
+.koenig-lexical .aspect-square {
+    aspect-ratio: 1 / 1;
 }
 
 .koenig-lexical .size-11 {
@@ -1178,6 +1191,10 @@
 
 .koenig-lexical .max-h-\[30vh\] {
     max-height: 30vh;
+}
+
+.koenig-lexical .max-h-\[80vh\] {
+    max-height: 80vh;
 }
 
 .koenig-lexical .max-h-\[85vh\] {
@@ -1404,6 +1421,10 @@
     max-width: 65%;
 }
 
+.koenig-lexical .max-w-\[90vw\] {
+    max-width: 90vw;
+}
+
 .koenig-lexical .max-w-\[92vw\] {
     max-width: 92vw;
 }
@@ -1551,6 +1572,10 @@
 
 .koenig-lexical .appearance-none {
     appearance: none;
+}
+
+.koenig-lexical .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .koenig-lexical .grid-cols-\[repeat\(auto-fill\2c minmax\(3\.4rem\2c 1fr\)\)\] {
@@ -2904,6 +2929,15 @@
 .koenig-lexical {
     position: relative;
     --cta-link-color-text: var(--grey-900);
+}
+
+/* The gutter: room on the left of the text column for the "+" button, so the button, the placeholder
+   and the caret never overlap and a host needs no padding of its own. It is plain CSS (no utility
+   class a host would have to generate). --kg-gutter sets it, 0 turns it off; the default is the
+   button's size (--kg-plus-size) plus a gap. */
+.koenig-lexical [data-kg-gutter] {
+    padding-left: var(--kg-gutter, calc(var(--kg-plus-size, calc(2.2 * var(--kg-rem, 0.625rem))) + calc(1.2 * var(--kg-rem, 0.625rem))));
+    box-sizing: border-box;
 }
 
 /* Link color */
@@ -4589,6 +4623,23 @@ em-emoji-picker {
 .kg-header-accent, .kg-callout-accent {
     --kg-accent-color: var(--kg-color-white, #FFF);
 }
+
+
+/* Title block (the composer's `title` option)
+/* -------------------------------------------------------------------- */
+.koenig-lexical h1.kg-title {
+    margin-top: 0;
+    position: relative;
+}
+
+.koenig-lexical h1.kg-title[data-kg-empty]::before {
+    content: attr(data-kg-placeholder);
+    position: absolute;
+    pointer-events: none;
+    color: var(--grey-500);
+    font-weight: 700;
+}
+
 /* The reader's view (preview): a card is not outlined when hovered or selected. */
 .koenig-lexical[data-kg-preview] [data-kg-card],
 .koenig-lexical[data-kg-preview] [data-kg-card]:hover {

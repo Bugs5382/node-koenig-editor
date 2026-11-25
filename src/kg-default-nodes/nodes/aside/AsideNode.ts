@@ -26,7 +26,8 @@ export class AsideNode extends ElementNode {
         node.setFormat(serializedNode.format);
         node.setIndent(serializedNode.indent);
         node.setDirection(serializedNode.direction);
-        return node;
+        // restores the node's NodeState (its block id) from the `$` key
+        return node.updateFromJSON(serializedNode as never);
     }
 
     exportJSON() {

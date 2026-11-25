@@ -9,7 +9,10 @@ import MarkdownShortcutPlugin from '../plugins/MarkdownShortcutPlugin';
 import React from 'react';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {EditorPlaceholder} from './ui/EditorPlaceholder';
+import {BlockIdPlugin} from '../../additions/blocks/BlockIdPlugin';
 import {CardSpacePlugin} from '../../additions/cardSpace/CardSpacePlugin';
+import {TitlePlugin} from '../../additions/title/TitlePlugin';
+import {useKoenigStrings} from '../../additions/options';
 import {HeadingLimitPlugin} from '../../additions/headings/HeadingLimitPlugin';
 import {useKoenigPreview} from '../../additions/preview/PreviewContext';
 import {ExternalControlPlugin} from '../plugins/ExternalControlPlugin';
@@ -49,8 +52,9 @@ const KoenigComposableEditor = ({
     const {historyState} = useSharedHistoryContext();
     const [editor] = useLexicalComposerContext();
     const {isCollabActive} = useCollaborationContext();
-    const {editorContainerRef, darkMode, spellCheck, lang} = React.useContext(KoenigComposerContext);
+    const {editorContainerRef, darkMode, spellCheck, lang, cardGaps, title} = React.useContext(KoenigComposerContext);
 
+    const strings = useKoenigStrings();
     const isNested = !!editor._parentEditor;
     // the reader's view has no editing chrome: no placeholder, toolbar or drag handles
     const {preview, previewComments} = useKoenigPreview();
@@ -101,7 +105,7 @@ const KoenigComposableEditor = ({
         >
             <RichTextPlugin
                 contentEditable={
-                    <div ref={onContentEditableRef} data-kg="editor">
+                    <div ref={onContentEditableRef} data-kg="editor" data-kg-gutter={isNested ? undefined : ''}>
                         <ContentEditable className={useDefaultClasses ? 'kg-prose' : ''} lang={lang} readOnly={readOnly} spellCheck={spellCheck} />
                     </div>
                 }
@@ -122,7 +126,9 @@ const KoenigComposableEditor = ({
             {onFocus && <KoenigFocusPlugin onFocus={onFocus} />}
             <MarkdownPastePlugin />
             <HeadingLimitPlugin />
-            {!readOnly && <CardSpacePlugin />}
+            <BlockIdPlugin />
+            {title && !isNested && <TitlePlugin placeholder={(typeof title === 'object' && title.placeholder) || strings.titlePlaceholder} />}
+            {!readOnly && <CardSpacePlugin gaps={cardGaps} />}
             {children}
         </div>
     );

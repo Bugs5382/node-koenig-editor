@@ -2,6 +2,7 @@ import {generateDecoratorNode, type DecoratorNodeData, type DecoratorNodePropert
 import {parseVideoNode} from './video-parser.js';
 import {renderVideoNode} from './video-renderer.js';
 import {safeMediaUrl} from '../../../additions/media/safeMediaUrl';
+import {exportNodeState} from '../../../additions/blocks/exportNodeState';
 
 // Video is an uploaded file played from the host's own storage. There is no thumbnail, loop or
 // outside embed. `trackSrc` is a WebVTT captions file; `transcript` is the same text in the page.
@@ -46,7 +47,8 @@ export class VideoNode extends generateDecoratorNode({
             cardWidth,
             trackSrc: safeMediaUrl(this.trackSrc),
             trackLang,
-            trackLabel
+            trackLabel,
+            ...exportNodeState(this)
         };
     }
 

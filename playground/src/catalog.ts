@@ -30,6 +30,7 @@ interface OptionalExports {
   KOENIG_TOOLS?: readonly string[];
   KOENIG_TOOLBAR_ITEMS?: readonly string[];
   useKoenigWordCount?: () => { readingTimeLabel: string; words: number; wordsLabel: string };
+  PostSettingsMenu?: typeof Koenig.PostSettingsMenu;
   useKoenigPreview?: () => {
     options: { width: string };
     setOptions: (changes: { width: string }) => void;
@@ -40,10 +41,12 @@ const lib = Koenig as unknown as OptionalExports;
 
 export const useWordCount = lib.useKoenigWordCount;
 export const usePreview = lib.useKoenigPreview;
+export const PostSettingsMenu = lib.PostSettingsMenu;
 
 export const catalog: Catalog = {
   cards: lib.KOENIG_CARD_NAMES ?? [],
   tools: lib.KOENIG_TOOLS ?? [],
   toolbar: lib.KOENIG_TOOLBAR_ITEMS ?? [],
   wordCount: typeof useWordCount === "function",
+  posts: typeof PostSettingsMenu === "function",
 };

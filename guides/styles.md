@@ -68,6 +68,17 @@ editor.
 | `--kg-menu-max-height` | `32rem` (in `--kg-rem` units)  | Tallest the menus grow before they scroll; they also shrink to fit the room.                                                                                                                                      |
 | `--kg-breakout-room`   | `1.8rem` (in `--kg-rem` units) | How far a wide or full card (the gallery, a wide image) may extend past the text column on each side. Set it large (`100vw`) when the editor spans the whole page, to get the viewport-wide cards upstream draws. |
 | `--kg-plus-size`       | `2.2rem` (in `--kg-rem` units) | Diameter of the "+" button beside an empty line.                                                                                                                                                                  |
+| `--kg-gutter`          | the `+` size plus `1.2rem`     | Room kept on the left of the text column for the "+" button, so the button, the placeholder and the caret never overlap. `0` switches it off (a host that adds its own left padding).                             |
+
+### The gutter and what a host needs to do
+
+The stylesheet is complete: `node-koenig-editor/styles.css` is built with the package's own Tailwind
+setup and every class the editor uses is in it, scoped to `.koenig-lexical`. A host does not scan
+the package for Tailwind classes and does not add padding of its own. The left gutter for the "+"
+button is plain CSS on the text column (`--kg-gutter`, default the button's size plus a gap), so a
+host box with no padding still shows the button clear of the placeholder and the caret. A host that
+already pads its box on the left sets `--kg-gutter: 0` on an ancestor of the editor and keeps its
+own padding. Nested editors (card captions) have no gutter.
 
 The `--kg-font-size-h2`, `--kg-font-size-h3`, `--kg-font-size-h4` and `--kg-font-size-h5`
 defaults are `3.2rem`, `2.5rem`, `2.2rem` and `2rem`. The editor itself sets `--kg-menu-fit`

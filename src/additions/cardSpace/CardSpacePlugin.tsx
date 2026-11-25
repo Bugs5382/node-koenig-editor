@@ -30,40 +30,72 @@ import {
   KEY_ENTER_COMMAND,
   type LexicalNode,
 } from "lexical";
+import { $isCodeNode } from "@lexical/code";
+import { $isTableNode } from "@lexical/table";
 import { useEffect } from "react";
 
 // Koenig cards mark themselves with `isKoenigCard()`; stock nodes do not have it.
 const isCard = (node: LexicalNode | null): boolean =>
   !!node && (node as { isKoenigCard?: () => boolean }).isKoenigCard?.() === true;
 
+// In "every" mode the code block and the table count too: a cursor cannot leave either of them by
+// the arrow keys, so they need the same line beside them a card has.
+const isBlockCard = (node: LexicalNode | null, gaps: CardGaps): boolean =>
+  isCard(node) || (gaps === "every" && ($isCodeNode(node) || $isTableNode(node)));
+
+/** `"ends"` (the default) keeps a line above the first card and below the last; `"every"` keeps one after every card. */
+export type CardGaps = "ends" | "every";
+
 /**
  * A card at the very start or end of the document has no line beside it, so the cursor cannot
  * go above or below it. This adds an empty paragraph there, only when there is none, and returns
- * how many it added. Between two cards it adds nothing: a gap there is the person's to keep or
- * delete, and one that was deleted is never put back.
+ * how many it added. In the default `"ends"` mode it adds nothing between two cards: a gap there
+ * is the person's to keep or delete, and one that was deleted is never put back. In `"every"`
+ * mode a card is never directly followed by another card or by the end of the document: an empty
+ * paragraph is kept after each one, the way Medium does.
  */
-export const $ensureCardSpace = (): number => {
+export const $ensureCardSpace = (gaps: CardGaps = "ends"): number => {
   const root = $getRoot();
   let added = 0;
-  if (isCard(root.getFirstChild())) {
+  if (isBlockCard(root.getFirstChild(), gaps)) {
     root.getFirstChild()!.insertBefore($createParagraphNode());
     added += 1;
   }
-  if (isCard(root.getLastChild())) {
+  if (gaps === "every") {
+    for (const child of root.getChildren()) {
+      if (
+        isBlockCard(child, gaps) &&
+        (child.getNextSibling() === null || isBlockCard(child.getNextSibling(), gaps))
+      ) {
+        child.insertAfter($createParagraphNode());
+        added += 1;
+      }
+    }
+  } else if (isCard(root.getLastChild())) {
     root.getLastChild()!.insertAfter($createParagraphNode());
     added += 1;
   }
   return added;
 };
 
-const needsSpace = (): boolean =>
-  isCard($getRoot().getFirstChild()) || isCard($getRoot().getLastChild());
+const needsSpace = (gaps: CardGaps): boolean => {
+  const root = $getRoot();
+  if (isBlockCard(root.getFirstChild(), gaps)) return true;
+  if (gaps === "ends") return isCard(root.getLastChild());
+  return root
+    .getChildren()
+    .some(
+      (child) =>
+        isBlockCard(child, gaps) &&
+        (child.getNextSibling() === null || isBlockCard(child.getNextSibling(), gaps)),
+    );
+};
 
 // Collaborators' changes arrive tagged; the editor that made the change adds the space, so two
 // editors do not both add one.
 const REMOTE_TAGS = ["collaboration", "historic", "skip-collab"];
 
-export const CardSpacePlugin = () => {
+export const CardSpacePlugin = ({ gaps = "ends" }: { gaps?: CardGaps }) => {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     if (editor._parentEditor) return undefined;
@@ -72,7 +104,7 @@ export const CardSpacePlugin = () => {
       // "history-merge" keeps the paragraph in the same undo step as the change that needed it.
       editor.update(
         () => {
-          $ensureCardSpace();
+          $ensureCardSpace(gaps);
         },
         { tag: "history-merge" },
       );
@@ -80,7 +112,7 @@ export const CardSpacePlugin = () => {
     fix();
     const stopUpdates = editor.registerUpdateListener(({ editorState, tags }) => {
       if (!editor.isEditable() || REMOTE_TAGS.some((tag) => tags.has(tag))) return;
-      if (editorState.read(needsSpace)) fix();
+      if (editorState.read(() => needsSpace(gaps))) fix();
     });
     // Enter on a selected card with no paragraph after it makes one and moves the cursor into it.
     // A card that already has a paragraph below it is left to the editor's own handling.
@@ -111,7 +143,7 @@ export const CardSpacePlugin = () => {
       stopUpdates();
       stopEnter();
     };
-  }, [editor]);
+  }, [editor, gaps]);
   return null;
 };
 
