@@ -67,6 +67,8 @@ export interface Catalog {
   /** The format toolbar's buttons, when the build exports them. */
   toolbar?: readonly string[];
   wordCount?: boolean;
+  /** The build has the title block, the card gaps and the post settings menu. */
+  posts?: boolean;
 }
 
 export interface Settings {
@@ -88,6 +90,10 @@ export interface Settings {
   brandColors: boolean;
   comments: boolean;
   wordCount: boolean;
+  /** The document's first block is a title (the composer's `title`). */
+  title: boolean;
+  /** An empty paragraph after every card (the composer's `cardGaps: "every"`). */
+  gapEveryCard: boolean;
   readOnly: boolean;
   dark: boolean;
   sampleUploads: boolean;
@@ -121,6 +127,8 @@ export function defaultSettings(catalog: Catalog): Settings {
     brandColors: false,
     comments: true,
     wordCount: true,
+    title: false,
+    gapEveryCard: false,
     readOnly: false,
     dark: false,
     sampleUploads: true,
@@ -135,6 +143,8 @@ export function defaultSettings(catalog: Catalog): Settings {
 const FLAGS = [
   "comments",
   "wordCount",
+  "title",
+  "gapEveryCard",
   "readOnly",
   "dark",
   "sampleUploads",
@@ -232,6 +242,8 @@ export function buildSnippet(settings: Settings, catalog: Catalog): string {
   if (settings.toolbarRows !== 2) props.push(`toolbarRows={${settings.toolbarRows}}`);
   if (settings.brandColors || !settings.colorPicker) props.push("colors={colors}");
   if (settings.comments) props.push("comments={comments}");
+  if (settings.title) props.push("title");
+  if (settings.gapEveryCard) props.push('cardGaps="every"');
   if (settings.readOnly) props.push("editable={false}");
   props.push("fileUploader={fileUploader}");
 

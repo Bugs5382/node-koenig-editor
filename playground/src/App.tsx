@@ -25,10 +25,11 @@ import {
   KoenigEditor,
   type KoenigCardName,
   type KoenigCommentEvent,
+  type KoenigDocument,
   type KoenigCommentThread,
 } from "node-koenig-editor";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { catalog, usePreview, useWordCount } from "./catalog";
+import { catalog, PostSettingsMenu, usePreview, useWordCount } from "./catalog";
 import { ConfirmDialog, Toast } from "./dialogs";
 import { EditorErrorBoundary } from "./EditorErrorBoundary";
 import { GuidePage } from "./GuidePage";
@@ -61,6 +62,11 @@ import { broadcastProviderFactory, roomFromAddress } from "./collab";
 import { fileUploader, setSampleUploads } from "./uploader";
 
 // Everything but the text size changes what the composer is built with, so it rebuilds.
+const POST_TOPICS = ["Art", "Books", "Code", "Design", "Film", "Games", "Music"].map((label) => ({
+  id: label.toLowerCase(),
+  label,
+}));
+
 // fonts the demo offers when "sample fonts" is on, all from the system's own families
 const SAMPLE_FONTS = [
   { label: "Serif", value: "Georgia, 'Times New Roman', serif" },
@@ -311,6 +317,13 @@ export function App() {
   }, []);
   const comments = useMemo(() => ({ onEvent, threads: threadsInit }), [onEvent, threadsInit]);
 
+  const [postSettings, setPostSettings] = useState({
+    displayTitle: "",
+    displaySubtitle: "",
+    featuredImageId: "",
+    topicIds: [] as string[],
+  });
+
   const onChange = useCallback((next: unknown) => {
     docRef.current = JSON.stringify(next);
     setState(next);
@@ -329,6 +342,8 @@ export function App() {
   if (catalog.toolbar?.length) optionalProps.toolbar = settings.toolbar;
   if (settings.fonts) optionalProps.fonts = SAMPLE_FONTS;
   if (!settings.spellCheck) optionalProps.spellCheck = false;
+  if (settings.title) optionalProps.title = true;
+  if (settings.gapEveryCard) optionalProps.cardGaps = "every";
   if (settings.collaboration) optionalProps.collaboration = collaboration;
   if (settings.toolbarRows !== 2) optionalProps.toolbarRows = settings.toolbarRows;
   if (settings.brandColors || !settings.colorPicker) optionalProps.colors = colorOptions(settings);
@@ -457,6 +472,34 @@ export function App() {
                   ))}
                 </div>
               </section>
+              {PostSettingsMenu && (
+                <section className="card">
+                  <h2>Post settings</h2>
+                  <p className="muted">
+                    The Medium-style three dots menu, for a host to place next to Publish. Its image
+                    list comes from the document you are editing.
+                  </p>
+                  <div className="row">
+                    <PostSettingsMenu
+                      darkMode={settings.dark}
+                      document={(state ?? initial ?? { root: { children: [] } }) as KoenigDocument}
+                      items={[
+                        {
+                          label: "Share draft link",
+                          onSelect: () => setEvents((all) => ["share draft link", ...all]),
+                        },
+                        {
+                          label: "See revision history",
+                          onSelect: () => setEvents((all) => ["revision history", ...all]),
+                        },
+                      ]}
+                      topics={POST_TOPICS}
+                      value={postSettings}
+                      onChange={setPostSettings}
+                    />
+                  </div>
+                </section>
+              )}
               <section className="card">
                 <h2>Comment threads</h2>
                 <ThreadList events={events} />

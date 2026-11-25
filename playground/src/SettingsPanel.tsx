@@ -158,6 +158,26 @@ export function SettingsPanel({ catalog, onChange, settings }: Props) {
             />{" "}
             brand colours only
           </label>
+          {catalog.posts && (
+            <>
+              <label title="The document's first block is a plain title field">
+                <input
+                  type="checkbox"
+                  checked={settings.title}
+                  onChange={(e) => onChange({ title: e.target.checked })}
+                />{" "}
+                title block
+              </label>
+              <label title="Keep an empty paragraph after every card, like Medium">
+                <input
+                  type="checkbox"
+                  checked={settings.gapEveryCard}
+                  onChange={(e) => onChange({ gapEveryCard: e.target.checked })}
+                />{" "}
+                a line after every card
+              </label>
+            </>
+          )}
           <label>
             <input
               type="checkbox"

@@ -37,6 +37,9 @@ or off, adds its own nodes, wording and theme. Two things to know before changin
 - `src/additions/placement/` - `placeFloating` (viewport-safe menu placement) and the portal the "+" and slash menus use
 - `src/additions/toolbarActions/` - saving and restoring the selection for host toolbar actions
 - `src/koenig-lexical/nodes/GalleryNode*.tsx`, `HeaderNode*.tsx` - the gallery and header cards (ported from upstream); the composer's `cardRenderers` option swaps their layout
+- `src/additions/blocks/` - stable block ids (NodeState under `$`), `getBlocks`, the post fields and `resolveFeaturedImage`; card `exportJSON` spreads `exportNodeState`
+- `src/additions/title/` - the optional title block (`TitleNode` is always registered; `TitlePlugin` runs with the composer's `title`)
+- `src/additions/postSettings/` - the `PostSettingsMenu` (three dots card), controlled and host-agnostic
 - `src/additions/headings/` - the H1 to H5 limit
 - `src/additions/wordCount/` - `getWordCount`, `countWords`, `getReadingTime` and the `useKoenigWordCount` hook
 - `src/additions/comments/` - inline comment threads on mark nodes: store, plugin, hook (opt-in through the composer's `comments`)

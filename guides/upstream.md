@@ -40,6 +40,10 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   browser's own player, a captions track and a transcript, no loop, autoplay or outside embeds.
 - Tables: `@lexical/table`'s `table`, `tablerow` and `tablecell` are registered, with Lexical's
   table plugin and a Table entry in the "+" and slash menus (`src/additions/table/`).
+- Blocks: every top-level block saves a stable id (Lexical NodeState under `$`); the generated card
+  nodes and `aside` now write and read it. An optional `title` block and `cardGaps` are additions
+  (`src/additions/blocks/`, `title/`, `cardSpace/`), and so is the post settings menu
+  (`src/additions/postSettings/`). There is still no embed card; one would fetch from outside.
 - Collaboration: the composer takes a `collaboration` prop instead of opening its own websocket.
 - Markdown paste converts with `@lexical/markdown` rather than upstream's Markdown renderer.
 - The card menu's links to upstream's help pages are gone.
