@@ -259,4 +259,14 @@ describe("the host's own items and wording", () => {
     expect(screen.getByLabelText("Anzeigetitel")).toBeTruthy();
     expect(screen.getByLabelText("Display subtitle")).toBeTruthy();
   });
+
+  it("lines the card up with the end of the button by default, or the start", () => {
+    render(<Harness />);
+    open();
+    expect(document.querySelector("[data-kg-post-settings-panel]")?.className).toContain("right-0");
+    cleanup();
+    render(<Harness align="start" />);
+    open();
+    expect(document.querySelector("[data-kg-post-settings-panel]")?.className).toContain("left-0");
+  });
 });

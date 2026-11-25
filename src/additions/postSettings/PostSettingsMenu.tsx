@@ -58,6 +58,8 @@ export interface PostSettingsMenuProps {
   strings?: Partial<PostSettingsStrings>;
   disabled?: boolean;
   darkMode?: boolean;
+  /** Which edge of the button the card lines up with: `"end"` (default) opens it leftwards from a button at the right of a toolbar, `"start"` rightwards. */
+  align?: "start" | "end";
   className?: string;
 }
 
@@ -86,6 +88,7 @@ const BUTTON =
  * about where the post is saved. Place it next to the host's Publish or Save button.
  */
 export const PostSettingsMenu = ({
+  align = "end",
   className,
   darkMode = false,
   disabled = false,
@@ -173,7 +176,7 @@ export const PostSettingsMenu = ({
         <div
           ref={panel}
           aria-label={text.title}
-          className="absolute right-0 top-full z-50 mt-2 max-h-[80vh] w-[34rem] max-w-[90vw] overflow-y-auto rounded-lg border border-grey-300 bg-white p-4 text-left shadow-lg dark:border-grey-800 dark:bg-grey-950"
+          className={`absolute ${align === "end" ? "right-0" : "left-0"} top-full z-50 mt-2 max-h-[80vh] w-[34rem] max-w-[90vw] overflow-y-auto rounded-lg border border-grey-300 bg-white p-4 text-left shadow-lg dark:border-grey-800 dark:bg-grey-950`}
           data-kg-post-settings-panel
           id={`${id}-panel`}
           role="dialog"

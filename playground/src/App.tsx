@@ -481,6 +481,7 @@ export function App() {
                   </p>
                   <div className="row">
                     <PostSettingsMenu
+                      align="start"
                       darkMode={settings.dark}
                       document={(state ?? initial ?? { root: { children: [] } }) as KoenigDocument}
                       items={[

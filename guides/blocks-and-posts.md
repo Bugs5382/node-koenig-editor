@@ -107,6 +107,7 @@ import { PostSettingsMenu } from "node-koenig-editor";
   strings={{ button: "Settings" }} // any part; the rest stays English
   disabled={false}
   darkMode={false}
+  align="end" // "start" opens the card rightwards
 />;
 ```
 

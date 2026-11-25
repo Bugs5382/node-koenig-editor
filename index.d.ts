@@ -1224,6 +1224,8 @@ export interface KoenigPostSettingsValue {
   topicIds: string[];
 }
 export interface KoenigPostSettingsProps {
+  /** Which edge of the button the card lines up with: `"end"` (default) opens it leftwards, `"start"` rightwards. */
+  align?: "end" | "start";
   className?: string;
   darkMode?: boolean;
   disabled?: boolean;
