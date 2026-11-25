@@ -88,18 +88,19 @@ class BadgeNode extends DecoratorNode<JSX.Element> {
 }
 
 describe("cards", () => {
-  it("lists every shipped card when the host picks none", async () => {
+  it("lists every shipped card when the host picks none, except the opt-in embed card", async () => {
     const { api } = await mount();
     const labels = await openSlashMenu(api);
-    for (const card of KOENIG_CARD_NAMES) {
+    for (const card of KOENIG_CARD_NAMES.filter((name) => name !== "embed")) {
       expect(labels).toContain(DEFAULT_STRINGS.cards[card].label);
     }
+    expect(labels).not.toContain(DEFAULT_STRINGS.cards.embed.label);
   });
 
   it("leaves a card the host did not pick out of the menus and the editor", async () => {
     const { api } = await mount({ composer: { cards: ["image", "divider"] } });
     const labels = await openSlashMenu(api);
-    expect(labels).toEqual(expect.arrayContaining(["Image", "Divider"]));
+    expect(labels).toEqual(expect.arrayContaining(["Image", "Section break"]));
     expect(labels).not.toContain("Callout");
     expect(labels).not.toContain("Toggle");
     expect(labels).not.toContain("Table");
@@ -145,7 +146,7 @@ describe("strings", () => {
     const labels = await openSlashMenu(api);
     expect(labels).toContain("Picture");
     expect(labels).not.toContain("Image");
-    expect(labels).toContain("Divider");
+    expect(labels).toContain("Section break");
   });
 });
 

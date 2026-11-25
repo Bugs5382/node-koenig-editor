@@ -37,13 +37,15 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   no version 1 controls), and both take a host layout through `cardRenderers`.
 - File, video and audio: the file card is upstream's, without the email table. Video and audio are
   written for this package (upstream's depend on Ghost's thumbnails and player script): the
-  browser's own player, a captions track and a transcript, no loop, autoplay or outside embeds.
+  browser's own player, a captions track and a transcript, no loop, autoplay or outside embeds. The
+  embed card for linked video is also written for this package: opt-in, with a host allow-list, and
+  it loads nothing from the video site until the reader presses play.
 - Tables: `@lexical/table`'s `table`, `tablerow` and `tablecell` are registered, with Lexical's
   table plugin and a Table entry in the "+" and slash menus (`src/additions/table/`).
 - Blocks: every top-level block saves a stable id (Lexical NodeState under `$`); the generated card
   nodes and `aside` now write and read it. An optional `title` block and `cardGaps` are additions
   (`src/additions/blocks/`, `title/`, `cardSpace/`), and so is the post settings menu
-  (`src/additions/postSettings/`). There is still no embed card; one would fetch from outside.
+  (`src/additions/postSettings/`).
 - Collaboration: the composer takes a `collaboration` prop instead of opening its own websocket.
 - Markdown paste converts with `@lexical/markdown` rather than upstream's Markdown renderer.
 - The card menu's links to upstream's help pages are gone.
@@ -51,7 +53,7 @@ one, apply the change by hand, and update the commit here. Upstream history is n
   card selection, drag to reorder, remote carets, and the image, callout, toggle, divider and
   aside cards.
 - Removed: cards that need a Ghost site or service (membership, signup, product, paywall, email
-  and email CTA, call to action, bookmark, embed,
+  and email CTA, call to action, bookmark, upstream's embed (oEmbed fetch),
   HTML, Transistor, Ghost's code block card), the GIF and Unsplash pickers, the Pintura
   image editor (replaced by a small canvas editor), the upstream emoji picker (replaced by an
   offline one), the TK and at-link nodes, replacement strings, the

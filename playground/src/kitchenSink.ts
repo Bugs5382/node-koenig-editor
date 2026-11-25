@@ -135,7 +135,7 @@ const CARD_NODES: Record<string, () => CardNode[]> = {
       ],
     },
   ],
-  divider: () => [{ type: "horizontalrule", version: 1 }],
+  divider: () => [{ type: "horizontalrule", version: 1, variant: "dots" }],
   table: () => [
     table([
       ["Card", "Add it with"],
@@ -177,6 +177,15 @@ const CARD_NODES: Record<string, () => CardNode[]> = {
       alignment: "center",
     },
   ],
+  // A link, not a player: the card loads nothing from the video site until play is pressed.
+  embed: () => [
+    {
+      type: "embed",
+      version: 1,
+      url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      title: "Big Buck Bunny, a short film",
+    },
+  ],
   markdown: () => [
     {
       type: "markdown",
@@ -202,6 +211,7 @@ const ORDER = [
   "file",
   "audio",
   "video",
+  "embed",
 ];
 
 /** The kitchen sink as saved-state JSON. `available` is what the package has, `enabled` what is on. */
@@ -274,15 +284,20 @@ const TRY: Record<TryId, { label: string; hint: string; needs: string | null }> 
     hint: "Add and remove items; press an arrow to open one. There is no limit on how many.",
     needs: "toggleGroup",
   },
-  divider: {
-    label: "Divider",
-    hint: "Select the line and press Backspace to remove it.",
+  "section-break": {
+    label: "Section break",
+    hint: "Select the three dots and press Backspace to remove them. /line adds a plain line.",
     needs: "divider",
   },
   table: {
     label: "Table",
     hint: "Click in a cell: a toolbar above it adds and removes rows and columns.",
     needs: "table",
+  },
+  embed: {
+    label: "Embed",
+    hint: "Nothing loads from YouTube until you press play. Select the card to change its link or title.",
+    needs: "embed",
   },
   file: {
     label: "File",

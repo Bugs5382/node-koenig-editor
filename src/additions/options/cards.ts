@@ -40,6 +40,7 @@ export const KOENIG_CARD_NAMES: readonly KoenigCardName[] = [
   "file",
   "video",
   "audio",
+  "embed",
 ];
 
 // The node types each card registers. Leaving a card out leaves these out, and
@@ -49,6 +50,7 @@ export const CARD_NODE_TYPES: Record<KoenigCardName, readonly string[]> = {
   audio: ["audio"],
   callout: ["callout"],
   divider: ["horizontalrule"],
+  embed: ["embed"],
   file: ["file"],
   gallery: ["gallery"],
   header: ["header"],

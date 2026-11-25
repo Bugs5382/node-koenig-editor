@@ -127,7 +127,14 @@ const KoenigComposableEditor = ({
             <MarkdownPastePlugin />
             <HeadingLimitPlugin />
             <BlockIdPlugin />
-            {title && !isNested && <TitlePlugin placeholder={(typeof title === 'object' && title.placeholder) || strings.titlePlaceholder} />}
+            {title && !isNested && (
+                <TitlePlugin
+                    placeholder={(typeof title === 'object' && title.placeholder) || strings.titlePlaceholder}
+                    subtitle={typeof title === 'object' && title.subtitle
+                        ? ((typeof title.subtitle === 'object' && title.subtitle.placeholder) || strings.subtitlePlaceholder)
+                        : null}
+                />
+            )}
             {!readOnly && <CardSpacePlugin gaps={cardGaps} />}
             {children}
         </div>

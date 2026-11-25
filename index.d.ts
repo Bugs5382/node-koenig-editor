@@ -42,6 +42,7 @@ export type KoenigCardName =
   | "button"
   | "callout"
   | "divider"
+  | "embed"
   | "file"
   | "gallery"
   | "header"
@@ -246,10 +247,14 @@ export interface KoenigStrings {
   nestedPlaceholder: string;
   /** The title block's placeholder, when the composer's `title` option is on. */
   titlePlaceholder: string;
+  /** The subtitle block's placeholder, when `title: { subtitle: true }` is on. */
+  subtitlePlaceholder: string;
   errorFallback: string;
   close: string;
   searching: string;
   cards: Record<KoenigCardName, KoenigCardText>;
+  /** The plain-line entry of the "+" and "/" menus. `cards.divider` words the section break (three dots). */
+  dividerLine: KoenigCardText;
   /** The Emoji entry of the "+" and "/" menus. Typing `/emoji` anywhere opens the same picker. */
   emoji: KoenigCardText;
   /** The Preview button, and the reader simulation's controls. */
@@ -462,6 +467,8 @@ export interface KoenigStrings {
   image: {
     altPlaceholder: string;
     captionPlaceholder: string;
+    /** Shown on the card when a chosen file is not a picture. `{name}` is the file's name. */
+    decodeError: string;
     dropHere: string;
     dropManyHere: string;
     dropToGallery: string;
@@ -583,8 +590,33 @@ export interface KoenigStrings {
     /** `{name}` is replaced with the file name. */
     typeError: string;
   };
-  video: KoenigMediaStrings & { captionPlaceholder: string };
+  video: KoenigMediaStrings & {
+    captionPlaceholder: string;
+    /** Shown when a poster address is not http, https or a path, or an uploaded file is not a picture. */
+    posterError: string;
+    /** Names the poster address field. */
+    posterLabel: string;
+    posterRemove: string;
+    posterUpload: string;
+  };
   audio: KoenigMediaStrings & { titlePlaceholder: string };
+  /** The embed card for linked video (opt-in). `{hosts}` is the names of the sites on the list, `{host}`
+   *  one site's name, `{title}` the title (or the site's name). */
+  embed: {
+    embedButton: string;
+    invalid: string;
+    needsParent: string;
+    notAllowed: string;
+    notVideo: string;
+    play: string;
+    privacy: string;
+    refusedSaved: string;
+    titleLabel: string;
+    titlePlaceholder: string;
+    unsafe: string;
+    urlLabel: string;
+    urlPlaceholder: string;
+  };
   callout: { background: string; emoji: string; placeholder: string; textColor: string };
   toggle: {
     /** The reader's button when the toggle is open. */
@@ -660,6 +692,63 @@ export interface FileUploader {
     progress: number;
     upload: (files: File[] | FileList) => Promise<{ fileName?: string; url: string }[] | null>;
   };
+}
+
+/** One video site the embed card may play; the host app supplies the list as `embedHosts`. */
+export interface KoenigEmbedHost {
+  /** A short id: `youtube`. */
+  id: string;
+  /** The name people see: `YouTube`. */
+  label: string;
+  /** The hostnames a link to this site may have, lowercase, no port. Matched exactly. */
+  hostnames: readonly string[];
+  /** Set when the player refuses to load without the page's domain (Twitch): a link is refused until
+   *  the host app gives `embedParent`. */
+  needsParent?: boolean;
+  /** Turns a link on one of `hostnames` into the https address of the site's player, or `null` when
+   *  it is not a video. Plain string work: it must not touch the network. */
+  parse: (url: URL, context: { parent: string }) => string | null;
+}
+
+/** What a good link becomes. */
+export interface KoenigEmbedSource {
+  host: string;
+  label: string;
+  /** The address the iframe loads, only after the reader presses play. */
+  embedUrl: string;
+}
+
+export type KoenigEmbedRefusal =
+  | "empty"
+  | "invalid"
+  | "unsafe"
+  | "not-allowed"
+  | "not-a-video"
+  | "needs-parent";
+
+export type KoenigEmbedResult =
+  | { ok: true; source: KoenigEmbedSource }
+  | { ok: false; reason: KoenigEmbedRefusal };
+
+/** YouTube (through the privacy-enhanced youtube-nocookie.com domain), Vimeo (with dnt=1) and Twitch. */
+export declare const DEFAULT_EMBED_HOSTS: readonly KoenigEmbedHost[];
+
+/** Checks a link against a list of hosts and returns the player address or the reason it was refused.
+ *  No network call; `parent` is the page's domain for hosts that need it. */
+export declare const parseEmbedUrl: (
+  input: string,
+  hosts?: readonly KoenigEmbedHost[],
+  options?: { parent?: string },
+) => KoenigEmbedResult;
+
+/** What `onUploadError` receives. */
+export interface KoenigUploadError {
+  /** The card that refused the file. */
+  card: "image";
+  file: File | null;
+  /** The plain sentence the card shows, in the host's wording. */
+  message: string;
+  reason: "not-a-picture";
 }
 
 /** How the host wires collaboration: the provider for the main document and every nested
@@ -936,7 +1025,7 @@ export interface KoenigComposerProps {
   /** Options for the gallery card. */
   gallery?: KoenigGalleryOptions;
   cardConfig?: Record<string, unknown>;
-  /** The shipped cards to register, and so list in the menus. Default: all of them. */
+  /** The shipped cards to register, and so list in the menus. Default: all of them except `"embed"`, which is off unless named here. */
   cards?: readonly KoenigCardName[];
   children?: ReactNode;
   /** Inline comment threads anchored on selected text. Off unless given. */
@@ -967,13 +1056,26 @@ export interface KoenigComposerProps {
   /** The base node set the `cards` choice filters. Default: `DEFAULT_NODES`. */
   nodes?: EditorNodes;
   onError?: (error: Error) => void;
+  /** Called when a card refuses a file it was given, after the card has shown its own error: today a
+   *  file chosen for an image card that is not a picture (`reason: "not-a-picture"`). */
+  onUploadError?: (error: KoenigUploadError) => void;
+  /** The sites the embed card (opt-in: name `"embed"` in `cards`) may play, and how each link is read.
+   *  Anything else is refused with a plain error. Default: `DEFAULT_EMBED_HOSTS` (YouTube, Vimeo, Twitch). */
+  embedHosts?: readonly KoenigEmbedHost[];
+  /** The domain of the page that shows the player, for hosts that need it (Twitch). Default: the
+   *  current page's hostname. */
+  embedParent?: string;
   /** The host's wording, laid over the English defaults. */
   strings?: KoenigStringsInput;
   /** An optional title as the document's first block: plain text on one line, always first, saved as
    *  `{ type: "title" }` with a block id like any other block. Off by default. `true` turns it on;
    *  an object also sets the placeholder (default: `strings.titlePlaceholder`). A document saved
-   *  with a title opens in a host that leaves this off, where it shows as a heading. */
-  title?: boolean | { placeholder?: string };
+   *  with a title opens in a host that leaves this off, where it shows as a heading.
+   *  `subtitle` adds an optional one-line subtitle block right under the title, saved as
+   *  `{ type: "subtitle" }` with a block id (off by default; `true`, or `{ placeholder }`, default
+   *  `strings.subtitlePlaceholder`). Enter in the title goes to the subtitle, Enter in the subtitle
+   *  goes to the body. */
+  title?: boolean | { placeholder?: string; subtitle?: boolean | { placeholder?: string } };
   /** Where the editor keeps an empty paragraph so the cursor can always reach a card. `"ends"` (the
    *  default): above a first card and below a last one. `"every"`: also after every card, the code
    *  block and the table, the way Medium does, so no two cards ever touch. */

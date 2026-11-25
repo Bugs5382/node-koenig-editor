@@ -67,6 +67,7 @@ export class VideoNode extends BaseVideoNode {
                     initialFile={this.__initialFile}
                     kind="video"
                     nodeKey={this.getKey()}
+                    poster={this.poster}
                     src={this.src}
                     textValue={this.caption}
                     trackLabel={this.trackLabel}

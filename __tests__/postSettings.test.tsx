@@ -128,6 +128,74 @@ describe("opening and closing", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
+  it("a click outside closes it and the same click reaches what was clicked", () => {
+    const saved = vi.fn();
+    render(
+      <>
+        <Harness />
+        <button type="button" onClick={saved}>
+          Save draft
+        </button>
+      </>,
+    );
+    open();
+    const save = screen.getByRole("button", { name: "Save draft" });
+    // the whole press, the way a mouse does it: down, up, click
+    fireEvent.mouseDown(save);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.mouseUp(save);
+    fireEvent.click(save);
+    expect(saved).toHaveBeenCalledTimes(1);
+  });
+
+  it("closes even when what was clicked stops the mouse-down from travelling", () => {
+    const saved = vi.fn();
+    render(
+      <>
+        <Harness />
+        <button
+          type="button"
+          onClick={saved}
+          onMouseDown={(event) => event.nativeEvent.stopPropagation()}
+        >
+          Save draft
+        </button>
+      </>,
+    );
+    open();
+    const save = screen.getByRole("button", { name: "Save draft" });
+    fireEvent.mouseDown(save);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(save);
+    expect(saved).toHaveBeenCalledTimes(1);
+  });
+
+  it("a touch outside closes it too, and the click still lands", () => {
+    const saved = vi.fn();
+    render(
+      <>
+        <Harness />
+        <button type="button" onClick={saved}>
+          Save draft
+        </button>
+      </>,
+    );
+    open();
+    const save = screen.getByRole("button", { name: "Save draft" });
+    fireEvent.pointerDown(save, { pointerType: "touch" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(save);
+    expect(saved).toHaveBeenCalledTimes(1);
+  });
+
+  it("a press inside the card does not close it", () => {
+    render(<Harness />);
+    open();
+    fireEvent.mouseDown(screen.getByRole("dialog"));
+    fireEvent.pointerDown(screen.getByRole("dialog"));
+    expect(screen.queryByRole("dialog")).not.toBeNull();
+  });
+
   it("does not open when disabled", () => {
     render(<Harness disabled />);
     expect(

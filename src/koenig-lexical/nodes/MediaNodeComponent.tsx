@@ -27,6 +27,7 @@ function MediaNodeComponent({
     src,
     textValue,
     transcript,
+    poster,
     trackSrc,
     trackLang,
     trackLabel,
@@ -42,12 +43,16 @@ function MediaNodeComponent({
     const {isSelected} = React.useContext(CardContext);
     const fileInputRef = React.useRef();
     const trackInputRef = React.useRef();
+    const posterInputRef = React.useRef();
     const [showSnippetToolbar, setShowSnippetToolbar] = React.useState(false);
     const [problem, setProblem] = React.useState('');
 
     const uploader = fileUploader.useFileUpload(kind);
     // captions are small text files; hosts that only know media types use their 'file' rule
     const trackUploader = fileUploader.useFileUpload('file');
+    // the video card's poster is a picture, uploaded the way an image card's is
+    const posterUploader = fileUploader.useFileUpload('image');
+    const [posterProblem, setPosterProblem] = React.useState('');
     const rule = fileUploader.fileTypes?.[kind];
 
     const update = React.useCallback((values) => {
@@ -99,6 +104,33 @@ function MediaNodeComponent({
         }
     };
 
+    const setPoster = (value) => {
+        const address = value.trim();
+        if (address && !safeMediaUrl(address)) {
+            setPosterProblem(text.posterError);
+            return;
+        }
+        setPosterProblem('');
+        update({poster: address});
+    };
+
+    const uploadPoster = async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+            return;
+        }
+        if (!/^image\//.test(file.type)) {
+            setPosterProblem(text.posterError);
+            return;
+        }
+        setPosterProblem('');
+        const result = await posterUploader.upload([file]);
+        const url = result?.[0]?.url;
+        if (url) {
+            update({poster: url});
+        }
+    };
+
     const dragHandler = useFileDragAndDrop({handleDrop: upload});
 
     React.useEffect(() => {
@@ -126,7 +158,8 @@ function MediaNodeComponent({
 
     const safeSrc = safeMediaUrl(src);
     const safeTrack = safeMediaUrl(trackSrc);
-    const errors = [...(problem ? [{message: problem}] : []), ...(uploader.errors || []), ...(trackUploader.errors || [])];
+    const safePoster = kind === 'video' ? safeMediaUrl(poster) : '';
+    const errors = [...(problem ? [{message: problem}] : []), ...(uploader.errors || []), ...(trackUploader.errors || []), ...(kind === 'video' ? (posterUploader.errors || []) : [])];
     const Player = kind;
     // a reader sees the player and the text, not the fields, the warning or the settings
     const editable = useKoenigEditable();
@@ -157,6 +190,7 @@ function MediaNodeComponent({
                         controls
                         data-testid={`${kind}-card-populated`}
                         height={kind === 'video' && width && height ? height : undefined}
+                        poster={safePoster || undefined}
                         preload="metadata"
                         src={safeSrc}
                         tabIndex={0}
@@ -234,6 +268,49 @@ function MediaNodeComponent({
                                     onChange={event => update({trackLabel: event.target.value})}
                                 />
                             </div>
+                            {kind === 'video' && (
+                                <div className="flex flex-wrap items-center gap-2" data-kg-poster-settings>
+                                    <input
+                                        aria-label={text.posterLabel}
+                                        className={`${field} min-w-[12rem] flex-1 rounded-md border border-grey/30 px-2 py-1`}
+                                        data-kg-media-field="poster"
+                                        defaultValue={poster}
+                                        placeholder={text.posterLabel}
+                                        onChange={event => setPoster(event.target.value)}
+                                    />
+                                    <button
+                                        className="rounded-md border border-grey/30 px-3 py-1 font-sans text-sm text-grey-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-selection dark:text-grey-200"
+                                        data-kg-poster-upload
+                                        type="button"
+                                        onClick={() => openFileSelection({fileInputRef: posterInputRef})}
+                                    >
+                                        {text.posterUpload}
+                                    </button>
+                                    {safePoster && (
+                                        <button
+                                            className="rounded-md border border-grey/30 px-3 py-1 font-sans text-sm text-grey-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-selection dark:text-grey-200"
+                                            data-kg-poster-remove
+                                            type="button"
+                                            onClick={() => setPoster('')}
+                                        >
+                                            {text.posterRemove}
+                                        </button>
+                                    )}
+                                    <input
+                                        ref={posterInputRef}
+                                        accept="image/*"
+                                        hidden={true}
+                                        name="poster-input"
+                                        type="file"
+                                        onChange={uploadPoster}
+                                    />
+                                    {posterProblem && (
+                                        <p className="w-full font-sans text-sm font-semibold text-red" data-kg-poster-error role="alert">
+                                            {posterProblem}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                             <input
                                 ref={trackInputRef}
                                 accept=".vtt,text/vtt"

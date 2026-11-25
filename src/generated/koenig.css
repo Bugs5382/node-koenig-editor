@@ -1365,6 +1365,10 @@
     min-width: calc(4.4 * var(--kg-rem, 0.625rem));
 }
 
+.koenig-lexical .min-w-\[12rem\] {
+    min-width: calc(12 * var(--kg-rem, 0.625rem));
+}
+
 .koenig-lexical .min-w-\[16rem\] {
     min-width: calc(16 * var(--kg-rem, 0.625rem));
 }
@@ -2274,6 +2278,11 @@
 .koenig-lexical .py-1\.5 {
     padding-top: calc(0.6 * var(--kg-rem, 0.625rem));
     padding-bottom: calc(0.6 * var(--kg-rem, 0.625rem));
+}
+
+.koenig-lexical .py-10 {
+    padding-top: calc(4 * var(--kg-rem, 0.625rem));
+    padding-bottom: calc(4 * var(--kg-rem, 0.625rem));
 }
 
 .koenig-lexical .py-2 {
@@ -3483,6 +3492,49 @@ em-emoji-picker {
     .koenig-lexical [class*="kg-token-"] { color: CanvasText; }
 }
 
+/* Section break: three centred dots (the divider card's default look). Tokens, all optional:
+   --kg-section-break-dot-size, --kg-section-break-gap, --kg-section-break-color,
+   --kg-section-break-space (room above and below). */
+.koenig-lexical .kg-section-break {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--kg-section-break-gap, calc(1.2 * var(--kg-rem, 0.625rem)));
+    width: 100%;
+    padding: var(--kg-section-break-space, calc(1.2 * var(--kg-rem, 0.625rem))) 0;
+}
+
+.koenig-lexical .kg-section-break > span {
+    display: block;
+    flex: none;
+    width: var(--kg-section-break-dot-size, calc(0.6 * var(--kg-rem, 0.625rem)));
+    height: var(--kg-section-break-dot-size, calc(0.6 * var(--kg-rem, 0.625rem)));
+    border-radius: 50%;
+    background-color: var(--kg-section-break-color, var(--grey-600));
+}
+
+.koenig-lexical.dark .kg-section-break > span,
+.koenig-lexical > .dark .kg-section-break > span,
+.dark .koenig-lexical .kg-section-break > span {
+    background-color: var(--kg-section-break-color, var(--grey-500));
+}
+
+/* On paper the dots print in black, and the background colour is not dropped by the browser. */
+@media print {
+    .koenig-lexical .kg-section-break > span {
+        background-color: var(--kg-section-break-color, #000) !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+@media (forced-colors: active) {
+    .koenig-lexical .kg-section-break > span {
+        background-color: CanvasText;
+        forced-color-adjust: none;
+    }
+}
+
 /* Content Styles
     /*
     /* We use only margin-top to set the vertical spacings. The styles below
@@ -4638,6 +4690,22 @@ em-emoji-picker {
     pointer-events: none;
     color: var(--grey-500);
     font-weight: 700;
+}
+
+/* Subtitle block (the composer's `title: { subtitle: true }` option), under the title */
+.koenig-lexical h2.kg-subtitle {
+    margin-top: 0;
+    position: relative;
+    font-weight: 400;
+    color: var(--grey-700);
+}
+
+.koenig-lexical h2.kg-subtitle[data-kg-empty]::before {
+    content: attr(data-kg-placeholder);
+    position: absolute;
+    pointer-events: none;
+    color: var(--grey-500);
+    font-weight: 400;
 }
 
 /* The reader's view (preview): a card is not outlined when hovered or selected. */

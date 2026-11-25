@@ -80,7 +80,7 @@ describe.each(Object.keys(configs))("every card the slash menu offers (%s)", (na
     expect(labels).toEqual(
       expect.arrayContaining([
         "Image",
-        "Divider",
+        "Section break",
         "Table",
         "Callout",
         "Toggle",

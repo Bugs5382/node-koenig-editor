@@ -152,7 +152,7 @@ const SAMPLES: Record<string, Record<string, unknown>> = {
     fileSize: 2048,
     showIcon: true,
   },
-  horizontalrule: { type: "horizontalrule", version: 1 },
+  horizontalrule: { type: "horizontalrule", version: 1, variant: "dots" },
   callout: {
     type: "callout",
     version: 1,

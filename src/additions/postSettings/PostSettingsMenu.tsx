@@ -123,11 +123,18 @@ export const PostSettingsMenu = ({
     if (!open) return undefined;
     // focus moves into the card, onto its first field
     panel.current?.querySelector<HTMLElement>("input, button")?.focus();
-    const onPointer = (event: MouseEvent) => {
+    // A press outside closes the card. The listener is in the capture phase, so something that
+    // stops the event from travelling still closes it, and it never prevents the default or stops
+    // the event: the same click goes on to reach what was pressed (Save draft, for example).
+    const onPointer = (event: Event) => {
       if (root.current && !root.current.contains(event.target as Node)) setOpen(false);
     };
-    window.document.addEventListener("mousedown", onPointer);
-    return () => window.document.removeEventListener("mousedown", onPointer);
+    window.document.addEventListener("pointerdown", onPointer, true);
+    window.document.addEventListener("mousedown", onPointer, true);
+    return () => {
+      window.document.removeEventListener("pointerdown", onPointer, true);
+      window.document.removeEventListener("mousedown", onPointer, true);
+    };
   }, [open]);
 
   useEffect(() => {

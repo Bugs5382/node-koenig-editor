@@ -21,7 +21,7 @@
     "*.css"
   ],
   "config": {
-    "packMaxUnpackedBytes": 1110000,
+    "packMaxUnpackedBytes": 1200000,
     "packMaxGrowthPercent": 25
   },
   "engines": {

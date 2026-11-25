@@ -1,6 +1,16 @@
 import {$getNodeByKey} from 'lexical';
 import {getImageDimensions} from './getImageDimensions';
 
+// Thrown when a chosen file cannot be shown as a picture (a text file renamed .png, a broken file).
+// The image card catches it and shows a plain error; nothing is uploaded.
+export class ImageDecodeError extends Error {
+    constructor(file) {
+        super('The file is not a picture');
+        this.name = 'ImageDecodeError';
+        this.file = file;
+    }
+}
+
 export const imageUploadHandler = async (files, nodeKey, editor, upload) => {
     if (!files) {
         return;
@@ -16,7 +26,19 @@ export const imageUploadHandler = async (files, nodeKey, editor, upload) => {
     }
 
     // use the local object URL to grab metadata
-    const {width, height} = await getImageDimensions(previewUrl);
+    let dimensions;
+    try {
+        dimensions = await getImageDimensions(previewUrl);
+    } catch {
+        // not a picture: take the preview away and let the card say so, rather than dropping the file
+        await editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            node.previewSrc = null;
+        });
+        URL.revokeObjectURL?.(previewUrl);
+        throw new ImageDecodeError(files[0]);
+    }
+    const {width, height} = dimensions;
 
     // perform the actual upload
     const result = await upload(files);

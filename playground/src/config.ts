@@ -47,11 +47,20 @@ export const PRESETS = [
 
 export type PresetId = (typeof PRESETS)[number]["id"];
 
+/** Cards that are off in the package until a host names them, so off here until switched on. */
+export const OPT_IN_CARDS: readonly string[] = ["embed"];
+
+/** The package's own default: every card except the opt-in ones. */
+export const defaultCards = (catalog: Catalog): string[] =>
+  catalog.cards.filter((card) => !OPT_IN_CARDS.includes(card));
+
 /** The cards a preset turns on, in the package's order. */
 export function applyPreset(id: PresetId, catalog: Catalog): string[] {
   const preset = PRESETS.find((p) => p.id === id);
   const wanted: readonly string[] | null = preset?.cards ?? null;
-  return catalog.cards.filter((card) => !wanted || wanted.includes(card));
+  return catalog.cards.filter((card) =>
+    wanted ? wanted.includes(card) : !OPT_IN_CARDS.includes(card),
+  );
 }
 
 /** The preset whose cards are exactly `cards` (as a list in the package's order), or "custom". */
@@ -92,6 +101,8 @@ export interface Settings {
   wordCount: boolean;
   /** The document's first block is a title (the composer's `title`). */
   title: boolean;
+  /** A subtitle under the title (the composer's `title: { subtitle: true }`); needs the title. */
+  subtitle: boolean;
   /** An empty paragraph after every card (the composer's `cardGaps: "every"`). */
   gapEveryCard: boolean;
   readOnly: boolean;
@@ -116,7 +127,7 @@ export type PreviewWidth = (typeof PREVIEW_WIDTHS)[number];
 
 export function defaultSettings(catalog: Catalog): Settings {
   return {
-    cards: [...catalog.cards],
+    cards: defaultCards(catalog),
     tools: [...catalog.tools],
     toolbar: [...(catalog.toolbar ?? [])],
     fonts: false,
@@ -128,6 +139,7 @@ export function defaultSettings(catalog: Catalog): Settings {
     comments: true,
     wordCount: true,
     title: false,
+    subtitle: false,
     gapEveryCard: false,
     readOnly: false,
     dark: false,
@@ -144,6 +156,7 @@ const FLAGS = [
   "comments",
   "wordCount",
   "title",
+  "subtitle",
   "gapEveryCard",
   "readOnly",
   "dark",
@@ -229,7 +242,8 @@ const list = (names: readonly string[]) => `[${names.map((n) => JSON.stringify(n
 /** The host component that does what the checkboxes currently do. */
 export function buildSnippet(settings: Settings, catalog: Catalog): string {
   const props: string[] = [];
-  if (!sameList(settings.cards, catalog.cards)) props.push(`cards={${list(settings.cards)}}`);
+  if (!sameList(settings.cards, defaultCards(catalog)))
+    props.push(`cards={${list(settings.cards)}}`);
   if (catalog.tools.length && !sameList(settings.tools, catalog.tools)) {
     props.push(`tools={${list(settings.tools)}}`);
   }
@@ -242,7 +256,7 @@ export function buildSnippet(settings: Settings, catalog: Catalog): string {
   if (settings.toolbarRows !== 2) props.push(`toolbarRows={${settings.toolbarRows}}`);
   if (settings.brandColors || !settings.colorPicker) props.push("colors={colors}");
   if (settings.comments) props.push("comments={comments}");
-  if (settings.title) props.push("title");
+  if (settings.title) props.push(settings.subtitle ? "title={{ subtitle: true }}" : "title");
   if (settings.gapEveryCard) props.push('cardGaps="every"');
   if (settings.readOnly) props.push("editable={false}");
   props.push("fileUploader={fileUploader}");

@@ -158,7 +158,7 @@ describe("rendered output", () => {
     expect(out.outerHTML).not.toMatch(/ghost|spacergif|youtube|vimeo/i);
   });
 
-  it("video: no autoplay, loop or outside poster; unsafe sources are dropped", () => {
+  it("video: no autoplay or loop; unsafe sources are dropped", () => {
     const out = renderVideoNode(
       {
         caption: "",
