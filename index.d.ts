@@ -244,6 +244,8 @@ export interface KoenigMediaStrings {
 export interface KoenigStrings {
   placeholder: string;
   nestedPlaceholder: string;
+  /** The title block's placeholder, when the composer's `title` option is on. */
+  titlePlaceholder: string;
   errorFallback: string;
   close: string;
   searching: string;
@@ -967,6 +969,15 @@ export interface KoenigComposerProps {
   onError?: (error: Error) => void;
   /** The host's wording, laid over the English defaults. */
   strings?: KoenigStringsInput;
+  /** An optional title as the document's first block: plain text on one line, always first, saved as
+   *  `{ type: "title" }` with a block id like any other block. Off by default. `true` turns it on;
+   *  an object also sets the placeholder (default: `strings.titlePlaceholder`). A document saved
+   *  with a title opens in a host that leaves this off, where it shows as a heading. */
+  title?: boolean | { placeholder?: string };
+  /** Where the editor keeps an empty paragraph so the cursor can always reach a card. `"ends"` (the
+   *  default): above a first card and below a last one. `"every"`: also after every card, the code
+   *  block and the table, the way Medium does, so no two cards ever touch. */
+  cardGaps?: "ends" | "every";
   /** The browser's spell check in the editing area. Default: on (not set). `false` switches it off. */
   spellCheck?: boolean;
   /** The language of the text (a BCP 47 tag such as `de`), so the browser checks spelling in it. */
