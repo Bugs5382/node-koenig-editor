@@ -1,6 +1,7 @@
 import {generateDecoratorNode, type DecoratorNodeData, type DecoratorNodeProperty, type DecoratorNodeValueMap} from '../../generate-decorator-node.js';
 import {parseImageNode} from './image-parser.js';
 import {renderImageNode} from './image-renderer.js';
+import {exportNodeState} from '../../../additions/blocks/exportNodeState';
 
 const imageProperties = [
     {name: 'src', default: '', urlType: 'url'},
@@ -38,7 +39,8 @@ export class ImageNode extends generateDecoratorNode({
             alt,
             caption,
             cardWidth,
-            href
+            href,
+            ...exportNodeState(this)
         };
         return dataset;
     }

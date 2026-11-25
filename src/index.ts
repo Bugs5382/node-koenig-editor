@@ -47,3 +47,11 @@ export { useKoenigPreview } from "./additions/preview/PreviewContext";
 export { ImageEditorDialog } from "./additions/imageEditor/ImageEditorDialog";
 export { EmojiPicker } from "./additions/emojiPicker/EmojiPicker";
 export { insertEmoji } from "./additions/emojiPicker/insertEmoji";
+export {
+  EMPTY_POST_META,
+  getBlockById,
+  getBlocks,
+  getPostMeta,
+  resolveFeaturedImage,
+  setPostMeta,
+} from "./additions/blocks/blocks";

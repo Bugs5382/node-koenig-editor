@@ -9,6 +9,7 @@ import MarkdownShortcutPlugin from '../plugins/MarkdownShortcutPlugin';
 import React from 'react';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {EditorPlaceholder} from './ui/EditorPlaceholder';
+import {BlockIdPlugin} from '../../additions/blocks/BlockIdPlugin';
 import {CardSpacePlugin} from '../../additions/cardSpace/CardSpacePlugin';
 import {HeadingLimitPlugin} from '../../additions/headings/HeadingLimitPlugin';
 import {useKoenigPreview} from '../../additions/preview/PreviewContext';
@@ -122,6 +123,7 @@ const KoenigComposableEditor = ({
             {onFocus && <KoenigFocusPlugin onFocus={onFocus} />}
             <MarkdownPastePlugin />
             <HeadingLimitPlugin />
+            <BlockIdPlugin />
             {!readOnly && <CardSpacePlugin />}
             {children}
         </div>

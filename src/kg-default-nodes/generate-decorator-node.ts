@@ -1,5 +1,6 @@
 import {KoenigDecoratorNode} from './KoenigDecoratorNode.js';
 import type {ExportDOMOptions, ExportDOMOutput} from './export-dom.js';
+import {exportNodeState} from '../additions/blocks/exportNodeState';
 import readTextContent from './utils/read-text-content.js';
 import {buildDefaultVisibility, isVisibilityRestricted, migrateOldVisibilityFormat} from './utils/visibility.js';
 import type {LexicalEditor} from 'lexical';
@@ -272,7 +273,10 @@ export function generateDecoratorNode<
                 data[prop.name] = serializedNode[prop.name];
             });
 
-            return new this(data as Partial<DecoratorNodeValueMap<Props, HasVisibility>>);
+            // `updateFromJSON` restores the node's NodeState (its block id) from the `$` key
+            return new this(data as Partial<DecoratorNodeValueMap<Props, HasVisibility>>).updateFromJSON(
+                serializedNode as never
+            );
         }
 
         /**
@@ -290,6 +294,8 @@ export function generateDecoratorNode<
                     return obj;
                 }, {})
             };
+            // NodeState (the block id) is written next to the card's own properties
+            Object.assign(dataset, exportNodeState(this));
             return dataset;
         }
 

@@ -54,7 +54,12 @@ export type KoenigCardName =
 
 /** Features that are not cards. Pass a list as the composer's `tools` to keep only those. */
 export type KoenigTool =
-  "cleanPaste" | "emojiPicker" | "findReplace" | "imageEditor" | "preview" | "shortcuts";
+  | "cleanPaste"
+  | "emojiPicker"
+  | "findReplace"
+  | "imageEditor"
+  | "preview"
+  | "shortcuts";
 
 /** The emoji picker's groups, in tab order. */
 export type KoenigEmojiCategory =
@@ -1128,3 +1133,47 @@ export declare const useKoenigComments: () => {
 
 /** Lexical's editor state, as `onChange` and `registerAPI` hand it over. */
 export type EditorState = LexicalEditorState;
+
+/** A saved document in any of the forms the editor hands over: a JSON string, the object, or an editor state. */
+export type KoenigDocument =
+  | LexicalEditorState
+  | Record<string, unknown>
+  | SerializedEditorState
+  | string;
+/** One top-level block of a document: the same shape for a paragraph, a card or the title. */
+export interface KoenigBlock {
+  /** The type of the block above, `null` for the first. */
+  after: null | string;
+  /** The block's stable id, `""` for a document saved before ids existed. */
+  id: string;
+  /** The block's place in the list, from 0. */
+  index: number;
+  /** The saved node, as it is in the document. */
+  node: Record<string, unknown>;
+  /** The block's text; empty for a card that has none. */
+  text: string;
+  /** The node type: `paragraph`, `heading`, `title`, `image`, `horizontalrule`, and so on. */
+  type: string;
+}
+/** The document's top-level blocks, title and cards included, in order. */
+export declare const getBlocks: (document: KoenigDocument) => KoenigBlock[];
+/** The block with this id, or `null`. */
+export declare const getBlockById: (document: KoenigDocument, id: string) => KoenigBlock | null;
+/** Post-level fields saved beside the block list, in the document. Topics, unlisted and sharing are the host's. */
+export interface KoenigPostMeta {
+  /** Overrides the body title for the homepage, previews and sharing; `""` falls back to the title. */
+  displayTitle: string;
+  /** Overrides the subtitle in the same places; `""` for none. */
+  displaySubtitle: string;
+  /** The id of the image card chosen as the featured image; `""` for none. */
+  featuredImageRef: string;
+}
+export declare const EMPTY_POST_META: KoenigPostMeta;
+export declare const getPostMeta: (document: KoenigDocument) => KoenigPostMeta;
+/** Changes the given post fields; the others keep their value. */
+export declare const setPostMeta: (editor: LexicalEditor, changes: Partial<KoenigPostMeta>) => void;
+/** The image card a `featuredImageRef` points at, or `null` if it is empty, deleted, or not an image card. */
+export declare const resolveFeaturedImage: (
+  document: KoenigDocument,
+  ref?: string,
+) => KoenigBlock | null;
