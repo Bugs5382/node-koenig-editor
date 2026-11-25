@@ -325,7 +325,8 @@ export const DEFAULT_STRINGS: KoenigStrings = {
   image: {
     altPlaceholder: "Type alt text for image (optional)",
     captionPlaceholder: "Type caption for image (optional)",
-    decodeError: "{name} is not a picture that can be shown. Choose a PNG, JPEG, GIF, WebP or SVG file",
+    decodeError:
+      "{name} is not a picture that can be shown. Choose a PNG, JPEG, GIF, WebP or SVG file",
     dropHere: "Drop it here",
     dropManyHere: "Drop them here",
     dropToGallery: "Drop to convert to a gallery",
