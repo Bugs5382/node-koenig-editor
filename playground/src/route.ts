@@ -39,6 +39,7 @@ export const TRY_IDS = [
   "file",
   "video",
   "audio",
+  "embed",
   "button",
   "markdown",
   "image-editor",

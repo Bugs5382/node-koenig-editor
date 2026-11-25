@@ -39,6 +39,45 @@ const catalog: Catalog = {
   tools: ["emojiPicker", "imageEditor"],
 };
 
+describe("the opt-in embed card", () => {
+  const withEmbed: Catalog = { ...catalog, cards: [...catalog.cards, "embed"] };
+
+  it("starts switched off, like the package, and the other cards stay on", () => {
+    expect(defaultSettings(withEmbed).cards).toEqual(catalog.cards);
+    expect(applyPreset("all", withEmbed)).toEqual(catalog.cards);
+    expect(presetOf(catalog.cards, withEmbed)).toBe("all");
+  });
+
+  it("is a switch: it shows in the address and in the host component only when on", () => {
+    expect(serializeSettings(defaultSettings(withEmbed), withEmbed)).toBe("");
+    expect(buildSnippet(defaultSettings(withEmbed), withEmbed)).not.toContain("embed");
+    const on = { ...defaultSettings(withEmbed), cards: [...withEmbed.cards] };
+    expect(serializeSettings(on, withEmbed)).toContain("embed");
+    expect(buildSnippet(on, withEmbed)).toContain('"embed"');
+    expect(parseSettings(serializeSettings(on, withEmbed), withEmbed).cards).toContain("embed");
+  });
+});
+
+describe("the subtitle switch", () => {
+  it("is off by default, and only written when on", () => {
+    expect(defaultSettings(catalog).subtitle).toBe(false);
+    expect(serializeSettings(defaultSettings(catalog), catalog)).toBe("");
+    const on = { ...defaultSettings(catalog), title: true, subtitle: true };
+    expect(serializeSettings(on, catalog)).toContain("subtitle=1");
+    expect(parseSettings(serializeSettings(on, catalog), catalog)).toMatchObject({
+      title: true,
+      subtitle: true,
+    });
+  });
+
+  it("changes the host component's title prop", () => {
+    const titleOnly = { ...defaultSettings(catalog), title: true };
+    expect(buildSnippet(titleOnly, catalog)).toContain("title\n");
+    const both = { ...titleOnly, subtitle: true };
+    expect(buildSnippet(both, catalog)).toContain("title={{ subtitle: true }}");
+  });
+});
+
 describe("settings in the page address", () => {
   it("starts with every card and tool on and the extras off", () => {
     const s = defaultSettings(catalog);

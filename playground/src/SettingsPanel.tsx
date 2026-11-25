@@ -168,6 +168,15 @@ export function SettingsPanel({ catalog, onChange, settings }: Props) {
                 />{" "}
                 title block
               </label>
+              <label title="An optional line under the title: Enter in the title goes to it, Enter in it goes to the body">
+                <input
+                  type="checkbox"
+                  checked={settings.subtitle}
+                  disabled={!settings.title}
+                  onChange={(e) => onChange({ subtitle: e.target.checked })}
+                />{" "}
+                subtitle
+              </label>
               <label title="Keep an empty paragraph after every card, like Medium">
                 <input
                   type="checkbox"

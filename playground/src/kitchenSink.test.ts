@@ -110,6 +110,27 @@ describe("kitchen sink document", () => {
   });
 });
 
+describe("the embed card in the demo", () => {
+  const WITH = [...ALL, "embed"];
+
+  it("is in the kitchen sink only when it is switched on", () => {
+    expect(typesOf(kitchenSink(WITH, ["image", "embed"]))).toContain("embed");
+    expect(typesOf(kitchenSink(WITH, ["image"]))).not.toContain("embed");
+    expect(typesOf(kitchenSink(ALL, null))).not.toContain("embed");
+  });
+
+  it("holds a link to a video, not a player address", () => {
+    const embed = childrenOf(kitchenSink(WITH, ["embed"])).find((n) => n.type === "embed") as Node;
+    expect(String(embed.url)).toMatch(/^https:\/\/www\.youtube\.com\/watch\?v=/);
+    expect(JSON.stringify(embed)).not.toContain("nocookie");
+  });
+
+  it("has a Try it document, when the package has the card", () => {
+    expect(typesOf(tryDocument("embed", WITH)!)).toContain("embed");
+    expect(tryDocument("embed", ALL)).toBeNull();
+  });
+});
+
 describe("try documents", () => {
   it("make a short document for each card, with that card in it", () => {
     for (const id of [
@@ -146,7 +167,7 @@ describe("try documents", () => {
   });
 
   it("has a document for every try id when the package has everything", () => {
-    for (const id of TRY_IDS) expect(tryDocument(id, ALL), id).not.toBeNull();
+    for (const id of TRY_IDS) expect(tryDocument(id, [...ALL, "embed"]), id).not.toBeNull();
   });
 
   const catalog: Catalog = { cards: ALL, tools: ["emojiPicker", "imageEditor"], wordCount: true };

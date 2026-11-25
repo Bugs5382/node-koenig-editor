@@ -342,7 +342,7 @@ export function App() {
   if (catalog.toolbar?.length) optionalProps.toolbar = settings.toolbar;
   if (settings.fonts) optionalProps.fonts = SAMPLE_FONTS;
   if (!settings.spellCheck) optionalProps.spellCheck = false;
-  if (settings.title) optionalProps.title = true;
+  if (settings.title) optionalProps.title = settings.subtitle ? { subtitle: true } : true;
   if (settings.gapEveryCard) optionalProps.cardGaps = "every";
   if (settings.collaboration) optionalProps.collaboration = collaboration;
   if (settings.toolbarRows !== 2) optionalProps.toolbarRows = settings.toolbarRows;

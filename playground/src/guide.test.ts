@@ -44,6 +44,7 @@ const CARDS = [
   "File",
   "Video",
   "Audio",
+  "Embed",
   "Button",
   "Markdown",
 ];
