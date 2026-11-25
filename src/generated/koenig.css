@@ -3483,6 +3483,49 @@ em-emoji-picker {
     .koenig-lexical [class*="kg-token-"] { color: CanvasText; }
 }
 
+/* Section break: three centred dots (the divider card's default look). Tokens, all optional:
+   --kg-section-break-dot-size, --kg-section-break-gap, --kg-section-break-color,
+   --kg-section-break-space (room above and below). */
+.koenig-lexical .kg-section-break {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--kg-section-break-gap, calc(1.2 * var(--kg-rem, 0.625rem)));
+    width: 100%;
+    padding: var(--kg-section-break-space, calc(1.2 * var(--kg-rem, 0.625rem))) 0;
+}
+
+.koenig-lexical .kg-section-break > span {
+    display: block;
+    flex: none;
+    width: var(--kg-section-break-dot-size, calc(0.6 * var(--kg-rem, 0.625rem)));
+    height: var(--kg-section-break-dot-size, calc(0.6 * var(--kg-rem, 0.625rem)));
+    border-radius: 50%;
+    background-color: var(--kg-section-break-color, var(--grey-600));
+}
+
+.koenig-lexical.dark .kg-section-break > span,
+.koenig-lexical > .dark .kg-section-break > span,
+.dark .koenig-lexical .kg-section-break > span {
+    background-color: var(--kg-section-break-color, var(--grey-500));
+}
+
+/* On paper the dots print in black, and the background colour is not dropped by the browser. */
+@media print {
+    .koenig-lexical .kg-section-break > span {
+        background-color: var(--kg-section-break-color, #000) !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+@media (forced-colors: active) {
+    .koenig-lexical .kg-section-break > span {
+        background-color: CanvasText;
+        forced-color-adjust: none;
+    }
+}
+
 /* Content Styles
     /*
     /* We use only margin-top to set the vertical spacings. The styles below

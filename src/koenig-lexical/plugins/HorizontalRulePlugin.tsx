@@ -1,4 +1,4 @@
-import {$createHorizontalRuleNode, INSERT_HORIZONTAL_RULE_COMMAND} from '../nodes/HorizontalRuleNode';
+import {$createHorizontalRuleNode, INSERT_DIVIDER_LINE_COMMAND, INSERT_HORIZONTAL_RULE_COMMAND} from '../nodes/HorizontalRuleNode';
 import {
     $createParagraphNode,
     $getSelection,
@@ -18,38 +18,48 @@ export const HorizontalRulePlugin = () => {
             console.error('HorizontalRulePlugin: HorizontalRuleNode not registered');
             return;
         }
-        return editor.registerCommand(
+        const insert = (variant) => {
+            const selection = $getSelection();
+
+            if (!$isRangeSelection(selection)) {
+                return false;
+            }
+
+            const focusNode = selection.focus.getNode();
+
+            if (focusNode !== null) {
+                const horizontalRuleNode = $createHorizontalRuleNode(variant);
+
+                // insert a paragraph unless we're already on a blank paragraph
+                const selectedNode = selection.focus.getNode();
+                if ($isParagraphNode(selectedNode) && selectedNode.getTextContent() !== '') {
+                    selection.insertParagraph();
+                }
+
+                // insert the horizontal rule before the current/inserted paragraph
+                // so the cursor stays on the blank paragraph
+                selection.focus
+                    .getNode()
+                    .getTopLevelElementOrThrow()
+                    .insertBefore(horizontalRuleNode);
+            }
+
+            return true;
+        };
+        const unregisterBreak = editor.registerCommand(
             INSERT_HORIZONTAL_RULE_COMMAND,
-            () => {
-                const selection = $getSelection();
-
-                if (!$isRangeSelection(selection)) {
-                    return false;
-                }
-
-                const focusNode = selection.focus.getNode();
-
-                if (focusNode !== null) {
-                    const horizontalRuleNode = $createHorizontalRuleNode();
-
-                    // insert a paragraph unless we're already on a blank paragraph
-                    const selectedNode = selection.focus.getNode();
-                    if ($isParagraphNode(selectedNode) && selectedNode.getTextContent() !== '') {
-                        selection.insertParagraph();
-                    }
-
-                    // insert the horizontal rule before the current/inserted paragraph
-                    // so the cursor stays on the blank paragraph
-                    selection.focus
-                        .getNode()
-                        .getTopLevelElementOrThrow()
-                        .insertBefore(horizontalRuleNode);
-                }
-
-                return true;
-            },
+            () => insert('dots'),
             COMMAND_PRIORITY_EDITOR
         );
+        const unregisterLine = editor.registerCommand(
+            INSERT_DIVIDER_LINE_COMMAND,
+            () => insert('line'),
+            COMMAND_PRIORITY_EDITOR
+        );
+        return () => {
+            unregisterBreak();
+            unregisterLine();
+        };
     }, [editor]);
 
     // added markdown shortcut to divider card

@@ -99,7 +99,7 @@ describe("cards", () => {
   it("leaves a card the host did not pick out of the menus and the editor", async () => {
     const { api } = await mount({ composer: { cards: ["image", "divider"] } });
     const labels = await openSlashMenu(api);
-    expect(labels).toEqual(expect.arrayContaining(["Image", "Divider"]));
+    expect(labels).toEqual(expect.arrayContaining(["Image", "Section break"]));
     expect(labels).not.toContain("Callout");
     expect(labels).not.toContain("Toggle");
     expect(labels).not.toContain("Table");
@@ -145,7 +145,7 @@ describe("strings", () => {
     const labels = await openSlashMenu(api);
     expect(labels).toContain("Picture");
     expect(labels).not.toContain("Image");
-    expect(labels).toContain("Divider");
+    expect(labels).toContain("Section break");
   });
 });
 

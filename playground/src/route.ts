@@ -34,7 +34,7 @@ export const TRY_IDS = [
   "callout",
   "toggle",
   "toggle-group",
-  "divider",
+  "section-break",
   "table",
   "file",
   "video",

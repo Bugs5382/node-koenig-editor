@@ -250,6 +250,8 @@ export interface KoenigStrings {
   close: string;
   searching: string;
   cards: Record<KoenigCardName, KoenigCardText>;
+  /** The plain-line entry of the "+" and "/" menus. `cards.divider` words the section break (three dots). */
+  dividerLine: KoenigCardText;
   /** The Emoji entry of the "+" and "/" menus. Typing `/emoji` anywhere opens the same picker. */
   emoji: KoenigCardText;
   /** The Preview button, and the reader simulation's controls. */

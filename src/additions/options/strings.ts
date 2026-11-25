@@ -37,7 +37,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     button: { desc: "Add a call-to-action link", label: "Button" },
     callout: { desc: "Info boxes that stand out", label: "Callout" },
     audio: { desc: "Upload an audio file", label: "Audio" },
-    divider: { desc: "Insert a dividing line", label: "Divider" },
+    divider: { desc: "Insert a section break", label: "Section break" },
     file: { desc: "Upload a downloadable file", label: "File" },
     gallery: { desc: "Create an image gallery", label: "Gallery" },
     header: { desc: "Add a header", label: "Header" },
@@ -48,6 +48,7 @@ export const DEFAULT_STRINGS: KoenigStrings = {
     toggleGroup: { desc: "Add a stack of collapsible items", label: "Toggle group" },
     video: { desc: "Upload a video file", label: "Video" },
   },
+  dividerLine: { desc: "Insert a plain dividing line", label: "Divider line" },
   emoji: { desc: "Insert an emoji, or type /emoji anywhere", label: "Emoji" },
   menu: {
     addCard: "Add a card",

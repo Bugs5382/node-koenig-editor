@@ -135,7 +135,7 @@ const CARD_NODES: Record<string, () => CardNode[]> = {
       ],
     },
   ],
-  divider: () => [{ type: "horizontalrule", version: 1 }],
+  divider: () => [{ type: "horizontalrule", version: 1, variant: "dots" }],
   table: () => [
     table([
       ["Card", "Add it with"],
@@ -274,9 +274,9 @@ const TRY: Record<TryId, { label: string; hint: string; needs: string | null }> 
     hint: "Add and remove items; press an arrow to open one. There is no limit on how many.",
     needs: "toggleGroup",
   },
-  divider: {
-    label: "Divider",
-    hint: "Select the line and press Backspace to remove it.",
+  "section-break": {
+    label: "Section break",
+    hint: "Select the three dots and press Backspace to remove them. /line adds a plain line.",
     needs: "divider",
   },
   table: {

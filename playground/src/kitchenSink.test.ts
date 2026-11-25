@@ -112,9 +112,17 @@ describe("kitchen sink document", () => {
 
 describe("try documents", () => {
   it("make a short document for each card, with that card in it", () => {
-    for (const id of ["image", "gallery", "header", "callout", "toggle", "divider", "table"]) {
+    for (const id of [
+      "image",
+      "gallery",
+      "header",
+      "callout",
+      "toggle",
+      "section-break",
+      "table",
+    ]) {
       const types = childrenOf(tryDocument(id as never, ALL)!).map((n) => n.type);
-      const want = id === "divider" ? "horizontalrule" : id;
+      const want = id === "section-break" ? "horizontalrule" : id;
       expect(types, id).toContain(want);
       expect(types[0]).toBe("paragraph");
     }

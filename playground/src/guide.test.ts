@@ -39,7 +39,7 @@ const CARDS = [
   "Toggle",
   "Toggle group",
   "Code",
-  "Divider",
+  "Section break",
   "Table",
   "File",
   "Video",

@@ -165,7 +165,7 @@ describe("a gap between two cards is the person's to keep or delete", () => {
   it("callout then divider: at most one empty paragraph between them", async () => {
     const { api } = await mount();
     await insertFromMenu(api, "Callout");
-    await insertFromMenu(api, "Divider");
+    await insertFromMenu(api, "Section break");
     const order = shape(api);
     const between = order.slice(order.indexOf("callout") + 1, order.indexOf("horizontalrule"));
     expect(between.filter((node) => node === "gap").length).toBeLessThanOrEqual(1);
@@ -204,7 +204,7 @@ describe("a gap between two cards is the person's to keep or delete", () => {
   it("callout, divider, callout: nothing is added between them", async () => {
     const { api } = await mount();
     await insertFromMenu(api, "Callout");
-    await insertFromMenu(api, "Divider");
+    await insertFromMenu(api, "Section break");
     await insertFromMenu(api, "Callout");
     const order = shape(api);
     const first = order.indexOf("callout");
@@ -218,7 +218,7 @@ describe("a gap between two cards is the person's to keep or delete", () => {
   it("undo and redo settle on the same document", async () => {
     const { api } = await mount();
     await insertFromMenu(api, "Callout");
-    await insertFromMenu(api, "Divider");
+    await insertFromMenu(api, "Section break");
     const before = shape(api);
     await act(async () => {
       api.editorInstance.dispatchCommand(UNDO_COMMAND, undefined);

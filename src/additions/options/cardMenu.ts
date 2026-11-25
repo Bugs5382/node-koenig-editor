@@ -63,7 +63,11 @@ export const getCardMenuNodes = (
         nodeType,
         {
           kgMenu: Array.isArray(menu)
-            ? menu.map((entry, index) => (index === 0 ? reword(entry, strings, nodeType) : entry))
+            ? menu.map((entry, index) => {
+                if (index === 0) return reword(entry, strings, nodeType);
+                // the divider card's second entry is the plain line
+                return nodeType === "horizontalrule" ? { ...entry, ...strings.dividerLine } : entry;
+              })
             : reword(menu, strings, nodeType),
         },
       ];

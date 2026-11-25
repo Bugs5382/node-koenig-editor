@@ -7,22 +7,22 @@ cards.
 
 ## Quick reference
 
-| Card         | Use it for                          | Add it with                | Good to know                                                        |
-| ------------ | ----------------------------------- | -------------------------- | ------------------------------------------------------------------- |
-| Image        | One picture                         | `/image`                   | Alt text and caption; regular, wide or full width                   |
-| Gallery      | Several pictures in rows            | `/gallery`                 | Up to 50 pictures by default; full-screen viewer                    |
-| Header       | A big title at the top of a section | `/header`                  | Colour or picture background, optional button                       |
-| Callout      | A box that stands out               | `/callout`                 | Nine colours, optional emoji                                        |
-| Toggle       | Text that opens and closes          | `/toggle`                  | A header and hidden content                                         |
-| Toggle group | A stack of toggles with no gap      | `/toggle-group`            | Any number of items; add and remove them                            |
-| Code         | Code with line numbers              | `/code` or three backticks | Language list, Copy button, highlighting                            |
-| Divider      | A line between sections             | `/hr` or type `---`        | No settings                                                         |
-| Table        | Rows and columns                    | `/table`                   | Merge cells, shading, alignment, caption; dashed grid while editing |
-| File         | A download                          | `/file`                    | Title, description, name and size                                   |
-| Video        | A video you upload                  | `/video`                   | Needs captions or a transcript                                      |
-| Audio        | A sound file you upload             | `/audio`                   | Needs captions or a transcript                                      |
-| Button       | A call-to-action link               | `/button`                  | Only `http`, `https` and `mailto` links                             |
-| Markdown     | Text written in Markdown            | `/md`                      | Raw HTML is shown as text, never run                                |
+| Card          | Use it for                          | Add it with                | Good to know                                                        |
+| ------------- | ----------------------------------- | -------------------------- | ------------------------------------------------------------------- |
+| Image         | One picture                         | `/image`                   | Alt text and caption; regular, wide or full width                   |
+| Gallery       | Several pictures in rows            | `/gallery`                 | Up to 50 pictures by default; full-screen viewer                    |
+| Header        | A big title at the top of a section | `/header`                  | Colour or picture background, optional button                       |
+| Callout       | A box that stands out               | `/callout`                 | Nine colours, optional emoji                                        |
+| Toggle        | Text that opens and closes          | `/toggle`                  | A header and hidden content                                         |
+| Toggle group  | A stack of toggles with no gap      | `/toggle-group`            | Any number of items; add and remove them                            |
+| Code          | Code with line numbers              | `/code` or three backticks | Language list, Copy button, highlighting                            |
+| Section break | Three dots between two parts        | `/hr` or type `---`        | Dots by default; `/line` adds a plain line                          |
+| Table         | Rows and columns                    | `/table`                   | Merge cells, shading, alignment, caption; dashed grid while editing |
+| File          | A download                          | `/file`                    | Title, description, name and size                                   |
+| Video         | A video you upload                  | `/video`                   | Needs captions or a transcript                                      |
+| Audio         | A sound file you upload             | `/audio`                   | Needs captions or a transcript                                      |
+| Button        | A call-to-action link               | `/button`                  | Only `http`, `https` and `mailto` links                             |
+| Markdown      | Text written in Markdown            | `/md`                      | Raw HTML is shown as text, never run                                |
 
 Not cards, but part of the editor: the **image editor** (crop and rotate before upload), the
 **emoji picker** (in the callout card) and the **word count** (a number and a reading time).
@@ -159,12 +159,19 @@ result is announced.
 **Developer:** `codeLanguages` lists the languages; `strings.code` is the wording. The block is part of
 the base node set and cannot be left out with `cards`.
 
-## Divider
+## Section break
 
-**For:** a line that separates two parts of the writing.
-**Add it:** the plus button, `/hr`, or type `---` on an empty line.
+**For:** a break between two parts of the writing: three centred dots, the way Medium marks a new part.
+**Add it:** the plus button, `/hr` (or `/divider`), or type `---` on an empty line. For a plain line
+instead of the dots, pick "Divider line" in the menu.
 **What it can do:** nothing to set. Select it and press Backspace or Delete to remove it.
-**Developer:** `cards` leaves it out.
+**Accessibility:** it is a separator for a screen reader; the dots are decoration and are not read.
+**Developer:** `cards` leaves it out (it is still named `divider` there). It is saved as
+`{ "type": "horizontalrule", "variant": "dots" }` or `"line"`. A document saved before the section
+break existed has no `variant` and keeps its line. The exported HTML is `<hr class="kg-section-break">`
+for the dots and a bare `<hr>` for the line; without the stylesheet both read as a line. Wording:
+`strings.cards.divider` (the section break) and `strings.dividerLine`. Look: the section break tokens in
+[styles](./styles.md#section-break-tokens).
 
 ## Table
 

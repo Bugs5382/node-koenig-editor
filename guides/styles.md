@@ -70,6 +70,20 @@ editor.
 | `--kg-plus-size`       | `2.2rem` (in `--kg-rem` units) | Diameter of the "+" button beside an empty line.                                                                                                                                                                  |
 | `--kg-gutter`          | the `+` size plus `1.2rem`     | Room kept on the left of the text column for the "+" button, so the button, the placeholder and the caret never overlap. `0` switches it off (a host that adds its own left padding).                             |
 
+### Section break tokens
+
+The divider card draws three dots by default. Set these on any ancestor of the editor; each is optional.
+
+| Token                         | Default                          | What it sets                               |
+| ----------------------------- | -------------------------------- | ------------------------------------------ |
+| `--kg-section-break-dot-size` | `0.6rem` (in `--kg-rem` units)   | Diameter of each dot.                      |
+| `--kg-section-break-gap`      | `1.2rem` (in `--kg-rem` units)   | Space between the dots.                    |
+| `--kg-section-break-space`    | `1.2rem` (in `--kg-rem` units)   | Room above and below the dots.             |
+| `--kg-section-break-color`    | grey 600 (grey 500 in dark mode) | Dot colour. On paper the dots print black. |
+
+In forced-colours mode the dots take the system text colour. The exported HTML marks the dots as
+`<hr class="kg-section-break">`; a host page styles that class itself.
+
 ### The gutter and what a host needs to do
 
 The stylesheet is complete: `node-koenig-editor/styles.css` is built with the package's own Tailwind
