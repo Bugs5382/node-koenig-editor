@@ -441,6 +441,10 @@ export const DEFAULT_STRINGS: KoenigStrings = {
   video: {
     captionPlaceholder: "Type caption for video (optional)",
     captionsMissing: "Add captions or a transcript so everyone can follow this video",
+    posterError: "The poster must be a picture, or an http or https address",
+    posterLabel: "Poster image address",
+    posterRemove: "Remove poster",
+    posterUpload: "Upload poster",
     select: "Click to upload a video",
     sizeError: "The file {name} is larger than the {limit} limit",
     trackError: "Captions must be a WebVTT (.vtt) file",

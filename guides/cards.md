@@ -217,7 +217,8 @@ before uploading and names the file in its message.
 **For:** a video file you upload. Nothing is embedded from another site.
 **Add it:** the plus button, `/video`, or dragging a video in.
 **What it can do:** plays in the browser's own player, so play, seek, volume and mute work from
-the keyboard.
+the keyboard. Select the card to give it a **poster image** (an address or an upload) that shows
+before play.
 **Captions are required.** Add a **transcript** (plain text) or upload a **WebVTT (`.vtt`)
 captions file**. Until you do, the card shows a reminder.
 **Limits:** the developer can limit types and size with `fileTypes.video`. The captions file goes

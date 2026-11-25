@@ -587,7 +587,15 @@ export interface KoenigStrings {
     /** `{name}` is replaced with the file name. */
     typeError: string;
   };
-  video: KoenigMediaStrings & { captionPlaceholder: string };
+  video: KoenigMediaStrings & {
+    captionPlaceholder: string;
+    /** Shown when a poster address is not http, https or a path, or an uploaded file is not a picture. */
+    posterError: string;
+    /** Names the poster address field. */
+    posterLabel: string;
+    posterRemove: string;
+    posterUpload: string;
+  };
   audio: KoenigMediaStrings & { titlePlaceholder: string };
   callout: { background: string; emoji: string; placeholder: string; textColor: string };
   toggle: {

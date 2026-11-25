@@ -23,7 +23,8 @@ export function parseVideoNode(VideoNode: new (data: Record<string, unknown>) =>
                             transcript: domNode.querySelector('.kg-media-transcript')?.textContent || '',
                             trackSrc: safeMediaUrl(track?.getAttribute('src') ?? ''),
                             trackLang: track?.getAttribute('srclang') || 'en',
-                            trackLabel: track?.getAttribute('label') || ''
+                            trackLabel: track?.getAttribute('label') || '',
+                            poster: safeMediaUrl(video.getAttribute('poster') ?? '')
                         };
                         const width = Number.parseInt(video.getAttribute('width') ?? '', 10);
                         const height = Number.parseInt(video.getAttribute('height') ?? '', 10);

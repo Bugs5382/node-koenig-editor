@@ -76,6 +76,12 @@ plays from the url your uploader returned.
   `<track kind="captions">`. A card with neither shows `strings.video.captionsMissing` (or
   `strings.audio.captionsMissing`) until one is added. The track file goes through
   `useFileUpload("file")`, so allow `.vtt` there. The transcript is plain text.
+- **Poster (video).** Select the card for an optional **poster image**, shown in the player before
+  play. Type an `http`, `https` or same-origin address, or upload a picture (it goes through
+  `useFileUpload("image")`, so the host's image rules apply). It is saved as `poster` on the card and
+  written as the `<video poster>` attribute; a card without one has none, and an unsafe address is
+  refused with `strings.video.posterError`. Wording: `strings.video.posterLabel`, `posterUpload`,
+  `posterRemove`.
 - **Safe urls.** Every source is checked in the editor, on import and in the HTML output: `http`,
   `https` or a path on your own origin. `javascript:`, `data:`, `blob:` and protocol-relative urls
   are dropped.

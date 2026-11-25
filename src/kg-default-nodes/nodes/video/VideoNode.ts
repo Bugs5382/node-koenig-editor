@@ -4,8 +4,9 @@ import {renderVideoNode} from './video-renderer.js';
 import {safeMediaUrl} from '../../../additions/media/safeMediaUrl';
 import {exportNodeState} from '../../../additions/blocks/exportNodeState';
 
-// Video is an uploaded file played from the host's own storage. There is no thumbnail, loop or
-// outside embed. `trackSrc` is a WebVTT captions file; `transcript` is the same text in the page.
+// Video is an uploaded file played from the host's own storage. There is no loop or outside
+// embed (linked video is the separate embed card). `poster` is an optional picture shown before
+// play. `trackSrc` is a WebVTT captions file; `transcript` is the same text in the page.
 const videoProperties = [
     {name: 'src', default: '', urlType: 'url'},
     {name: 'caption', default: '', wordCount: true},
@@ -18,7 +19,8 @@ const videoProperties = [
     {name: 'cardWidth', default: 'regular'},
     {name: 'trackSrc', default: '', urlType: 'url'},
     {name: 'trackLang', default: 'en'},
-    {name: 'trackLabel', default: ''}
+    {name: 'trackLabel', default: ''},
+    {name: 'poster', default: '', urlType: 'url'}
 ] as const satisfies readonly DecoratorNodeProperty[];
 
 export type VideoData = DecoratorNodeData<typeof videoProperties>;
@@ -48,6 +50,7 @@ export class VideoNode extends generateDecoratorNode({
             trackSrc: safeMediaUrl(this.trackSrc),
             trackLang,
             trackLabel,
+            poster: safeMediaUrl(this.poster),
             ...exportNodeState(this)
         };
     }
