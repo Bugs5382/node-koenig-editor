@@ -105,7 +105,7 @@ const KoenigComposableEditor = ({
         >
             <RichTextPlugin
                 contentEditable={
-                    <div ref={onContentEditableRef} data-kg="editor">
+                    <div ref={onContentEditableRef} data-kg="editor" data-kg-gutter={isNested ? undefined : ''}>
                         <ContentEditable className={useDefaultClasses ? 'kg-prose' : ''} lang={lang} readOnly={readOnly} spellCheck={spellCheck} />
                     </div>
                 }

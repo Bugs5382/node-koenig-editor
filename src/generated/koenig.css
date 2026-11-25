@@ -2931,6 +2931,15 @@
     --cta-link-color-text: var(--grey-900);
 }
 
+/* The gutter: room on the left of the text column for the "+" button, so the button, the placeholder
+   and the caret never overlap and a host needs no padding of its own. It is plain CSS (no utility
+   class a host would have to generate). --kg-gutter sets it, 0 turns it off; the default is the
+   button's size (--kg-plus-size) plus a gap. */
+.koenig-lexical [data-kg-gutter] {
+    padding-left: var(--kg-gutter, calc(var(--kg-plus-size, calc(2.2 * var(--kg-rem, 0.625rem))) + calc(1.2 * var(--kg-rem, 0.625rem))));
+    box-sizing: border-box;
+}
+
 /* Link color */
 .koenig-lexical .cta-link-color {
     color: var(--cta-link-color) !important;
