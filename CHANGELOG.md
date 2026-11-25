@@ -1,5 +1,17 @@
 # node-koenig-editor
 
+## v1.7.0 - 2026-11-25
+
+### What Changed 👀
+
+#### 🚀 Features
+
+- feat(editor): section break card, subtitle block and an opt-in linked video card @Bugs5382 (#116)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.6.0...v1.7.0
+
 ## v1.6.0 - 2026-11-25
 
 ### What Changed 👀
