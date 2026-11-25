@@ -151,3 +151,7 @@ export const resolveFeaturedImage = (
   const block = getBlockById(document, ref);
   return block && block.type === "image" ? block : null;
 };
+
+/** The image cards of a document, in order. Only a card that has an id can be picked. */
+export const findImageCards = (document: EditorDocument): Block[] =>
+  getBlocks(document).filter((block) => block.type === "image" && block.id !== "");

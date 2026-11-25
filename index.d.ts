@@ -1188,3 +1188,57 @@ export declare const resolveFeaturedImage: (
   document: KoenigDocument,
   ref?: string,
 ) => KoenigBlock | null;
+/** The image cards of a document, in order. Only a card that has an id can be picked as featured. */
+export declare const findImageCards: (document: KoenigDocument) => KoenigBlock[];
+
+/** The wording of the post settings menu. Pass any part of it as `strings`. `{max}` and `{topic}` are filled in. */
+export interface KoenigPostSettingsStrings {
+  button: string;
+  displaySubtitle: string;
+  displaySubtitleHint: string;
+  displaySubtitlePlaceholder: string;
+  displayTitle: string;
+  displayTitleHint: string;
+  displayTitlePlaceholder: string;
+  featuredImage: string;
+  featuredImageHint: string;
+  imageWithoutAlt: string;
+  missingImage: string;
+  noFeaturedImage: string;
+  noImages: string;
+  noTopics: string;
+  removeFeaturedImage: string;
+  removeTopic: string;
+  title: string;
+  topics: string;
+  topicsHint: string;
+  topicsLimit: string;
+}
+export declare const DEFAULT_POST_SETTINGS_STRINGS: KoenigPostSettingsStrings;
+export interface KoenigPostSettingsValue {
+  displaySubtitle: string;
+  displayTitle: string;
+  /** The stable block id of the chosen image card; `""` for none. */
+  featuredImageId: string;
+  /** Ids from the host's `topics` list. */
+  topicIds: string[];
+}
+export interface KoenigPostSettingsProps {
+  className?: string;
+  darkMode?: boolean;
+  disabled?: boolean;
+  /** The saved document (JSON string, object or editor state); its image cards are the featured image choices. */
+  document: KoenigDocument;
+  /** The host's own entries (share link, revision history, change topics ...), listed under the settings. */
+  items?: readonly { disabled?: boolean; label: string; onSelect: () => void }[];
+  /** The most topics a post may have. Default 5. */
+  maxTopics?: number;
+  onChange: (value: KoenigPostSettingsValue) => void;
+  strings?: Partial<KoenigPostSettingsStrings>;
+  /** The pre-set list topics are chosen from (never free text). Omit to hide Topics. */
+  topics?: readonly { id: string; label: string }[];
+  value: KoenigPostSettingsValue;
+}
+/** The Medium-style post "..." menu: display title and subtitle, featured image, topics and the
+ *  host's own items. Controlled; place it next to Publish or Save, inside or outside the composer. */
+export declare const PostSettingsMenu: FC<KoenigPostSettingsProps>;

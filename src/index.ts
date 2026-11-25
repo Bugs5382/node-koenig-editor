@@ -55,3 +55,6 @@ export {
   resolveFeaturedImage,
   setPostMeta,
 } from "./additions/blocks/blocks";
+export { findImageCards } from "./additions/blocks/blocks";
+export { PostSettingsMenu } from "./additions/postSettings/PostSettingsMenu";
+export { DEFAULT_POST_SETTINGS_STRINGS } from "./additions/postSettings/strings";
