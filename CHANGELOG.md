@@ -1,5 +1,17 @@
 # node-koenig-editor
 
+## v1.7.1 - 2026-11-25
+
+### What Changed 👀
+
+#### 🐛 Bug Fixes
+
+- fix(editor): keep a host node of type embed instead of the package's own @Bugs5382 (#118)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-koenig-editor/compare/v1.7.0...v1.7.1
+
 ## v1.7.0 - 2026-11-25
 
 ### What Changed 👀
