@@ -1033,7 +1033,8 @@ export interface KoenigComposerProps {
   /** Optional: with no value the editor works alone and asks for no provider. */
   collaboration?: KoenigCollaboration | null;
   /** The host's own nodes, registered after the shipped ones. A node with a static
-   *  `kgMenu` (a `CardMenuItem` or a list of them) is listed in the menus. */
+   *  `kgMenu` (a `CardMenuItem` or a list of them) is listed in the menus. A node of type
+   *  `embed` replaces the package's own embed node (its card is then unavailable). */
   customNodes?: EditorNodes;
   darkMode?: boolean;
   editable?: boolean;
