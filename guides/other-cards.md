@@ -145,6 +145,13 @@ document that already holds one still opens, plays nothing and loads nothing).
   any block. The exported HTML is `<figure class="kg-card kg-embed-card"><a href>` with the title: a
   plain link and nothing that loads. A host that wants the player in its pages builds it with the
   same rules (and its own click to load).
+- **A host node named `embed`.** The package's embed node uses the Lexical type `embed`. When your
+  `customNodes` (or `nodes`) already holds a node of type `embed`, for example to keep documents from an
+  older app, the package does not register its own: your node reads and writes those documents
+  unchanged, the package's embed card is unavailable and its menu entry is hidden even if `cards`
+  names `"embed"` (a console warning says so in development). Your node's own menu entry, if it has
+  one, still shows. Documents saved with the package's embed card need the package's node, so a host
+  that keeps its own `embed` node cannot open them as cards.
 - **Wording.** `strings.cards.embed` (menu) and `strings.embed` (the field labels, the privacy line
   and the refusals).
 

@@ -69,6 +69,10 @@ export const cardForNodeType = (nodeType: string): KoenigCardName | undefined =>
 const nodeType = (node: EditorNode): string =>
   "replace" in node ? node.replace.getType() : node.getType();
 
+/** Whether any of these nodes (a class or a `replace` entry) is registered under this Lexical type. */
+export const hasNodeOfType = (nodes: readonly EditorNode[] | undefined, type: string): boolean =>
+  (nodes ?? []).some((node) => nodeType(node) === type);
+
 /** The node set for a composer: the base set minus unpicked cards, plus the host's nodes. */
 export const selectEditorNodes = (
   base: readonly EditorNode[],

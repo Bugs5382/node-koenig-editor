@@ -14,7 +14,7 @@ import {GalleryNode} from '../nodes/GalleryNode';
 import {ImageNode} from '../nodes/ImageNode';
 import {withFigureEntry} from '../../additions/figure/figureExport';
 import {CommentsPlugin, KoenigCommentsContext, useCommentsStoreFor} from '../../additions/comments';
-import {KoenigStringsContext, KoenigToolsContext, resolveStrings, resolveTools, selectEditorNodes} from '../../additions/options';
+import {KoenigStringsContext, KoenigToolsContext, hasNodeOfType, resolveStrings, resolveTools, selectEditorNodes} from '../../additions/options';
 import {KoenigPreviewBridge} from './KoenigPreviewBridge';
 import {withCardProperties} from '../utils/collabCardProperties';
 import {MarkNode} from '@lexical/mark';
@@ -93,22 +93,31 @@ const KoenigComposer = ({
     children
 }) => {
     const hasComments = Boolean(comments);
+    // A host that registers its own node of Lexical type `embed` keeps it: the package's embed node
+    // is not added, so stored documents of the host's shape are read and written by the host's node.
+    const hostOwnsEmbed = React.useMemo(() => hasNodeOfType(customNodes, 'embed') || hasNodeOfType(baseNodes, 'embed'), [baseNodes, customNodes]);
     const nodes = React.useMemo(() => {
         const selected = selectEditorNodes(baseNodes, cards, customNodes);
         // The title node is always known, so a document saved with a title opens in a host with the option off.
         if (!selected.includes(TitleNode)) selected.push(TitleNode);
         if (!selected.includes(SubtitleNode)) selected.push(SubtitleNode);
         // The embed node is always known too; the card is off unless `cards` names it (see `embedOn`).
-        if (!selected.includes(EmbedNode)) selected.push(EmbedNode);
+        if (!hostOwnsEmbed && !selected.includes(EmbedNode)) selected.push(EmbedNode);
         // Comment anchors are mark nodes; they are registered only when comments are on.
         return hasComments && !selected.includes(MarkNode) ? [...selected, MarkNode] : selected;
-    }, [baseNodes, cards, customNodes, hasComments]);
+    }, [baseNodes, cards, customNodes, hasComments, hostOwnsEmbed]);
     // The embed card is opt-in: only a `cards` list that names it turns it on. Off, it is out of the
     // menus and plays nothing (an empty allow-list), but a saved embed card still opens.
-    const embedOn = Array.isArray(cards) && cards.includes('embed');
+    const embedAsked = Array.isArray(cards) && cards.includes('embed');
+    const embedOn = embedAsked && !hostOwnsEmbed;
+    React.useEffect(() => {
+        if (embedAsked && hostOwnsEmbed && typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
+            console.warn('KoenigComposer: `cards` lists "embed", but a node of type "embed" is already registered by the host. The host\'s node is kept and the package\'s embed card is unavailable.');
+        }
+    }, [embedAsked, hostOwnsEmbed]);
     const effectiveEmbedHosts = React.useMemo(() => (embedOn ? (embedHosts ?? DEFAULT_EMBED_HOSTS) : []), [embedOn, embedHosts]);
     const effectiveEmbedParent = embedParent ?? (typeof window !== 'undefined' ? window.location.hostname : '');
-    const effectiveMenuHidden = React.useMemo(() => (embedOn ? menuHidden : [...(menuHidden ?? []), 'embed']), [embedOn, menuHidden]);
+    const effectiveMenuHidden = React.useMemo(() => (embedOn || hostOwnsEmbed ? menuHidden : [...(menuHidden ?? []), 'embed']), [embedOn, hostOwnsEmbed, menuHidden]);
     const commentStore = useCommentsStoreFor(comments);
     const strings = React.useMemo(() => resolveStrings(hostStrings), [hostStrings]);
     const enabledTools = React.useMemo(() => resolveTools(tools), [tools]);
